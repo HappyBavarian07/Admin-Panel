@@ -1,0 +1,170 @@
+##########################################################
+#+------------------------------------------------------+#
+#|                        Notes                         |#
+#+------------------------------------------------------+#
+##########################################################
+
+# Placeholders:
+
+# Diese Placeholders werden für die Nachrichten im messages.yml File benutzt
+
+# %startprefix% = Start Prefix wenn das Plugin gestartet/gestoppt wird
+# Es dürfen ColorCodes verwendet werden!
+
+# %prefix% = General Prefix
+# Es dürfen ColorCodes verwendet werden!
+# Dieser PlaceHolder wird für alle Nachrichten verfügbar sein!
+# Auch für die No Permission Messages
+# Falls jemand einen Nachricht findet bei der es nicht funktioniert oder bei der die Farben nicht funktionieren bitte direkt
+# Auf Spigot MC anschreiben
+
+# %player% = Spieler der einen Command ausführt oder eine Action macht
+# Dieser Placeholder wird auch in den No Permission Messages verfügbar sein
+
+# %balance% = The Balance of the Target Player
+
+# %targetplayer% = Spieler, der von der Aktion eines Befehls betroffen ist
+# %permission% = Die Permission die der Command braucht um zu funktionieren
+
+# Gültige Colorcodes sind:
+# &1, &2, &3, &4, &5, &6, &7, &8, &9
+# &a, &b, &c, &d, &e, &f
+# Gültige Format Codes sind:
+# &n, &m, &l, &k
+
+# Plugin By HappyBavarian07
+
+# Der Bans.yml File ist nur für das Plugin wichtig!!! also bitte nichts dortdrin ändern sonst geht ein Teil des Plugins vielleicht kaputt.
+# Sobald du eine Datei löscht wird sie sich bei dem nächsten reload wieder auf Standard zurücksetzen und selber wieder erstellen
+
+##########################################################
+#+------------------------------------------------------+#
+#|                       General                        |#
+#+------------------------------------------------------+#
+##########################################################
+
+Plugin:
+  # Das ist der Prefix der vom Plugin verwendet wird in der Konsole beim Start oder Stop
+  StartPrefix: '&r[&4Admin&d-&8Panel&r]'
+  # Das ist der Prefix der vom Plugin für Chat Messages bentutzt wird
+  # Diese Nachrichten kann man im messages.yml File editieren
+  Prefix: '&r[&4Admin&d-&8Panel&r]'
+  # Hier kannst du einstellen ob du SuperVanish oder ProtocolVanish benutzen willst
+  # Oder garnichts
+  SuperVanish: true
+  ProtocolVanish: false
+  # Wenn dein Server Supervanish verwendet dann trage hier bitte die Version ein das ist wichtig zur erkennung weil ich nicht einfach für jede einzelne Version eine Methode erstellen kann : )
+  SuperVanishVersion: 6.2.5
+
+# Das sind die Einstellungen für das Panel
+Panel:
+
+  # ACHTUNG DAS SOUND FEATURE IST GERADE LEIDER NICHT VERFÜGBAR
+  # Hier kannst du einstellen ob Sounds beim Öffnen eines Inventars des Plugins
+  # abgespielt werden sollen
+  PlaySoundsWhenOpened: true
+  # Das ist der Sound der abgespielt wird wenn man ein Panel / Inventar öffnet
+  # er wird nur abgespielt wenn Die vorherige Abfrage auf true steht
+  SoundWhenOpened: ENTITY_BAT_TAKEOFF
+  # Das ist die Lautstärke
+  # Min: 0.0 Max: unendlich
+  # Standard: 100.0
+  SoundVolume: 100.0
+  # Das ist der Pitch
+  # Min: 0.0 Max: 2.0
+  # Standard: 1.0
+  SoundPitch: 1.0
+  
+  # Hier wird eingestellt ob wenn jemand ein Panel offen hat Effekt abgespielt werden sollen
+  # natürlich nur wenn man nicht im Vanish ist (Geht gerade nicht!)
+  ShowEffectWhenOpened: true
+  # Hier kannst du den Effekt einstellen
+  EffectWhenOpened: ENDER_SIGNAL
+
+##########################################################
+#+------------------------------------------------------+#
+#|                    Player Manager                    |#
+#+------------------------------------------------------+#
+##########################################################
+# Pman = Player Manager
+Pman:
+  # Hier kannst du alles einstellen was man bei Trolls einstellen kann
+  Troll:
+    # Hier kannst du einstellen wieviele Entitäten gespawnt werden wenn im Troll Menü die Mob Dupe Option aktiviert ist
+    # Und der Spieler eine Entität killt!
+    # Wenn du zu viel machst wird das Spiel warscheinlich anfangen zu laggen
+    MobDupe: 1
+  
+  Actions:
+    # Hier kannst du einstellen wieviel Leben man gesetzt bekommt wenn jemand für einen auf
+    # das Heal Item im Actions Menu im Pman klickt
+    # Max: 20.0 wenn man etwas höheres eingibt werden zwanzig Einheiten genommen von Spigot / Bukkit
+    HealthHealAmount: 20.0
+    
+    # Hier kannst du einstellen wieviel Hunger man gesetzt bekommt wenn jemand für einen auf
+    # das Heal Item im Actions Menu im Pman klickt
+    # Max: 20 wenn man etwas höheres eingibt werden zwanzig Einheiten genommen von Spigot / Bukkit
+    FoodLevelFillAmount: 20
+    # Hier kannst du einstellen wie lange der Spieler wenn man in über das Menu anzündet brennt. Hier wird in Seku
+    BurnDuration: 4
+    
+  Money:
+    # Das ist die Währung die für den Money Teil im Pman verwendet wird
+    currency: $
+
+# Hier kannst du einstellen was man über den Player Manager im Actions Menü unter Spawn Gui für Mobs spawnen kann
+# einfach von denen die man nicht will auf false setzen
+Spawn:
+  Bat: true
+  Bee: true
+  Blaze: true
+  Cat: true
+  Cave_Spider: true
+  Chicken: true
+  Cod: true
+  Cow: true
+  Creeper: true
+  Dolphin: true
+  Donkey: true
+  Drowned: true
+  Elder_Guardian: true
+  Enderman: true
+  Endermite: true
+  Evoker: true
+  Fox: true
+  Ghast: true
+  Guardian: true
+  Horse: true
+  Husk: true
+  Llama: true
+  Magma_Cube: true
+  Mooshroom: true
+  Mule: true
+  Ocelot: true
+  Panda: true
+  Parrot: true
+  Phantom: true
+  Pig: true
+  Pillager: true
+  Polar_Bear: true
+  Pufferfish: true
+  Rabbit: true
+  Ravager: true
+  Salmon: true
+  Sheep: true
+  Shulker: true
+  Silverfish: true
+  Skeleton: true
+  Skeleton_Horse: true
+  Slime: true
+  Spider: true
+  Squid: true
+  Stray: true
+  Tropical_Fish: true
+  Turtle: true
+  Vex: true
+  Villager: true
+  Vindicator: true
+  Witch: true
+  Wolf: true
+  Zombie: true
