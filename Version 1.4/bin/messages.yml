@@ -1,0 +1,35 @@
+Plugin:
+  EnablingMessage: '%startprefix% successfully enabled!'
+  DisablingMessage: '%startprefix% successfully disabled!'
+No-Permission-Message: '&cYou don''t have access to this Command!'
+ConsoleExecutesPlayerCommand: '&cYou have to be a player!'
+OpeningMessageSelf: '&cYou have opened the Admin Panel for you!'
+OpeningMessageSelfOpenedForOther: '&cYou have opened the Admin Panel for %targetplayer%!'
+OpeningMessageOther: '&c%player% has openend for you the Admin Panel!'
+TargetedPlayerIsNull: '&cThis player is not online or does not exist!'
+PlayerManager:
+  SelfBanningMessage: '&cYou cannot Ban yourself!'
+  KickReason: '&cKick for Safety!'
+  KickSourceMessage: '%player%'
+  BanReason: '&cBan for Safety!'
+  BanSourceMessage: '%player%'
+TomanyArguments: '&4There are to many Arguments!'
+ServerManager:
+  KickAllPlayersReason: §cKick for Safety
+  KickAllPlayersSource: '%player%'
+  ChatClearHeader: '&a+---------------------------------------------------+'
+  ChatClearMessage: '    &2The Chat has been cleared by &3%player%'
+  ChatClearFooter: '&a+---------------------------------------------------+'
+  MaintenanceMode: '&5%targetplayer% &cThe Server entered the &4&lMaintenance Mode!'
+Pman:
+  Money:
+    NotEnoughMoneyToTake: '%targetplayer% has not enoug Money (%balance%)'
+ChatMute:
+  PlayerMessage: '&4The Chat is muted try again later %player%!'
+  Broadcastheader: '&a+---------------------------------------------------+'
+  Broadcast: '       &4The Chat has been muted by %player%!'
+  Broadcastfooter: '&a+---------------------------------------------------+'
+ChatUnMute:
+  Broadcastheader: '&a+---------------------------------------------------+'
+  Broadcast: '       &4The Chat has been unmuted by %player%!'
+  Broadcastfooter: '&a+---------------------------------------------------+'
