@@ -1,0 +1,247 @@
+name: Admin-Panel
+main: de.happybavarian07.main.Main
+version: 1.2.4
+api-version: 1.13
+author: HappyBavaraian07
+depend: [Vault]
+softdepend: [Vault]
+load: POSTWORLD
+commands:
+  adminpanel:
+    description: Opens the Adminpanel
+    usage: /adminpanel [<Player>]
+    aliases: [apanel, adminp, ap]
+
+permissions:
+  AdminPanel.*:
+    default: op
+    description: Gibt dir Zugriff auf Alle Admin Panel Commands
+    children:
+      AdminPanel.Bypass.*:
+        default: op
+        description: Gibt dir Zugriff alle Bypasses zu nutzen
+        children:
+          AdminPanel.Bypass.AffectedByPlayerManager:
+            default: op
+            description: Du bist nicht mehr von den Aktionen des Player Managers betroffen
+          AdminPanel.Bypass.KickInMainTenanceMode:
+            default: op
+            description: Du bist wirst nicht mehr wenn der Server in den Maintenance Mode geht vom Server gekickt!
+          AdminPanel.Bypass.ChatMute:
+            default: op
+            description: Du bist nicht mehr vom Chat Mute betroffen
+          AdminPanel.Bypass.KickAll:
+            default: op
+            description: Du wirst bei Kick All nicht mehr vom Server geworfen
+      AdminPanel.Button.*:
+        default: op
+        description: Gibt dir Zugriff auf alle Buttons in allen Paneln
+        children:
+          AdminPanel.Button.Close:
+            default: op
+            description: Gibt dir Zugriff auf den Close Button
+          AdminPanel.Button.Back:
+            default: op
+            description: Gibt dir Zugriff auf den Back Button
+          AdminPanel.Button.pageforward:
+            default: op
+            description: Gibt dir Zugriff auf den Page Forward Button
+          AdminPanel.Button.pageback:
+            default: op
+            description: Gibt dir Zugriff auf den Page Back Button
+      AdminPanel.open:
+        default: op
+        description: Gibt dir Zugriff ueber den Befehl das Panel zu oeffnen
+      AdminPanel.open.other:
+        default: op
+        description: Gibt dir Zugriff ueber den Befehl das Panel fuer jemand anderes zu oeffnen (er wird trotzdem die Rechte fuer die einzelnen Sachen brauchen)
+      AdminPanel.PluginManager.*:
+        default: op
+        description: Gibt dir Zugriff auf alle PluginManager Panel Befehle
+        children:
+          AdminPanel.PluginManager.open:
+            default: op
+            description: Gibt dir Zugriff auf das Item fuer den PluginManager klicken
+          AdminPanel.PluginManager.PluginSettings.*:
+            default: op
+            description: Gibt dir Zugriff auf alle Plugin Settings
+            children:
+              AdminPanel.PluginManager.PluginSettings.Open:
+                default: op
+                description: Gibt dir Zugriff auf das Item fuer ein plugin zu klicken
+              AdminPanel.PluginManager.PluginSettings.Enable:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum enablen des Plugins das du ausgewaehlt hast zu klicken
+              AdminPanel.PluginManager.PluginSettings.Disable:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum disablen des Plugins das du ausgewaehlt hast zu klicken
+              AdminPanel.PluginManager.PluginSettings.Restart:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum restarten des Plugins das du ausgewaehlt hast zu klicken
+              AdminPanel.PluginManager.PluginSettings.Permissions:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum auflisten der Permissions des Plugins das du ausgewaehlt hast zu klicken
+              AdminPanel.PluginManager.PluginSettings.Commands:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum auflisten der Commands des Plugins das du ausgewaehlt hast zu klicken
+      AdminPanel.ServerStop:
+        default: op
+        description: Gibt dir Zugriff auf das Item zum Server stoppen zu klicken
+      AdminPanel.ServerReload:
+        default: op
+        description: Gibt dir Zugriff auf das Item zum Server reloaden zu klicken
+      AdminPanel.WorldManagment.*:
+        default: op
+        description: Gibt dir Zugriff auf alle World Managment Sachen
+        children:
+          AdminPanel.WorldManagment.Open:
+            default: op
+            description: Gibt dir Zugriff den World Manager zu oeffnen
+          AdminPanel.WorldManagment.Gamerules:
+            default: op
+            description: Gibt dir Zugriff den Gamerule Manager zu oeffnen
+          AdminPanel.WorldManagment.PVP:
+            default: op
+            description: Gibt dir Zugriff das Global PVP zu aktivieren / deaktvieren
+          AdminPanel.WorldManagment.Time_Weather.Open:
+            default: op
+            description: Gibt dir Zugriff den Time / Weather Manager zu oeffnen
+          AdminPanel.WorldManagment.Time.Change:
+            default: op
+            description: Gibt dir Zugriff die Zeit umzustellen
+          AdminPanel.WorldManagment.Weather.Change:
+            default: op
+            description: Gibt dir Zugriff das Wetter umzustellen
+      AdminPanel.ServerManagment.*:
+        default: op
+        description: Gibt dir Zugriff auf alle Server Managment Sachen
+        children:
+          AdminPanel.ServerManagment.KickAllPlayers:
+            default: op
+            description: Gibt dir Zugriff alle Spieler auf deinem Server zu kicken
+          AdminPanel.ServerManagment.MaintenanceMode:
+            default: op
+            description: Gibt dir Zugriff den Maintenance Mode zu aktivieren / deaktivieren
+          AdminPanel.ServerManagment.ChatManager.*:
+            default: op
+            description: Gibt dir Zugriff auf alle Chat Manager Sachen
+            children:
+              AdminPanel.ServerManagment.ChatManager.Clear:
+                default: op
+                description: Gibt dir Zugriff ueber den Manager den Chat zu clearen
+              AdminPanel.ServerManagment.ChatManager.Open:
+                default: op
+                description: Gibt dir Zugriff den Chat Manager zu oeffnen
+              AdminPanel.ServerManagment.ChatManager.Mute:
+                default: op
+                description: Gibt dir Zugriff ueber den Manager den Chat zu muten und zu unmuten
+          AdminPanel.ServerManagment.Open:
+            default: op
+            description: Gibt dir Zugriff alle Spieler auf deinem Server zu kicken
+      AdminPanel.PlayerManager.*:
+        default: op
+        description: Gibt dir Zugriff auf alle Player Manager Panel Befehle
+        children:
+          AdminPanel.PlayerManager.open:
+            default: op
+            description: Gibt dir Zugriff auf das Item fuer den Player Manager Panel klicken
+          AdminPanel.PlayerManager.PlayerSettings.*:
+            default: op
+            description: Gibt dir Zugriff auf alle Playersettings
+            children:
+              AdminPanel.PlayerManager.PlayerSettings.Ban:
+                default: op
+                description: Gibt dir Zugriff den Spieler ueber das Menu zu perma bannen
+              AdminPanel.PlayerManager.PlayerSettings.Unban:
+                default: op
+                description: Gibt dir Zugriff den Spieler ueber das Menu zu perma bannen
+              AdminPanel.PlayerManager.PlayerSettings.Kick:
+                default: op
+                description: Gibt dir Zugriff den Spieler ueber das Menu zu kicken
+              AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban:
+                default: op
+                description: Gibt dir Zugriff auf das Item fuer das Ban Menu in den Player Settings
+              AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick:
+                default: op
+                description: Gibt dir Zugriff auf das Item fuer das Ban Menu in den Player Settings
+              AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions:
+                default: op
+                description: Gibt dir Zugriff auf das Item fuer die Actions in den Player Settings
+              AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Money:
+                default: op
+                description: Gibt dir Zugriff auf das Item fuer das Geld in den Player Settings
+              AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview:
+                default: op
+                description: Gibt dir Zugriff auf das Item zum einsehen des Inventars des Spielers zu klicken
+              AdminPanel.PlayerManager.PlayerSettings.Money.Give:
+                default: op
+                description: Gibt dir Zugriff dem Spieler Geld zu geben (Vault + Economy)
+              Adminpanel.PlayerManager.PlayerSettings.Money.Set:
+                default: op
+                description: Gibt dir Zugriff dem Spieler Geld zu setzen (Vault + Economy)
+              AdminPanel.PlayerManager.PlayerSettings.Money.Take:
+                default: op
+                description: Gibt dir Zugriff dem Spieler Geld weg zu nehmen (Vault + Economy)
+              AdminPanel.PlayerManager.PlayerSettings.Actions.*:
+                default: op
+                description: Gibt dir Zugriff auf alle Aktionen
+                children:
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Burn:
+                    default: op
+                    description: Gibt dir Zugriff auf die Potions
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.*:
+                    default: op
+                    description: Gibt dir Zugriff auf alle Troll items
+                    children:
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BuildPrevent: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DropPlayersInv: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset: true
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Potions:
+                    default: op
+                    description: Gibt dir Zugriff auf die Potions
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Open:
+                    default: op
+                    description: Gibt dir Zugriff auf das Item fuer die Player Settings
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Ban:
+                    default: op
+                    description: Gibt Zugriff einen Spieler ueber den Manager zu bannen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Unban:
+                    default: op
+                    description: Gibt Zugriff einen Spieler ueber den Manager zu entbannen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Kick:
+                    default: op
+                    description: Gibt Zugriff einen Spieler ueber den Manager zu kicken
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode:
+                    default: op
+                    description: Gibt Zugriff einem Spieler ueber den Manager den Gamemode zu wechseln
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.ReSpawnLocation:
+                    default: op
+                    description: Gibt Zugriff den Spawn Punkt eines Spieler zu setzen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner:
+                    default: op
+                    description: Gibt Zugriff Entitaeten beim Spieler zu erzeugen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Heal:
+                    default: op
+                    description: Gibt Zugriff den Spieler zu heilen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Feed:
+                    default: op
+                    description: Gibt Zugriff Das Food Level des Spieler aufzufuellen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Kill:
+                    default: op
+                    description: Gibt Zugriff den Spieler zu killen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer:
+                    default: op
+                    description: Gibt Zugriff den Spieler zu killen
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou:
+                    default: op
+                    description: Gibt Zugriff den Spieler zu killen
