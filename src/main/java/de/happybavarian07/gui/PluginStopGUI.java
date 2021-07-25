@@ -1,5 +1,8 @@
 package de.happybavarian07.gui;
 
+import de.happybavarian07.events.plugins.PluginDisableEvent;
+import de.happybavarian07.events.plugins.PluginEnableEvent;
+import de.happybavarian07.events.plugins.PluginRestartEvent;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.main.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -244,20 +247,26 @@ public class PluginStopGUI implements Listener {
         else if (clickedItem.getType() == Material.LIME_WOOL && clickedItem.getItemMeta().getDisplayName().equals("§aEnabled")) {
         	if(p.hasPermission("AdminPanel.PluginManager.PluginSettings.Disable")) {
 	        	if(e.getRawSlot() == 0) {
-	        		plugin.getServer().getPluginManager().disablePlugin(plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle().toString()));
-	        		pluginmanager2.setItem(0, createGuiItem(Material.RED_WOOL, 1, "§cDisabled"));
-	        		for(int i = 0; i < plugin.getServer().getPluginManager().getPlugins().length; i++) {
-						ItemStack pluginitemred = new ItemStack(Material.RED_WOOL);
-						ItemMeta meta1 = pluginitemred.getItemMeta();
-						meta1.setDisplayName(p.getOpenInventory().getTitle());
-						pluginitemred.setItemMeta(meta1);
-						if(inv2.getItem(i).getItemMeta().getDisplayName().equals(pluginitemred.getItemMeta().getDisplayName()) && inv2.getItem(i).getType().equals(pluginitemred.getType())) {
-	        				inv2.setItem(i, createGuiItem(Material.RED_WOOL, 1, p.getOpenInventory().getTitle(), "§2Name: §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getName(), "§2Version: §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getVersion(), "§2Author(s): §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getAuthors()));
-	        			}
-	        		}
-	        		p.sendMessage("§aPlugin §c" + p.getOpenInventory().getTitle() + "§a successfully disabled!");
-	        		p.closeInventory();
-	        		PluginStopGUI.openInv(p);
+	        		Plugin pluginToDisable = plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle());
+					PluginDisableEvent disableEvent = new PluginDisableEvent(p, pluginToDisable);
+					Bukkit.getPluginManager().callEvent(disableEvent);
+					if(!disableEvent.isCancelled()) {
+						assert pluginToDisable != null;
+						Bukkit.getPluginManager().disablePlugin(pluginToDisable);
+						pluginmanager2.setItem(0, createGuiItem(Material.RED_WOOL, 1, "§cDisabled"));
+						for(int i = 0; i < plugin.getServer().getPluginManager().getPlugins().length; i++) {
+							ItemStack pluginitemred = new ItemStack(Material.RED_WOOL);
+							ItemMeta meta1 = pluginitemred.getItemMeta();
+							meta1.setDisplayName(p.getOpenInventory().getTitle());
+							pluginitemred.setItemMeta(meta1);
+							if(inv2.getItem(i).getItemMeta().getDisplayName().equals(pluginitemred.getItemMeta().getDisplayName()) && inv2.getItem(i).getType().equals(pluginitemred.getType())) {
+								inv2.setItem(i, createGuiItem(Material.RED_WOOL, 1, p.getOpenInventory().getTitle(), "§2Name: §6" + pluginToDisable.getDescription().getName(), "§2Version: §6" + pluginToDisable.getDescription().getVersion(), "§2Author(s): §6" + pluginToDisable.getDescription().getAuthors()));
+							}
+						}
+						p.sendMessage("§aPlugin §c" + p.getOpenInventory().getTitle() + "§a successfully disabled!");
+						p.closeInventory();
+						PluginStopGUI.openInv(p);
+					}
 	        	}
         	} else {
 				p.sendMessage(nopermissionmessage);
@@ -266,32 +275,44 @@ public class PluginStopGUI implements Listener {
         else if (clickedItem.getType() == Material.RED_WOOL && clickedItem.getItemMeta().getDisplayName().equals("§cDisabled")) {
         	if(p.hasPermission("AdminPanel.PluginManager.PluginSettings.Enable")) {
 	        	if(e.getRawSlot() == 0) {
-	        		plugin.getServer().getPluginManager().enablePlugin(plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle().toString()));
-	        		pluginmanager2.setItem(0, createGuiItem(Material.LIME_WOOL, 1, "§aEnabled"));
-	        		for(int i = 0; i < plugin.getServer().getPluginManager().getPlugins().length; i++) {
-						ItemStack pluginitemlime = new ItemStack(Material.LIME_WOOL);
-						ItemMeta meta1 = pluginitemlime.getItemMeta();
-						meta1.setDisplayName(p.getOpenInventory().getTitle());
-						pluginitemlime.setItemMeta(meta1);
-						if(inv2.getItem(i).getItemMeta().getDisplayName().equals(pluginitemlime.getItemMeta().getDisplayName()) && inv2.getItem(i).getType().equals(pluginitemlime.getType())) {
-	        				inv2.setItem(i, createGuiItem(Material.LIME_WOOL, 1, p.getOpenInventory().getTitle(), "§2Name: §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getName(), "§2Version: §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getVersion(), "§2Author(s): §6" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()).getDescription().getAuthors()));
-	        			}
-	        		}
-	        		p.sendMessage("§aPlugin §c" + p.getOpenInventory().getTitle() + "§a successfully enabled!");
-	        		p.closeInventory();
-	        		PluginStopGUI.openInv(p);
+	        		Plugin pluginToEnable = plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle());
+					PluginEnableEvent enableEvent = new PluginEnableEvent(p, pluginToEnable);
+					Bukkit.getPluginManager().callEvent(enableEvent);
+					if(!enableEvent.isCancelled()) {
+						assert pluginToEnable != null;
+						Bukkit.getPluginManager().enablePlugin(pluginToEnable);
+						pluginmanager2.setItem(0, createGuiItem(Material.LIME_WOOL, 1, "§aEnabled"));
+						for(int i = 0; i < plugin.getServer().getPluginManager().getPlugins().length; i++) {
+							ItemStack pluginitemlime = new ItemStack(Material.LIME_WOOL);
+							ItemMeta meta1 = pluginitemlime.getItemMeta();
+							meta1.setDisplayName(p.getOpenInventory().getTitle());
+							pluginitemlime.setItemMeta(meta1);
+							if(inv2.getItem(i).getItemMeta().getDisplayName().equals(pluginitemlime.getItemMeta().getDisplayName()) && inv2.getItem(i).getType().equals(pluginitemlime.getType())) {
+								inv2.setItem(i, createGuiItem(Material.LIME_WOOL, 1, p.getOpenInventory().getTitle(), "§2Name: §6" + pluginToEnable.getDescription().getName(), "§2Version: §6" + pluginToEnable.getDescription().getVersion(), "§2Author(s): §6" + pluginToEnable.getDescription().getAuthors()));
+							}
+						}
+						p.sendMessage("§aPlugin §c" + p.getOpenInventory().getTitle() + "§a successfully enabled!");
+						p.closeInventory();
+						PluginStopGUI.openInv(p);
+					}
 	        	}
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
         }
         else if(clickedItem.getType() == Material.HOPPER && clickedItem.getItemMeta().getDisplayName().equals("§aRestart")) {
+        	Plugin pluginToRestart = plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle());
         	if(p.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
-	        	p.sendMessage("§aSuccessfully restart §c" + plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()));
-	        	plugin.getPluginLoader().disablePlugin(plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()));
-	        	plugin.getPluginLoader().enablePlugin(plugin.getServer().getPluginManager().getPlugin(p.getOpenInventory().getTitle()));
-	        	p.closeInventory();
-	        	PluginStopGUI.openInv(p);
+				PluginRestartEvent restartEvent = new PluginRestartEvent(p, pluginToRestart);
+				Bukkit.getPluginManager().callEvent(restartEvent);
+				if(!restartEvent.isCancelled()) {
+					assert pluginToRestart != null;
+					Bukkit.getPluginManager().disablePlugin(pluginToRestart);
+					Bukkit.getPluginManager().enablePlugin(pluginToRestart);
+					p.sendMessage("§aSuccessfully restart §c" + pluginToRestart);
+					p.closeInventory();
+					PluginStopGUI.openInv(p);
+				}
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}

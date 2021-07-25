@@ -1,6 +1,6 @@
 name: Admin-Panel
 main: de.happybavarian07.main.Main
-version: 2.0
+version: 3.0
 api-version: 1.13
 author: HappyBavaraian07
 depend: [Vault, PlaceholderAPI]

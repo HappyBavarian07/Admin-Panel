@@ -1,8 +1,8 @@
 package de.happybavarian07.main;
 
 import de.happybavarian07.api.StartUpLogger;
-import de.happybavarian07.events.AdminPanelOpenEvent;
-import de.happybavarian07.events.AdminPanelOpenForOtherEvent;
+import de.happybavarian07.events.general.AdminPanelOpenEvent;
+import de.happybavarian07.events.general.AdminPanelOpenForOtherEvent;
 import de.happybavarian07.gui.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -25,12 +25,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-import java.util.logging.Logger;
 
 public class Main extends JavaPlugin implements Listener {
 	

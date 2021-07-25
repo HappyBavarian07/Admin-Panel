@@ -1,6 +1,7 @@
 package de.happybavarian07.gui;
 
 
+import de.happybavarian07.events.troll.*;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.main.Utils;
 import org.bukkit.*;
@@ -21,6 +22,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
@@ -42,7 +45,7 @@ public class TrollGUI implements Listener {
     	
     	cfg = config;
     	messages = messages2;
-    	this.plugin = main;
+    	plugin = main;
         // Create a new inventory, with no owner (as this isn't a real inventory), a size of nine, called example
     	
         // Put the items into the inventory
@@ -145,9 +148,8 @@ public class TrollGUI implements Listener {
 				Player p = (Player) ent;
 				if(!p.getScoreboardTags().contains("AdminPanelOpen")) {
 					Bukkit.getScheduler().cancelTask(particle);
-					return;
 				} else {
-					if(cfg.getBoolean("Panel.ShowEffectWhenOpened") == true) {
+					if(cfg.getBoolean("Panel.ShowEffectWhenOpened")) {
 						Location loc = p.getLocation();
 						loc.setY(loc.getY() + 3);
 						p.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
@@ -166,18 +168,19 @@ public class TrollGUI implements Listener {
     
     @EventHandler
     public void onKill(EntityDeathEvent e) {
-    	if(e.getEntity().getKiller() != null && e.getEntity() != null) {
-	    	if(e.getEntity().getKiller().getScoreboardTags().contains("dupemobsonkill")) {
-	    		e.getDrops().clear();
-	    		e.setDroppedExp(0);
-	    		for(int i = 0; i < plugin.getConfig().getInt("Pman.Troll.MobDupe"); i++) {
-		    		e.getEntity().getKiller().getWorld().spawnEntity(e.getEntity().getLocation(), e.getEntityType());
-	    		}
-	    		e.getEntity().getKiller().getWorld().spawnEntity(e.getEntity().getLocation(), e.getEntityType());
-	    	} else {
-	    		return;
-	    	}
-    	}
+    	if(e.getEntity().getKiller() != null) {
+			e.getEntity();
+			if (e.getEntity().getKiller().getScoreboardTags().contains("dupemobsonkill")) {
+				e.getDrops().clear();
+				e.setDroppedExp(0);
+				for (int i = 0; i < plugin.getConfig().getInt("Pman.Troll.MobDupe"); i++) {
+					e.getEntity().getKiller().getWorld().spawnEntity(e.getEntity().getLocation(), e.getEntityType());
+				}
+				e.getEntity().getKiller().getWorld().spawnEntity(e.getEntity().getLocation(), e.getEntityType());
+			} else {
+				return;
+			}
+		}
     }
     
     @EventHandler
@@ -219,28 +222,45 @@ public class TrollGUI implements Listener {
         	if(target.isOnline()) {
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lFake Deop")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop")) {
-	        	        target.sendMessage("§7[Server: Made " + target.getName() + " no longer a server operator]");
+						PlayerFakeOpEvent opEvent = new PlayerFakeOpEvent(p, target);
+						Bukkit.getPluginManager().callEvent(opEvent);
+						if(!opEvent.isCancelled()) {
+							target.sendMessage("§7[Server: Made " + target.getName() + " no longer a server operator]");
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lFake Op")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp")) {
-	        			target.sendMessage("§7[Server: Made " + target.getName() + " a server operator]");
+						PlayerFakeDeopEvent deopEvent = new PlayerFakeDeopEvent(p, target);
+						Bukkit.getPluginManager().callEvent(deopEvent);
+						if(!deopEvent.isCancelled()) {
+							target.sendMessage("§7[Server: Made " + target.getName() + " a server operator]");
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§a§lMute the Player in Chat")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
-	        			chatmute.remove(target);
+						PlayerChatUnMuteEvent unMuteEvent = new PlayerChatUnMuteEvent(p, target);
+						Bukkit.getPluginManager().callEvent(unMuteEvent);
+						if(!unMuteEvent.isCancelled()) {
+							chatmute.remove(target);
+						}
+
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lMute the Player in Chat")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
-	        			chatmute.put(target, true);
+						PlayerChatMuteEvent muteEvent = new PlayerChatMuteEvent(p, target);
+						Bukkit.getPluginManager().callEvent(muteEvent);
+						if(!muteEvent.isCancelled()) {
+							chatmute.put(target, true);
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
@@ -282,30 +302,47 @@ public class TrollGUI implements Listener {
         }
         if(clickedItem.getType() == Material.PISTON) {
         	if(target.isOnline()) {
+				PlayerKickBecauseErrorEvent kickBecauseErrorEvent;
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick for ...Connection reset!")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset")) {
-	        			target.kickPlayer("Internal exception: java.net.SocketException: Connection reset.");
+	        			kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(p, target, "Internal exception: java.net.SocketException: Connection reset.");
+						Bukkit.getPluginManager().callEvent(kickBecauseErrorEvent);
+						if(!kickBecauseErrorEvent.isCancelled()) {
+							target.kickPlayer(kickBecauseErrorEvent.getErrorMessage());
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick for Whitelist!")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist")) {
-	        			target.kickPlayer("You are not whitelisted on this server!");
+						kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(p, target, "You are not whitelisted on this server!");
+						Bukkit.getPluginManager().callEvent(kickBecauseErrorEvent);
+						if(!kickBecauseErrorEvent.isCancelled()) {
+							target.kickPlayer(kickBecauseErrorEvent.getErrorMessage());
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick for Serverstop!")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop")) {
-	        			target.kickPlayer("Server closed");
+						kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(p, target, "Server closed");
+						Bukkit.getPluginManager().callEvent(kickBecauseErrorEvent);
+						if(!kickBecauseErrorEvent.isCancelled()) {
+							target.kickPlayer(kickBecauseErrorEvent.getErrorMessage());
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick for Error!")) {
 	        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError")) {
-	        			target.kickPlayer("io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:");
+						kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(p, target, "io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:");
+						Bukkit.getPluginManager().callEvent(kickBecauseErrorEvent);
+						if(!kickBecauseErrorEvent.isCancelled()) {
+							target.kickPlayer(kickBecauseErrorEvent.getErrorMessage());
+						}
 	        		} else {
 						p.sendMessage(nopermissionmessage);
 					}
@@ -317,16 +354,26 @@ public class TrollGUI implements Listener {
         if(clickedItem.getType() == Material.DIAMOND_PICKAXE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aBlock breaking / placing")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BuildPrevent")) {
-        			if(target.getScoreboardTags().contains("blockbreakplacepreventertag")) {
-        				target.removeScoreboardTag("blockbreakplacepreventertag");
-        			}
+					BlockBreakPreventEvent preventEvent = new BlockBreakPreventEvent(p, target);
+					Bukkit.getPluginManager().callEvent(preventEvent);
+					if(!preventEvent.isCancelled()) {
+						if(target.hasMetadata("blockbreakplacepreventertag")) {
+							target.removeMetadata("blockbreakplacepreventertag", plugin);
+						}
+					}
         		} else {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§cBlock breaking / placing")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BuildPrevent")) {
-        			target.addScoreboardTag("blockbreakplacepreventertag");
+        			BlockBreakPreventEvent preventEvent = new BlockBreakPreventEvent(p, target);
+        			Bukkit.getPluginManager().callEvent(preventEvent);
+        			if(!preventEvent.isCancelled()) {
+						if(!target.hasMetadata("blockbreakplacepreventertag")) {
+							target.setMetadata("blockbreakplacepreventertag", new FixedMetadataValue(plugin, true));
+						}
+					}
         		} else {
 					p.sendMessage(nopermissionmessage);
 				}
@@ -335,10 +382,14 @@ public class TrollGUI implements Listener {
         if(clickedItem.getType() == Material.TNT) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lFake Tnt")) {
 		        if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT")) {
-		        	Location loc = target.getLocation();
-		        	TNTPrimed tnt = target.getWorld().spawn(loc, TNTPrimed.class);
-		        	tnt.setFuseTicks(20);
-		        	tnt.setYield(0);
+		        	TrollTNTSpawnEvent trollTNTSpawnEvent = new TrollTNTSpawnEvent(p, target);
+		        	Bukkit.getPluginManager().callEvent(trollTNTSpawnEvent);
+		        	if(!trollTNTSpawnEvent.isCancelled()) {
+						Location loc = target.getLocation();
+						TNTPrimed tnt = target.getWorld().spawn(loc, TNTPrimed.class);
+						tnt.setFuseTicks(20);
+						tnt.setYield(0);
+					}
 		        } else {
 					p.sendMessage(nopermissionmessage);
 				}
@@ -358,23 +409,27 @@ public class TrollGUI implements Listener {
         if(clickedItem.getType() == Material.VILLAGER_SPAWN_EGG) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§cAnnoying Villager Sounds")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
-					setVillagersounds(true);
+        			VillagerSoundsToggleEvent villagerSoundsToggleEvent = new VillagerSoundsToggleEvent(p, target);
+        			Bukkit.getPluginManager().callEvent(villagerSoundsToggleEvent);
+        			if(!villagerSoundsToggleEvent.isCancelled()) {
+						setVillagersounds(true);
+						Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+							if(isVillagersounds()) {
+								target.playSound(target.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 50, (float) 1.0);
+							}
+						}, 0L, 10L);
+					}
 				} else {
 					p.sendMessage(nopermissionmessage);
 				}
-        		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-					
-					@Override
-					public void run() {
-						if(isVillagersounds()) {
-							target.playSound(target.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 50, (float) 1.0);
-						}
-					}
-				}, 0L, 10L);
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aAnnoying Villager Sounds")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
-        			setVillagersounds(false);
+					VillagerSoundsToggleEvent villagerSoundsToggleEvent = new VillagerSoundsToggleEvent(p, target);
+					Bukkit.getPluginManager().callEvent(villagerSoundsToggleEvent);
+					if(!villagerSoundsToggleEvent.isCancelled()) {
+						setVillagersounds(false);
+					}
         		} else {
 					p.sendMessage(nopermissionmessage);
 				}
@@ -384,10 +439,8 @@ public class TrollGUI implements Listener {
 	
 	@EventHandler
 	public void onBreak(BlockBreakEvent e) {
-		if(e.getPlayer().getScoreboardTags().contains("blockbreakplacepreventertag")) {
+		if(e.getPlayer().hasMetadata("blockbreakplacepreventertag")) {
 			e.setCancelled(true);
-		} else {
-			return;
 		}
 	}
 	
@@ -400,10 +453,8 @@ public class TrollGUI implements Listener {
 	
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
-		if(e.getPlayer().getScoreboardTags().contains("blockbreakplacepreventertag")) {
+		if(e.getPlayer().hasMetadata("blockbreakplacepreventertag")) {
 			e.setCancelled(true);
-		} else {
-			return;
 		}
 	}
 	
@@ -411,15 +462,11 @@ public class TrollGUI implements Listener {
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
 		if(hurtingwater.containsKey(e.getPlayer())) {
-			Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
-				
-				@Override
-				public void run() {
-					if(e.getPlayer().getLocation().getBlock().getType() == Material.WATER) {
-						if(e.getPlayer().getHealth() > 0.2) {
-							e.getPlayer().setHealth(e.getPlayer().getHealth() - 0.1);
-							e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_HURT, 100, 1.0f);
-						}
+			Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> {
+				if(e.getPlayer().getLocation().getBlock().getType() == Material.WATER) {
+					if(e.getPlayer().getHealth() > 0.2) {
+						e.getPlayer().setHealth(e.getPlayer().getHealth() - 0.1);
+						e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_HURT, 100, 1.0f);
 					}
 				}
 			}, 20L, 1000L);

@@ -1,6 +1,7 @@
 package de.happybavarian07.gui;
 
 import de.happybavarian07.api.Fireworkgenerator;
+import de.happybavarian07.events.player.*;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.main.Utils;
 import org.bukkit.*;
@@ -929,7 +930,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Page Forward
         if(clickedItem.getType() == Material.ARROW) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Page Forward")) {
     	        if(p.hasPermission("AdminPanel.Button.pageforward")) {
@@ -959,7 +960,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Page Back
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aActions")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions")) {
@@ -968,7 +969,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Actions Menu
         if(clickedItem.getType() == Material.BEACON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§a§lLevel")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
@@ -981,7 +982,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Effect Time
         if(clickedItem.getType() == Material.CLOCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§a§lTime")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
@@ -994,11 +995,11 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Effect Strengthness
         if(clickedItem.getType() == Material.RED_STAINED_GLASS_PANE) {
     		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
     		p.performCommand("minecraft:effect clear " + target.getName());
-        }
+        } // Clear Effect
         if(clickedItem.getType() == Material.POTION) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lAbsorption")) {
         		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
@@ -1128,66 +1129,71 @@ public class PlayerManagerGUI implements Listener {
         		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
-        }
+        } // Give Effect
         if(clickedItem.getType() == Material.PLAYER_HEAD) {
         	if(!e.getInventory().equals(bannedplayers)) {
 	        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Open") && !clickedItem.getItemMeta().getDisplayName().equals(p.getName())) {
 	        		if(!Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", "")).hasPermission("AdminPanel.Bypass.AffectedByPlayerManager") && !(Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", "")) == null)) {
-	        			initializeItems(playermanager2);
-	        			actions2 = Bukkit.createInventory(null, 9*6, clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
-	        			playermanactionselector2 = Bukkit.createInventory(null, 9*3, clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
-		            	for(int i = 0; i < actions2.getSize(); i++) {
-		            		actions2.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-		            	}
-		            	for(int i = 0; i < playermanactionselector2.getSize(); i++) {
-		            		playermanactionselector2.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-		            	}
-		            	Player target = Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
-		            	actions2.setItem(47, createGuiItem(Material.COBBLESTONE, "§2Inventory", "§aShow the Player's Inventory!"));
-		            	playermanactionselector2.setItem(4, clickedItem);
-		            	actions2.setItem(4, clickedItem);
-		            	actions2.setItem(21, createGuiItem(Material.SPAWNER, "§6Spawn GUI", "§aSpawn Mobs on the Player!"));
-		            	actions2.setItem(19, createGuiItem(Material.POTION, "§5§lPotions", "§aGive the player a potion effect!"));
-		            	actions2.setItem(15, createGuiItem(Material.COOKED_BEEF, "§dFeed", "§aFeed the Player!"));
-		            	actions2.setItem(13, createGuiItem(Material.DIAMOND_SWORD, "§4Kill Player", "§aKill the Player"));
-		            	actions2.setItem(11, createGuiItem(Material.GOLDEN_APPLE, "§e§lHeal", "§aHeal the Player!"));
-		            	playermanactionselector2.setItem(26, createGuiItem(Material.BARRIER, "§cBack", "Click to go back to the Player Manager"));
-		            	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-							
-							@Override
-							public void run() {
-				            	if(target.getGameMode() == GameMode.ADVENTURE) {
-					            	actions2.setItem(23, createGuiItem(Material.GRASS_BLOCK, "§1Adventure", "§aClick to change game mode!"));
-				            	} else if(target.getGameMode() == GameMode.CREATIVE) {
-					            	actions2.setItem(23, createGuiItem(Material.BRICKS, "§1Creative", "§aClick to change game mode!"));
-				            	} else if(target.getGameMode() == GameMode.SPECTATOR) {
-					            	actions2.setItem(23, createGuiItem(Material.SPLASH_POTION, "§1Spectator", "§aClick to change game mode!"));
-				            	} else {
-					            	actions2.setItem(23, createGuiItem(Material.DIRT, "§1Survival", "§aClick to change game mode!"));
-				            	}
-				            	//if(VanishAPI.isInvisible(p)) { actions2.setItem(25, createGuiItem(Material.FEATHER, "§b§lVanish §4CURRENTLY IN DEVELOPMENT!3", "§aClick to activate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); } else { actions2.setItem(25, createGuiItem(Material.FEATHER, "§c§lVanish §4CURRENTLY IN DEVELOPMENT!4", "§aClick to deactivate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); }
+						Player target = Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
+						SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(p, target);
+						Bukkit.getPluginManager().callEvent(selectPlayerEvent);
+						if(!selectPlayerEvent.isCancelled()) {
+							initializeItems(playermanager2);
+							actions2 = Bukkit.createInventory(null, 9*6, clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
+							playermanactionselector2 = Bukkit.createInventory(null, 9*3, clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
+							for(int i = 0; i < actions2.getSize(); i++) {
+								actions2.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
 							}
-						}, 0L, 10L);
-		            	actions2.setItem(25, createGuiItem(Material.RED_BED, "§cPlayer Spawn Location", "§aClick to set the Spawn Location", "§aof the Player, to your Position!"));
-		            	actions2.setItem(31, createGuiItem(Material.TNT, "§c§lTroll Menu", "§r§cRed §6= §3off§6, §aGreen §6= §3on"));
-		            	actions2.setItem(43, createGuiItem(Material.PAPER, "§aOp", "§aMake the player an operator!"));
-		            	actions2.setItem(49, createGuiItem(Material.PAPER, "§cDeop", "§aTake away the player's operator!"));
-		            	actions2.setItem(41, createGuiItem(Material.END_CRYSTAL, "§1§lTeleport the Player to You"));
-		            	actions2.setItem(39, createGuiItem(Material.ENDER_PEARL, "§2§lTeleport to Player"));
-		            	actions2.setItem(37, createGuiItem(Material.FIREWORK_ROCKET, "§1F§2i§3r§4e§5w§6o§7r§8k", "§aThe player fires a", "§aFireworks rocket out of his head!"));
-		            	actions2.setItem(33, createGuiItem(Material.BLAZE_ROD, "§eLightning", "§cShot an Lightning on the Player!"));
-		            	actions2.setItem(29, createGuiItem(Material.FLINT_AND_STEEL, "§4§lBurn Player", "§aClick to burn the Player!"));
-		            	actions2.setItem(51, createGuiItem(Material.DIAMOND_CHESTPLATE, "§2Armor", "§aShows you the Armor of the player"));
-		            	actions2.setItem(53, createGuiItem(Material.BARRIER, "§4Back", "Back to the Player Menu!"));
-		            	playermanactionselector2.setItem(10, createGuiItem(Material.DIAMOND_SWORD, "§aActions", "§aClick to open the Actions Menu!"));
-		            	playermanactionselector2.setItem(12, createGuiItem(Material.PAPER, "§aMoney", "§aClick to open the Money Menu!"));
-		            	playermanactionselector2.setItem(14, createGuiItem(Material.BLACK_TERRACOTTA, "§aKick Player", "§aClick to open the Kick Menu!"));
-		            	playermanactionselector2.setItem(16, createGuiItem(Material.BEDROCK, "§aBan Player", "§aClick to open the Ban Menu!"));
-		            	actionsinvs.add(actions2);
-		            	armorinvs.add(armor2);
-		            	
-		            	playermanactionselectorinvs.add(playermanactionselector2);
-		            	PlayerManagerGUI.openPlayerMenuSelector(p);
+							for(int i = 0; i < playermanactionselector2.getSize(); i++) {
+								playermanactionselector2.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
+							}
+							actions2.setItem(47, createGuiItem(Material.COBBLESTONE, "§2Inventory", "§aShow the Player's Inventory!"));
+							playermanactionselector2.setItem(4, clickedItem);
+							actions2.setItem(4, clickedItem);
+							actions2.setItem(21, createGuiItem(Material.SPAWNER, "§6Spawn GUI", "§aSpawn Mobs on the Player!"));
+							actions2.setItem(19, createGuiItem(Material.POTION, "§5§lPotions", "§aGive the player a potion effect!"));
+							actions2.setItem(15, createGuiItem(Material.COOKED_BEEF, "§dFeed", "§aFeed the Player!"));
+							actions2.setItem(13, createGuiItem(Material.DIAMOND_SWORD, "§4Kill Player", "§aKill the Player"));
+							actions2.setItem(11, createGuiItem(Material.GOLDEN_APPLE, "§e§lHeal", "§aHeal the Player!"));
+							playermanactionselector2.setItem(26, createGuiItem(Material.BARRIER, "§cBack", "Click to go back to the Player Manager"));
+							Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+								@Override
+								public void run() {
+									assert target != null;
+									if(target.getGameMode() == GameMode.ADVENTURE) {
+										actions2.setItem(23, createGuiItem(Material.GRASS_BLOCK, "§1Adventure", "§aClick to change game mode!"));
+									} else if(target.getGameMode() == GameMode.CREATIVE) {
+										actions2.setItem(23, createGuiItem(Material.BRICKS, "§1Creative", "§aClick to change game mode!"));
+									} else if(target.getGameMode() == GameMode.SPECTATOR) {
+										actions2.setItem(23, createGuiItem(Material.SPLASH_POTION, "§1Spectator", "§aClick to change game mode!"));
+									} else {
+										actions2.setItem(23, createGuiItem(Material.DIRT, "§1Survival", "§aClick to change game mode!"));
+									}
+									//if(VanishAPI.isInvisible(p)) { actions2.setItem(25, createGuiItem(Material.FEATHER, "§b§lVanish §4CURRENTLY IN DEVELOPMENT!3", "§aClick to activate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); } else { actions2.setItem(25, createGuiItem(Material.FEATHER, "§c§lVanish §4CURRENTLY IN DEVELOPMENT!4", "§aClick to deactivate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); }
+								}
+							}, 0L, 10L);
+							actions2.setItem(25, createGuiItem(Material.RED_BED, "§cPlayer Spawn Location", "§aClick to set the Spawn Location", "§aof the Player, to your Position!"));
+							actions2.setItem(31, createGuiItem(Material.TNT, "§c§lTroll Menu", "§r§cRed §6= §3off§6, §aGreen §6= §3on"));
+							actions2.setItem(43, createGuiItem(Material.PAPER, "§aOp", "§aMake the player an operator!"));
+							actions2.setItem(49, createGuiItem(Material.PAPER, "§cDeop", "§aTake away the player's operator!"));
+							actions2.setItem(41, createGuiItem(Material.END_CRYSTAL, "§1§lTeleport the Player to You"));
+							actions2.setItem(39, createGuiItem(Material.ENDER_PEARL, "§2§lTeleport to Player"));
+							actions2.setItem(37, createGuiItem(Material.FIREWORK_ROCKET, "§1F§2i§3r§4e§5w§6o§7r§8k", "§aThe player fires a", "§aFireworks rocket out of his head!"));
+							actions2.setItem(33, createGuiItem(Material.BLAZE_ROD, "§eLightning", "§cShot an Lightning on the Player!"));
+							actions2.setItem(29, createGuiItem(Material.FLINT_AND_STEEL, "§4§lBurn Player", "§aClick to burn the Player!"));
+							actions2.setItem(51, createGuiItem(Material.DIAMOND_CHESTPLATE, "§2Armor", "§aShows you the Armor of the player"));
+							actions2.setItem(53, createGuiItem(Material.BARRIER, "§4Back", "Back to the Player Menu!"));
+							playermanactionselector2.setItem(10, createGuiItem(Material.DIAMOND_SWORD, "§aActions", "§aClick to open the Actions Menu!"));
+							playermanactionselector2.setItem(12, createGuiItem(Material.PAPER, "§aMoney", "§aClick to open the Money Menu!"));
+							playermanactionselector2.setItem(14, createGuiItem(Material.BLACK_TERRACOTTA, "§aKick Player", "§aClick to open the Kick Menu!"));
+							playermanactionselector2.setItem(16, createGuiItem(Material.BEDROCK, "§aBan Player", "§aClick to open the Ban Menu!"));
+							actionsinvs.add(actions2);
+							armorinvs.add(armor2);
+
+							playermanactionselectorinvs.add(playermanactionselector2);
+							PlayerManagerGUI.openPlayerMenuSelector(p);
+						}
 	        		} else {
 	        			p.sendMessage("§cYou can't do anything with this player because he has a bypass for the PlayerManager!");
 	        		}
@@ -1209,7 +1215,7 @@ public class PlayerManagerGUI implements Listener {
 					}
         		}
         	}
-        }
+        } // Select Player
         if(clickedItem.getType() == Material.TNT) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lTroll Menu")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll")) {
@@ -1218,16 +1224,16 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Troll Menu
         if(clickedItem.getType() == Material.BLACK_TERRACOTTA) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick Player")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick")) {
-            		PlayerManagerGUI.openKickInv(p, Bukkit.getPlayerExact(p.getOpenInventory().getTitle()));
+					PlayerManagerGUI.openKickInv(p, Bukkit.getPlayerExact(p.getOpenInventory().getTitle()));
         		} else {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Open Kick Inv
         if(clickedItem.getType() == Material.BLAZE_ROD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§eLightning")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Lightning")) {
@@ -1236,8 +1242,8 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
-        if(clickedItem.getType() == Material.GRASS_BLOCK || clickedItem.getType() == Material.BRICKS || clickedItem.getType() == Material.SPLASH_POTION || clickedItem.getType() == Material.DIRT) {
+        }  // Lightning Strike
+        if(clickedItem.getType() == Material.GRASS_BLOCK || clickedItem.getType() == Material.BRICKS || clickedItem.getType() == Material.SPLASH_POTION || clickedItem.getType() == Material.DIRT) { // GameMode
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
         		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§1Adventure")) {
@@ -1269,7 +1275,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Heal
         if(clickedItem.getType() == Material.COOKED_BEEF) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§dFeed")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Feed")) {
@@ -1279,7 +1285,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Feed
         if(clickedItem.getType() == Material.FIREWORK_ROCKET) {
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Firework")) {
         		Fireworkgenerator fwg = new Fireworkgenerator(plugin);
@@ -1292,7 +1298,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // Firework
         if(clickedItem.getType() == Material.ENDER_PEARL) {
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer")) {
         		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
@@ -1300,7 +1306,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // Teleport Player to Target
         if(clickedItem.getType() == Material.GREEN_WOOL) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aGive")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
@@ -1310,7 +1316,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Money Give Menu
         if(clickedItem.getType() == Material.BOOK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aSet")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
@@ -1320,7 +1326,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Money Set inv
         if(clickedItem.getType() == Material.RED_WOOL) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aTake")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
@@ -1330,7 +1336,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Money Take Inv
         if(clickedItem.getType() == Material.PAPER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aMoney")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Money")) {
@@ -1341,41 +1347,48 @@ public class PlayerManagerGUI implements Listener {
 				}
         	} else {
         		if(moneygiveinvs.contains(e.getInventory())) {
-	        		OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
-	        		if(!Utils.getInstance().getEconomy().hasAccount(target)) {
-						Utils.getInstance().getEconomy().createPlayerAccount(target);
-	        		}
-	        		double moneytogive = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
-					Utils.getInstance().getEconomy().depositPlayer(target.getName(), moneytogive);
-	        		p.sendMessage("§a" + target.getName() + " §agot " + clickedItem.getItemMeta().getDisplayName() + " from you and has now " + Utils.getInstance().getEconomy().getBalance(target));
-	        		if(target.isOnline()) {
-	        			((Player) target).sendMessage("§aYou got from " + p.getName() + " " + clickedItem.getItemMeta().getDisplayName());
-	        		}
-        		}
+					double moneytogive = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
+					OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
+					MoneyGiveEvent giveEvent = new MoneyGiveEvent(p, target, moneytogive);
+					Bukkit.getPluginManager().callEvent(giveEvent);
+					if(!giveEvent.isCancelled()) {
+						if(!Utils.getInstance().getEconomy().hasAccount(target)) {
+							Utils.getInstance().getEconomy().createPlayerAccount(target);
+						}
+						Utils.getInstance().getEconomy().depositPlayer(target.getName(), giveEvent.getAmount());
+						p.sendMessage("§a" + target.getName() + " §agot " + clickedItem.getItemMeta().getDisplayName() + " from you and has now " + Utils.getInstance().getEconomy().getBalance(target));
+						if(target.isOnline()) {
+							((Player) target).sendMessage("§aYou got from " + p.getName() + " " + clickedItem.getItemMeta().getDisplayName());
+						}
+					}
+        		} // Money Give
         		if(moneysetinvs.contains(e.getInventory())) {
 	        		OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
 	        		if(!Utils.getInstance().getEconomy().hasAccount(target)) {
 						Utils.getInstance().getEconomy().createPlayerAccount(target);
 	        		}
 	        		p.sendMessage("§4CURRENTLY IN DEVELOPMENT!");
-        		}
+        		} // Money Set
         		if(moneytakeinvs.contains(e.getInventory())) {
-	        		OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
-	        		if(!Utils.getInstance().getEconomy().hasAccount(target)) {
-						Utils.getInstance().getEconomy().createPlayerAccount(target);
-	        		}
-	        		double moneytotake = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
-	        		double bal = Utils.getInstance().getEconomy().getBalance(target);
-					if(Utils.getInstance().getEconomy().getBalance(target) < moneytotake) {
-	        			p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("Pman.Money.NotEnoughMoneyToTake"), Main.getPrefix()));
-	        			return;
+					OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
+					double moneytotake = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
+					double bal = Utils.getInstance().getEconomy().getBalance(target);
+					MoneyTakeEvent takeEvent = new MoneyTakeEvent(p, target, moneytotake, bal);
+					if(!takeEvent.isCancelled()) {
+						if(!Utils.getInstance().getEconomy().hasAccount(target))
+							Utils.getInstance().getEconomy().createPlayerAccount(target);
+
+						if(takeEvent.getCurrentBal() < takeEvent.getAmount()) {
+							p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("Pman.Money.NotEnoughMoneyToTake"), Main.getPrefix()));
+							return;
+						}
+						Utils.getInstance().getEconomy().withdrawPlayer(target.getName(), takeEvent.getAmount());
+						p.sendMessage("§aYou have taken from " + target.getName() + " " + clickedItem.getItemMeta().getDisplayName() + " and now he has " + Utils.getInstance().getEconomy().getBalance(target) + "!");
+						if(target.isOnline()) {
+							((Player) target).sendMessage("§a" + p.getName() + " take " + clickedItem.getItemMeta().getDisplayName() + " §afrom you!");
+						}
 					}
-					Utils.getInstance().getEconomy().withdrawPlayer(target.getName(), moneytotake);
-	        		p.sendMessage("§aYou have token from " + target.getName() + " " + clickedItem.getItemMeta().getDisplayName() + " and now he has " + Utils.getInstance().getEconomy().getBalance(target) + "!");
-	        		if(target.isOnline()) {
-	        			((Player) target).sendMessage("§a" + p.getName() + " take " + clickedItem.getItemMeta().getDisplayName() + " §afrom you!");
-	        		}
-        		}
+        		} // Money Take
         	}
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
         		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
@@ -1406,7 +1419,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // Teleported Target to player
 //        if(clickedItem.getType() == Material.RED_BED) {
 //        	if(clickedItem.getItemMeta().getDisplayName().equals("§cPlayer Spawn Location")) {
 //        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.ReSpawnLocation")) {
@@ -1481,7 +1494,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // Burn
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Kill Player")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kill")) {
@@ -1492,7 +1505,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Kill
         if(clickedItem.getType() == Material.POTION) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§5§lPotions")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
@@ -1502,7 +1515,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Potions Menu
         if(clickedItem.getType() == Material.SPAWNER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§6Spawn GUI")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
@@ -1512,7 +1525,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Spawner Menu
         if(clickedItem.getType() == Material.COBBLESTONE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2Inventory")) {
         		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
@@ -1525,7 +1538,7 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Inventory
         if(clickedItem.getType() == Material.DIAMOND_CHESTPLATE) {
 			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2Armor")) {
@@ -1545,19 +1558,24 @@ public class PlayerManagerGUI implements Listener {
 					p.sendMessage(nopermissionmessage);
 				}
         	}
-        }
+        } // Armor
         if(clickedItem.getType() == Material.BEDROCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Ban")) {
 	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
-	        	if(player.getName() != p.getName()) {
+	        	if(!player.getName().equals(p.getName())) {
 		        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Ban")) {
-		        		bans.set(player.getUniqueId().toString(), true);
-		        		try {
-							bans.save(banfile);
-						} catch (IOException e1) {
-							e1.printStackTrace();
+						PlayerBanEvent banEvent = new PlayerBanEvent(p, (Player) player, Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.BanReason"), ""), messages.getString("PlayerManager.BanSourceMessage"));
+						Bukkit.getPluginManager().callEvent(banEvent);
+						if(!banEvent.isCancelled()) {
+							bans.set(player.getUniqueId().toString(), true);
+							try {
+								bans.save(banfile);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							Utils.getInstance().ban(p, player.getName(), Utils.getInstance().replacePlaceHolders(p, banEvent.getReason(), Main.getPrefix()),
+									Utils.getInstance().replacePlaceHolders(p, banEvent.getSourcename(), Main.getPrefix()));
 						}
-						Utils.getInstance().ban(p, player.getName(), Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.BanReason"), Main.getPrefix()), Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.BanSourceMessage"), Main.getPrefix()));
 		        	} else {
 						p.sendMessage(nopermissionmessage);
 					}
@@ -1569,32 +1587,36 @@ public class PlayerManagerGUI implements Listener {
         	} else {
         		PlayerManagerGUI.openBanInv(p, Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle()));
         	}
-        }
+        } // Ban
         if(clickedItem.getType() == Material.BEACON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aUnban")) {
 	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
 	        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Unban")) {
-	        		if(bans.contains(player.getUniqueId().toString())) {
-	        			bans.set(player.getUniqueId().toString(), null);
-	        			try {
-							bans.save(banfile);
-						} catch (IOException e1) {
-							e1.printStackTrace();
+					PlayerUnBanEvent unBanEvent = new PlayerUnBanEvent(p, (Player) player);
+					Bukkit.getPluginManager().callEvent(unBanEvent);
+					if(!unBanEvent.isCancelled()) {
+						if(bans.contains(player.getUniqueId().toString())) {
+							bans.set(player.getUniqueId().toString(), null);
+							try {
+								bans.save(banfile);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
 						}
-	        		}
-					Utils.getInstance().unban(p, player.getName());
+						Utils.getInstance().unban(p, player.getName());
+					}
 	        	} else {
 					p.sendMessage(nopermissionmessage);
 				}
 	        	p.closeInventory();
 	        	PlayerManagerGUI.openInv(p);
         	}
-        }
+        } // Unban
         if(clickedItem.getType() == Material.RED_CONCRETE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aBanned Players")) {
         		PlayerManagerGUI.openBannedPlayers(p);
         	}
-        }
+        } // Banned Players
         if(clickedItem.getType() == Material.PISTON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§5Kick")) {
 	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
@@ -1606,17 +1628,7 @@ public class PlayerManagerGUI implements Listener {
 	        	p.closeInventory();
 	        	PlayerManagerGUI.openInv(p);
         	}
-        }
-        if(clickedItem.getType() == Material.STONE) {
-        	if(clickedItem.getItemMeta().getDisplayName().equals("§2Gamemode")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-        			Player target = Bukkit.getServer().getPlayerExact(p.getOpenInventory().getTitle());
-        			target.setGameMode(GameMode.CREATIVE);
-        		} else {
-					p.sendMessage(nopermissionmessage);
-				}
-        	}
-        }
+        } // Kick
         if(clickedItem.getType() == Material.BAT_SPAWN_EGG) {
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Bat") == true) {
@@ -1630,7 +1642,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // Spawn Eggs...
         if(clickedItem.getType() == Material.BEE_SPAWN_EGG) {
         	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Bee") == true) {
@@ -2355,7 +2367,7 @@ public class PlayerManagerGUI implements Listener {
         	} else {
 				p.sendMessage(nopermissionmessage);
 			}
-        }
+        } // End
     }
 
     // Cancel dragging in our inventory

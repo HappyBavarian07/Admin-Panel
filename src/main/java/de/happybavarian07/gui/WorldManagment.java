@@ -1,5 +1,7 @@
 package de.happybavarian07.gui;
 
+import de.happybavarian07.events.world.GlobalPVPToggleEvent;
+import de.happybavarian07.events.world.MenuGameruleChangeEvent;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.main.Utils;
 import org.bukkit.BanList.Type;
@@ -195,14 +197,21 @@ public class WorldManagment implements Listener {
         }
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
         	if(p.hasPermission("AdminPanel.WorldManagment.PVP")) {
-	        	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lGobal §aPVP")) {
-					for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
-						Bukkit.getWorlds().get(i).setPVP(false);
+				GlobalPVPToggleEvent pvpToggleEvent;
+				if(clickedItem.getItemMeta().getDisplayName().equals("§4§lGobal §aPVP")) {
+					pvpToggleEvent = new GlobalPVPToggleEvent(p, false);
+					if(!pvpToggleEvent.isCancelled()) {
+						for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
+							Bukkit.getWorlds().get(i).setPVP(pvpToggleEvent.isGlobalPVP());
+						}
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lGobal §cPVP")) {
-					for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
-						Bukkit.getWorlds().get(i).setPVP(true);
+					pvpToggleEvent = new GlobalPVPToggleEvent(p, true);
+					if(!pvpToggleEvent.isCancelled()) {
+						for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
+							Bukkit.getWorlds().get(i).setPVP(pvpToggleEvent.isGlobalPVP());
+						}
 					}
 	        	}
         	} else {
@@ -220,7 +229,11 @@ public class WorldManagment implements Listener {
         }
         if(clickedItem.getType() == Material.RED_TERRACOTTA) {
             if(p.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
-            	p.getWorld().setGameRuleValue(clickedItem.getItemMeta().getDisplayName(), "true");
+				MenuGameruleChangeEvent changeEvent = new MenuGameruleChangeEvent(p, clickedItem.getItemMeta().getDisplayName());
+				Bukkit.getPluginManager().callEvent(changeEvent);
+				if(!changeEvent.isCancelled()) {
+					p.getWorld().setGameRuleValue(changeEvent.getGameRule(), "true");
+				}
             } else {
 				p.sendMessage(nopermissionmessage);
 			}
