@@ -258,7 +258,10 @@ public class WorldManagment implements Listener {
 			@Override
 			public void run() {
 		    	for(int i = 0; i < p.getWorld().getGameRules().length; i++) {
-		    		if(!p.getWorld().getGameRules()[i].equalsIgnoreCase("randomTickSpeed") && !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxEntityCramming") && !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxCommandChainLength")) {
+		    		if((boolean) !p.getWorld().getGameRules()[i].equalsIgnoreCase("spawnRadius")
+							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("randomTickSpeed")
+							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxEntityCramming")
+							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxCommandChainLength")) {
 		    			try {
 							if((boolean) p.getWorld().getGameRuleValue(GameRule.getByName(p.getWorld().getGameRules()[i]))) {
 								gameruleinv.setItem(i, createGuiItem(Material.GREEN_TERRACOTTA, false, p.getWorld().getGameRules()[i], "§1§lValue: §atrue"));
