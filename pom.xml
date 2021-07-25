@@ -10,6 +10,7 @@
     <packaging>jar</packaging>
 
     <name>AdminPanel</name>
+    <url>https://jitpack.io/#HappyBavarian07/Admin-Panel/3.0</url>
 
     <properties>
         <java.version>1.8</java.version>
