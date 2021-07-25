@@ -253,24 +253,20 @@ public class WorldManagment implements Listener {
     	for(int i = 0; i < gamerules.getSize(); i++) {
     		gameruleinv.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, false, " "));
     	}
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@Override
-			public void run() {
-		    	for(int i = 0; i < p.getWorld().getGameRules().length; i++) {
-		    		if((boolean) !p.getWorld().getGameRules()[i].equalsIgnoreCase("spawnRadius")
-							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("randomTickSpeed")
-							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxEntityCramming")
-							&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxCommandChainLength")) {
-		    			try {
-							if((boolean) p.getWorld().getGameRuleValue(GameRule.getByName(p.getWorld().getGameRules()[i]))) {
-								gameruleinv.setItem(i, createGuiItem(Material.GREEN_TERRACOTTA, false, p.getWorld().getGameRules()[i], "§1§lValue: §atrue"));
-				    		} else {
-				    			gameruleinv.setItem(i, createGuiItem(Material.RED_TERRACOTTA, false, p.getWorld().getGameRules()[i], "§1§lValue: §cfalse"));
-				    		}
-		    			} catch (ClassCastException ignored) { }
-		    		}
-		    	}
+    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+			for(int i = 0; i < p.getWorld().getGameRules().length; i++) {
+				if(!p.getWorld().getGameRules()[i].equalsIgnoreCase("spawnRadius")
+						&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("randomTickSpeed")
+						&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxEntityCramming")
+						&& !p.getWorld().getGameRules()[i].equalsIgnoreCase("maxCommandChainLength")) {
+					try {
+						if(Boolean.parseBoolean(p.getWorld().getGameRuleValue(p.getWorld().getGameRules()[i]))) {
+							gameruleinv.setItem(i, createGuiItem(Material.GREEN_TERRACOTTA, false, p.getWorld().getGameRules()[i], "§1§lValue: §atrue"));
+						} else {
+							gameruleinv.setItem(i, createGuiItem(Material.RED_TERRACOTTA, false, p.getWorld().getGameRules()[i], "§1§lValue: §cfalse"));
+						}
+					} catch (ClassCastException ignored) { }
+				}
 			}
 		}, 0L, 20L);
     	gamerules.setItem(35, createGuiItem(Material.BARRIER, false, "§4Back"));
