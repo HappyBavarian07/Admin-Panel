@@ -11,3 +11,4 @@ Aber falls jetzt jemand denkt ich hätte den Code vom anderen einfach kopiert, N
 
 
 Ich habe da wirklich ein anderes Plugin angefangen und habe mich nur inspirieren lassen!
+[![](https://jitpack.io/v/HappyBavarian07/Admin-Panel.svg)](https://jitpack.io/#HappyBavarian07/Admin-Panel)
