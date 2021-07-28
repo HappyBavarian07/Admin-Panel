@@ -4,7 +4,7 @@
 
     <groupId>de.happybavarian07.main</groupId>
     <artifactId>AdminPanel</artifactId>
-    <version>3.0</version>
+    <version>3.1-SNAPSHOt</version>
 
     <build>
         <plugins>
@@ -159,7 +159,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/HappyBavarian07/Admin-Panel.git</connection>
-        <developerConnection>scm:git:git@github.com:HappyBavarian07/HappyBavarian07.git</developerConnection>
+        <developerConnection>scm:git:ssh://github.com:HappyBavarian07/Admin-Panel.git</developerConnection>
         <url>https://github.com/HappyBavarian07/Admin-Panel</url>
         <tag>HEAD</tag>
     </scm>
@@ -197,7 +197,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.16.5-RO.1</version>
             <scope>provided</scope>
         </dependency>
         <!-- SuperVanish -->
