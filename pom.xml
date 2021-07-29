@@ -4,7 +4,7 @@
 
     <groupId>io.github.happybavarian07</groupId>
     <artifactId>Admin-Panel</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1</version>
 
     <name>Admin-Panel</name>
     <description>An Minecraft Plugin to control your Server!</description>
@@ -164,7 +164,7 @@
         <connection>scm:git:git://github.com/HappyBavarian07/Admin-Panel.git</connection>
         <developerConnection>scm:git:ssh://github.com:HappyBavarian07/Admin-Panel.git</developerConnection>
         <url>https://github.com/HappyBavarian07/Admin-Panel</url>
-        <tag>HEAD</tag>
+        <tag>Admin-Panel-3.1</tag>
     </scm>
 
     <properties>
