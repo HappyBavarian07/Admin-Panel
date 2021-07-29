@@ -2,9 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.happybavarian07.main</groupId>
-    <artifactId>AdminPanel</artifactId>
-    <version>3.1-SNAPSHOt</version>
+    <groupId>io.github.happybavarian07</groupId>
+    <artifactId>Admin-Panel</artifactId>
+    <version>3.1</version>
+
+    <name>Admin-Panel</name>
+    <description>An Minecraft Plugin to control your Server!</description>
+    <url>https://github.com/HappyBavarian07/Admin-Panel</url>
 
     <build>
         <plugins>
@@ -89,6 +93,9 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
+                    <checkModificationExcludes>
+                        <checkModificationExclude>pom.xml</checkModificationExclude>
+                    </checkModificationExcludes>
                     <localCheckout>true</localCheckout>
                     <pushChanges>false</pushChanges>
                     <mavenExecutorId>forked-path</mavenExecutorId>
@@ -126,10 +133,6 @@
         </resources>
     </build>
 
-    <name>AdminPanel</name>
-    <description>An Minecraft Plugin to control your Server!</description>
-    <url>https://github.com/HappyBavarian07/Admin-Panel</url>
-
     <licenses>
         <license>
             <name>MIT License</name>
@@ -161,7 +164,7 @@
         <connection>scm:git:git://github.com/HappyBavarian07/Admin-Panel.git</connection>
         <developerConnection>scm:git:ssh://github.com:HappyBavarian07/Admin-Panel.git</developerConnection>
         <url>https://github.com/HappyBavarian07/Admin-Panel</url>
-        <tag>HEAD</tag>
+        <tag>Admin-Panel-3.1</tag>
     </scm>
 
     <properties>
@@ -184,10 +187,6 @@
             <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
@@ -197,7 +196,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.5-RO.1</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- SuperVanish -->
