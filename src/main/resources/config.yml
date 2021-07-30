@@ -27,10 +27,6 @@ Plugin:
   # Das ist der Prefix der vom Plugin für Chat Messages bentutzt wird
   # Diese Nachrichten kann man im messages.yml File editieren
   Prefix: '&r[&4Admin&d-&8Panel&r]'
-  # Hier kannst du einstellen ob du SuperVanish oder ProtocolVanish benutzen willst
-  # Oder garnichts
-  SuperVanish: true
-  ProtocolVanish: false
   # Wenn dein Server Supervanish verwendet dann trage hier bitte die Version ein das ist wichtig zur erkennung weil ich nicht einfach für jede einzelne Version eine Methode erstellen kann : )
   SuperVanishVersion: 6.2.5
   checkForUpdates: true

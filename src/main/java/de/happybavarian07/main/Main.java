@@ -4,6 +4,9 @@ import de.happybavarian07.api.StartUpLogger;
 import de.happybavarian07.events.general.AdminPanelOpenEvent;
 import de.happybavarian07.events.general.AdminPanelOpenForOtherEvent;
 import de.happybavarian07.gui.*;
+import de.happybavarian07.placeholders.PanelExpansion;
+import de.happybavarian07.placeholders.PlayerExpansion;
+import de.happybavarian07.placeholders.PluginExpansion;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -46,7 +49,7 @@ public class Main extends JavaPlugin implements Listener {
 	static FileConfiguration trollitems = YamlConfiguration.loadConfiguration(trollguiitemsfile);
 
 	static File banfile = new File("plugins/Admin-Panel", "bans.yml");
-	FileConfiguration bans = YamlConfiguration.loadConfiguration(banfile);
+	private FileConfiguration banConfig = YamlConfiguration.loadConfiguration(banfile);
 	
 	public static FileConfiguration getMessages() { return messages; }
 
@@ -62,6 +65,10 @@ public class Main extends JavaPlugin implements Listener {
 
 	public static void setPrefix(String prefix) {
 		Main.prefix = prefix;
+	}
+
+	public FileConfiguration getBanConfig() {
+		return banConfig;
 	}
 
 	private static Main plugin;
@@ -87,7 +94,10 @@ public class Main extends JavaPlugin implements Listener {
 		logger.message("§e§lVariable Done!§r");
 		mm = new MessagesManager(this);
 		if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-			logger.message("§a§lInitialized PlaceHolderAPI!");
+			new PlayerExpansion().register();
+			new PluginExpansion().register();
+			new PanelExpansion().register();
+			logger.message("§a§lInitialized PlaceHolderAPI with Placeholders!");
 		} else {
 			logger.coloredSpacer(ChatColor.RED);
 			logger.message("§4§lCould not find PlaceholderAPI!!");
@@ -155,7 +165,7 @@ public class Main extends JavaPlugin implements Listener {
 		PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvents(new ExampleGui(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading AdminPanel Main GUI Events!§r");
-		pm.registerEvents(new PlayerManagerGUI(this, messages, this.getConfig(), bans, banfile), this);
+		pm.registerEvents(new PlayerManagerGUI(this, messages, this.getConfig(), banConfig, banfile), this);
 		logger.message("§3§lLoading Player Manager GUI Events!§r");
 		pm.registerEvents(new PluginStopGUI(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading Plugin Manager GUI Events!§r");

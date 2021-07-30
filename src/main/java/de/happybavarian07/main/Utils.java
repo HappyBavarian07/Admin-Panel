@@ -123,7 +123,7 @@ public class Utils {
 			if(bannedPlayer.isBanned()) {
 				p.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c got already banned!");
 			} else {
-				if(sourcename == "") {
+				if(sourcename.equals("")) {
 					Bukkit.getBanList(Type.NAME).addBan(bannedPlayer.getName(), reason, null, p.getName());
 					if(bannedPlayer.isOnline()) {
 						((Player) bannedPlayer).kickPlayer("§cYou got banned from that Server!\n" +
