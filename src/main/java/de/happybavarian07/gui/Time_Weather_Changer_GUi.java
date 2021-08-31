@@ -1,7 +1,8 @@
 package de.happybavarian07.gui;
 
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -125,138 +126,140 @@ public class Time_Weather_Changer_GUi implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         
-        final Player p = (Player) e.getWhoClicked();
+        final Player player = (Player) e.getWhoClicked();
 
-        String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
+        LanguageManager lgm = plugin.getLanguageManager();
+
+        String nopermissionmessage = lgm.getMessage("Player.General.NoPermissions", player);
 
         // Using slots click is a best option for your inventory click's
         if(clickedItem.getType() == Material.BARRIER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Back")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	WorldManagment.openInv(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	WorldManagment.openInv(player);
 					if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
 						if(cfg.getString("Panel.SoundWhenOpened") != null) {
 							String sound = cfg.getString("Panel.SoundWhenOpened");
-							p.playSound(p.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
+							player.playSound(player.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
 						}
 					}
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	} else {
         		if(clickedItem.getItemMeta().getDisplayName().equals("§4Close")) {
-    	        	if(p.hasPermission("AdminPanel.Button.Close")) {
-    	        		ExampleGui.openInv(p);
+    	        	if(player.hasPermission("AdminPanel.Button.Close")) {
+    	        		ExampleGui.openInv(player);
 						if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
 							if(cfg.getString("Panel.SoundWhenOpened") != null) {
 								String sound = cfg.getString("Panel.SoundWhenOpened");
-								p.playSound(p.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
+								player.playSound(player.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
 							}
 						}
     	        	} else {
-						p.sendMessage(nopermissionmessage);
+						player.sendMessage(nopermissionmessage);
 					}
         		}
         	}
         }
     	if(clickedItem.getType() == Material.MAGENTA_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aDay")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(0);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(0);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.LIGHT_BLUE_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aMorning")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(1000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(1000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.LIME_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aNoon")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(6000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(6000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.GREEN_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aAfternoon")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(9000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(9000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.YELLOW_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aSunset")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(12000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(12000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.GRAY_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aNight")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(14000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(14000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.BLACK_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aMidnight")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(18000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(18000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.ORANGE_CONCRETE) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aSunrise")) {
-				p.getWorld().setTime(23000);
-    			if(p.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
-    				p.getWorld().setTime(23000);
+				player.getWorld().setTime(23000);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Time.Change")) {
+    				player.getWorld().setTime(23000);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.WATER_BUCKET) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aRain")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
-    				p.getWorld().setStorm(true);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
+    				player.getWorld().setStorm(true);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.BUCKET) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aSun")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
-    				p.getWorld().setThundering(false);
-    				p.getWorld().setStorm(false);
+    			if(player.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
+    				player.getWorld().setThundering(false);
+    				player.getWorld().setStorm(false);
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}
     	if(clickedItem.getType() == Material.LAVA_BUCKET) {
     		if(clickedItem.getItemMeta().getDisplayName().equals("§aThunder")) {
-    			if(p.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
-    				p.sendMessage("§cCurrently in development! : (");
+    			if(player.hasPermission("AdminPanel.WorldManagment.Weather.Change")) {
+    				player.sendMessage("§cCurrently in development! : (");
     			} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
     		}
     	}

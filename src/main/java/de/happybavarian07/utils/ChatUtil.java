@@ -1,4 +1,4 @@
-package de.happybavarian07.main;
+package de.happybavarian07.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

@@ -1,0 +1,352 @@
+Messages:
+  Plugin:
+    EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
+    DisablingMessage: '[Admin-Panel] erfolgreich deaktiviert!'
+  Player:
+    General:
+      AlreadyOnFirstPage: '%prefix% &9> &cDu bist schon auf der ersten Seite!'
+      AlreadyOnLastPage: '%prefix% &9> &cDu bist schon auf der letzten Seite!'
+      NoPermissions: '%prefix% &9> &cDu hast keinen Zugriff auf diesen Command!'
+      OpeningMessageSelf: '%prefix% &9> &cDu hast das Admin-Panel für dich geöffnet!'
+      OpeningMessageSelfOpenedForOther: '%prefix% &9> &cDu hast das Admin-Panel für
+        %player_name% geöffnet!'
+      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel für dich
+        geöffnet!'
+      TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert
+        nicht!'
+    PlayerManager:
+      Bypass: '%prefix% &9> &cDiesen Spieler kann man nicht auswählen, da er die Permission dazu hat!'
+      ChooseYourself: '%prefix% &9> &cDu kannst dich nicht selber auswählen!'
+      SelfBanning: '%prefix% &9> &cDu kannst dich nicht selber bannen!'
+      KickReason: '&cKick zur Sicherheit'
+      KickSource: '%player_name%'
+      BanReason: '&cBan zur Sicherheit!'
+      BanSource: '%player_name%'
+      AlreadyOp: '&cDieser Spieler ist bereits Operator!'
+      NotOp: '&cDieser Spieler ist kein Operator!'
+      OppedMessage: '&aDu hast den Spieler zum Operator gemacht!'
+      DeoppedMessage: '&cDu hast dem Spieler die Operatorrechte weggenommen!'
+      Money:
+        PleaseEnterAmount: '%prefix% &9> &aBitte gebe den Betrag in den Chat ein mit dem du arbeiten willst!'
+        NotEnoughMoney: '%prefix% &9> &c%player_name% hat nicht genug Geld dafür! (%vault_eco_balance%)'
+        NotANumber: '%prefix% &9> &c%player_name%, das ist keine Nummer!'
+        GiveMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% gegeben!'
+        TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
+    ServerManager:
+      KickAllPlayersReason: '&cKick zur Sicherheit'
+      KickAllPlayersSource: '%player_name%'
+      ChatClearHeader: '&a+---------------------------------------------------+'
+      ChatClearMessage: '    &2Der Chat wurde geleert von &3%player_name%'
+      ChatClearFooter: '&a+---------------------------------------------------+'
+      MaintenanceMode: '%prefix% &9> &5%player_name% &cDer Server ist im &4&lWartungsmodus!'
+    ChatMute:
+      PlayerMessage: '%prefix% &9> &4Der Chat ist gemuted! %player_name%!'
+      Broadcastheader: '&a+---------------------------------------------------+'
+      Broadcast: '       &4Der Chat wurde gemuted von %player_name%!'
+      Broadcastfooter: '&a+---------------------------------------------------+'
+    ChatUnMute:
+      Broadcastheader: '&a+---------------------------------------------------+'
+      Broadcast: '       &4Der Chat wurde entmuted von %player_name%!'
+      Broadcastfooter: '&a+---------------------------------------------------+'
+  Console:
+    ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
+  TomanyArguments: '&4Zu viele Argumente!'
+Items:
+  General:
+    FillerItem:
+      material: BLACK_STAINED_GLASS_PANE
+      displayName: ' '
+      lore:
+        - ''
+    Close:
+      material: BARRIER
+      displayName: '&cClose'
+      lore:
+        - '&cSchließe diese Seite!'
+    Left:
+      material: DARK_OAK_BUTTON
+      displayName: '&cLeft'
+      lore:
+        - '&cGehe zur vorletzten Seite!'
+    Right:
+      material: DARK_OAK_BUTTON
+      displayName: '&cRight'
+      lore:
+        - '&cGehe zur nächsten Seite!'
+    EmptySlot:
+      material: BARRIER
+      displayName: ' '
+      lore:
+        - ' '
+    Refresh:
+      material: LEVER
+      displayName: '&aAktualisieren'
+      lore:
+        - '&aAktualisiere diese Seite!'
+  PlayerManager:
+    PlayerHead:
+      material: PLAYER_HEAD
+      displayName: '%player_name%'
+      lore:
+        - '&6GameMode: &7%player_gamemode%'
+        - '&6Geld: &7%vault_eco_balance%'
+        - '&6Lebel: &7%player_health%'
+        - '&6Essen: &7%player_food_level%'
+        - '&6IP-Addresse: &7%player_ip%'
+    TrollMenu:
+      VillagerSounds:
+        true:
+          material: VILLAGER_SPAWN_EGG
+          displayName: '&aNervige Dorfbewohner Geräusche'
+          lore:
+            - '&6Nerve den Spieler mit Dorfbewohner Geräuschen!'
+        false:
+          material: VILLAGER_SPAWN_EGG
+          displayName: '&cNervige Dorfbewohner Geräusche'
+          lore:
+            - '&6Nerve den Spieler mit Dorfbewohner Geräuschen!'
+      BreakPlacePrevent:
+        true:
+          material: DIAMOND_PICKAXE
+          displayName: '&aBauen/Abbauen verhindern'
+          lore:
+            - '&6Verhindere, dass der Spieler abbauen kann!'
+        false:
+          material: DIAMOND_PICKAXE
+          displayName: '&cBauen/Abbauen verhindern'
+          lore:
+            - '&6Verhindere, dass der Spieler abbauen kann!'
+      HurtingWater:
+        true:
+          material: WATER_BUCKET
+          displayName: '&aVerletzendes Wasser'
+          lore:
+            - '&6Mache, dass der Spieler sich im Wasser verletzt!'
+        false:
+          material: WATER_BUCKET
+          displayName: '&cVerletzendes Wasser'
+          lore:
+            - '&6Mache, dass der Spieler sich im Wasser verletzt!'
+      ChatMute:
+        true:
+          material: PAPER
+          displayName: '&aChat stumm schalten'
+          lore:
+            - '&6Schalte den Spieler im Chat stumm!'
+        false:
+          material: PAPER
+          displayName: '&cChat stumm schalten'
+          lore:
+            - '&6Schalte den Spieler im Chat stumm!'
+      DupeMobsOnKill:
+        true:
+          material: BLAZE_SPAWN_EGG
+          displayName: '&aMob Dupe'
+          lore:
+            - '&6Sobald der Spieler eine Entität tötet wird sie verdoppelt!'
+        false:
+          material: BLAZE_SPAWN_EGG
+          displayName: '&cMob Dupe'
+          lore:
+            - '&6Sobald der Spieler eine Entität tötet wird sie verdoppelt!'
+      Kick:
+        ConnectionReset:
+          material: PISTON
+          displayName: '&aKick für ...Connection Reset'
+          lore:
+            - '&aKickt einen Spieler mit der Nachricht: !'
+            - '&7"&aInternal exception: java.net.SocketException: Connection reset.&7"'
+        ServerStoppedError:
+          material: PISTON
+          displayName: '&aKick für Error'
+          lore:
+            - '&aKickt einen Spieler mit der Nachricht: !'
+            - '&7"&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection
+            refused: no further informations:&7"'
+        Serverstop:
+          material: PISTON
+          displayName: '&aKick für Serverstop'
+          lore:
+            - '&aKickt einen Spieler mit der Nachricht: !'
+            - '&7"&aServer closed!&7"'
+        Whitelist:
+          material: PISTON
+          displayName: '&aKick für Whitelist'
+          lore:
+            - '&aKickt einen Spieler mit der Nachricht: !'
+            - '&7"&aYou are not whitelisted on this server!&7"'
+      FakeOp:
+        material: PAPER
+        displayName: '&cFake Op'
+        lore:
+          - '&6Faked eine Standard /op Message'
+      FakeDeop:
+        material: PAPER
+        displayName: '&cFake Deop'
+        lore:
+          - '&6Faked eine Standard /deop Message'
+      FakeTNT:
+        material: TNT
+        displayName: '&4Fake Tnt'
+        lore:
+          - '&6Spawne ein TNT vor den Füßen des Spielers!'
+      DropPlayerInv:
+        material: DIAMOND_CHESTPLATE
+        displayName: '&a&lDrop Inventar'
+        lore:
+          - '&6Lass den Spieler sein komplettes Inventar droppen!'
+    ActionsMenu:
+      Kill:
+        material: DIAMOND_SWORD
+        displayName: '&cSpieler töten!'
+        lore:
+          - '&cTöte den Spieler!'
+      Heal:
+        material: GOLDEN_APPLE
+        displayName: '&cSpieler heilen!'
+        lore:
+          - '&cHeile den Spieler!'
+      Feed:
+        material: COOKED_BEEF
+        displayName: '&cSpieler füttern!'
+        lore:
+          - '&cFülle die Hungersleiste des Spielers wieder auf!'
+      Burn:
+        material: FLINT_AND_STEEL
+        displayName: '&cSpieler anzünden!'
+        lore:
+          - '&cZünde den Spieler an!'
+      Lightning:
+        material: BLAZE_ROD
+        displayName: '&cBlitze schießen!'
+        lore:
+          - '&cSchieße einen Blitz auf den Spieler!'
+      Firework:
+        material: FIREWORK_ROCKET
+        displayName: '&1F&2e&3u&4e&5r&6w&7e&8r&9k &az&bü&cn&dd&ee&fn!'
+        lore:
+          - '&cZünde buntes Feuerwerk über dem Spieler!'
+      TeleportYouToPlayer:
+        material: ENDER_PEARL
+        displayName: '&2Teleportiere dich zum Spieler!'
+        lore:
+          - '&cTeleportiere dich zum Spieler!'
+      TeleportPlayerToYou:
+        material: END_CRYSTAL
+        displayName: '&1Teleportiere den Spieler zu dir!'
+        lore:
+          - '&cTeleportiere den Spieler zu dir!'
+      Op:
+        material: PAPER
+        displayName: '&aOp'
+        lore:
+          - '&aGebe dem Spieler Operatorrechte!'
+      Deop:
+        material: PAPER
+        displayName: '&cDeop'
+        lore:
+          - '&cNehme dem Spieler die Operatorrechte weg!'
+      Armor:
+        material: DIAMOND_CHESTPLATE
+        displayName: '&2Rüstung'
+        lore:
+          - '&cZeige die Rüstung des Spielers!'
+      Inventory:
+        material: COBBLESTONE
+        displayName: '&2Inventar'
+        lore:
+          - '&aZeige das Inventar des Spielers!'
+      Potions:
+        material: POTION
+        displayName: '&5Tränke!'
+        lore:
+          - '&aGebe dem Spieler Effekte!'
+      ClearPotions:
+        material: RED_CONCRETE
+        displayName: '&4Lösche alle Effekte'
+        lore:
+          - '&aLöscht alle Effekte des Spielers!'
+      Spawning:
+        material: SPAWNER
+        displayName: '&aSpawner'
+        lore:
+          - '&cErschaffe Entitäten in dem Spieler!'
+      Troll:
+        material: TNT
+        displayName: '&4&lTroll Menü'
+        lore:
+          - '&cTrolle den Spieler!'
+          - '&cRot &6= &3aus | &aGrün &6= &3an'
+      PlayerSpawnLocation:
+        material: RED_BED
+        displayName: '&aPlayer Spawn Location'
+        lore:
+          - '&aSetze die Spawnposition des Spielers!'
+      GameMode:
+        Survival:
+          material: DIRT
+          displayName: '&aSurvival'
+          lore:
+            - '&aWechsle den GameMode des Spielers auf Adventure! (Klick)'
+        Adventure:
+          material: GRASS_BLOCK
+          displayName: '&aAdventure'
+          lore:
+            - '&aWechsle den GameMode des Spielers auf Creative! (Klick)'
+        Creative:
+          material: BRICK
+          displayName: '&aCreative'
+          lore:
+            - '&aWechsle den GameMode des Spielers auf Spectator! (Klick)'
+        Spectator:
+          material: SPLASH_POTION
+          displayName: '&aSpectator'
+          lore:
+            - '&aWechsle den GameMode des Spielers auf Survival! (Klick)'
+      MoneyItem:
+        material: PAPER
+        displayName: '&aGeld Inventar'
+        lore:
+          - '&aÖffnet das Geld Inventar!'
+      ActionsItem:
+        material: DIAMOND_SWORD
+        displayName: '&aAktionen Menu'
+        lore:
+          - '&aÖffnet das Aktionen Menu!'
+      BannedPlayers:
+        material: RED_CONCRETE
+        displayName: '&cGebannte Spieler'
+        lore:
+          - '&aSiehe alle Spieler ein die gebannt wurden!'
+      BanItem:
+        material: BEDROCK
+        displayName: '&cBanne den Spieler'
+        lore:
+          - '&cBanne den Spieler!'
+      KickItem:
+        material: PISTON
+        displayName: '&cKicke den Spieler'
+        lore:
+          - '&aKicke den Spieler!'
+    MoneyMenu:
+      Give:
+        material: GREEN_WOOL
+        displayName: '&aGive Money'
+        lore:
+          - '&aGebe dem Spieler Geld!'
+      Take:
+        material: RED_WOOL
+        displayName: '&cTake Money'
+        lore:
+          - '&cNehme dem Spieler Geld Weg!'
+MenuTitles:
+  PlayerManager:
+    PlayerSelector: '&aSpieler auswählen'
+    PlayerActions: '&aAktionen: %player_name%'
+    SelectPlayerAction: '&aAktionen: %player_name%'
+    SpawningMenu: '&Entitäten spawnen'
+    PotionMenu: '&aTränke geben'
+    TrollMenu: '&1T&2r&3o&4l&5l &6M&7e&8n&9ü'
+    ArmorView: '&4Rüstung'
+    MoneyMenu: '&a&lGeld'
+    BannedPlayers: '&cGebannte Spieler'

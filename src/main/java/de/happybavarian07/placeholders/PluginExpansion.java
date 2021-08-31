@@ -1,7 +1,7 @@
 package de.happybavarian07.placeholders;
 
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +41,7 @@ public class PluginExpansion extends PlaceholderExpansion {
             return Main.getPrefix();
         }
         if (params.startsWith("message-")) {
-            if (Main.getMessages().contains(params.substring(8))) {
-                return Utils.getInstance().replacePlaceHolders(player, Main.getMessages().getString(params.substring(8)), Main.getPrefix());
-            } else {
-                return "";
-            }
+            return Main.getPlugin().getLanguageManager().getMessage(params.substring(8), player);
         }
         return null;
     }

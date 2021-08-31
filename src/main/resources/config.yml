@@ -12,8 +12,8 @@
 
 # Plugin By HappyBavarian07
 
-# Der Bans.yml File ist nur für das Plugin wichtig!!! also bitte nichts dortdrin ändern sonst geht ein Teil des Plugins vielleicht kaputt.
-# Sobald du eine Datei l?scht wird sie sich bei dem n?chsten reload wieder auf Standard zur?cksetzen und selber wieder erstellen
+# The Bans.yml file is only important for the plugin !!! so please don't change anything in there, otherwise part of the plugin might break.
+# As soon as you delete a file, it will reset itself to the default with the next reload and will create itself again
 
 ##########################################################
 #+------------------------------------------------------+#
@@ -22,37 +22,54 @@
 ##########################################################
 
 Plugin:
-  # Das ist der Prefix der vom Plugin verwendet wird in der Konsole beim Start oder Stop
+  # This is the prefix used by the plugin in the console when starting or stopping
   StartPrefix: '&r[&4Admin&d-&8Panel&r]'
-  # Das ist der Prefix der vom Plugin für Chat Messages bentutzt wird
-  # Diese Nachrichten kann man im messages.yml File editieren
+  # This is the prefix used by the plugin for chat messages
+  # These messages can be edited in the messages.yml file
   Prefix: '&r[&4Admin&d-&8Panel&r]'
-  # Wenn dein Server Supervanish verwendet dann trage hier bitte die Version ein das ist wichtig zur erkennung weil ich nicht einfach für jede einzelne Version eine Methode erstellen kann : )
-  SuperVanishVersion: 6.2.5
-  checkForUpdates: true
 
-# Das sind die Einstellungen für das Panel
+  # Currently Disabled
+  ## If your server uses Supervanish then please enter the version here.This is important for identification because I cannot simply create a method for each individual version:)
+  # SuperVanishVersion: 6.2.5
+
+  # This is the language option you can add language files to the "languages" folder,
+  # and then enter the name of the file (without .yml) here. Note upper and lower case!
+  # Example: /plugins/Admin-Panel/languages/Language.yml | language (in the config): Language
+  language: de
+  Updater:
+    # If this option is activated, the updater will automatically check for updates
+    # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
+    # The plugin uses https://spiget.org for this feature
+    checkForUpdates: true
+    # If this option is activated, the updater will automatically download the update (if available) from Spigot.
+    # The update can then be found in plugins/Admin-Panel/downladed-update/Admin-Panel-<UpdateVersion>.jar!
+    downloadPluginUpdate: true
+    # If this option and the downloadPluginUpdate option is activated,
+    # then the updater will automatically replace the plugin with the new version!
+    # (!!!!!!!!Attention: This Option will Reload The Server after the new Version got replaced!!!!!!!!!!)
+    automaticReplace: false
+
+# These are the settings for the panel
 Panel:
 
-  # Hier kannst du einstellen ob Sounds beim öffnen eines Inventars des Plugins
-  # abgespielt werden sollen
+  # Here you can set whether there are sounds when opening an inventory of the plugin should be played
   PlaySoundsWhenOpened: true
-  # Das ist der Sound der abgespielt wird wenn man ein Panel / Inventar öffnet
-  # er wird nur abgespielt wenn Die vorherige Abfrage auf true steht
+  # This is the sound that is played when you open a panel / inventory
+  # it is only played if the previous query is true
   SoundWhenOpened: ENTITY_BAT_TAKEOFF
-  # Das ist die Lautstärke
-  # Min: 0.0 Max: unendlich
-  # Standard: 100.0
+  # That's the volume
+  # Min: 0.0 Max: IDon'tNowtheLimit
+  # Default: 100.0
   SoundVolume: 100.0
-  # Das ist der Pitch
+  # That's the pitch
   # Min: 0.0 Max: 2.0
-  # Standard: 1.0
+  # Default: 1.0
   SoundPitch: 1.0
-  
-  # Hier wird eingestellt ob wenn jemand ein Panel offen hat Effekt abgespielt werden sollen
-  # natürlich nur wenn man nicht im Vanish ist (Geht gerade nicht!)
+
+  # Here you can set whether an effect should be played when someone has a panel open
+  # Of course only if you are not in the Vanish (not possible at the moment!)
   ShowEffectWhenOpened: true
-  # Hier kannst du den Effekt einstellen
+  # Here you can set the effect
   EffectWhenOpened: ENDER_SIGNAL
 
 ##########################################################
@@ -62,36 +79,35 @@ Panel:
 ##########################################################
 # Pman = Player Manager
 Pman:
-  # Hier kannst du alles einstellen was man bei Trolls einstellen kann
+  # Here you can set everything that can be set at Trolls
   Troll:
-    # Hier kannst du einstellen wieviele Entitäten gespawnt werden wenn im Troll Menü die Mob Dupe Option aktiviert ist
-    # Und der Spieler eine Entität killt!
-    # Wenn du zu viel machst wird das Spiel warscheinlich anfangen zu laggen
+    # Here you can set how many entities are spawned when the Mob Dupe option is activated in the Troll menu
+    # And the player kills an entity!
+    # If you do too much, the game will likely lag
     MobDupe: 1
   
   Actions:
-    # Hier kannst du einstellen wieviel Leben man gesetzt bekommt wenn jemand für einen auf
-    # das Heal Item im Actions Menu im Pman klickt
-    # Max: 20.0 wenn man etwas höheres eingibt werden zwanzig Einheiten genommen von Spigot / Bukkit
+    # Here you can set how much life you get if someone opens up for you
+    # click the Heal Item in the Actions menu in Pman
+    # Max: 20.0 if you enter something higher, twenty units are taken from Spigot / Bukkit
     HealthHealAmount: 20.0
-    
-    # Hier kannst du einstellen wieviel Hunger man gesetzt bekommt wenn jemand für einen auf
-    # das Heal Item im Actions Menu im Pman klickt
-    # Max: 20 wenn man etwas höheres eingibt werden zwanzig Einheiten genommen von Spigot / Bukkit
+    # Here you can set how much hunger you get when someone opens up for you
+    # click the Heal Item in the Actions menu in Pman
+    # Max: 20 if you enter something higher, twenty units are taken from Spigot / Bukkit
     FoodLevelFillAmount: 20
-    # Hier kannst du einstellen wie lange der Spieler wenn man in über das Menu anzündet brennt. Hier wird in Seku
+    # Here you can set how long the player burns when you light it via the menu. Here it is calculated in seconds
     BurnDuration: 4
 
-    # Hier kann man Spieler konfigurieren die nicht gebannt werden können
+    # Here you can configure players who cannot be banned
     ExemptPlayers:
       - 'ExamplePlayer'
     
   Money:
-    # Das ist die Währung die für den Money Teil im Pman verwendet wird
+    # This is the currency used for the money part in the Pman
     currency: $
 
-# Hier kannst du einstellen was man über den Player Manager im Actions Menü unter Spawn Gui für Mobs spawnen kann
-# einfach von denen die man nicht will auf false setzen
+# Here you can set what you can spawn for mobs via the Player Manager in the Actions menu under Spawn Gui
+# just set those you don't want to false
 Spawn:
   Bat: true
   Bee: true

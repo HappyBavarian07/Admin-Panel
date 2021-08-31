@@ -1,5 +1,6 @@
-package de.happybavarian07.main;
+package de.happybavarian07.utils;
 
+import de.happybavarian07.main.Main;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,7 +123,7 @@ public class Utils {
 		try {
 			OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(target);
 			if(bannedPlayer.isBanned()) {
-				p.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c got already banned!");
+				p.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c is already banned!");
 			} else {
 				if(sourcename.equals("")) {
 					Bukkit.getBanList(Type.NAME).addBan(bannedPlayer.getName(), reason, null, p.getName());
@@ -146,6 +148,12 @@ public class Utils {
 						"§3Permanently banned!" + "\n");
 					}
 				}
+				plugin.getBanConfig().set(bannedPlayer.getUniqueId().toString(), true);
+				try {
+					plugin.getBanConfig().save(plugin.getBanFile());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				p.sendMessage("§c§cYou have successfully banned §a" + bannedPlayer.getName() + " §cfor §a" + Bukkit.getBanList(Type.NAME).getBanEntry(bannedPlayer.getName()).getReason().toString() + "§c!");
 			}
 		} catch (NullPointerException e) {
@@ -165,10 +173,17 @@ public class Utils {
 			OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(target);
 			if(!bannedPlayer.isBanned()) {
 				Player.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c is not banned!");
+				return;
 			}
 			if(bannedPlayer.isBanned()) {
 				Bukkit.getBanList(Type.NAME).pardon(bannedPlayer.getName());
 				Player.sendMessage("§cYou have successfully unbanned §a" + bannedPlayer.getName() + "§c!");
+				plugin.getBanConfig().set(bannedPlayer.getUniqueId().toString(), null);
+				try {
+					plugin.getBanConfig().save(plugin.getBanFile());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (NullPointerException e) {
 			Player.sendMessage("§cThe Player is not online or doesn't exists!");

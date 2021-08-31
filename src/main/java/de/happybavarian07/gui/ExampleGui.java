@@ -1,8 +1,9 @@
 package de.happybavarian07.gui;
 
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
-import me.clip.placeholderapi.PlaceholderAPI;
+import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
@@ -126,64 +127,65 @@ public class ExampleGui implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
-        final Player p = (Player) e.getWhoClicked();
+        final Player player = (Player) e.getWhoClicked();
 
-        String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
+		LanguageManager lgm = plugin.getLanguageManager();
+
+		String nopermissionmessage = lgm.getMessage("Player.General.NoPermissions", player);
 
         // Using slots click is a best option for your inventory click's
         if(e.getRawSlot() == 13) {
         	if(clickedItem.getType() == Material.REDSTONE_BLOCK) {
-	        	if(p.hasPermission("AdminPanel.PluginManager.open")) {
-	        		p.closeInventory();
-	        		PluginStopGUI.openInv(p);
+	        	if(player.hasPermission("AdminPanel.PluginManager.open")) {
+	        		player.closeInventory();
+	        		PluginStopGUI.openInv(player);
 	        	} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.DIAMOND_BLOCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§6Server Managment")) {
-        		if(p.hasPermission("AdminPanel.ServerManagment.Open")) {
-        			ServerManagment.openInv(p);
+        		if(player.hasPermission("AdminPanel.ServerManagment.Open")) {
+        			ServerManagment.openInv(player);
         		}
         	}
         }
         if(e.getRawSlot() == 14) {
         	if(clickedItem.getType() == Material.DIAMOND) {
-	        	if(p.hasPermission("AdminPanel.ServerStop")) {
-	        		p.closeInventory();
-					Utils.getInstance().serverStop(p, 1000, 2000);
+	        	if(player.hasPermission("AdminPanel.ServerStop")) {
+	        		player.closeInventory();
+					Utils.getInstance().serverStop(player, 1000, 2000);
 	        	} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(e.getRawSlot() == 4) {
         	if(clickedItem.getType() == Material.ACACIA_BOAT) {
-        		if(p.hasPermission("AdminPanel.ServerReload")) {
-					Utils.getInstance().serverReload(p, 1000);
+        		if(player.hasPermission("AdminPanel.ServerReload")) {
+					Utils.getInstance().serverReload(player, 1000);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(e.getRawSlot() == 12) {
         	if(clickedItem.getType() == Material.PLAYER_HEAD) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.open")) {
-        			p.closeInventory();
-        			PlayerManagerGUI.openInv(p);
+        		if(player.hasPermission("AdminPanel.PlayerManager.open")) {
+        			new PlayerSelectMenu(Main.getPlayerMenuUtility(player)).open();
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(e.getRawSlot() == 10) {
         	if(clickedItem.getType() == Material.GRASS_BLOCK) {
-        		if(p.hasPermission("AdminPanel.WorldManagment.Open")) {
-        			p.closeInventory();
-        			WorldManagment.openInv(p);
+        		if(player.hasPermission("AdminPanel.WorldManagment.Open")) {
+        			player.closeInventory();
+        			WorldManagment.openInv(player);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }

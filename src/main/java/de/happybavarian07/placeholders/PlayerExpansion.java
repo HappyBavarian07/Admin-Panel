@@ -1,7 +1,7 @@
 package de.happybavarian07.placeholders;
 
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

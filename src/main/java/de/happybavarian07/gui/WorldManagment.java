@@ -2,8 +2,9 @@ package de.happybavarian07.gui;
 
 import de.happybavarian07.events.world.GlobalPVPToggleEvent;
 import de.happybavarian07.events.world.MenuGameruleChangeEvent;
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -145,60 +146,62 @@ public class WorldManagment implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         
-        final Player p = (Player) e.getWhoClicked();
+        final Player player = (Player) e.getWhoClicked();
 
-        String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
+		LanguageManager lgm = plugin.getLanguageManager();
+
+		String nopermissionmessage = lgm.getMessage("Player.General.NoPermissions", player);
 
         // Using slots click is a best option for your inventory click's
         if(clickedItem.getType() == Material.BARRIER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Back")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	WorldManagment.openInv(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	WorldManagment.openInv(player);
 					if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
 						if(cfg.getString("Panel.SoundWhenOpened") != null) {
 							String sound = cfg.getString("Panel.SoundWhenOpened");
-							p.playSound(p.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
+							player.playSound(player.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
 						}
 					}
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	} else {
         		if(clickedItem.getItemMeta().getDisplayName().equals("§4Close")) {
-    	        	if(p.hasPermission("AdminPanel.Button.Close")) {
-    	        		ExampleGui.openInv(p);
+    	        	if(player.hasPermission("AdminPanel.Button.Close")) {
+    	        		ExampleGui.openInv(player);
 						if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
 							if(cfg.getString("Panel.SoundWhenOpened") != null) {
 								String sound = cfg.getString("Panel.SoundWhenOpened");
-								p.playSound(p.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
+								player.playSound(player.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
 							}
 						}
     	        	} else {
-						p.sendMessage(nopermissionmessage);
+						player.sendMessage(nopermissionmessage);
 					}
         		}
         	}
         }
         if(clickedItem.getType() == Material.IRON_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Time/Weather Changer")) {
-        		if(p.hasPermission("AdminPanel.WorldManagment.Time_Weather.Open")) {
-        			Time_Weather_Changer_GUi.openInv(p);
+        		if(player.hasPermission("AdminPanel.WorldManagment.Time_Weather.Open")) {
+        			Time_Weather_Changer_GUi.openInv(player);
 					if(cfg.getBoolean("Panel.PlaySoundsWhenOponed") == true) {
 						if(cfg.getString("Panel.SoundWhenOpened") != null) {
 							String sound = cfg.getString("Panel.SoundWhenOpened");
-							p.playSound(p.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
+							player.playSound(player.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
 						}
 					}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
-        	if(p.hasPermission("AdminPanel.WorldManagment.PVP")) {
+        	if(player.hasPermission("AdminPanel.WorldManagment.PVP")) {
 				GlobalPVPToggleEvent pvpToggleEvent;
 				if(clickedItem.getItemMeta().getDisplayName().equals("§4§lGobal §aPVP")) {
-					pvpToggleEvent = new GlobalPVPToggleEvent(p, false);
+					pvpToggleEvent = new GlobalPVPToggleEvent(player, false);
 					if(!pvpToggleEvent.isCancelled()) {
 						for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
 							Bukkit.getWorlds().get(i).setPVP(pvpToggleEvent.isGlobalPVP());
@@ -206,7 +209,7 @@ public class WorldManagment implements Listener {
 					}
 	        	}
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lGobal §cPVP")) {
-					pvpToggleEvent = new GlobalPVPToggleEvent(p, true);
+					pvpToggleEvent = new GlobalPVPToggleEvent(player, true);
 					if(!pvpToggleEvent.isCancelled()) {
 						for(int i = 0; i < Bukkit.getWorlds().size(); i++) {
 							Bukkit.getWorlds().get(i).setPVP(pvpToggleEvent.isGlobalPVP());
@@ -214,35 +217,35 @@ public class WorldManagment implements Listener {
 					}
 	        	}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.GREEN_TERRACOTTA) {
         	if(!clickedItem.getItemMeta().getDisplayName().equals("§2Afternoon")) {
-	        	if(p.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
-	        		p.getWorld().setGameRuleValue(clickedItem.getItemMeta().getDisplayName(), "false");
+	        	if(player.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
+	        		player.getWorld().setGameRuleValue(clickedItem.getItemMeta().getDisplayName(), "false");
 	        	} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.RED_TERRACOTTA) {
-            if(p.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
-				MenuGameruleChangeEvent changeEvent = new MenuGameruleChangeEvent(p, clickedItem.getItemMeta().getDisplayName());
+            if(player.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
+				MenuGameruleChangeEvent changeEvent = new MenuGameruleChangeEvent(player, clickedItem.getItemMeta().getDisplayName());
 				Bukkit.getPluginManager().callEvent(changeEvent);
 				if(!changeEvent.isCancelled()) {
-					p.getWorld().setGameRuleValue(changeEvent.getGameRule(), "true");
+					player.getWorld().setGameRuleValue(changeEvent.getGameRule(), "true");
 				}
             } else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.COMMAND_BLOCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aGamerules")) {
-        		if(p.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
-        			WorldManagment.openGameruleInv(p);
+        		if(player.hasPermission("AdminPanel.WorldManagment.Gamerules")) {
+        			WorldManagment.openGameruleInv(player);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }

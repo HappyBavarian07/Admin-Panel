@@ -2,8 +2,9 @@ package de.happybavarian07.gui;
 
 import de.happybavarian07.api.Fireworkgenerator;
 import de.happybavarian07.events.player.*;
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -216,210 +217,20 @@ public class PlayerManagerGUI implements Listener {
     	playermanager.setItem(49, createGuiItem(Material.BARRIER, "§4Close", "§cClose the Menu!"));
     	playermanager.setItem(48, createGuiItem(Material.ARROW, "§4Page Back"));
     	playermanager.setItem(50, createGuiItem(Material.ARROW, "§4Page Forward"));
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@SuppressWarnings("static-access")
-			@Override
-			public void run() {
-		    	ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-		    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-		    	OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
-		    	for(int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
-		    		if(i <= (i+45)) {
-			    		if(onlineplayer[i].hasPlayedBefore() && onlineplayer[i].isOnline()) {
-				    		meta.setOwningPlayer(onlineplayer[i]);
-				    		meta.setDisplayName(onlineplayer[i].getName());
-				    		List<String> lore = new ArrayList<>();
-				    		lore.add("§4Health: §3" + onlineplayer[i].getPlayer().getHealth());
-				    		lore.add("§6Food: §9" + onlineplayer[i].getPlayer().getFoodLevel());
-				    		lore.add("§2Money: §6" + plugin.eco.getBalance(onlineplayer[i]));
-				    		lore.add("§3Gamemode: §6" + onlineplayer[i].getPlayer().getGameMode());
-				    		lore.add("§5IP-Adresse: §4" + onlineplayer[i].getPlayer().getAddress());
-				    		meta.setLore(lore);
-				    		head.setItemMeta(meta);
-				    		if(i != 45) {
-					    		playermanager.setItem(i, head);
-				    		} else {
-				    			return;
-				    		}
-			    		}
-		    		}
-		    	}
-				
+    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+			OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
+			for (int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
+				if (i <= (i + 45)) {
+					if (onlineplayer[i].isOnline()) {
+						ItemStack head = plugin.getLanguageManager().getItem("PlayerManager.PlayerHead", (Player) onlineplayer[i]);
+						SkullMeta meta = (SkullMeta) head.getItemMeta();
+						meta.setOwningPlayer(onlineplayer[i]);
+						head.setItemMeta(meta);
+						playermanager.setItem(i, head);
+					}
+				}
 			}
 		}, 0L, 40L);
-    }
-
-    public static void initializeItems2(Inventory playermanager) {
-    	for(int i = 0; i < playermanager.getSize() ; i++) {
-    		if(playermanager.getItem(i) == null) {
-    			playermanager.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-    		}
-    	}
-    	playermanager.setItem(49, createGuiItem(Material.BARRIER, "§4Close", "§cClose the Menu!"));
-    	playermanager.setItem(48, createGuiItem(Material.ARROW, "§4Page Back"));
-    	playermanager.setItem(50, createGuiItem(Material.ARROW, "§4Page Forward"));
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@SuppressWarnings("static-access")
-			@Override
-			public void run() {
-		    	ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-		    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-		    	OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
-		    	for(int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
-		    		if(i <= (i+45)) {
-			    		if(onlineplayer[i].hasPlayedBefore() && onlineplayer[i].isOnline()) {
-				    		meta.setOwningPlayer(onlineplayer[i]);
-				    		meta.setDisplayName(onlineplayer[i].getName());
-				    		List<String> lore = new ArrayList<>();
-				    		lore.add("§4Health: §3" + onlineplayer[i].getPlayer().getHealth());
-				    		lore.add("§6Food: §9" + onlineplayer[i].getPlayer().getFoodLevel());
-				    		lore.add("§2Money: §6" + plugin.eco.getBalance(onlineplayer[i]));
-				    		lore.add("§3Gamemode: §6" + onlineplayer[i].getPlayer().getGameMode());
-				    		lore.add("§5Adresse: §4" + onlineplayer[i].getPlayer().getAddress());
-				    		meta.setLore(lore);
-				    		head.setItemMeta(meta);
-				    		if(i != 45) {
-					    		playermanager.setItem(i, head);
-				    		} else {
-				    			return;
-				    		}
-			    		}
-		    		}
-		    	}
-				
-			}
-		}, 0L, 40L);
-    }
-
-    public static void initializeItems3(Inventory playermanager) {
-    	for(int i = 0; i < playermanager.getSize() ; i++) {
-    		if(playermanager.getItem(i) == null) {
-    			playermanager.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-    		}
-    	}
-    	playermanager.setItem(49, createGuiItem(Material.BARRIER, "§4Close", "§cClose the Menu!"));
-    	playermanager.setItem(48, createGuiItem(Material.ARROW, "§4Page Back"));
-    	playermanager.setItem(50, createGuiItem(Material.ARROW, "§4Page Forward"));
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@SuppressWarnings("static-access")
-			@Override
-			public void run() {
-		    	ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-		    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-		    	OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
-		    	for(int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
-		    		if(i <= (i+45)) {
-			    		if(onlineplayer[i].hasPlayedBefore() && onlineplayer[i].isOnline()) {
-				    		meta.setOwningPlayer(onlineplayer[i]);
-				    		meta.setDisplayName(onlineplayer[i].getName());
-				    		List<String> lore = new ArrayList<>();
-				    		lore.add("§4Health: §3" + onlineplayer[i].getPlayer().getHealth());
-				    		lore.add("§6Food: §9" + onlineplayer[i].getPlayer().getFoodLevel());
-				    		lore.add("§2Money: §6" + plugin.eco.getBalance(onlineplayer[i]));
-				    		lore.add("§3Gamemode: §6" + onlineplayer[i].getPlayer().getGameMode());
-				    		lore.add("§5Adresse: §4" + onlineplayer[i].getPlayer().getAddress());
-				    		meta.setLore(lore);
-				    		head.setItemMeta(meta);
-				    		if(i != 45) {
-					    		playermanager.setItem(i, head);
-				    		} else {
-				    			return;
-				    		}
-			    		}
-		    		}
-		    	}
-				
-			}
-		}, 0L, 40L);
-    }
-
-    public static void initializeItems4(Inventory playermanager) {
-    	for(int i = 0; i < playermanager.getSize() ; i++) {
-    		if(playermanager.getItem(i) == null) {
-    			playermanager.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-    		}
-    	}
-    	playermanager.setItem(49, createGuiItem(Material.BARRIER, "§4Close", "§cClose the Menu!"));
-    	playermanager.setItem(48, createGuiItem(Material.ARROW, "§4Page Back"));
-    	playermanager.setItem(50, createGuiItem(Material.ARROW, "§4Page Forward"));
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@SuppressWarnings("static-access")
-			@Override
-			public void run() {
-		    	ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-		    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-		    	OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
-		    	for(int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
-		    		if(i <= (i+45)) {
-			    		if(onlineplayer[i].hasPlayedBefore() && onlineplayer[i].isOnline()) {
-				    		meta.setOwningPlayer(onlineplayer[i]);
-				    		meta.setDisplayName(onlineplayer[i].getName());
-				    		List<String> lore = new ArrayList<>();
-				    		lore.add("§4Health: §3" + onlineplayer[i].getPlayer().getHealth());
-				    		lore.add("§6Food: §9" + onlineplayer[i].getPlayer().getFoodLevel());
-				    		lore.add("§2Money: §6" + plugin.eco.getBalance(onlineplayer[i]));
-				    		lore.add("§3Gamemode: §6" + onlineplayer[i].getPlayer().getGameMode());
-				    		lore.add("§5Adresse: §4" + onlineplayer[i].getPlayer().getAddress());
-				    		meta.setLore(lore);
-				    		head.setItemMeta(meta);
-				    		if(i != 45) {
-					    		playermanager.setItem(i, head);
-				    		} else {
-				    			return;
-				    		}
-			    		}
-		    		}
-		    	}
-				
-			}
-		}, 0L, 40L);
-    }
-
-    public static void initializeItems5(Inventory playermanager) {
-    	for(int i = 0; i < playermanager.getSize() ; i++) {
-    		if(playermanager.getItem(i) == null) {
-    			playermanager.setItem(i, createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-    		}
-    	}
-    	playermanager.setItem(49, createGuiItem(Material.BARRIER, "§4Close", "§cClose the Menu!"));
-    	playermanager.setItem(48, createGuiItem(Material.ARROW, "§4Page Back"));
-    	playermanager.setItem(50, createGuiItem(Material.ARROW, "§4Page Forward"));
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-			
-			@SuppressWarnings("static-access")
-			@Override
-			public void run() {
-		    	ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-		    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-		    	OfflinePlayer[] onlineplayer = Bukkit.getOfflinePlayers();
-		    	for(int i = 0; i < Bukkit.getOfflinePlayers().length; i++) {
-		    		if(i <= (i+45)) {
-			    		if(onlineplayer[i].hasPlayedBefore() && onlineplayer[i].isOnline()) {
-				    		meta.setOwningPlayer(onlineplayer[i]);
-				    		meta.setDisplayName(onlineplayer[i].getName());
-				    		List<String> lore = new ArrayList<>();
-				    		lore.add("§4Health: §3" + onlineplayer[i].getPlayer().getHealth());
-				    		lore.add("§6Food: §9" + onlineplayer[i].getPlayer().getFoodLevel());
-				    		lore.add("§2Money: §6" + plugin.eco.getBalance(onlineplayer[i]));
-				    		lore.add("§3Gamemode: §6" + onlineplayer[i].getPlayer().getGameMode());
-				    		lore.add("§5IP-Adress: §4" + onlineplayer[i].getPlayer().getAddress());
-				    		meta.setLore(lore);
-				    		head.setItemMeta(meta);
-				    		if(i != 45) {
-					    		playermanager.setItem(i, head);
-				    		} else {
-				    			return;
-				    		}
-			    		}
-		    		}
-		    	}
-				
-			}
-		}, 0L, 20L);
     }
 
     // Nice little method to create a gui item with a custom name, and description
@@ -482,91 +293,6 @@ public class PlayerManagerGUI implements Listener {
 		bannedplayers.setItem(49, createGuiItem(Material.BARRIER, "§cBack"));
     	bannedplayersinvs.add(bannedplayers);
 		ent.openInventory(bannedplayers);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-    }
-
-    // You can open the inventory with this
-    public static void openInv1(final HumanEntity ent) {
-    	playermanager2 = Bukkit.createInventory(null, 54, "§5§lPlayer Manager");
-    	initializeItems2(playermanager2);
-    	playermanagerinvs.add(playermanager2);
-		ent.openInventory(playermanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-    }
-
-    // You can open the inventory with this
-    public static void openInv2(final HumanEntity ent) {
-    	playermanager2 = Bukkit.createInventory(null, 54, "§5§lPlayer Manager");
-    	initializeItems(playermanager2);
-    	playermanagerinvs.add(playermanager2);
-		ent.openInventory(playermanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-    }
-
-    // You can open the inventory with this
-    public static void openInv3(final HumanEntity ent) {
-    	playermanager2 = Bukkit.createInventory(null, 54, "§5§lPlayer Manager");
-    	initializeItems(playermanager2);
-    	playermanagerinvs.add(playermanager2);
-		ent.openInventory(playermanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-    }
-
-    // You can open the inventory with this
-    public static void openInv4(final HumanEntity ent) {
-    	playermanager2 = Bukkit.createInventory(null, 54, "§5§lPlayer Manager");
-    	initializeItems(playermanager2);
-    	playermanagerinvs.add(playermanager2);
-		ent.openInventory(playermanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-    }
-
-    // You can open the inventory with this
-    public static void openInv5(final HumanEntity ent) {
-    	playermanager2 = Bukkit.createInventory(null, 54, "§5§lPlayer Manager");
-    	initializeItems(playermanager2);
-    	playermanagerinvs.add(playermanager2);
-		ent.openInventory(playermanager2);
 		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
 			if(cfg.getString("Panel.SoundWhenOpened") != null) {
 				String sound = cfg.getString("Panel.SoundWhenOpened");
@@ -888,254 +614,256 @@ public class PlayerManagerGUI implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         
-        final Player p = (Player) e.getWhoClicked();
+        final Player player = (Player) e.getWhoClicked();
 
-		String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
+		LanguageManager lgm = plugin.getLanguageManager();
+
+		String nopermissionmessage = lgm.getMessage("Player.General.NoPermissions", player);
 
 		// Using slots click is a best option for your inventory click's
         if(clickedItem.getType() == Material.BARRIER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§cBack")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	PlayerManagerGUI.openInv(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	PlayerManagerGUI.openInv(player);
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Back")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	PlayerManagerGUI.openPlayerMenuSelector(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	PlayerManagerGUI.openPlayerMenuSelector(player);
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Back!")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-		        	PlayerManagerGUI.openMoneyInv(p, target);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+		        	PlayerManagerGUI.openMoneyInv(player, target);
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lBack")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	PlayerManagerGUI.openActions(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	PlayerManagerGUI.openActions(player);
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Close")) {
-    	        if(p.hasPermission("AdminPanel.Button.Close")) {
-    	        	ExampleGui.openInv(p);
+    	        if(player.hasPermission("AdminPanel.Button.Close")) {
+    	        	ExampleGui.openInv(player);
     	        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Page Forward
         if(clickedItem.getType() == Material.ARROW) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Page Forward")) {
-    	        if(p.hasPermission("AdminPanel.Button.pageforward")) {
-    	        	if(p.getOpenInventory().getTitle().equals("")) {
+    	        if(player.hasPermission("AdminPanel.Button.pageforward")) {
+    	        	if(player.getOpenInventory().getTitle().equals("")) {
     	        		
     	        	}
-    	        	if(p.getOpenInventory().getTitle().equals("")) {
+    	        	if(player.getOpenInventory().getTitle().equals("")) {
     	        		
     	        	}
-    	        	if(p.getOpenInventory().getTitle().equals("")) {
+    	        	if(player.getOpenInventory().getTitle().equals("")) {
     	        		
     	        	}
-    	        	if(p.getOpenInventory().getTitle().equals("")) {
+    	        	if(player.getOpenInventory().getTitle().equals("")) {
     	        		
     	        	}
-    	        	if(p.getOpenInventory().getTitle().equals("")) {
+    	        	if(player.getOpenInventory().getTitle().equals("")) {
     	        		
     	        	}
     	        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Page Back")) {
-    	        if(p.hasPermission("AdminPanel.Button.pageback")) {
+    	        if(player.hasPermission("AdminPanel.Button.pageback")) {
     	        	
     	        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Page Back
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aActions")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions")) {
-        			PlayerManagerGUI.openActions(p);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions")) {
+        			PlayerManagerGUI.openActions(player);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Actions Menu
         if(clickedItem.getType() == Material.BEACON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§a§lLevel")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
         			if(!(clickedItem.getAmount() == 20)) {
         				clickedItem.setAmount(clickedItem.getAmount() + 1);
         			} else {
         				clickedItem.setAmount(1);
         			}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Effect Time
         if(clickedItem.getType() == Material.CLOCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§a§lTime")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
         			if(!(clickedItem.getAmount() == 64)) {
         				clickedItem.setAmount(clickedItem.getAmount() + 1);
         			} else {
         				clickedItem.setAmount(1);
         			}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Effect Strengthness
         if(clickedItem.getType() == Material.RED_STAINED_GLASS_PANE) {
-    		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-    		p.performCommand("minecraft:effect clear " + target.getName());
+    		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+    		player.performCommand("minecraft:effect clear " + target.getName());
         } // Clear Effect
         if(clickedItem.getType() == Material.POTION) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lAbsorption")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lBad Omen")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lBlindness")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lConduit Power")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.CONDUIT_POWER, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lDolphins Grace")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lFire Resistance")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lGlowing")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lHaste")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lHealth Boost")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lHero of the Village")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lHunger")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lInstant Damage")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.HARM, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lInstant Health")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lInvisibility")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lJump Boost")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lLevitation")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lLuck")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lMining Fatigue")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lNausea")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lNight Vision")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lPoison")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lRegeneration")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lResistance")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lSaturation")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lSlow Falling")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lSlowness")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lSpeed")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lStrength")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lUnluck")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2§lWater Breathing")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lWeakness")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4§lWither")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, (potioninv2.getItem(39).getAmount() * 1200), (potioninv2.getItem(41).getAmount()) - 1));
         	}
         } // Give Effect
         if(clickedItem.getType() == Material.PLAYER_HEAD) {
         	if(!e.getInventory().equals(bannedplayers)) {
-	        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Open") && !clickedItem.getItemMeta().getDisplayName().equals(p.getName())) {
+	        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions") && !clickedItem.getItemMeta().getDisplayName().equals(player.getName())) {
 	        		if(!Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", "")).hasPermission("AdminPanel.Bypass.AffectedByPlayerManager") && !(Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", "")) == null)) {
 						Player target = Bukkit.getPlayerExact(clickedItem.getItemMeta().getDisplayName().replace("§e§l", ""));
-						SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(p, target);
+						SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, target);
 						Bukkit.getPluginManager().callEvent(selectPlayerEvent);
 						if(!selectPlayerEvent.isCancelled()) {
 							initializeItems(playermanager2);
@@ -1150,11 +878,11 @@ public class PlayerManagerGUI implements Listener {
 							actions2.setItem(47, createGuiItem(Material.COBBLESTONE, "§2Inventory", "§aShow the Player's Inventory!"));
 							playermanactionselector2.setItem(4, clickedItem);
 							actions2.setItem(4, clickedItem);
-							actions2.setItem(21, createGuiItem(Material.SPAWNER, "§6Spawn GUI", "§aSpawn Mobs on the Player!"));
-							actions2.setItem(19, createGuiItem(Material.POTION, "§5§lPotions", "§aGive the player a potion effect!"));
-							actions2.setItem(15, createGuiItem(Material.COOKED_BEEF, "§dFeed", "§aFeed the Player!"));
-							actions2.setItem(13, createGuiItem(Material.DIAMOND_SWORD, "§4Kill Player", "§aKill the Player"));
-							actions2.setItem(11, createGuiItem(Material.GOLDEN_APPLE, "§e§lHeal", "§aHeal the Player!"));
+							actions2.setItem(21, lgm.getItem("PlayerManager.ActionsMenu.Spawning", player));
+							actions2.setItem(19, lgm.getItem("PlayerManager.ActionsMenu.Potions", player));
+							actions2.setItem(15, lgm.getItem("PlayerManager.ActionsMenu.Feed", player));
+							actions2.setItem(13, lgm.getItem("PlayerManager.ActionsMenu.Kill", player));
+							actions2.setItem(11, lgm.getItem("PlayerManager.ActionsMenu.Heal", player));
 							playermanactionselector2.setItem(26, createGuiItem(Material.BARRIER, "§cBack", "Click to go back to the Player Manager"));
 							Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -1170,7 +898,7 @@ public class PlayerManagerGUI implements Listener {
 									} else {
 										actions2.setItem(23, createGuiItem(Material.DIRT, "§1Survival", "§aClick to change game mode!"));
 									}
-									//if(VanishAPI.isInvisible(p)) { actions2.setItem(25, createGuiItem(Material.FEATHER, "§b§lVanish §4CURRENTLY IN DEVELOPMENT!3", "§aClick to activate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); } else { actions2.setItem(25, createGuiItem(Material.FEATHER, "§c§lVanish §4CURRENTLY IN DEVELOPMENT!4", "§aClick to deactivate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); }
+									//if(VanishAPI.isInvisible(player)) { actions2.setItem(25, createGuiItem(Material.FEATHER, "§b§lVanish §4CURRENTLY IN DEVELOPMENT!3", "§aClick to activate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); } else { actions2.setItem(25, createGuiItem(Material.FEATHER, "§c§lVanish §4CURRENTLY IN DEVELOPMENT!4", "§aClick to deactivate the Vanish", "§afor the Player!", "Vanish-Plugin: SuperVanish")); }
 								}
 							}, 0L, 10L);
 							actions2.setItem(25, createGuiItem(Material.RED_BED, "§cPlayer Spawn Location", "§aClick to set the Spawn Location", "§aof the Player, to your Position!"));
@@ -1192,60 +920,60 @@ public class PlayerManagerGUI implements Listener {
 							armorinvs.add(armor2);
 
 							playermanactionselectorinvs.add(playermanactionselector2);
-							PlayerManagerGUI.openPlayerMenuSelector(p);
+							PlayerManagerGUI.openPlayerMenuSelector(player);
 						}
 	        		} else {
-	        			p.sendMessage("§cYou can't do anything with this player because he has a bypass for the PlayerManager!");
+	        			player.sendMessage(lgm.getMessage("Player.PlayerManager.Bypass", player));
 	        		}
 	        	} else {
-	        		if(!p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Open")) {
-						p.sendMessage(nopermissionmessage);
+	        		if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Open")) {
+						player.sendMessage(nopermissionmessage);
 					}
-	        		if(clickedItem.getItemMeta().getDisplayName().equals(p.getName())) {
-	        			p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.ChooseYourselfMessage"), Main.getPrefix()));
+	        		if(clickedItem.getItemMeta().getDisplayName().equals(player.getName())) {
+	        			player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
 	        		}
 				}
         	}
         	if(e.getInventory().equals(bannedplayers)) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban")) {
-					Utils.getInstance().unban(p, clickedItem.getItemMeta().getDisplayName());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban")) {
+					Utils.getInstance().unban(player, clickedItem.getItemMeta().getDisplayName());
         		} else {
-	        		if(!p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban")) {
-						p.sendMessage(nopermissionmessage);
+	        		if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban")) {
+						player.sendMessage(nopermissionmessage);
 					}
         		}
         	}
         } // Select Player
         if(clickedItem.getType() == Material.TNT) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lTroll Menu")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll")) {
-        			TrollGUI.openTrollInv(p, Bukkit.getPlayerExact(p.getOpenInventory().getTitle()));
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll")) {
+        			TrollGUI.openTrollInv(player, Bukkit.getPlayerExact(player.getOpenInventory().getTitle()));
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Troll Menu
         if(clickedItem.getType() == Material.BLACK_TERRACOTTA) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aKick Player")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick")) {
-					PlayerManagerGUI.openKickInv(p, Bukkit.getPlayerExact(p.getOpenInventory().getTitle()));
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick")) {
+					PlayerManagerGUI.openKickInv(player, Bukkit.getPlayerExact(player.getOpenInventory().getTitle()));
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Open Kick Inv
         if(clickedItem.getType() == Material.BLAZE_ROD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§eLightning")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Lightning")) {
-        			Bukkit.getPlayerExact(p.getOpenInventory().getTitle()).getWorld().strikeLightning(Bukkit.getPlayerExact(p.getOpenInventory().getTitle()).getLocation());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Lightning")) {
+        			Bukkit.getPlayerExact(player.getOpenInventory().getTitle()).getWorld().strikeLightning(Bukkit.getPlayerExact(player.getOpenInventory().getTitle()).getLocation());
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }  // Lightning Strike
         if(clickedItem.getType() == Material.GRASS_BLOCK || clickedItem.getType() == Material.BRICKS || clickedItem.getType() == Material.SPLASH_POTION || clickedItem.getType() == Material.DIRT) { // GameMode
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
 	        	if(clickedItem.getItemMeta().getDisplayName().equals("§1Adventure")) {
 	        		target.setGameMode(GameMode.CREATIVE);
 	        		actions2.setItem(23, createGuiItem(Material.BRICKS, "§1Creative", "§aKlicke um den Gamemode zu wechseln!"));
@@ -1263,168 +991,168 @@ public class PlayerManagerGUI implements Listener {
 	        		actions2.setItem(23, createGuiItem(Material.GRASS_BLOCK, "§1Adventure", "§aKlicke um den Gamemode zu wechseln!"));
 	        	}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.GOLDEN_APPLE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§e§lHeal")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Heal")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Heal")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         			target.setHealth(cfg.getDouble("Pman.Actions.HealthHealAmount"));
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Heal
         if(clickedItem.getType() == Material.COOKED_BEEF) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§dFeed")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Feed")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Feed")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         			target.setFoodLevel(cfg.getInt("Pman.Actions.FoodLevelFillAmount"));
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Feed
         if(clickedItem.getType() == Material.FIREWORK_ROCKET) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Firework")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Firework")) {
         		Fireworkgenerator fwg = new Fireworkgenerator(plugin);
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		fwg.setLocation(target.getLocation().add(0, 1.7, 0));
         		fwg.setPower(1);
         		fwg.setEffect(FireworkEffect.builder().withColor(Color.RED).withColor(Color.AQUA).withColor(Color.YELLOW).withColor(Color.BLUE).withColor(Color.GREEN).with(Type.BALL_LARGE).withFlicker().build());
         		fwg.setLifeTime(30);
         		fwg.spawn();
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // Firework
         if(clickedItem.getType() == Material.ENDER_PEARL) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-        		p.teleport(target);
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer")) {
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+        		player.teleport(target);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // Teleport Player to Target
         if(clickedItem.getType() == Material.GREEN_WOOL) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aGive")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-					PlayerManagerGUI.openMoneyGiveInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+					PlayerManagerGUI.openMoneyGiveInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Money Give Menu
         if(clickedItem.getType() == Material.BOOK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aSet")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-					PlayerManagerGUI.openMoneySetInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+					PlayerManagerGUI.openMoneySetInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Money Set inv
         if(clickedItem.getType() == Material.RED_WOOL) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aTake")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-					PlayerManagerGUI.openMoneyTakeInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+					PlayerManagerGUI.openMoneyTakeInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Money Take Inv
         if(clickedItem.getType() == Material.PAPER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aMoney")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Money")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-        			PlayerManagerGUI.openMoneyInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Money")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+        			PlayerManagerGUI.openMoneyInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	} else {
         		if(moneygiveinvs.contains(e.getInventory())) {
 					double moneytogive = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
-					OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
-					MoneyGiveEvent giveEvent = new MoneyGiveEvent(p, target, moneytogive);
+					OfflinePlayer target = Bukkit.getOfflinePlayer(player.getOpenInventory().getTitle());
+					MoneyGiveEvent giveEvent = new MoneyGiveEvent(player, target, moneytogive);
 					Bukkit.getPluginManager().callEvent(giveEvent);
 					if(!giveEvent.isCancelled()) {
 						if(!Utils.getInstance().getEconomy().hasAccount(target)) {
 							Utils.getInstance().getEconomy().createPlayerAccount(target);
 						}
 						Utils.getInstance().getEconomy().depositPlayer(target.getName(), giveEvent.getAmount());
-						p.sendMessage("§a" + target.getName() + " §agot " + clickedItem.getItemMeta().getDisplayName() + " from you and has now " + Utils.getInstance().getEconomy().getBalance(target));
+						player.sendMessage("§a" + target.getName() + " §agot " + clickedItem.getItemMeta().getDisplayName() + " from you and has now " + Utils.getInstance().getEconomy().getBalance(target));
 						if(target.isOnline()) {
-							((Player) target).sendMessage("§aYou got from " + p.getName() + " " + clickedItem.getItemMeta().getDisplayName());
+							((Player) target).sendMessage("§aYou got from " + player.getName() + " " + clickedItem.getItemMeta().getDisplayName());
 						}
 					}
         		} // Money Give
         		if(moneysetinvs.contains(e.getInventory())) {
-	        		OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
+	        		OfflinePlayer target = Bukkit.getOfflinePlayer(player.getOpenInventory().getTitle());
 	        		if(!Utils.getInstance().getEconomy().hasAccount(target)) {
 						Utils.getInstance().getEconomy().createPlayerAccount(target);
 	        		}
-	        		p.sendMessage("§4CURRENTLY IN DEVELOPMENT!");
+	        		player.sendMessage("§4CURRENTLY IN DEVELOPMENT!");
         		} // Money Set
         		if(moneytakeinvs.contains(e.getInventory())) {
-					OfflinePlayer target = Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle());
+					OfflinePlayer target = Bukkit.getOfflinePlayer(player.getOpenInventory().getTitle());
 					double moneytotake = Double.parseDouble(clickedItem.getItemMeta().getDisplayName().replace(".", "").replace("§a§l", "").replace(cfg.getString("Pman.Money.currency"), ""));
 					double bal = Utils.getInstance().getEconomy().getBalance(target);
-					MoneyTakeEvent takeEvent = new MoneyTakeEvent(p, target, moneytotake, bal);
+					MoneyTakeEvent takeEvent = new MoneyTakeEvent(player, target, moneytotake, bal);
 					if(!takeEvent.isCancelled()) {
 						if(!Utils.getInstance().getEconomy().hasAccount(target))
 							Utils.getInstance().getEconomy().createPlayerAccount(target);
 
 						if(takeEvent.getCurrentBal() < takeEvent.getAmount()) {
-							p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("Pman.Money.NotEnoughMoneyToTake"), Main.getPrefix()));
+							player.sendMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("Pman.Money.NotEnoughMoneyToTake"), Main.getPrefix()));
 							return;
 						}
 						Utils.getInstance().getEconomy().withdrawPlayer(target.getName(), takeEvent.getAmount());
-						p.sendMessage("§aYou have taken from " + target.getName() + " " + clickedItem.getItemMeta().getDisplayName() + " and now he has " + Utils.getInstance().getEconomy().getBalance(target) + "!");
+						player.sendMessage("§aYou have taken from " + target.getName() + " " + clickedItem.getItemMeta().getDisplayName() + " and now he has " + Utils.getInstance().getEconomy().getBalance(target) + "!");
 						if(target.isOnline()) {
-							((Player) target).sendMessage("§a" + p.getName() + " take " + clickedItem.getItemMeta().getDisplayName() + " §afrom you!");
+							((Player) target).sendMessage("§a" + player.getName() + " take " + clickedItem.getItemMeta().getDisplayName() + " §afrom you!");
 						}
 					}
         		} // Money Take
         	}
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		if(clickedItem.getItemMeta().getDisplayName().equals("§aOp")) {
         			if(!target.isOp()) {
         				target.setOp(true);
-        				p.sendMessage("§6Made §c" + target.getName() + "§6 a server operator!");
+        				player.sendMessage("§6Made §c" + target.getName() + "§6 a server operator!");
         			} else {
-        				p.sendMessage("§c" + target.getName() + " §6is already OP!");
+        				player.sendMessage("§c" + target.getName() + " §6is already OP!");
         			}
         		}
         		if(clickedItem.getItemMeta().getDisplayName().equals("§cDeop")) {
         			if(target.isOp()) {
         				target.setOp(false);
-        				p.sendMessage("§6Made §c" + target.getName() + "§6 no longer a server operator!");
+        				player.sendMessage("§6Made §c" + target.getName() + "§6 no longer a server operator!");
         			} else {
-        				p.sendMessage("§c" + target.getName() + " §6is not OP!");
+        				player.sendMessage("§c" + target.getName() + " §6is not OP!");
         			}
         		}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.END_CRYSTAL) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-        		target.teleport(p);
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+        		target.teleport(player);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // Teleported Target to player
 //        if(clickedItem.getType() == Material.RED_BED) {
 //        	if(clickedItem.getItemMeta().getDisplayName().equals("§cPlayer Spawn Location")) {
-//        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.ReSpawnLocation")) {
-//        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-//        			target.setBedSpawnLocation(p.getLocation(), true);
+//        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.ReSpawnLocation")) {
+//        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+//        			target.setBedSpawnLocation(player.getLocation(), true);
 //        			bans.set(target.getName() + ".Name", target.getName());
 //        			bans.set(target.getName() + ".UUID", target.getUniqueId());
 //        			bans.set(target.getName() + ".Adress.HostName", target.getAddress().getHostName());
@@ -1482,69 +1210,69 @@ public class PlayerManagerGUI implements Listener {
 //						e1.printStackTrace();
 //					}
 //        		} else {
-//					p.sendMessage(nopermissionmessage);
+//					player.sendMessage(nopermissionmessage);
 //				}
 //        	}
 //        }
         if(clickedItem.getType() == Material.FLINT_AND_STEEL) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Burn")) {
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Burn")) {
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		int burnduration = cfg.getInt("Pman.Actions.BurnDuration");
         		target.setFireTicks(burnduration*20);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // Burn
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Kill Player")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kill")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kill")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         			target.setHealth(0);
         			target.setFoodLevel(0);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Kill
         if(clickedItem.getType() == Material.POTION) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§5§lPotions")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-        			PlayerManagerGUI.openPotionInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+        			PlayerManagerGUI.openPotionInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Potions Menu
         if(clickedItem.getType() == Material.SPAWNER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§6Spawn GUI")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
-        			PlayerManagerGUI.openSpawnerInv(p, target);
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
+        			PlayerManagerGUI.openSpawnerInv(player, target);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Spawner Menu
         if(clickedItem.getType() == Material.COBBLESTONE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2Inventory")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
-        			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
+        			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         			if(target == null || !target.isOnline()) {
-        				p.sendMessage("§cDer Spieler ist nicht Online oder existiert nicht!");
+        				player.sendMessage("§cDer Spieler ist nicht Online oder existiert nicht!");
         			}
-        			p.openInventory(target.getInventory());
+        			player.openInventory(target.getInventory());
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Inventory
         if(clickedItem.getType() == Material.DIAMOND_CHESTPLATE) {
-			Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+			Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         	if(clickedItem.getItemMeta().getDisplayName().equals("§2Armor")) {
-        		if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
+        		if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
         			if(target == null || !target.isOnline()) {
-        				p.sendMessage("§cDer Spieler ist nicht Online oder existiert nicht!");
+        				player.sendMessage("§cDer Spieler ist nicht Online oder existiert nicht!");
         			}
         			armor2 = Bukkit.createInventory(null, 9, "§5Armor");
         			armor2.setItem(0, target.getInventory().getHelmet());
@@ -1553,819 +1281,823 @@ public class PlayerManagerGUI implements Listener {
         			armor2.setItem(3, target.getInventory().getBoots());
 	        		armor2.setItem(8, createGuiItem(Material.BARRIER, "§4Back", "§aGet back to the Player Menu!"));
 	        		armorinvs.add(armor2);
-	        		p.openInventory(armor2);
+	        		player.openInventory(armor2);
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         } // Armor
         if(clickedItem.getType() == Material.BEDROCK) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Ban")) {
-	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
-	        	if(!player.getName().equals(p.getName())) {
-		        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Ban")) {
-						PlayerBanEvent banEvent = new PlayerBanEvent(p, (Player) player, Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.BanReason"), ""), messages.getString("PlayerManager.BanSourceMessage"));
+	        	OfflinePlayer target = Bukkit.getServer().getOfflinePlayer(player.getOpenInventory().getTitle());
+	        	if(!target.getName().equals(player.getName())) {
+		        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Ban")) {
+						PlayerBanEvent banEvent = new PlayerBanEvent(player, (Player) target, Utils.getInstance().replacePlaceHolders(player,
+								messages.getString("PlayerManager.BanReason"), ""),
+								messages.getString("PlayerManager.BanSourceMessage"));
 						Bukkit.getPluginManager().callEvent(banEvent);
 						if(!banEvent.isCancelled()) {
-							bans.set(player.getUniqueId().toString(), true);
+							bans.set(target.getUniqueId().toString(), true);
 							try {
 								bans.save(banfile);
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
-							Utils.getInstance().ban(p, player.getName(), Utils.getInstance().replacePlaceHolders(p, banEvent.getReason(), Main.getPrefix()),
-									Utils.getInstance().replacePlaceHolders(p, banEvent.getSourcename(), Main.getPrefix()));
+							Utils.getInstance().ban(player, target.getName(),
+									Utils.getInstance().replacePlaceHolders(player, banEvent.getReason(), Main.getPrefix()),
+									Utils.getInstance().replacePlaceHolders(player, banEvent.getSourcename(), Main.getPrefix()));
 						}
 		        	} else {
-						p.sendMessage(nopermissionmessage);
+						player.sendMessage(nopermissionmessage);
 					}
 	        	} else {
-	        		p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.SelfBanningMessage"), Main.getPrefix()));
+					player.sendMessage(Utils.getInstance().replacePlaceHolders(player,
+							messages.getString("PlayerManager.SelfBanningMessage"), Main.getPrefix()));
 	        	}
-	        	p.closeInventory();
-	        	PlayerManagerGUI.openPlayerMenuSelector(p);
+				player.closeInventory();
+	        	PlayerManagerGUI.openPlayerMenuSelector(player);
         	} else {
-        		PlayerManagerGUI.openBanInv(p, Bukkit.getOfflinePlayer(p.getOpenInventory().getTitle()));
+        		PlayerManagerGUI.openBanInv(player, Bukkit.getOfflinePlayer(player.getOpenInventory().getTitle()));
         	}
         } // Ban
         if(clickedItem.getType() == Material.BEACON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aUnban")) {
-	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
-	        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Unban")) {
-					PlayerUnBanEvent unBanEvent = new PlayerUnBanEvent(p, (Player) player);
+	        	OfflinePlayer target = Bukkit.getServer().getOfflinePlayer(player.getOpenInventory().getTitle());
+	        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban.Unban")) {
+					PlayerUnBanEvent unBanEvent = new PlayerUnBanEvent(player, (Player) target);
 					Bukkit.getPluginManager().callEvent(unBanEvent);
 					if(!unBanEvent.isCancelled()) {
-						if(bans.contains(player.getUniqueId().toString())) {
-							bans.set(player.getUniqueId().toString(), null);
+						if(bans.contains(target.getUniqueId().toString())) {
+							bans.set(target.getUniqueId().toString(), null);
 							try {
 								bans.save(banfile);
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
 						}
-						Utils.getInstance().unban(p, player.getName());
+						Utils.getInstance().unban(player, target.getName());
 					}
 	        	} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
-	        	p.closeInventory();
-	        	PlayerManagerGUI.openInv(p);
+	        	player.closeInventory();
+	        	PlayerManagerGUI.openInv(player);
         	}
         } // Unban
         if(clickedItem.getType() == Material.RED_CONCRETE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§aBanned Players")) {
-        		PlayerManagerGUI.openBannedPlayers(p);
+        		PlayerManagerGUI.openBannedPlayers(player);
         	}
         } // Banned Players
         if(clickedItem.getType() == Material.PISTON) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§5Kick")) {
-	        	OfflinePlayer player = Bukkit.getServer().getOfflinePlayer(p.getOpenInventory().getTitle());
-	        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kick")) {
-					Utils.getInstance().kick(p, player.getName(), Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.KickReason"), Main.getPrefix()), Utils.getInstance().replacePlaceHolders(p, messages.getString("PlayerManager.KickSourceMessage"), Main.getPrefix()));
+	        	OfflinePlayer target = Bukkit.getServer().getOfflinePlayer(player.getOpenInventory().getTitle());
+	        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kick")) {
+					Utils.getInstance().kick(player, target.getName(), Utils.getInstance().replacePlaceHolders(player, messages.getString("PlayerManager.KickReason"), Main.getPrefix()), Utils.getInstance().replacePlaceHolders(player, messages.getString("PlayerManager.KickSourceMessage"), Main.getPrefix()));
 	        	} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
-	        	p.closeInventory();
-	        	PlayerManagerGUI.openInv(p);
+	        	player.closeInventory();
+	        	PlayerManagerGUI.openInv(player);
         	}
         } // Kick
         if(clickedItem.getType() == Material.BAT_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Bat") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.BAT);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // Spawn Eggs...
         if(clickedItem.getType() == Material.BEE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Bee") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.BEE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.BLAZE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Blaze") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.BLAZE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.CAT_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Cat") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.CAT);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.CAVE_SPIDER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Cave_Spider") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		target.getWorld().spawnEntity(loc, EntityType.CAVE_SPIDER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.CHICKEN_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Chicken") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		target.getWorld().spawnEntity(loc, EntityType.CHICKEN);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.COD_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Cod") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.COD);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.COW_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Cow") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.COW);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.CREEPER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Creeper") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.CREEPER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.DOLPHIN_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Dolphin") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.DOLPHIN);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.DONKEY_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Donkey") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.DONKEY);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.DROWNED_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Drowned") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.DROWNED);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.ELDER_GUARDIAN_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Elder_Guardian") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.ELDER_GUARDIAN);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.ENDERMAN_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Enderman") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.ENDERMAN);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.ENDERMITE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Endermite") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.ENDERMITE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.EVOKER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Evoker") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.EVOKER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.FOX_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Fox") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.FOX);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.GHAST_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Ghast") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.GHAST);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.GUARDIAN_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Guardian") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.GUARDIAN);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.HORSE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Horse") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.HORSE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.HUSK_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Husk") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.HUSK);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.LLAMA_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Llama") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.LLAMA);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.MAGMA_CUBE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Magma_Cube") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.MAGMA_CUBE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.MOOSHROOM_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Mooshroom") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.MUSHROOM_COW);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.MULE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Mule") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.MULE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.OCELOT_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Ocelot") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.OCELOT);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PANDA_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Panda") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PANDA);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PARROT_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Parrot") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PARROT);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PHANTOM_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Phantom") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PHANTOM);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PIG_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Pig") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PIG);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PILLAGER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Pillager") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PILLAGER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.POLAR_BEAR_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Polar_Bear") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.POLAR_BEAR);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.PUFFERFISH_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Pufferfish") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.PUFFERFISH);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.RABBIT_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Rabbit") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.RABBIT);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.RAVAGER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Ravager") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.RAVAGER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SALMON_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Salmon") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SALMON);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SHEEP_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Sheep") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SHEEP);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SHULKER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Shulker") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SHULKER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SILVERFISH_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Silverfish") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		target.getWorld().spawnEntity(loc, EntityType.SILVERFISH);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SKELETON_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Skeleton") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SKELETON);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SKELETON_HORSE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Skeleton_Horse") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SKELETON_HORSE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SLIME_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Slime") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SLIME);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SPIDER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Spider") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SPIDER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.SQUID_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Squid") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.SQUID);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.STRAY_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Stray") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.STRAY);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.TROPICAL_FISH_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Tropical_Fish") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.TROPICAL_FISH);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.TURTLE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Turtle") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.TURTLE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.VEX_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Vex") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.VEX);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.VILLAGER_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Villager") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.VILLAGER);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.VINDICATOR_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Vindicator") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.VINDICATOR);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.WITCH_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Witch") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.WITCH);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.WOLF_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Wolf") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.WOLF);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.ZOMBIE_SPAWN_EGG) {
-        	if(p.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
+        	if(player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
         		if(!cfg.getBoolean("Spawn.Zombie") == true) {
-        			p.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
+        			player.sendMessage(clickedItem.getItemMeta().getDisplayName() + "§c wurde in der Config deaktiviert!");
         			return;
         		}
-        		Player target = Bukkit.getPlayerExact(p.getOpenInventory().getTitle());
+        		Player target = Bukkit.getPlayerExact(player.getOpenInventory().getTitle());
         		Location loc = target.getLocation();
         		loc.setY((loc.getY()+2));
         		target.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         } // End
     }

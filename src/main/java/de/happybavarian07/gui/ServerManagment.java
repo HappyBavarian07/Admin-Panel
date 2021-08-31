@@ -4,9 +4,10 @@ import de.happybavarian07.events.server.ClearChatEvent;
 import de.happybavarian07.events.server.KickAllPlayersEvent;
 import de.happybavarian07.events.server.MaintenanceModeToggleEvent;
 import de.happybavarian07.events.server.MuteChatEvent;
-import de.happybavarian07.main.ChatUtil;
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.main.Utils;
+import de.happybavarian07.utils.ChatUtil;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -201,133 +202,140 @@ public class ServerManagment implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         
-        final Player p = (Player) e.getWhoClicked();
+        final Player player = (Player) e.getWhoClicked();
 
-        String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
+		LanguageManager lgm = plugin.getLanguageManager();
+
+		String nopermissionmessage = lgm.getMessage("Player.General.NoPermissions", player);
 
         // Using slots click is a best option for your inventory click's
         if(clickedItem.getType() == Material.BARRIER) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Back")) {
-		        if(p.hasPermission("AdminPanel.Button.Back")) {
-		        	ServerManagment.openInv(p);
+		        if(player.hasPermission("AdminPanel.Button.Back")) {
+		        	ServerManagment.openInv(player);
 		        } else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	} else {
         		if(clickedItem.getItemMeta().getDisplayName().equals("§4Close")) {
-    	        	if(p.hasPermission("AdminPanel.Button.Close")) {
-    	        		ExampleGui.openInv(p);
+    	        	if(player.hasPermission("AdminPanel.Button.Close")) {
+    	        		ExampleGui.openInv(player);
     	        	} else {
-						p.sendMessage(nopermissionmessage);
+						player.sendMessage(nopermissionmessage);
 					}
         		}
         	}
         }
         if(clickedItem.getType() == Material.ARMOR_STAND) {
-        	if(p.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
-        		ServerManagment.openChatInv(p);
+        	if(player.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
+        		ServerManagment.openChatInv(player);
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.REDSTONE) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§c§lMaintenance Mode")) {
-        		if(p.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
-					MaintenanceModeToggleEvent modeToggleEvent = new MaintenanceModeToggleEvent(p, true);
+        		if(player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
+					MaintenanceModeToggleEvent modeToggleEvent = new MaintenanceModeToggleEvent(player, true);
 					Bukkit.getPluginManager().callEvent(modeToggleEvent);
 					if(!modeToggleEvent.isCancelled()) {
 						setMaintenance_mode(modeToggleEvent.isMaintenanceMode());
 						for(Player online : Bukkit.getOnlinePlayers()) {
-							if(online != p && !online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
+							if(online != player && !online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
 								online.kickPlayer(Utils.getInstance().replacePlaceHolders(online, messages.getString("ServerManager.MaintenanceMode"), Main.getPrefix()));
 							}
 						}
 						ChatUtil.getInstance().broadcast(" &4The Server is now in the Maintenance Mode all Players that have no Perms got kicked!", Main.getPrefix());
 					}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.GLOWSTONE_DUST) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§e§lMaintenance Mode")) {
-        		if(p.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
-					MaintenanceModeToggleEvent modeToggleEvent = new MaintenanceModeToggleEvent(p, false);
+        		if(player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
+					MaintenanceModeToggleEvent modeToggleEvent = new MaintenanceModeToggleEvent(player, false);
 					Bukkit.getPluginManager().callEvent(modeToggleEvent);
 					if(!modeToggleEvent.isCancelled()) {
 						setMaintenance_mode(modeToggleEvent.isMaintenanceMode());
 						for(Player online : Bukkit.getOnlinePlayers()) {
-							if(online != p && !online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
+							if(online != player && !online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
 								online.kickPlayer(Utils.getInstance().replacePlaceHolders(online, messages.getString("ServerManager.MaintenanceMode"), Main.getPrefix()));
 							}
 						}
 						ChatUtil.getInstance().broadcast(" &4The Server is no longer in the Maintenance Mode all Players can join again!", Main.getPrefix());
 					}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.IRON_SWORD) {
         	if(clickedItem.getItemMeta().getDisplayName().equals("§4Kick all Players")) {
-        		if(p.hasPermission("AdminPanel.ServerManagment.KickAllPlayers")) {
+        		if(player.hasPermission("AdminPanel.ServerManagment.KickAllPlayers")) {
         			List<Player> kickedPlayers = new ArrayList<>();
-        			for(Player player : Bukkit.getOnlinePlayers()) {
-        				if(!player.hasPermission("AdminPanel.Bypass.KickAll")) {
-							kickedPlayers.add(player);
+        			for(Player online : Bukkit.getOnlinePlayers()) {
+        				if(!online.hasPermission("AdminPanel.Bypass.KickAll")) {
+							kickedPlayers.add(online);
 						}
 					}
-					KickAllPlayersEvent kickAllPlayersEvent = new KickAllPlayersEvent(p, kickedPlayers);
+					KickAllPlayersEvent kickAllPlayersEvent = new KickAllPlayersEvent(player, kickedPlayers);
         			Bukkit.getPluginManager().callEvent(kickAllPlayersEvent);
         			if(!kickAllPlayersEvent.isCancelled()) {
-						for(Player player : kickedPlayers) {
-							if(!player.getName().equals(p.getName())) {
-								Utils.getInstance().kick(p, player.getName(), Utils.getInstance().replacePlaceHolders(p, messages.getString("ServerManager.KickAllPlayersReason"), Main.getPrefix()), Utils.getInstance().replacePlaceHolders(p, messages.getString("ServerManager.KickAllPlayersSource"), Main.getPrefix()));
+						for(Player online : kickedPlayers) {
+							if(!online.getName().equals(online.getName())) {
+								Utils.getInstance().kick(online, online.getName(),
+										Utils.getInstance().replacePlaceHolders(online,
+												messages.getString("ServerManager.KickAllPlayersReason"),
+												Main.getPrefix()), Utils.getInstance().replacePlaceHolders(online,
+												messages.getString("ServerManager.KickAllPlayersSource"),
+												Main.getPrefix()));
 							}
 						}
 					}
         		} else {
-					p.sendMessage(nopermissionmessage);
+					player.sendMessage(nopermissionmessage);
 				}
         	}
         }
         if(clickedItem.getType() == Material.DIAMOND_SWORD) {
-        	if(p.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
-				ClearChatEvent clearChatEvent = new ClearChatEvent(p, 100, true);
+        	if(player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
+				ClearChatEvent clearChatEvent = new ClearChatEvent(player, 100, true);
 				Bukkit.getPluginManager().callEvent(clearChatEvent);
 				if(!clearChatEvent.isCancelled()) {
-					Utils.getInstance().clearChat(clearChatEvent.getLines(), clearChatEvent.showPlayerName(), p);
+					Utils.getInstance().clearChat(clearChatEvent.getLines(), clearChatEvent.showPlayerName(), player);
 				}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.GREEN_DYE) {
-        	if(p.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
-				MuteChatEvent muteChatEvent = new MuteChatEvent(p, false);
+        	if(player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
+				MuteChatEvent muteChatEvent = new MuteChatEvent(player, false);
 				Bukkit.getPluginManager().callEvent(muteChatEvent);
 				if(!muteChatEvent.isCancelled()) {
 					ServerManagment.setChatmuted(muteChatEvent.isChatMuted());
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatUnMute.Broadcastheader"), Main.getPrefix()));
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatUnMute.Broadcast"), Main.getPrefix()));
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatUnMute.Broadcastfooter"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatUnMute.Broadcastheader"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatUnMute.Broadcast"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatUnMute.Broadcastfooter"), Main.getPrefix()));
 				}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
         if(clickedItem.getType() == Material.RED_DYE) {
-        	if(p.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
-				MuteChatEvent muteChatEvent = new MuteChatEvent(p, true);
+        	if(player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
+				MuteChatEvent muteChatEvent = new MuteChatEvent(player, true);
 				Bukkit.getPluginManager().callEvent(muteChatEvent);
 				if(!muteChatEvent.isCancelled()) {
 					ServerManagment.setChatmuted(muteChatEvent.isChatMuted());
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatMute.Broadcastheader"), Main.getPrefix()));
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatMute.Broadcast"), Main.getPrefix()));
-					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("ChatMute.Broadcastfooter"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatMute.Broadcastheader"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatMute.Broadcast"), Main.getPrefix()));
+					Bukkit.getServer().broadcastMessage(Utils.getInstance().replacePlaceHolders(player, messages.getString("ChatMute.Broadcastfooter"), Main.getPrefix()));
 				}
         	} else {
-				p.sendMessage(nopermissionmessage);
+				player.sendMessage(nopermissionmessage);
 			}
         }
     }

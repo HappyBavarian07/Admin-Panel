@@ -4,9 +4,15 @@ import de.happybavarian07.api.StartUpLogger;
 import de.happybavarian07.events.general.AdminPanelOpenEvent;
 import de.happybavarian07.events.general.AdminPanelOpenForOtherEvent;
 import de.happybavarian07.gui.*;
+import de.happybavarian07.listeners.MenuListener;
+import de.happybavarian07.menusystem.PlayerMenuUtility;
+import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.placeholders.PanelExpansion;
 import de.happybavarian07.placeholders.PlayerExpansion;
 import de.happybavarian07.placeholders.PluginExpansion;
+import de.happybavarian07.utils.ChatUtil;
+import de.happybavarian07.utils.Updater;
+import de.happybavarian07.utils.Utils;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -28,9 +34,13 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -39,17 +49,23 @@ public class Main extends JavaPlugin implements Listener {
 	public Economy eco = null;
 	public Permission perms = null;
 	public Chat chat = null;
+	private Updater updater;
 	final StartUpLogger logger = StartUpLogger.create();
 	File configFile = new File(this.getDataFolder(), "config.yml");
 	
 	static File messagesfile = new File("plugins/Admin-Panel", "messages.yml");
 	static FileConfiguration messages = YamlConfiguration.loadConfiguration(messagesfile);
-	
-	static File trollguiitemsfile = new File("plugins/Admin-Panel/Items", "TrollGUI.yml");
-	static FileConfiguration trollitems = YamlConfiguration.loadConfiguration(trollguiitemsfile);
 
 	static File banfile = new File("plugins/Admin-Panel", "bans.yml");
 	private FileConfiguration banConfig = YamlConfiguration.loadConfiguration(banfile);
+
+	private LanguageManager languageManager;
+
+	public final Map<Player, Boolean> hurtingwater = new HashMap<>();
+	public final Map<Player, Boolean> chatmute = new HashMap<>();
+	public final Map<Player, Boolean> villagerSounds = new HashMap<>();
+	public final Map<Player, Boolean> blockBreakPrevent = new HashMap<>();
+	public final Map<Player, Boolean> dupeMobsOnKill = new HashMap<>();
 	
 	public static FileConfiguration getMessages() { return messages; }
 
@@ -63,6 +79,10 @@ public class Main extends JavaPlugin implements Listener {
 		return prefix;
 	}
 
+	public Updater getUpdater() {
+		return updater;
+	}
+
 	public static void setPrefix(String prefix) {
 		Main.prefix = prefix;
 	}
@@ -71,11 +91,21 @@ public class Main extends JavaPlugin implements Listener {
 		return banConfig;
 	}
 
+	public LanguageManager getLanguageManager() {
+		return languageManager;
+	}
+
+	private static final Map<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
+
+	public Map<Player, PlayerMenuUtility> getPlayerMenuUtilityMap() {
+		return playerMenuUtilityMap;
+	}
+
 	private static Main plugin;
 	@Override
 	public void onEnable() {
-		Utils Utils = new Utils(this);
-		ChatUtil ChatUtil = new ChatUtil();
+		new Utils(this);
+		new ChatUtil();
 		Server server = getServer();
 		ConsoleCommandSender ccs = server.getConsoleSender();
 
@@ -91,6 +121,7 @@ public class Main extends JavaPlugin implements Listener {
                 );
 		logger.coloredSpacer(ChatColor.DARK_RED).message("§4§lInitialize Plugin Main Variable to this!§r");
 		setPlugin(this);
+		new File(this.getDataFolder() + "/languages").mkdir();
 		logger.message("§e§lVariable Done!§r");
 		mm = new MessagesManager(this);
 		if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -142,7 +173,6 @@ public class Main extends JavaPlugin implements Listener {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			loadMessages();
 			logger.message("§e§lDone!§r");
 		}
 //		ccs.sendMessage("|---------§c§lCreating Item Configuration files if not exists!§r---------|");
@@ -180,92 +210,48 @@ public class Main extends JavaPlugin implements Listener {
 		logger.coloredSpacer(ChatColor.DARK_RED).message("§e§lStarting Done!§r");
 		pm.registerEvents(this, this);
 		logger.coloredSpacer(ChatColor.GREEN);
-		if(messages != null && messages.getConfigurationSection("Plugin") != null) {
-			ccs.sendMessage(ChatColor.translateAlternateColorCodes('&', messages.getString("Plugin.EnablingMessage")));
+		// Language Manager Enabling
+		LanguageFile deLang = new LanguageFile(this, "de");
+		LanguageFile enLang = new LanguageFile(this, "en");
+		languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"));
+		languageManager.addLang(deLang, deLang.getLangName());
+		languageManager.addLang(enLang, enLang.getLangName());
+		languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language")));
+		Bukkit.getPluginManager().registerEvents(new MenuListener(), this);
+		if (languageManager != null && languageManager.getMessage("Plugin.EnablingMessage", null) != null &&
+				!languageManager.getMessage("Plugin.EnablingMessage", null).equals("null config") &&
+				!languageManager.getMessage("Plugin.EnablingMessage", null).startsWith("null path: Messages.")) {
+			getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null));
 		} else {
 			getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
 		}
-		//logger.coloredSpacer(ChatColor.GREEN);
-		//logger.message("Searching for Updates: .");
-		//logger.message("Searching for Updates: ..");
-		//logger.message("Searching for Updates: ...");
-		//logger.message("Searching for Updates: .....");
-		//logger.message("Searching for Updates: ......");
-		//UpdateChecker updater = new UpdateChecker(this);
-		//updater.fetch();
-		//logger.coloredSpacer(ChatColor.GREEN);
+		if(getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
+			updater = new Updater(this, 91800);
+			updater.checkForUpdates();
+			if(updater.updateAvailable()) {
+				updater.downloadPlugin();
+			}
+		}
+	}
+
+	public File getFile() {
+		return this.getFile();
 	}
 
 	public StartUpLogger getStartUpLogger() { return logger; }
 
-
-
-//	private void loadTrollItems(ConsoleCommandSender ccs) {
-//		ccs.sendMessage("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST");
-//		ccs.sendMessage("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST12121");
-//	}
-
-
-
-
-
-
-
-
-	private void loadMessages() {
-//		messages.addDefault("Plugin.EnablingMessage", "%startprefix% successfully enabled!");
-//		messages.addDefault("Plugin.DisablingMessage", "%startprefix% successfully disabled!");
-//		messages.addDefault("No-Permission-Message", "&cYou don't have access to this Command!");
-//		messages.addDefault("ConsoleExecutesPlayerCommand", "&cYou have to be a player!");
-//		messages.addDefault("OpeningMessageSelf", "&cYou have opened the Admin Panel for you!");
-//		messages.addDefault("OpeningMessageSelfOpenedForOther", "&cYou have opened the Admin Panel for %targetplayer%!");
-//		messages.addDefault("OpeningMessageOther", "&c%player% has openend for you the Admin Panel!");
-//		messages.addDefault("TargetedPlayerIsNull", "&cThis player is not online or does not exist!");
-//		messages.addDefault("PlayerManager.SelfBanningMessage", "&cYou cannot Ban yourself!");
-//		messages.addDefault("PlayerManager.KickReason", "&cKick for Safety!");
-//		messages.addDefault("PlayerManager.KickSourceMessage", "%player%");
-//		messages.addDefault("PlayerManager.BanReason", "&cBan for Safety!");
-//		messages.addDefault("PlayerManager.BanSourceMessage", "%player%");
-//		messages.addDefault("TomanyArguments", "&4There are to many Arguments!");
-//		messages.addDefault("ServerManager.KickAllPlayersReason", "§cKick for Safety");
-//		messages.addDefault("ServerManager.KickAllPlayersSource", "%player%");
-//		messages.addDefault("ServerManager.ChatClearHeader", "&a+---------------------------------------------------+");
-//		messages.addDefault("ServerManager.ChatClearMessage", "    &2The Chat has been cleared by &3%player%");
-//		messages.addDefault("ServerManager.ChatClearFooter", "&a+---------------------------------------------------+");
-//		messages.addDefault("ServerManager.MaintenanceMode", "&5%targetplayer% &cThe Server entered the &4&lMaintenance Mode!");
-//		messages.addDefault("Pman.Money.NotEnoughMoneyToTake", "%targetplayer% has not enoug Money (%balance%)");
-//		messages.addDefault("ChatMute.PlayerMessage", "&4The Chat is muted try again later %player%!");
-//		messages.addDefault("ChatMute.Broadcastheader", "&a+---------------------------------------------------+");
-//		messages.addDefault("ChatMute.Broadcast", "       &4The Chat has been muted by %player%!");
-//		messages.addDefault("ChatMute.Broadcastfooter", "&a+---------------------------------------------------+");
-//		messages.addDefault("ChatUnMute.Broadcastheader", "&a+---------------------------------------------------+");
-//		messages.addDefault("ChatUnMute.Broadcast", "       &4The Chat has been unmuted by %player%!");
-//		messages.addDefault("ChatUnMute.Broadcastfooter", "&a+---------------------------------------------------+");
-//		messages.addDefault("TrollGui.Messages.Test", "Test");
-//		messages.options().copyDefaults(true);
-//		try {
-//			messages.save(messagesfile);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-	}
-	
-	public static boolean isSuperVanishEnabled() {
-		return plugin.getServer().getPluginManager().isPluginEnabled("SuperVanish");
-	}
-	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onLogin(PlayerLoginEvent e) {
-		Player p = e.getPlayer();
-		if(ServerManagment.isMaintenance_mode() == true) {
-			e.disallow(null, Utils.getInstance().replacePlaceHolders(p, messages.getString("ServerManager.MaintenanceMode"), Main.getPrefix()));
+		Player player = e.getPlayer();
+		if(ServerManagment.isMaintenance_mode()) {
+			e.disallow(PlayerLoginEvent.Result.KICK_OTHER, languageManager.getMessage("Player.ServerManager.MaintenanceMode", player));
 		}
-		if(p.isBanned()) {
+		if(player.isBanned()) {
 			e.setKickMessage("§cDu wurdest vom Server gebannt!\n" +
 							"\n" + 
-							"§3Von: §e" + Bukkit.getBanList(Type.NAME).getBanEntry(p.getName()).getSource().toString() + "\n" +
+							"§3Von: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getSource() + "\n" +
 							"\n" + 
-							"§3Reason: §e" + Bukkit.getBanList(Type.NAME).getBanEntry(p.getName()).getReason().toString() + "\n" +
+							"§3Reason: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getReason() + "\n" +
 							"\n" + 
 							"§3Permanently banned!" + "\n" +
 							"\n" + 
@@ -275,115 +261,135 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onDisable() {
-		if(messages != null && messages.getConfigurationSection("Plugin") != null) {
-			getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', messages.getString("Plugin.DisablingMessage")));
+		if(languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null) != null &&
+				!languageManager.getMessage("Plugin.DisablingMessage", null).equals("null config") &&
+				!languageManager.getMessage("Plugin.DisablingMessage", null).startsWith("null path: Messages.")) {
+			getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null));
 		} else {
 			getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
 		}
 		
 	}
 
-	private boolean setupPermission() {
+	private void setupPermission() {
 		RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-		perms = rsp.getProvider();
-		return perms != null;
+		if (rsp != null)
+			perms = rsp.getProvider();
 	}
 
-	private boolean setupChat() {
+	private void setupChat() {
 		RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-		chat = rsp.getProvider();
-		return chat != null;
+		if (rsp != null)
+			chat = rsp.getProvider();
 	}
 
 	private boolean setupEconomy() {
-		RegisteredServiceProvider<Economy> economy = getServer().
-				getServicesManager().getRegistration(
-						Economy.class);
+		RegisteredServiceProvider<Economy> economy = getServer().getServicesManager().getRegistration(Economy.class);
 		if(economy != null)
 			eco = economy.getProvider();
-		return (eco != null);
+		return eco != null;
 	}
-	
+
+	public static PlayerMenuUtility getPlayerMenuUtility(Player p) {
+		PlayerMenuUtility playerMenuUtility;
+		if (!(playerMenuUtilityMap.containsKey(p))) { //See if the player has a playermenuutility "saved" for them
+
+			//This player doesn't. Make one for them add add it to the hashmap
+			playerMenuUtility = new PlayerMenuUtility(p);
+			playerMenuUtilityMap.put(p, playerMenuUtility);
+
+			return playerMenuUtility;
+		} else {
+			return playerMenuUtilityMap.get(p); //Return the object by using the provided player
+		}
+	}
+
 	@Override
-	public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
+	public boolean onCommand(@NotNull CommandSender s, Command cmd, @NotNull String label, String[] args) {
+		/*if(cmd.getName().equalsIgnoreCase("test")) {
+			new PlayerSelectMenu(getPlayerMenuUtility((Player) s)).open();
+		}*/
 		if(cmd.getName().equalsIgnoreCase("adminpanel") || cmd.getName().equalsIgnoreCase("apanel") || cmd.getName().equalsIgnoreCase("adminp") || cmd.getName().equalsIgnoreCase("ap")) {
 			if(args.length == 0) {
 				if(s instanceof Player) {
-					Player p = (Player) s;
+					Player player = (Player) s;
 					String sound = getConfig().getString("Panel.SoundWhenOpened");
-					String nopermissionmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix());
-					String openingselfmessage = Utils.getInstance().replacePlaceHolders(p, messages.getString("OpeningMessageSelf"), Main.getPrefix());
-					if(p.hasPermission("AdminPanel.open")) {
-						AdminPanelOpenEvent openEvent = new AdminPanelOpenEvent(p, openingselfmessage, Sound.valueOf(sound));
+					String nopermissionmessage = languageManager.getMessage("Player.General.NoPermissions", player);
+					String openingselfmessage = languageManager.getMessage("Player.General.OpeningMessageSelf", player);
+					if(player.hasPermission("AdminPanel.open")) {
+						AdminPanelOpenEvent openEvent = new AdminPanelOpenEvent(player, openingselfmessage, Sound.valueOf(sound));
 						Bukkit.getPluginManager().callEvent(openEvent);
 						if(!openEvent.isCancelled()) {
-							p.sendMessage(openEvent.getMessage());
-							ExampleGui.openInv(p);
-							if(getConfig().getBoolean("Panel.PlaySoundsWhenOponed") == true) {
+							player.sendMessage(openEvent.getMessage());
+							ExampleGui.openInv(player);
+							if(getConfig().getBoolean("Panel.PlaySoundsWhenOponed")) {
 								if(getConfig().getString("Panel.SoundWhenOpened") != null) {
-									p.playSound(p.getLocation(), openEvent.getOpeningSound(), (float) getConfig().getDouble("Panel.SoundVolume"), (float) getConfig().getDouble("Panel.SoundPitch"));
+									player.playSound(player.getLocation(), openEvent.getOpeningSound(), (float) getConfig().getDouble("Panel.SoundVolume"), (float) getConfig().getDouble("Panel.SoundPitch"));
 								}
 							}
 						}
 					} else {
-						p.sendMessage(nopermissionmessage);
+						player.sendMessage(nopermissionmessage);
 					}
 				} else {
-					s.sendMessage(Utils.getInstance().replacePlaceHolders(null, messages.getString("ConsoleExecutesPlayerCommand"), Main.getPrefix()));
+					s.sendMessage(languageManager.getMessage("Console.ExecutesPlayerCommand", null));
 				}
 			} else if(args.length == 1) {
 				if(s instanceof Player) {
-					Player p = (Player) s;
+					Player player = (Player) s;
 					Player target = Bukkit.getPlayerExact(args[0]);
-					String OpeningMessageOther = Utils.getInstance().replacePlaceHolders(p, messages.getString("OpeningMessageOther"), Main.getPrefix());
-					String targetplayerisnull = Utils.getInstance().replacePlaceHolders(p, messages.getString("TargetedPlayerIsNull"), Main.getPrefix());
-					String OpeningMessageSelfOpenedForOther = Utils.getInstance().replacePlaceHolders(p, messages.getString("OpeningMessageSelfOpenedForOther"), Main.getPrefix());
-					if(p.hasPermission("AdminPanel.open.other")) {
-						AdminPanelOpenForOtherEvent openForOtherEvent = new AdminPanelOpenForOtherEvent(p, target, OpeningMessageSelfOpenedForOther, OpeningMessageOther);
+					String OpeningMessageOther = languageManager.getMessage("Player.General.OpeningMessageOther", player);
+					String targetplayerisnull = languageManager.getMessage("Player.General.TargetedPlayerIsNull", player);
+					String OpeningMessageSelfOpenedForOther = languageManager.getMessage("Player.General.OpeningMessageSelfOpenedForOther", player);
+					if(player.hasPermission("AdminPanel.open.other")) {
+						AdminPanelOpenForOtherEvent openForOtherEvent = new AdminPanelOpenForOtherEvent(player, target, OpeningMessageSelfOpenedForOther, OpeningMessageOther);
 						Bukkit.getPluginManager().callEvent(openForOtherEvent);
 						if(!openForOtherEvent.isCancelled()) {
-							if (!messages.getString("OpeningMessageSelfOpenedForOther").equals("") || messages.getString("OpeningMessageSelfOpenedForOther") != null) {
+							if(!OpeningMessageSelfOpenedForOther.equals("null config") &&
+									!OpeningMessageSelfOpenedForOther.startsWith("null path: Messages.")) {
 								try {
-									ExampleGui.openInv(target);
-									p.sendMessage(OpeningMessageSelfOpenedForOther);
-									target.sendMessage(OpeningMessageOther);
+									ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+									player.sendMessage(OpeningMessageSelfOpenedForOther);
+									openForOtherEvent.getTargetPlayer().sendMessage(OpeningMessageSelfOpenedForOther);
 								} catch (NullPointerException e) {
-									p.sendMessage(targetplayerisnull);
+									player.sendMessage(targetplayerisnull);
 								}
 							} else {
 								try {
-									ExampleGui.openInv(target);
-									p.sendMessage(OpeningMessageSelfOpenedForOther);
+									ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+									player.sendMessage(OpeningMessageSelfOpenedForOther);
 								} catch (NullPointerException e) {
-									p.sendMessage(targetplayerisnull);
+									player.sendMessage(targetplayerisnull);
 								}
 							}
 						}
 					} else {
-						p.sendMessage(Utils.getInstance().replacePlaceHolders(p, messages.getString("No-Permission-Message"), Main.getPrefix()));
+						player.sendMessage(languageManager.getMessage("Player.General.NoPermissions", player));
 					}
 				}
 				if(s instanceof ConsoleCommandSender) {
 					ConsoleCommandSender console = (ConsoleCommandSender) s;
 					Player target = Bukkit.getPlayerExact(args[0]);
-					String OpeningMessageOther = Utils.getInstance().replacePlaceHolders(target, messages.getString("OpeningMessageOther"), Main.getPrefix());
-					String targetplayerisnull = Utils.getInstance().replacePlaceHolders(target, messages.getString("TargetedPlayerIsNull"), Main.getPrefix());
-					String OpeningMessageSelfOpenedForOther = Utils.getInstance().replacePlaceHolders(target, messages.getString("OpeningMessageSelfOpenedForOther"), Main.getPrefix());
-					AdminPanelOpenForOtherEvent openForOtherEvent = new AdminPanelOpenForOtherEvent(null, target, OpeningMessageOther, OpeningMessageSelfOpenedForOther);
+					String OpeningMessageOther = languageManager.getMessage("Player.General.OpeningMessageOther", target);
+					String targetplayerisnull = languageManager.getMessage("Player.General.TargetedPlayerIsNull", target);
+					String OpeningMessageSelfOpenedForOther = languageManager.getMessage("Player.General.OpeningMessageSelfOpenedForOther", target);
+					AdminPanelOpenForOtherEvent openForOtherEvent =
+							new AdminPanelOpenForOtherEvent(null, target, OpeningMessageOther, OpeningMessageSelfOpenedForOther);
 					Bukkit.getPluginManager().callEvent(openForOtherEvent);
 					if(!openForOtherEvent.isCancelled()) {
-						if(messages.getString("OpeningMessageSelfOpenedForOther") != "" || messages.getString("OpeningMessageSelfOpenedForOther") != null) {
+						if(!OpeningMessageSelfOpenedForOther.equals("null config") &&
+								!OpeningMessageSelfOpenedForOther.startsWith("null path: Messages.")) {
 							try {
-								ExampleGui.openInv(target);
+								ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
 								console.sendMessage(openForOtherEvent.getMessageToPlayer());
-								target.sendMessage(openForOtherEvent.getMessageToTarget());
+								openForOtherEvent.getTargetPlayer().sendMessage(openForOtherEvent.getMessageToTarget());
 							} catch (NullPointerException e) {
 								console.sendMessage(targetplayerisnull);
 							}
 						} else {
 							try {
 								console.sendMessage(openForOtherEvent.getMessageToPlayer());
-								ExampleGui.openInv(target);
+								ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
 							} catch (NullPointerException e) {
 								console.sendMessage(targetplayerisnull);
 							}
@@ -391,44 +397,21 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			} else {
-				s.sendMessage(Utils.getInstance().replacePlaceHolders(null, messages.getString("TomanyArguments"), Main.getPrefix()));
+				s.sendMessage(languageManager.getMessage("Player.ToManyArguments", null));
 			}
 		}
 		return true;
 	}
 
-	/*private String getAlphaNumericString(int n) {
-		// lower limit for LowerCase Letters
-		int lowerLimit = 97;
-
-		// lower limit for LowerCase Letters
-		int upperLimit = 122;
-
-		Random random = new Random();
-
-		// Create a StringBuffer to store the result
-		StringBuffer r = new StringBuffer(n);
-
-		for (int i = 0; i < n; i++) {
-
-			// take a random value between 97 and 122
-			int nextRandomChar = lowerLimit
-					+ (int) (random.nextFloat()
-					* (upperLimit - lowerLimit + 1));
-
-			// append a character at the end of bs
-			r.append((char) nextRandomChar);
-		}
-
-		// return the resultant string
-		return r.toString();
-	}*/
-
 	public static Main getPlugin() {
 		return plugin;
 	}
 
-	public static void setPlugin(Main plugin) {
+	private void setPlugin(Main plugin) {
 		Main.plugin = plugin;
+	}
+
+	public File getBanFile() {
+		return banfile;
 	}
 }
