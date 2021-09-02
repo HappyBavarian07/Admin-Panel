@@ -77,7 +77,7 @@ Items:
         - ' '
     Refresh:
       material: LEVER
-      displayName: '&aAktualisieren'
+      displayName: '&aRefresh'
       lore:
         - '&aRefresh this Page!'
   PlayerManager:
@@ -86,10 +86,10 @@ Items:
       displayName: '%player_name%'
       lore:
         - '&6GameMode: &7%player_gamemode%'
-        - '&6Geld: &7%vault_eco_balance%'
-        - '&6Lebel: &7%player_health%'
-        - '&6Essen: &7%player_food_level%'
-        - '&6IP-Addresse: &7%player_ip%'
+        - '&6Money: &7%vault_eco_balance%'
+        - '&6Health: &7%player_health%'
+        - '&6Food: &7%player_food_level%'
+        - '&6IP-Address: &7%player_ip%'
     TrollMenu:
       VillagerSounds:
         true:
@@ -336,7 +336,249 @@ Items:
         displayName: '&cTake Money'
         lore:
           - '&cTake the Players Money!'
+  WorldManager:
+    Settings:
+      PVP:
+        true:
+          material: DIAMOND_SWORD
+          displayName: '&aPVP'
+          lore:
+            - '&cTurn off PVP in the world!'
+        false:
+          material: DIAMOND_SWORD
+          displayName: '&cPVP'
+          lore:
+            - '&cTurn on PVP in the world!'
+      AutoSave:
+        true:
+          material: PAPER
+          displayName: '&aAuto Save'
+          lore:
+            - '&aTurn off Auto Save in the world!'
+        false:
+          material: PAPER
+          displayName: '&cAuto Save'
+          lore:
+            - '&cTurn on Auto Save in the world!'
+      Load:
+        material: BEACON
+        displayName: '&aLoad'
+        lore:
+          - '&aLoad the World!'
+      Unload:
+        material: ANVIL
+        displayName: '&cUnload'
+        lore:
+          - '&aUnload the World!'
+      Save:
+        material: ENDER_CHEST
+        displayName: '&6Save'
+        lore:
+          - '&aSave the World (World Files)!'
+      Delete:
+        material: TNT
+        displayName: '&4Delete'
+        lore:
+          - '&4Delete the World!'
+      GameRule:
+        material: COMMAND_BLOCK
+        displayName: '&aGamerules'
+        lore:
+          - '&aChange all Gamerules listed in this Menu!'
+      TPToSpawn:
+        material: ENDER_PEARL
+        displayName: '&aTeleport to World Spawn'
+        lore:
+          - '&aTeleport you to the World Spawn!'
+      Weather:
+        material: WATER_BUCKET
+        displayName: '&aWeather'
+        lore:
+          - '&aChange the Weather!'
+      Time:
+        material: CLOCK
+        displayName: '&aTime'
+        lore:
+          - '&aChange the Time!'
+    Create:
+      material: CHEST
+      displayName: '&aCreate World'
+      lore:
+        - '&aCreate the new World!'
+    CreateMenu:
+      Name:
+        material: PAPER
+        displayName: '&aName'
+        lore:
+          - '&aSet the Name of the World!'
+          - '&a%name%'
+      Type:
+        NORMAL:
+          material: BEACON
+          displayName: '&aWorld Type'
+          lore:
+            - '&aSet the type of the world!'
+            - '&c%type%'
+        AMPLIFIED:
+          material: BEACON
+          displayName: '&aWorld Type'
+          lore:
+            - '&aSet the type of the world!'
+            - '&c%type%'
+        FLAT:
+          material: BEACON
+          displayName: '&aWorld Type'
+          lore:
+            - '&aSet the type of the world!'
+            - '&c%type%'
+        LARGE_BIOMES:
+          material: BEACON
+          displayName: '&aWorld Type'
+          lore:
+            - '&aSet the type of the world!'
+            - '&c%type%'
+      Environment:
+        NORMAL:
+          material: GRASS_BLOCK
+          displayName: '&aEnvironment'
+          lore:
+            - '&aSet the environment of the world!'
+            - '&c%environment%'
+        NETHER:
+          material: GRASS_BLOCK
+          displayName: '&aEnvironment'
+          lore:
+            - '&aSet the environment of the world!'
+            - '&c%environment%'
+        THE_END:
+          material: GRASS_BLOCK
+          displayName: '&aEnvironment'
+          lore:
+            - '&aSet the environment of the world!'
+            - '&c%environment%'
+      GenerateStructures:
+        true:
+          material: END_PORTAL_FRAME
+          displayName: '&aGenerate Structures'
+          lore:
+            - '&aSet GenerateStructures to false!'
+        false:
+          material: END_PORTAL_FRAME
+          displayName: '&cGenerate Structures'
+          lore:
+            - '&aSet GenerateStructures to true!'
+      CreateWorld:
+        material: CHEST
+        displayName: '&aCreate World'
+        lore:
+          - '&aCreates the World!'
+      Hardcore:
+        true:
+          material: GOLDEN_APPLE
+          displayName: '&aHardcore'
+          lore:
+            - '&aPut the world in hardcore!'
+        false:
+          material: GOLDEN_APPLE
+          displayName: '&cHardcore'
+          lore:
+            - '&cPut the world in hardcore!'
+    Weather:
+      CLEAR:
+        material: BUCKET
+        displayName: '&aClear'
+        lore:
+          - '&cChange to Clear!'
+      RAINING:
+        material: WATER_BUCKET
+        displayName: '&aRain'
+        lore:
+          - '&cChange to Rain!'
+      THUNDERING:
+        material: LAVA_BUCKET
+        displayName: '&aThunder'
+        lore:
+          - '&cChange to Thunder!'
+    Time:
+      SUNRISE:
+        material: MAGENTA_CONCRETE
+        displayName: '&aSunrise'
+        lore:
+          - '&cChange to Sunrise!'
+      DAY:
+        material: LIGHT_BLUE_CONCRETE
+        displayName: '&aDay'
+        lore:
+          - '&cChange to Day!'
+      MORNING:
+        material: LIME_CONCRETE
+        displayName: '&aMorning'
+        lore:
+          - '&cChange to Morning!'
+      NOON:
+        material: GREEN_CONCRETE
+        displayName: '&aNoon'
+        lore:
+          - '&cChange to Noon!'
+      AFTERNOON:
+        material: YELLOW_CONCRETE
+        displayName: '&aAfternoon'
+        lore:
+          - '&cChange to Afternoon!'
+      SUNSET:
+        material: GRAY_CONCRETE
+        displayName: '&aSunset'
+        lore:
+          - '&cChange to Sunset!'
+      NIGHT:
+        material: GRAY_CONCRETE
+        displayName: '&aNight'
+        lore:
+          - '&cChange to Night!'
+      MIDNIGHT:
+        material: BLACK_CONCRETE
+        displayName: '&aMidnight'
+        lore:
+          - '&cChange to Midnight!'
+  StartMenu:
+    WorldManager:
+      material: GRASS_BLOCK
+      displayName: '&2World Manager'
+      lore:
+        - '&aManages the Worlds from the Server!'
+    PlayerManager:
+      material: PLAYER_HEAD
+      displayName: '&6Player Manager'
+      lore:
+        - '&aManages the Players from the Server!'
+    PluginManager:
+      material: REDSTONE_BLOCK
+      displayName: '&3Plugin Manager'
+      lore:
+        - '&aManages the Plugins from the Server!'
+    ServerManager:
+      material: DIAMOND_BLOCK
+      displayName: '&6Server Manager'
+      lore:
+        - '&aManages the Server!'
+    ServerReload:
+      material: ACACIA_BOAT
+      displayName: '&6Server reload'
+      lore:
+        - '&aReloads the Server!'
+    ServerStop:
+      material: DIAMOND
+      displayName: '&4Server Stop'
+      lore:
+        - '&aStops the Server!'
+    HintItem:
+      material: PAPER
+      displayName: '&aAdmin Panel Info'
+      lore:
+        - '&aIn this menu you can click on Items,'
+        - '&awhich then forward you to submenus!'
 MenuTitles:
+  StartMenu: '&4&lAdmin-Panel'
   PlayerManager:
     PlayerSelector: '&aSelect a Player'
     PlayerActions: '&aActions: %player_name%'
@@ -350,3 +592,7 @@ MenuTitles:
   WorldManager:
     WorldSelector: '&aSelect a World'
     WorldSettings: '&3Settings'
+    WorldCreateMenu: '&3Create World'
+    GameRuleMenu: '&3Gamerules'
+    TimeMenu: '&3Time'
+    WeatherMenu: '&3Weather'

@@ -1,2 +1,0 @@
-# Spiget
-SourceCodes for SpigetApi

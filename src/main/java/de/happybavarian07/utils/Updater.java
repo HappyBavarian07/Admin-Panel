@@ -5,15 +5,13 @@ import io.CodedByYou.spiget.Resource;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -21,8 +19,9 @@ import org.jsoup.Jsoup;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.*;
 
 public class Updater implements Listener {
     private final Main plugin;
@@ -37,6 +36,10 @@ public class Updater implements Listener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String html2text(String html) {
+        return Jsoup.parse(html).text();
     }
 
     public String getLatestVersionID() {
@@ -149,6 +152,8 @@ public class Updater implements Listener {
             Bukkit.getPluginManager().registerEvents(this, plugin);
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             try {
+                String descriptionEncoded = jsonObject.getString("description");
+                String descriptionDecoded = html2text(new String(Base64.getDecoder().decode(descriptionEncoded)));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
                         " &cPlugin outdated! &6Please download the new version on&r\n" +
                                 "&6https://www.spigotmc.org/resources/servermanager-an-mc-integrated-admin-panel-german.91800/\n" +
@@ -156,16 +161,13 @@ public class Updater implements Listener {
                                 "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
                                 "&bNew Version: &c" + getLatestVersionName() + "&r\n" +
                                 "&bNew Version ID: &c" + getLatestVersionID() + "&r\n" +
-                                "&bNew Version Title: &c" + jsonObject.getString("title") + "&r"));
+                                "&bNew Version Title: &c" + jsonObject.getString("title") + "&r\n" +
+                                "&bNew Version Description: &c" + descriptionDecoded));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
         }
-    }
-
-    public static String html2text(String html) {
-        return Jsoup.parse(html).text();
     }
 
     public void sendUpdateMessage(Player sender) {
@@ -218,6 +220,8 @@ public class Updater implements Listener {
         if (!plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate")) return;
         try {
             File downloadPath = new File(plugin.getDataFolder() + "/downladed-update/91800.jar");
+            File oldPluginFile = new File("plugins/Admin-Panel-" + getPluginVersion() + ".jar");
+            File newPluginFile = new File("plugins/Admin-Panel-" + getLatestVersionName() + ".jar");
             downloadPath.getParentFile().mkdir();
             if (!downloadPath.exists()) {
                 downloadPath.createNewFile();
@@ -227,29 +231,189 @@ public class Updater implements Listener {
             downloadPath.renameTo(new File(plugin.getDataFolder() + "/downladed-update/Admin-Panel-" + getLatestVersionName() + ".jar"));
             downloadPath = new File(plugin.getDataFolder() + "/downladed-update/Admin-Panel-" + getLatestVersionName() + ".jar");
             new File(plugin.getDataFolder() + "/downladed-update/91800.jar").delete();
-            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") &&
-                    !replace) {
+            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !replace) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
+                return;
             }
-            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") &&
-                    replace) {
-                HandlerList.unregisterAll((Plugin) plugin);
-                unregisterCommand(plugin.getCommand("adminpanel"));
-                unregisterCommand(plugin.getCommand("test"));
-                unregisterCommand(plugin.getCommand("update"));
-                Bukkit.getPluginManager().disablePlugin(plugin);
-                new File("plugins/Admin-Panel-" + getPluginVersion() + ".jar").delete();
-                FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
+            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && replace) {
+
+                try {
+                    unload(plugin);
+                    oldPluginFile.delete();
+                    FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                load(Bukkit.getPluginManager().getPlugin("Admin-Panel"));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
                         "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
-                                "&aAnd The New Version started automatically! If you can please check Console for Errors! Server reloaded!"));
-                Bukkit.getPluginManager().loadPlugin(downloadPath);
-                Bukkit.getPluginManager().enablePlugin(plugin);
+                                "&aAnd The New Version started automatically! If you can please check Console for Errors!"));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void load(Plugin plugin) {
+        load(plugin.getName(), plugin.getDescription().getVersion());
+    }
+
+    public void load(String name, String version) {
+
+        Plugin target = null;
+
+        File pluginDir = new File("plugins");
+
+        if (!pluginDir.isDirectory()) {
+            return;
+        }
+
+        File pluginFile = new File(pluginDir, name + "-" + version + ".jar");
+
+        if (!pluginFile.isFile()) {
+            for (File f : pluginDir.listFiles()) {
+                if (f.getName().endsWith(".jar")) {
+                    try {
+                        PluginDescriptionFile desc = plugin.getPluginLoader().getPluginDescription(f);
+                        if (desc.getName().equalsIgnoreCase(name)) {
+                            pluginFile = f;
+                            break;
+                        }
+                    } catch (InvalidDescriptionException e) {
+                        return;
+                    }
+                }
+            }
+        }
+
+        try {
+            target = Bukkit.getPluginManager().loadPlugin(pluginFile);
+        } catch (InvalidDescriptionException | InvalidPluginException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        target.onLoad();
+        Bukkit.getPluginManager().enablePlugin(target);
+    }
+
+    public void unload(Plugin plugin) {
+
+        String name = plugin.getName();
+
+        PluginManager pluginManager = Bukkit.getPluginManager();
+
+        SimpleCommandMap commandMap = null;
+
+        List<Plugin> plugins = null;
+
+        Map<String, Plugin> names = null;
+        Map<String, Command> commands = null;
+        Map<Event, SortedSet<RegisteredListener>> listeners = null;
+
+        boolean reloadlisteners = true;
+
+        if (pluginManager != null) {
+            pluginManager.disablePlugin(plugin);
+
+            try {
+
+                Field pluginsField = Bukkit.getPluginManager().getClass().getDeclaredField("plugins");
+                pluginsField.setAccessible(true);
+                plugins = (List<Plugin>) pluginsField.get(pluginManager);
+
+                Field lookupNamesField = Bukkit.getPluginManager().getClass().getDeclaredField("lookupNames");
+                lookupNamesField.setAccessible(true);
+                names = (Map<String, Plugin>) lookupNamesField.get(pluginManager);
+
+                try {
+                    Field listenersField = Bukkit.getPluginManager().getClass().getDeclaredField("listeners");
+                    listenersField.setAccessible(true);
+                    listeners = (Map<Event, SortedSet<RegisteredListener>>) listenersField.get(pluginManager);
+                } catch (Exception e) {
+                    reloadlisteners = false;
+                }
+
+                Field commandMapField = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
+                commandMapField.setAccessible(true);
+                commandMap = (SimpleCommandMap) commandMapField.get(pluginManager);
+
+                Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+                knownCommandsField.setAccessible(true);
+                commands = (Map<String, Command>) knownCommandsField.get(commandMap);
+
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        pluginManager.disablePlugin(plugin);
+
+        if (plugins != null && plugins.contains(plugin))
+            plugins.remove(plugin);
+
+        if (names != null && names.containsKey(name))
+            names.remove(name);
+
+        if (listeners != null && reloadlisteners) {
+            for (SortedSet<RegisteredListener> set : listeners.values()) {
+                for (Iterator<RegisteredListener> it = set.iterator(); it.hasNext(); ) {
+                    RegisteredListener value = it.next();
+                    if (value.getPlugin() == plugin) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        if (commandMap != null) {
+            for (Iterator<Map.Entry<String, Command>> it = commands.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<String, Command> entry = it.next();
+                if (entry.getValue() instanceof PluginCommand) {
+                    PluginCommand c = (PluginCommand) entry.getValue();
+                    if (c.getPlugin() == plugin) {
+                        c.unregister(commandMap);
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        // Attempt to close the classloader to unlock any handles on the plugin's jar file.
+        ClassLoader cl = plugin.getClass().getClassLoader();
+
+        if (cl instanceof URLClassLoader) {
+
+            try {
+
+                Field pluginField = cl.getClass().getDeclaredField("plugin");
+                pluginField.setAccessible(true);
+                pluginField.set(cl, null);
+
+                Field pluginInitField = cl.getClass().getDeclaredField("pluginInit");
+                pluginInitField.setAccessible(true);
+                pluginInitField.set(cl, null);
+
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+
+                ((URLClassLoader) cl).close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        }
+
+        // Will not work on processes started with the -XX:+DisableExplicitGC flag, but lets try it anyway.
+        // This tries to get around the issue where Windows refuses to unlock jar files that were previously loaded into the JVM.
+        System.gc();
     }
 
     public CommandMap getCommandMap() {
@@ -285,13 +449,17 @@ public class Updater implements Listener {
         if (player.hasPermission("adminpanel.updatenotify")) {
             JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/91800/updates/latest?size=5&page=0&sort=%2B");
             try {
+                String descriptionEncoded = jsonObject.getString("description");
+                String descriptionDecoded = html2text(new String(Base64.getDecoder().decode(descriptionEncoded)));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        Main.getPrefix() + " &cPlugin outdated! &6Please download the new version on&r\n" +
+                        " &cPlugin outdated! &6Please download the new version on&r\n" +
                                 "&6https://www.spigotmc.org/resources/servermanager-an-mc-integrated-admin-panel-german.91800/\n" +
+                                "&6or just activate automatic updating and replacing in the Config!\n" +
                                 "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
                                 "&bNew Version: &c" + getLatestVersionName() + "&r\n" +
                                 "&bNew Version ID: &c" + getLatestVersionID() + "&r\n" +
-                                "&bNew Version Title: &c" + jsonObject.getString("title") + "&r"));
+                                "&bNew Version Title: &c" + jsonObject.getString("title") + "&r\n" +
+                                "&bNew Version Description: &c" + descriptionDecoded));
                 if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") &&
                         !plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));

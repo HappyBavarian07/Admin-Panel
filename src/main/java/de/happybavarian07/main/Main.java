@@ -109,7 +109,6 @@ public class Main extends JavaPlugin implements Listener {
 	private static Main plugin;
 	@Override
 	public void onEnable() {
-		new Utils(this);
 		new ChatUtil();
 		Server server = getServer();
 
@@ -125,6 +124,7 @@ public class Main extends JavaPlugin implements Listener {
                 );
 		logger.coloredSpacer(ChatColor.DARK_RED).message("§4§lInitialize Plugin Main Variable to this!§r");
 		setPlugin(this);
+		new Utils(getPlugin());
 		new File(this.getDataFolder() + "/languages").mkdir();
 		logger.message("§e§lVariable Done!§r");
 		mm = new MessagesManager(this);
@@ -227,6 +227,14 @@ public class Main extends JavaPlugin implements Listener {
 				updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"));
 			}
 			this.getCommand("update").setExecutor(new UpdateCommand());
+		}
+	}
+
+	@Override
+	public void onLoad() {
+		if(getServer().getPluginManager().getPlugin("Vault") != null || getServer().getPluginManager().getPlugin("Vault").isEnabled() ||
+				getServer().getPluginManager().getPlugin("PlaceholderAPI") != null || getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
+			onEnable();
 		}
 	}
 

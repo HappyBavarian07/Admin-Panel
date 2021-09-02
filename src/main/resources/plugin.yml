@@ -3,10 +3,11 @@ main: de.happybavarian07.main.Main
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07
-depend: [Vault, PlaceholderAPI, TitleAPI]
+depend: [Vault, PlaceholderAPI]
 load: POSTWORLD
 loadbefore:
   - Vault
+  - PlaceholderAPI
 commands:
   adminpanel:
     description: Opens the Adminpanel

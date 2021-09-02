@@ -94,7 +94,7 @@ Items:
       lore:
         - '&6GameMode: &7%player_gamemode%'
         - '&6Geld: &7%vault_eco_balance%'
-        - '&6Lebel: &7%player_health%'
+        - '&6Leben: &7%player_health%'
         - '&6Essen: &7%player_food_level%'
         - '&6IP-Addresse: &7%player_ip%'
     TrollMenu:
