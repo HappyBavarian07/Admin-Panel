@@ -38,7 +38,7 @@ public class Updater implements Listener {
         }
     }
 
-    public static String html2text(String html) {
+    public String html2text(String html) {
         return Jsoup.parse(html).text();
     }
 
@@ -148,7 +148,7 @@ public class Updater implements Listener {
         if (!updateAvailable) {
             plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + " &a No Update available!"));
         } else {
-            JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/91800/updates/latest?size=5&page=0&sort=%2B");
+            JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
             Bukkit.getPluginManager().registerEvents(this, plugin);
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             try {
@@ -171,7 +171,7 @@ public class Updater implements Listener {
     }
 
     public void sendUpdateMessage(Player sender) {
-        JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/91800/updates/latest?size=5&page=0&sort=%2B");
+        JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
         try {
             String descriptionEncoded = jsonObject.getString("description");
             String descriptionDecoded = html2text(new String(Base64.getDecoder().decode(descriptionEncoded)));
@@ -190,7 +190,7 @@ public class Updater implements Listener {
     }
 
     public void sendUpdateMessage(ConsoleCommandSender sender) {
-        JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/91800/updates/latest?size=5&page=0&sort=%2B");
+        JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
         try {
             String descriptionEncoded = jsonObject.getString("description");
             String descriptionDecoded = html2text(new String(Base64.getDecoder().decode(descriptionEncoded)));
@@ -371,6 +371,7 @@ public class Updater implements Listener {
         }
 
         if (commandMap != null) {
+            assert commands != null;
             for (Iterator<Map.Entry<String, Command>> it = commands.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<String, Command> entry = it.next();
                 if (entry.getValue() instanceof PluginCommand) {
@@ -416,21 +417,6 @@ public class Updater implements Listener {
         System.gc();
     }
 
-    public CommandMap getCommandMap() {
-        try {
-            Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            field.setAccessible(true);
-            return (CommandMap) field.get(Bukkit.getServer());
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void unregisterCommand(Command command) {
-        command.unregister(getCommandMap());
-    }
-
     public Resource getResource() {
         return resource;
     }
@@ -447,7 +433,7 @@ public class Updater implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("adminpanel.updatenotify")) {
-            JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/91800/updates/latest?size=5&page=0&sort=%2B");
+            JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
             try {
                 String descriptionEncoded = jsonObject.getString("description");
                 String descriptionDecoded = html2text(new String(Base64.getDecoder().decode(descriptionEncoded)));
