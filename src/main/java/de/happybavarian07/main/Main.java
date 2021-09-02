@@ -1,12 +1,16 @@
 package de.happybavarian07.main;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import de.happybavarian07.api.StartUpLogger;
+import de.happybavarian07.commands.UpdateCommand;
 import de.happybavarian07.events.general.AdminPanelOpenEvent;
 import de.happybavarian07.events.general.AdminPanelOpenForOtherEvent;
 import de.happybavarian07.gui.*;
 import de.happybavarian07.listeners.MenuListener;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
-import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
+import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.menusystem.menu.worldmanager.WorldSelectMenu;
 import de.happybavarian07.placeholders.PanelExpansion;
 import de.happybavarian07.placeholders.PlayerExpansion;
 import de.happybavarian07.placeholders.PluginExpansion;
@@ -17,10 +21,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.BanList.Type;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Server;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -31,6 +32,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,9 +41,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -107,7 +112,6 @@ public class Main extends JavaPlugin implements Listener {
 		new Utils(this);
 		new ChatUtil();
 		Server server = getServer();
-		ConsoleCommandSender ccs = server.getConsoleSender();
 
 		// bStats
 		int bStatsID = 11778;
@@ -175,10 +179,6 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			logger.message("§e§lDone!§r");
 		}
-//		ccs.sendMessage("|---------§c§lCreating Item Configuration files if not exists!§r---------|");
-//		ccs.sendMessage("|-----------------------§c§lLoading Troll Items!§r-----------------------|");
-//		loadTrollItems();
-//		ccs.sendMessage("|-----------------------------§e§lDone!§r--------------------------------|");
 		if(!banfile.exists()) {
 			logger.spacer().message("§c§lCreating bans.yml file!§r");
 			try {
@@ -193,17 +193,12 @@ public class Main extends JavaPlugin implements Listener {
 		logger.message("§e§lPrefix Done!§r");
 		logger.coloredSpacer(ChatColor.DARK_RED).message("§2§lStarting Registration of Events:§r");
 		PluginManager pm = this.getServer().getPluginManager();
-		pm.registerEvents(new ExampleGui(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading AdminPanel Main GUI Events!§r");
-		pm.registerEvents(new PlayerManagerGUI(this, messages, this.getConfig(), banConfig, banfile), this);
 		logger.message("§3§lLoading Player Manager GUI Events!§r");
 		pm.registerEvents(new PluginStopGUI(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading Plugin Manager GUI Events!§r");
-		pm.registerEvents(new WorldManagment(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading Time/Weather Changer GUI Events!§r");
-		pm.registerEvents(new Time_Weather_Changer_GUi(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading Player Troll GUI Events!§r");
-		pm.registerEvents(new TrollGUI(this, messages, this.getConfig()), this);
 		logger.message("§3§lLoading Server Manager GUI Events!§r");
 		pm.registerEvents(new ServerManagment(this, messages, this.getConfig()), this);
 		logger.message("§4§lEventregistration: Done!§r");
@@ -229,8 +224,9 @@ public class Main extends JavaPlugin implements Listener {
 			updater = new Updater(this, 91800);
 			updater.checkForUpdates();
 			if(updater.updateAvailable()) {
-				updater.downloadPlugin();
+				updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"));
 			}
+			this.getCommand("update").setExecutor(new UpdateCommand());
 		}
 	}
 
@@ -306,9 +302,9 @@ public class Main extends JavaPlugin implements Listener {
 
 	@Override
 	public boolean onCommand(@NotNull CommandSender s, Command cmd, @NotNull String label, String[] args) {
-		/*if(cmd.getName().equalsIgnoreCase("test")) {
-			new PlayerSelectMenu(getPlayerMenuUtility((Player) s)).open();
-		}*/
+		if(cmd.getName().equalsIgnoreCase("test")) {
+			new WorldSelectMenu(getPlayerMenuUtility((Player) s)).open();
+		}
 		if(cmd.getName().equalsIgnoreCase("adminpanel") || cmd.getName().equalsIgnoreCase("apanel") || cmd.getName().equalsIgnoreCase("adminp") || cmd.getName().equalsIgnoreCase("ap")) {
 			if(args.length == 0) {
 				if(s instanceof Player) {
@@ -321,7 +317,7 @@ public class Main extends JavaPlugin implements Listener {
 						Bukkit.getPluginManager().callEvent(openEvent);
 						if(!openEvent.isCancelled()) {
 							player.sendMessage(openEvent.getMessage());
-							ExampleGui.openInv(player);
+							new AdminPanelStartMenu(getPlayerMenuUtility(player)).open();
 							if(getConfig().getBoolean("Panel.PlaySoundsWhenOponed")) {
 								if(getConfig().getString("Panel.SoundWhenOpened") != null) {
 									player.playSound(player.getLocation(), openEvent.getOpeningSound(), (float) getConfig().getDouble("Panel.SoundVolume"), (float) getConfig().getDouble("Panel.SoundPitch"));
@@ -348,7 +344,7 @@ public class Main extends JavaPlugin implements Listener {
 							if(!OpeningMessageSelfOpenedForOther.equals("null config") &&
 									!OpeningMessageSelfOpenedForOther.startsWith("null path: Messages.")) {
 								try {
-									ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+									new AdminPanelStartMenu(getPlayerMenuUtility(openForOtherEvent.getTargetPlayer())).open();
 									player.sendMessage(OpeningMessageSelfOpenedForOther);
 									openForOtherEvent.getTargetPlayer().sendMessage(OpeningMessageSelfOpenedForOther);
 								} catch (NullPointerException e) {
@@ -356,7 +352,7 @@ public class Main extends JavaPlugin implements Listener {
 								}
 							} else {
 								try {
-									ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+									new AdminPanelStartMenu(getPlayerMenuUtility(openForOtherEvent.getTargetPlayer())).open();
 									player.sendMessage(OpeningMessageSelfOpenedForOther);
 								} catch (NullPointerException e) {
 									player.sendMessage(targetplayerisnull);
@@ -380,7 +376,7 @@ public class Main extends JavaPlugin implements Listener {
 						if(!OpeningMessageSelfOpenedForOther.equals("null config") &&
 								!OpeningMessageSelfOpenedForOther.startsWith("null path: Messages.")) {
 							try {
-								ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+								new AdminPanelStartMenu(getPlayerMenuUtility(openForOtherEvent.getTargetPlayer())).open();
 								console.sendMessage(openForOtherEvent.getMessageToPlayer());
 								openForOtherEvent.getTargetPlayer().sendMessage(openForOtherEvent.getMessageToTarget());
 							} catch (NullPointerException e) {
@@ -389,7 +385,7 @@ public class Main extends JavaPlugin implements Listener {
 						} else {
 							try {
 								console.sendMessage(openForOtherEvent.getMessageToPlayer());
-								ExampleGui.openInv(openForOtherEvent.getTargetPlayer());
+								new AdminPanelStartMenu(getPlayerMenuUtility(openForOtherEvent.getTargetPlayer())).open();
 							} catch (NullPointerException e) {
 								console.sendMessage(targetplayerisnull);
 							}
@@ -401,6 +397,28 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 		return true;
+	}
+
+	public ItemStack createSkull(String url, String name) {
+		ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short) 3);
+		if(url.isEmpty()) return head;
+
+		SkullMeta meta = (SkullMeta) head.getItemMeta();
+		meta.setDisplayName(Utils.getInstance().chat(name));
+		GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+
+		profile.getProperties().put("textures", new Property("textures", url));
+
+		try {
+			Field field = meta.getClass().getDeclaredField("profile");
+			field.setAccessible(true);
+			field.set(meta, profile);
+		} catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		head.setItemMeta(meta);
+		return head;
 	}
 
 	public static Main getPlugin() {

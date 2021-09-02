@@ -13,12 +13,16 @@ commands:
     usage: /adminpanel [<Player>]
     aliases: [apanel, adminp, ap]
   test:
+  update:
+    description: The Update Command
+    usage: /update <Check|Download|Replace>
 
 permissions:
   AdminPanel.*:
     default: op
     children:
       AdminPanel.updatenotify: true
+      AdminPanel.update: true
       AdminPanel.Bypass.*:
         default: op
         children:
@@ -80,11 +84,13 @@ permissions:
             default: op
           AdminPanel.WorldManagment.PVP:
             default: op
-          AdminPanel.WorldManagment.Time_Weather.Open:
+          AdminPanel.WorldManagment.Time:
             default: op
-          AdminPanel.WorldManagment.Time.Change:
+          AdminPanel.WorldManagment.Weather:
             default: op
-          AdminPanel.WorldManagment.Weather.Change:
+          AdminPanel.WorldManagment.Settings:
+            default: op
+          AdminPanel.WorldManagment.Create:
             default: op
       AdminPanel.ServerManagment.*:
         default: op

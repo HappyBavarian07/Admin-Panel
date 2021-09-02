@@ -4,9 +4,9 @@ import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
+import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.menusystem.menu.playermanager.money.PlayerActionSelectMenu;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +28,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
 
     @Override
     public String getMenuName() {
-        return Main.getPlugin().getLanguageManager().getMenuTitle("PlayerManager.PlayerSelector", null);
+        return lgm.getMenuTitle("PlayerManager.PlayerSelector", null);
     }
 
     @Override
@@ -55,30 +55,28 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            player.closeInventory();
-        } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
-            if (item.equals(lgm.getItem("General.Left", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageleft")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
-                } else {
-                    page = page - 1;
-                    super.open();
-                }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageright")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (!((index + 1) >= players.size())) {
-                    page = page + 1;
-                    super.open();
-                } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
-                }
+            new AdminPanelStartMenu(Main.getPlayerMenuUtility(player)).open();
+        } else if (item.equals(lgm.getItem("General.Left", null))) {
+            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            if (page == 0) {
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+            } else {
+                page = page - 1;
+                super.open();
+            }
+        } else if (item.equals(lgm.getItem("General.Right", null))) {
+            if (!player.hasPermission("AdminPanel.Button.pageright")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            if (!((index + 1) >= players.size())) {
+                page = page + 1;
+                super.open();
+            } else {
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
             }
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
             super.open();

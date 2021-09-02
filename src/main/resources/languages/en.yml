@@ -347,3 +347,6 @@ MenuTitles:
     ArmorView: '&4Armor'
     MoneyMenu: '&a&lMoney'
     BannedPlayers: '&cBanned Players'
+  WorldManager:
+    WorldSelector: '&aSelect a World'
+    WorldSettings: '&3Settings'

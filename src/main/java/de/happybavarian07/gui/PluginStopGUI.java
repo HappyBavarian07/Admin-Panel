@@ -5,10 +5,9 @@ import de.happybavarian07.events.plugins.PluginEnableEvent;
 import de.happybavarian07.events.plugins.PluginRestartEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
-import de.happybavarian07.utils.Utils;
+import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
@@ -16,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -112,92 +110,31 @@ public class PluginStopGUI implements Listener {
         initializeItems(inv2, page2_2);
         invs.add(inv2);
         ent.openInventory(inv2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
     }
     
     public static void openPage2(final HumanEntity ent) {
     	page2invs.add(page2_2);
     	ent.openInventory(page2_2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
     }
     
     public static void openPluginMenu(final HumanEntity ent) {
     	pluginmanagerinvs.add(pluginmanager2);
     	ent.openInventory(pluginmanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
     }
     
     public static void openPermissionsPage1(final HumanEntity ent) {
     	permissionspage1invs.add(permissionspage1_2);
     	ent.openInventory(permissionspage1_2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
     }
     
     public static void openPermissionsPage2(final HumanEntity ent) {
     	permissionspage2invs.add(permissionspage2_2);
     	ent.openInventory(permissionspage2_2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
     }
     
     public static void openPermissionsPage3(final HumanEntity ent) {
     	permissionspage3invs.add(permissionspage3_2);
     	ent.openInventory(permissionspage3_2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-	}
-	
-	@EventHandler
-	public void onInvClose(final InventoryCloseEvent e) {
-		if(e.getPlayer().getScoreboardTags().contains("AdminPanelOpen")) {
-			e.getPlayer().removeScoreboardTag("AdminPanelOpen");
-		}
 	}
 	
     // Check for clicks on items
@@ -392,7 +329,7 @@ public class PluginStopGUI implements Listener {
         			PluginStopGUI.openInv(player);
         			return;
         		}
-        		ExampleGui.openInv(player);
+        		new AdminPanelStartMenu(Main.getPlayerMenuUtility(player)).open();
         	} else {
         		PluginStopGUI.openInv(player);
         	}

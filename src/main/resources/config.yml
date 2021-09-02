@@ -46,14 +46,13 @@ Plugin:
     downloadPluginUpdate: true
     # If this option and the downloadPluginUpdate option is activated,
     # then the updater will automatically replace the plugin with the new version!
-    # (!!!!!!!!Attention: This Option will Reload The Server after the new Version got replaced!!!!!!!!!!)
     automaticReplace: false
 
 # These are the settings for the panel
 Panel:
 
   # Here you can set whether there are sounds when opening an inventory of the plugin should be played
-  PlaySoundsWhenOpened: true
+  PlaySoundsWhenOpened: false
   # This is the sound that is played when you open a panel / inventory
   # it is only played if the previous query is true
   SoundWhenOpened: ENTITY_BAT_TAKEOFF
@@ -68,7 +67,7 @@ Panel:
 
   # Here you can set whether an effect should be played when someone has a panel open
   # Of course only if you are not in the Vanish (not possible at the moment!)
-  ShowEffectWhenOpened: true
+  ShowEffectWhenOpened: false
   # Here you can set the effect
   EffectWhenOpened: ENDER_SIGNAL
 

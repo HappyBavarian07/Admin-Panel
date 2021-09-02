@@ -14,6 +14,9 @@ Messages:
         geöffnet!'
       TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert
         nicht!'
+    WorldManager:
+      CreateMenu:
+        Name: '%prefix% &9> &aBitte gib einen Namen in den Chat ein!'
     PlayerManager:
       Bypass: '%prefix% &9> &cDiesen Spieler kann man nicht auswählen, da er die Permission dazu hat!'
       ChooseYourself: '%prefix% &9> &cDu kannst dich nicht selber auswählen!'
@@ -51,6 +54,7 @@ Messages:
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
   TomanyArguments: '&4Zu viele Argumente!'
+  TooFewArguments: '&4Zu wenig Argumente!'
 Items:
   General:
     FillerItem:
@@ -339,7 +343,250 @@ Items:
         displayName: '&cTake Money'
         lore:
           - '&cNehme dem Spieler Geld Weg!'
+  WorldManager:
+    Settings:
+      PVP:
+        true:
+          material: DIAMOND_SWORD
+          displayName: '&aPVP'
+          lore:
+            - '&aSchalte PVP in der Welt aus!'
+        false:
+          material: DIAMOND_SWORD
+          displayName: '&cPVP'
+          lore:
+            - '&cSchalte PVP in der Welt an!'
+      AutoSave:
+        true:
+          material: PAPER
+          displayName: '&aAuto Save'
+          lore:
+            - '&aSchalte Auto Save in der Welt aus!'
+        false:
+          material: PAPER
+          displayName: '&cAuto Save'
+          lore:
+            - '&cSchalte Auto Save in der Welt an!'
+      Load:
+        material: BEACON
+        displayName: '&aLaden'
+        lore:
+          - '&aLade die Welt!'
+      Unload:
+        material: ANVIL
+        displayName: '&cEntladen'
+        lore:
+          - '&aEntlade die Welt!'
+      Save:
+        material: ENDER_CHEST
+        displayName: '&6Save'
+        lore:
+          - '&aSpeichere die Welt!'
+      Delete:
+        material: TNT
+        displayName: '&4Löschen'
+        lore:
+          - '&4Lösche die Welt!'
+      GameRule:
+        material: COMMAND_BLOCK
+        displayName: '&aGamerules'
+        lore:
+          - '&aÄndere alle Gamerules die einen true/false Wert haben!'
+      TPToSpawn:
+        material: ENDER_PEARL
+        displayName: '&aTeleport to World Spawn'
+        lore:
+          - '&aTeleportiere dich in die Welt!'
+      Weather:
+        material: WATER_BUCKET
+        displayName: '&aWetter'
+        lore:
+          - '&aWechsle das Wetter!'
+      Time:
+        material: CLOCK
+        displayName: '&aZeit'
+        lore:
+          - '&aWechsle die Zeit!'
+    Create:
+      material: CHEST
+      displayName: '&aErstelle eine Welt'
+      lore:
+        - '&aErstelle eine neue Welt!'
+    CreateMenu:
+      Name:
+        material: PAPER
+        displayName: '&aName der Welt'
+        lore:
+          - '&aSetze den Namen der Welt!'
+          - '&a%name%'
+      Type:
+        NORMAL:
+          material: BEACON
+          displayName: '&aTyp der Welt'
+          lore:
+            - '&aSetze den Typ der Welt!'
+            - '&c%type%'
+        AMPLIFIED:
+          material: BEACON
+          displayName: '&aTyp der Welt'
+          lore:
+            - '&aSetze den Typ der Welt!'
+            - '&c%type%'
+        FLAT:
+          material: BEACON
+          displayName: '&aTyp der Welt'
+          lore:
+            - '&aSetze den Typ der Welt!'
+            - '&c%type%'
+        LARGE_BIOMES:
+          material: BEACON
+          displayName: '&aTyp der Welt'
+          lore:
+            - '&aSetze den Typ der Welt!'
+            - '&c%type%'
+      Environment:
+        NORMAL:
+          material: GRASS_BLOCK
+          displayName: '&aSetze die Umgebung'
+          lore:
+            - '&aSetze die Umgebung der Welt!'
+            - '&c%environment%'
+        NETHER:
+          material: GRASS_BLOCK
+          displayName: '&aSetze die Umgebung'
+          lore:
+            - '&aSetze die Umgebung der Welt!'
+            - '&c%environment%'
+        THE_END:
+          material: GRASS_BLOCK
+          displayName: '&aSetze die Umgebung'
+          lore:
+            - '&aSetze die Umgebung der Welt!'
+            - '&c%environment%'
+      GenerateStructures:
+        true:
+          material: END_PORTAL_FRAME
+          displayName: '&aGeneriere Strukturen'
+          lore:
+            - '&aSetze GenerateStructures auf false!'
+        false:
+          material: END_PORTAL_FRAME
+          displayName: '&cGeneriere Strukturen'
+          lore:
+            - '&aSetze GenerateStructures auf true!'
+      CreateWorld:
+        material: CHEST
+        displayName: '&aErstellt die Welt'
+        lore:
+          - '&aErstellt die neue Welt!'
+      Hardcore:
+        true:
+          material: GOLDEN_APPLE
+          displayName: '&aHardcore'
+          lore:
+            - '&aSetze die Welt in den Hardcore!'
+        false:
+          material: GOLDEN_APPLE
+          displayName: '&cHardcore'
+          lore:
+            - '&cSetze die Welt in den Hardcore!'
+    Weather:
+      CLEAR:
+        material: BUCKET
+        displayName: '&aKlar'
+        lore:
+          - '&cWechsle zu klarem Wetter!'
+      RAINING:
+        material: WATER_BUCKET
+        displayName: '&aRegen'
+        lore:
+          - '&cWechsle zu regnerischen Wetter!'
+      THUNDERING:
+        material: LAVA_BUCKET
+        displayName: '&aGewitter'
+        lore:
+          - '&cWechsle zu gewittrigem Wetter!'
+    Time:
+      SUNRISE:
+        material: MAGENTA_CONCRETE
+        displayName: '&aSonnenaufgang'
+        lore:
+          - '&cWechsle zu klarem Wetter!'
+      DAY:
+        material: LIGHT_BLUE_CONCRETE
+        displayName: '&aTag'
+        lore:
+          - '&cWechsle zu regnerischen Wetter!'
+      MORNING:
+        material: LIME_CONCRETE
+        displayName: '&aMorgen'
+        lore:
+          - '&cWechsle zu gewittrigem Wetter!'
+      NOON:
+        material: GREEN_CONCRETE
+        displayName: '&aMittag'
+        lore:
+          - '&cWechsle zu klarem Wetter!'
+      AFTERNOON:
+        material: YELLOW_CONCRETE
+        displayName: '&aNachmittag'
+        lore:
+          - '&cWechsle zu regnerischen Wetter!'
+      SUNSET:
+        material: GRAY_CONCRETE
+        displayName: '&aSonnenuntergang'
+        lore:
+          - '&cWechsle zu gewittrigem Wetter!'
+      NIGHT:
+        material: GRAY_CONCRETE
+        displayName: '&aNacht'
+        lore:
+          - '&cWechsle zu regnerischen Wetter!'
+      MIDNIGHT:
+        material: BLACK_CONCRETE
+        displayName: '&aMitternacht'
+        lore:
+          - '&cWechsle zu gewittrigem Wetter!'
+  StartMenu:
+    WorldManager:
+      material: GRASS_BLOCK
+      displayName: '&2World Manager'
+      lore:
+        - '&aVerwaltet die Welten auf dem Server!'
+    PlayerManager:
+      material: PLAYER_HEAD
+      displayName: '&6Player Manager'
+      lore:
+        - '&aVerwaltet die Spieler auf dem Server!'
+    PluginManager:
+      material: REDSTONE_BLOCK
+      displayName: '&3Plugin Manager'
+      lore:
+        - '&aVerwaltet die Plugins auf dem Server!'
+    ServerManager:
+      material: DIAMOND_BLOCK
+      displayName: '&6Server Manager'
+      lore:
+        - '&aVerwaltet den Server!'
+    ServerReload:
+      material: ACACIA_BOAT
+      displayName: '&6Server reload'
+      lore:
+        - '&aReloaded den Server!'
+    ServerStop:
+      material: DIAMOND
+      displayName: '&4Server Stop'
+      lore:
+        - '&aStoppt den Server!'
+    HintItem:
+      material: PAPER
+      displayName: '&aAdmin Panel Infos'
+      lore:
+        - '&aIn diesem Menu kann man auf Items klicken,'
+        - '&adie einen dann in Untermenüs weiterleiten!'
+
 MenuTitles:
+  StartMenu: '&4&lAdmin-Panel'
   PlayerManager:
     PlayerSelector: '&aSpieler auswählen'
     PlayerActions: '&aAktionen: %player_name%'
@@ -350,3 +597,10 @@ MenuTitles:
     ArmorView: '&4Rüstung'
     MoneyMenu: '&a&lGeld'
     BannedPlayers: '&cGebannte Spieler'
+  WorldManager:
+    WorldSelector: '&aSelect a World'
+    WorldSettings: '&3Einstellungen'
+    WorldCreateMenu: '&3Welt erstellen'
+    GameRuleMenu: '&3Gamerules'
+    TimeMenu: '&3Zeit'
+    WeatherMenu: '&3Wetter'

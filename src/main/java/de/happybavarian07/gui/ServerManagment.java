@@ -6,11 +6,11 @@ import de.happybavarian07.events.server.MaintenanceModeToggleEvent;
 import de.happybavarian07.events.server.MuteChatEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
+import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.utils.ChatUtil;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
@@ -128,15 +127,6 @@ public class ServerManagment implements Listener {
         initializeItems(servermanager2);
         servermanagerinvs.add(servermanager2);
 		ent.openInventory(servermanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
 	}
     
     // You can open the inventory with this
@@ -145,22 +135,6 @@ public class ServerManagment implements Listener {
         initializeChatItems(chatmanager2);
         chatmanagerinvs.add(chatmanager2);
 		ent.openInventory(chatmanager2);
-		if(cfg.getBoolean("Panel.PlaySoundsWhenOpened") == true) {
-			if(cfg.getString("Panel.SoundWhenOpened") != null) {
-				String sound = cfg.getString("Panel.SoundWhenOpened");
-				((Player) ent).playSound(ent.getLocation(), Sound.valueOf(sound), (float) cfg.getDouble("Panel.SoundVolume"), (float) cfg.getDouble("Panel.SoundPitch"));
-			}
-		}
-		if(!ent.getScoreboardTags().contains("AdminPanelOpen")) {
-			ent.addScoreboardTag("AdminPanelOpen");
-		}
-	}
-	
-	@EventHandler
-	public void onInvClose(final InventoryCloseEvent e) {
-		if(e.getPlayer().getScoreboardTags().contains("AdminPanelOpen")) {
-			e.getPlayer().removeScoreboardTag("AdminPanelOpen");
-		}
 	}
 	
 	public static boolean isChatmuted() {
@@ -219,7 +193,7 @@ public class ServerManagment implements Listener {
         	} else {
         		if(clickedItem.getItemMeta().getDisplayName().equals("§4Close")) {
     	        	if(player.hasPermission("AdminPanel.Button.Close")) {
-    	        		ExampleGui.openInv(player);
+						new AdminPanelStartMenu(Main.getPlayerMenuUtility(player)).open();
     	        	} else {
 						player.sendMessage(nopermissionmessage);
 					}
