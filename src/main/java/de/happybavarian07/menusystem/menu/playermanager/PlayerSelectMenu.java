@@ -1,11 +1,12 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.player.SelectPlayerEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.menusystem.menu.playermanager.money.PlayerActionSelectMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -45,17 +47,26 @@ public class PlayerSelectMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
         if(item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
-            if(player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
-                return;
+            UUID target = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()).getUniqueId();
+            SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, target);
+            try {
+                Main.getAPI().callAdminPanelEvent(selectPlayerEvent);
+                if (!selectPlayerEvent.isCancelled()) {
+                    if(player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
+                        player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
+                        return;
+                    }
+                    new PlayerActionSelectMenu(Main.getAPI().getPlayerMenuUtility(player), target).open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
             }
-            new PlayerActionSelectMenu(playerMenuUtility, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()).getUniqueId()).open();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if(!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new AdminPanelStartMenu(Main.getPlayerMenuUtility(player)).open();
+            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
@@ -79,9 +90,13 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
             }
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             super.open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null))) {
-            new BannedPlayersMenu(playerMenuUtility).open();
+            new BannedPlayersMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 

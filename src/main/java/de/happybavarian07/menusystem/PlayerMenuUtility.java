@@ -11,9 +11,7 @@ Companion class to all menus. This is needed to pass information across the enti
 
 public class PlayerMenuUtility {
 
-    private Player owner;
-    //store the player that will be killed so we can access him in the next menu
-    private Player playerToKill;
+    private final Player owner;
 
     public PlayerMenuUtility(Player p) {
         this.owner = p;
@@ -21,14 +19,6 @@ public class PlayerMenuUtility {
 
     public Player getOwner() {
         return owner;
-    }
-
-    public Player getPlayerToKill() {
-        return playerToKill;
-    }
-
-    public void setPlayerToKill(Player playerToKill) {
-        this.playerToKill = playerToKill;
     }
 }
 

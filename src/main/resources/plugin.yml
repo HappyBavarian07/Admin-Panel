@@ -42,11 +42,11 @@ permissions:
         children:
           AdminPanel.Button.Close:
             default: op
-          AdminPanel.Button.Back:
-            default: op
           AdminPanel.Button.pageright:
             default: op
           AdminPanel.Button.pageleft:
+            default: op
+          AdminPanel.Button.refresh:
             default: op
       AdminPanel.open:
         default: op
@@ -56,6 +56,8 @@ permissions:
         default: op
         children:
           AdminPanel.PluginManager.open:
+            default: op
+          AdminPanel.PluginManager.InstallPlugins:
             default: op
           AdminPanel.PluginManager.PluginSettings.*:
             default: op
@@ -67,6 +69,10 @@ permissions:
               AdminPanel.PluginManager.PluginSettings.Disable:
                 default: op
               AdminPanel.PluginManager.PluginSettings.Restart:
+                default: op
+              AdminPanel.PluginManager.PluginSettings.Unload:
+                default: op
+              AdminPanel.PluginManager.PluginSettings.Load:
                 default: op
               AdminPanel.PluginManager.PluginSettings.Permissions:
                 default: op
@@ -98,6 +104,10 @@ permissions:
         children:
           AdminPanel.ServerManagment.KickAllPlayers:
             default: op
+          AdminPanel.ServerManagment.Whitelist:
+            default: op
+          AdminPanel.ServerManagment.Broadcast:
+            default: op
           AdminPanel.ServerManagment.MaintenanceMode:
             default: op
           AdminPanel.ServerManagment.ChatManager.*:
@@ -110,6 +120,8 @@ permissions:
               AdminPanel.ServerManagment.ChatManager.Mute:
                 default: op
           AdminPanel.ServerManagment.Open:
+            default: op
+          AdminPanel.ServerManagment.ManageWhitelist:
             default: op
       AdminPanel.PlayerManager.*:
         default: op

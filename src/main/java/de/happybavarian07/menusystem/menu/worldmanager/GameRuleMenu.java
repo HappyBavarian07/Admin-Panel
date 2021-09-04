@@ -1,6 +1,8 @@
 package de.happybavarian07.menusystem.menu.worldmanager;
 
-import de.happybavarian07.main.Heads;
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.world.MenuGameruleChangeEvent;
+import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
@@ -56,13 +58,31 @@ public class GameRuleMenu extends PaginatedMenu {
             int count = 0;
             for(String gmName : gamerules) {
                 if(Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
-                    world.setGameRuleValue(gmName, "false");
-                    super.open();
-                    return;
+                    MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
+                            player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
+                    try {
+                        Main.getAPI().callAdminPanelEvent(gameruleChangeEvent);
+                        if(!gameruleChangeEvent.isCancelled()) {
+                            world.setGameRuleValue(gmName, "false");
+                            super.open();
+                            return;
+                        }
+                    } catch (NotAPanelEventException notAPanelEventException) {
+                        notAPanelEventException.printStackTrace();
+                    }
                 } else if (!Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
-                    world.setGameRuleValue(gmName, "true");
-                    super.open();
-                    return;
+                    MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
+                            player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
+                    try {
+                        Main.getAPI().callAdminPanelEvent(gameruleChangeEvent);
+                        if(!gameruleChangeEvent.isCancelled()) {
+                            world.setGameRuleValue(gmName, "true");
+                            super.open();
+                            return;
+                        }
+                    } catch (NotAPanelEventException notAPanelEventException) {
+                        notAPanelEventException.printStackTrace();
+                    }
                 }
                 count++;
             }
@@ -71,7 +91,7 @@ public class GameRuleMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSettingsMenu(playerMenuUtility, world).open();
+            new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
             if (item.equals(lgm.getItem("General.Left", null))) {
                 if(!player.hasPermission("AdminPanel.Button.pageleft")) {
@@ -97,6 +117,10 @@ public class GameRuleMenu extends PaginatedMenu {
                 }
             }
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             super.open();
         }
     }
@@ -123,13 +147,14 @@ public class GameRuleMenu extends PaginatedMenu {
                     List<String> lore = new ArrayList<>();
                     ItemStack head = lgm.getItem("General.EmptySlot", playerMenuUtility.getOwner());
                     if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
-                        head = plugin.createSkull(Heads.GAMERULEON.getPrefix() + Heads.GAMERULEON.getTexture(), gamerules.get(index));
+                        head = Head.BLANK_GREEN.getAsItem();
                         lore.add(Utils.getInstance().chat("&6Value: &atrue"));
                     } else if (!Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
-                        head = plugin.createSkull(Heads.GAMERULEOFF.getPrefix() + Heads.GAMERULEOFF.getTexture(), gamerules.get(index));
+                        head = Head.BLANK_RED.getAsItem();
                         lore.add(Utils.getInstance().chat("&6Value: &cfalse"));
                     }
                     ItemMeta meta = head.getItemMeta();
+                    meta.setDisplayName(gamerules.get(index));
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                     inventory.addItem(head);

@@ -11,7 +11,6 @@ public class ChatUtil {
 
     public ChatUtil() {
         setInstance(this);
-        String string = "§4&4§4%&&&&&&§%)ß0§?=()=%$(=%/=§%%";
     }
 
     // Without Prefix

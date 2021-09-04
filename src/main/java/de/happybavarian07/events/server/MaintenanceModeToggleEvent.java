@@ -1,21 +1,20 @@
 package de.happybavarian07.events.server;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MaintenanceModeToggleEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class MaintenanceModeToggleEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
-    private boolean maintenanceMode;
+    private final boolean maintenanceMode;
 
     public MaintenanceModeToggleEvent(Player player, boolean maintenanceMode) {
         this.player = player;
         this.maintenanceMode = maintenanceMode;
-        String string = "§4&4§4%&&&&&&§%)ß0§?=()=%$(=%/=§%%";
     }
 
     public Player getPlayer() {
@@ -24,10 +23,6 @@ public class MaintenanceModeToggleEvent extends Event implements Cancellable {
 
     public boolean isMaintenanceMode() {
         return maintenanceMode;
-    }
-
-    public void setMaintenanceMode(boolean maintenanceMode) {
-        this.maintenanceMode = maintenanceMode;
     }
 
     @Override
@@ -39,7 +34,7 @@ public class MaintenanceModeToggleEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

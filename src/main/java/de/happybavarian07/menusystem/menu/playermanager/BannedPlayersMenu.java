@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
@@ -67,7 +66,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerSelectMenu(playerMenuUtility).open();
+            new PlayerSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
             if (item.equals(lgm.getItem("General.Left", null))) {
                 if(!player.hasPermission("AdminPanel.Button.pageleft")) {
@@ -93,6 +92,10 @@ public class BannedPlayersMenu extends PaginatedMenu {
                 }
             }
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             super.open();
         }
     }

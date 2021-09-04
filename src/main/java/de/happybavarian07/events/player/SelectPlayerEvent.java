@@ -1,24 +1,26 @@
 package de.happybavarian07.events.player;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SelectPlayerEvent extends Event implements Cancellable {
+import java.util.UUID;
 
-    private final HandlerList handlers = new HandlerList();
+public class SelectPlayerEvent extends AdminPanelEvent implements Cancellable {
+
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
-    private final Player selectedPlayer;
+    private final UUID selectedPlayer;
 
-    public SelectPlayerEvent(Player player, Player selectedPlayer) {
+    public SelectPlayerEvent(Player player, UUID selectedPlayer) {
         this.player = player;
         this.selectedPlayer = selectedPlayer;
     }
 
-    public Player getSelectedPlayer() {
+    public UUID getSelectedPlayer() {
         return selectedPlayer;
     }
 
@@ -35,7 +37,7 @@ public class SelectPlayerEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

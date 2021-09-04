@@ -60,7 +60,11 @@ public class SpawningMenu extends PaginatedMenu {
                         EntityType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()));
             } catch (NullPointerException | IllegalArgumentException ignored) {}
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            new PlayerActionsMenu(playerMenuUtility, targetUUID).open();
+            if(!player.hasPermission("AdminPanel.Button.Close")) {
+                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
+                return;
+            }
+            new PlayerActionsMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("General.Left", null))) {
             if (page == 0) {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));

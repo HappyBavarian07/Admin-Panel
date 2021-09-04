@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MenuListener implements Listener {
@@ -42,8 +43,8 @@ public class MenuListener implements Listener {
     @EventHandler
     public void onInvClose(InventoryCloseEvent event) {
         if(event.getInventory().getHolder() instanceof Menu) {
-            if(event.getPlayer().getScoreboardTags().contains("AdminPanelOpen")) {
-                event.getPlayer().removeScoreboardTag("AdminPanelOpen");
+            if(event.getPlayer().hasMetadata("AdminPanelOpen")) {
+                event.getPlayer().removeMetadata("AdminPanelOpen", Main.getPlugin());
             }
         }
     }
@@ -52,8 +53,8 @@ public class MenuListener implements Listener {
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
         if(event.getInventory().getHolder() instanceof Menu) {
-            if(!event.getPlayer().getScoreboardTags().contains("AdminPanelOpen")) {
-                event.getPlayer().addScoreboardTag("AdminPanelOpen");
+            if(!event.getPlayer().hasMetadata("AdminPanelOpen")) {
+                event.getPlayer().setMetadata("AdminPanelOpen", new FixedMetadataValue(Main.getPlugin(), true));
             }
             FileConfiguration cfg = Main.getPlugin().getConfig();
             if(cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {

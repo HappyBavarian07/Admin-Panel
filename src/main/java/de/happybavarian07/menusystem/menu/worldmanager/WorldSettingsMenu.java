@@ -1,5 +1,7 @@
 package de.happybavarian07.menusystem.menu.worldmanager;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.world.*;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
@@ -51,75 +53,147 @@ public class WorldSettingsMenu extends Menu {
 
         if (item == null || !item.hasItemMeta()) return;
         if(item.equals(lgm.getItem(itemPath + "PVP.true", player))) {
-            world.setPVP(false);
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "PVP.false", player))) {
-            world.setPVP(true);
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.true", player))) {
-            world.setAutoSave(false);
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.false", player))) {
-            world.setAutoSave(true);
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Time", player))) {
-            new TimeChangeMenu(playerMenuUtility, world).open();
-        } else if (item.equals(lgm.getItem(itemPath + "Weather", player))) {
-            new WeatherChangeMenu(playerMenuUtility, world).open();
-        } else if (item.equals(lgm.getItem(itemPath + "Load", player))) {
+            PVPToggleEvent pvpToggleEvent = new PVPToggleEvent(player, world, false);
             try {
-                if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
-                    new File(world.getWorldFolder() + "\\data\\").mkdir();
-                    new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
+                Main.getAPI().callAdminPanelEvent(pvpToggleEvent);
+                if(!pvpToggleEvent.isCancelled()) {
+                    world.setPVP(false);
+                    super.open();
                 }
-                if(!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
-                    new File(world.getWorldFolder() + "\\DIM-1\\data\\").mkdir();
-                    new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
-                }
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
             }
-            Bukkit.createWorld(new WorldCreator(world.getName()));
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Unload", player))) {
-            Bukkit.unloadWorld(world, world.isAutoSave());
-            super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Save", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "PVP.false", player))) {
+            PVPToggleEvent pvpToggleEvent = new PVPToggleEvent(player, world, true);
             try {
-                if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
-                    new File(world.getWorldFolder() + "\\data\\raids.dat").mkdir();
-                    new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
+                Main.getAPI().callAdminPanelEvent(pvpToggleEvent);
+                if(!pvpToggleEvent.isCancelled()) {
+                    world.setPVP(true);
+                    super.open();
                 }
-                if(!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
-                    new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").mkdir();
-                    new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.true", player))) {
+            AutoSaveToggleEvent autoSaveEvent = new AutoSaveToggleEvent(player, world, false);
+            try {
+                Main.getAPI().callAdminPanelEvent(autoSaveEvent);
+                if(!autoSaveEvent.isCancelled()) {
+                    world.setAutoSave(false);
+                    super.open();
                 }
-                world.save();
-            } catch (Exception ignored) {}
-            super.open();
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.false", player))) {
+            AutoSaveToggleEvent autoSaveEvent = new AutoSaveToggleEvent(player, world, true);
+            try {
+                Main.getAPI().callAdminPanelEvent(autoSaveEvent);
+                if(!autoSaveEvent.isCancelled()) {
+                    world.setAutoSave(true);
+                    super.open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(itemPath + "Time", player))) {
+            new TimeChangeMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
+        } else if (item.equals(lgm.getItem(itemPath + "Weather", player))) {
+            new WeatherChangeMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
+        } else if (item.equals(lgm.getItem(itemPath + "Load", player))) {
+            WorldLoadEvent loadEvent = new WorldLoadEvent(player, world);
+            try {
+                Main.getAPI().callAdminPanelEvent(loadEvent);
+                if(!loadEvent.isCancelled()) {
+                    try {
+                        if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
+                            new File(world.getWorldFolder() + "\\data\\").mkdir();
+                            new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
+                        }
+                        if(!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
+                            new File(world.getWorldFolder() + "\\DIM-1\\data\\").mkdir();
+                            new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
+                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                    Bukkit.createWorld(new WorldCreator(world.getName()));
+                    super.open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(itemPath + "Unload", player))) {
+            WorldUnloadEvent unloadEvent = new WorldUnloadEvent(player, world);
+            try {
+                Main.getAPI().callAdminPanelEvent(unloadEvent);
+                if (!unloadEvent.isCancelled()) {
+                    Bukkit.unloadWorld(world, world.isAutoSave());
+                    super.open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(itemPath + "Save", player))) {
+            WorldSaveEvent saveEvent = new WorldSaveEvent(player, world);
+            try {
+                Main.getAPI().callAdminPanelEvent(saveEvent);
+                if(!saveEvent.isCancelled()) {
+                    try {
+                        if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
+                            new File(world.getWorldFolder() + "\\data\\raids.dat").mkdir();
+                            new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
+                        }
+                        if(!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
+                            new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").mkdir();
+                            new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
+                        }
+                        world.save();
+                    } catch (Exception ignored) {}
+                    super.open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
         } else if (item.equals(lgm.getItem(itemPath + "TPToSpawn", player))) {
             player.closeInventory();
             player.teleport(world.getSpawnLocation());
             super.open();
         } else if (item.equals(lgm.getItem(itemPath + "Delete", player))) {
-            for(Player playerInWorld : world.getPlayers()) {
-                playerInWorld.kickPlayer(Utils.getInstance().chat("The World just got deleted!"));
-            }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Bukkit.unloadWorld(world, false);
-                    getServer().getWorlds().remove(world);
-                    deleteWorldFolder(world.getWorldFolder().getAbsoluteFile());
-                    new WorldSelectMenu(playerMenuUtility).open();
+            WorldDeleteEvent deleteEvent = new WorldDeleteEvent(player, world);
+            try {
+                Main.getAPI().callAdminPanelEvent(deleteEvent);
+                if(!deleteEvent.isCancelled()) {
+                    for(Player playerInWorld : world.getPlayers()) {
+                        playerInWorld.kickPlayer(Utils.getInstance().chat("The World just got deleted!"));
+                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            Bukkit.unloadWorld(world, false);
+                            getServer().getWorlds().remove(world);
+                            deleteWorldFolder(world.getWorldFolder().getAbsoluteFile());
+                            new WorldSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+                        }
+                    }.runTaskLater(plugin, 5);
                 }
-            }.runTaskLater(plugin, 5);
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
         } else if (item.equals(lgm.getItem(itemPath + "GameRule", player))) {
-            new GameRuleMenu(playerMenuUtility, world).open();
+            new GameRuleMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
         } else if (item.equals(lgm.getItem("General.Refresh", player))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             super.open();
         } else if (item.equals(lgm.getItem("General.Close", player))) {
-            new WorldSelectMenu(playerMenuUtility).open();
+            if(!player.hasPermission("AdminPanel.Button.Close")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            new WorldSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 

@@ -1,5 +1,7 @@
 package de.happybavarian07.menusystem.menu.worldmanager.weather;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.world.WeatherChangeEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
@@ -18,6 +20,7 @@ public class WeatherChangeMenu extends Menu {
     public WeatherChangeMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
+        setOpeningPermission("AdminPanel.WorldManagment.Weather");
     }
 
     @Override
@@ -38,19 +41,44 @@ public class WeatherChangeMenu extends Menu {
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
+        WeatherChangeEvent changeEvent;
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(lgm.getItem(itemPath + Weather.CLEAR, player))) {
-            world.setStorm(false); world.setThundering(false);
+            changeEvent = new WeatherChangeEvent(player, world, Weather.CLEAR);
+            try {
+                Main.getAPI().callAdminPanelEvent(changeEvent);
+                if(!changeEvent.isCancelled()) {
+                    world.setStorm(false); world.setThundering(false);
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
         } else if (item.equals(lgm.getItem(itemPath + Weather.RAINING, player))) {
-            world.setStorm(true); world.setThundering(false);
+            changeEvent = new WeatherChangeEvent(player, world, Weather.RAINING);
+            try {
+                Main.getAPI().callAdminPanelEvent(changeEvent);
+                if(!changeEvent.isCancelled()) {
+                    world.setStorm(true); world.setThundering(false);
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
         } else if (item.equals(lgm.getItem(itemPath + Weather.THUNDERING, player))) {
-            world.setStorm(true); world.setThundering(true);
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+            changeEvent = new WeatherChangeEvent(player, world, Weather.THUNDERING);
+            try {
+                Main.getAPI().callAdminPanelEvent(changeEvent);
+                if(!changeEvent.isCancelled()) {
+                    world.setStorm(true); world.setThundering(true);
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem("General.Close", player))) {
             if(!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSettingsMenu(playerMenuUtility, world).open();
+            new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
         }
     }
 

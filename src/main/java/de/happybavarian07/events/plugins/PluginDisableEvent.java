@@ -1,13 +1,13 @@
 package de.happybavarian07.events.plugins;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
-public class PluginDisableEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class PluginDisableEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
@@ -16,7 +16,6 @@ public class PluginDisableEvent extends Event implements Cancellable {
     public PluginDisableEvent(Player player, Plugin plugin) {
         this.player = player;
         this.plugin = plugin;
-        String string = "§4&4§4%&&&&&&§%)ß0§?=()=%$(=%/=§%%";
     }
 
     public Player getPlayer() {
@@ -36,7 +35,7 @@ public class PluginDisableEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

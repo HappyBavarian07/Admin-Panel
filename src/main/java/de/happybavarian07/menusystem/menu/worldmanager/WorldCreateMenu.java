@@ -1,10 +1,11 @@
 package de.happybavarian07.menusystem.menu.worldmanager;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.world.WorldCreateEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -32,7 +33,6 @@ public class WorldCreateMenu extends Menu implements Listener {
     public WorldCreateMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.WorldManagment.Create");
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -117,17 +117,30 @@ public class WorldCreateMenu extends Menu implements Listener {
             this.hardcore = true;
             super.open();
         } else if (item.equals(lgm.getItem("General.Close", player))) {
+            if(!player.hasPermission("AdminPanel.Button.Close")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             new WorldSelectMenu(playerMenuUtility).open();
         } else if (item.equals(lgm.getItem(itemPath + "CreateWorld", player))) {
-            WorldCreator worldCreator = new WorldCreator(this.worldName);
-            worldCreator.type(this.worldType);
-            worldCreator.environment(this.worldEnvironment);
-            worldCreator.generateStructures(this.generateStructures);
-            worldCreator.hardcore(this.hardcore);
-            World world = worldCreator.createWorld();
-            player.closeInventory();
-            assert world != null;
-            player.teleport(world.getSpawnLocation());
+            WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
+            try {
+                Main.getAPI().callAdminPanelEvent(worldCreateEvent);
+                if(!worldCreateEvent.isCancelled()) {
+                    WorldCreator worldCreator = new WorldCreator(worldCreateEvent.getName());
+                    worldCreator.type(worldCreateEvent.getWorldType());
+                    worldCreator.environment(worldCreateEvent.getWorldEnvironment());
+                    worldCreator.generateStructures(worldCreateEvent.isGenerateStructures());
+                    worldCreator.hardcore(worldCreateEvent.isHardcore());
+                    World world = worldCreator.createWorld();
+                    player.closeInventory();
+                    assert world != null;
+                    player.teleport(world.getSpawnLocation());
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+
         }
     }
 

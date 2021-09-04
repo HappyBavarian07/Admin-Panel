@@ -1,20 +1,22 @@
 package de.happybavarian07.events.troll;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class VillagerSoundsToggleEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class VillagerSoundsToggleEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
     private final Player target;
+    private final boolean value;
 
-    public VillagerSoundsToggleEvent(Player player, Player target) {
+    public VillagerSoundsToggleEvent(Player player, Player target, boolean value) {
         this.player = player;
         this.target = target;
+        this.value = value;
     }
 
     public Player getTarget() {
@@ -23,6 +25,10 @@ public class VillagerSoundsToggleEvent extends Event implements Cancellable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean value() {
+        return value;
     }
 
     @Override
@@ -34,7 +40,7 @@ public class VillagerSoundsToggleEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

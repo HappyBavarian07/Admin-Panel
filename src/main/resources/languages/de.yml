@@ -8,12 +8,8 @@ Messages:
       AlreadyOnLastPage: '%prefix% &9> &cDu bist schon auf der letzten Seite!'
       NoPermissions: '%prefix% &9> &cDu hast keinen Zugriff auf diesen Command!'
       OpeningMessageSelf: '%prefix% &9> &cDu hast das Admin-Panel für dich geöffnet!'
-      OpeningMessageSelfOpenedForOther: '%prefix% &9> &cDu hast das Admin-Panel für
-        %player_name% geöffnet!'
-      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel für dich
-        geöffnet!'
-      TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert
-        nicht!'
+      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel für dich geöffnet!'
+      TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert nicht!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aBitte gib einen Namen in den Chat ein!'
@@ -36,24 +32,46 @@ Messages:
         GiveMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% gegeben!'
         TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
     ServerManager:
+      MaintenanceModeOff: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
+      MaintenanceModeOn: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler können wieder beitreten!'
+      AllPlayersKicked: '%prefix% &9> &aAlle Spieler wurden vom Server gekickt!'
+      PleaseEnterAMessage: '%prefix% &9> &aBitte gebe eine Nachricht in den Chat ein!'
+      BroadcastHeader: '&a+---------------------------------------------------+'
+      BroadcastMessage: '%prefix% &9> %message%'
+      BroadcastFooter: '&a+---------------------------------------------------+'
       KickAllPlayersReason: '&cKick zur Sicherheit'
       KickAllPlayersSource: '%player_name%'
-      ChatClearHeader: '&a+---------------------------------------------------+'
-      ChatClearMessage: '    &2Der Chat wurde geleert von &3%player_name%'
-      ChatClearFooter: '&a+---------------------------------------------------+'
       MaintenanceMode: '%prefix% &9> &5%player_name% &cDer Server ist im &4&lWartungsmodus!'
+      MaintenanceModeMOTD: '%prefix% &9> &cDer Server ist momentan im &4&lWartungsmodus!'
+      WhitelistManager:
+        PleaseEnterName: '%prefix% &9> &aBitte gib einen Spieler ein (Name oder UUID)!'
+        AddedPlayer: '%prefix% &9> &aErfolgreich Spieler hinzugefügt!'
+        RemovedPlayer: '%prefix% &9> &aErfolgreich Spieler entfernt!'
+    Chat:
+      Header: '&a+---------------------------------------------------+'
+      Message: '    &2Der Chat wurde geleert von &3%player_name%'
+      Footer: '&a+---------------------------------------------------+'
     ChatMute:
       PlayerMessage: '%prefix% &9> &4Der Chat ist gemuted! %player_name%!'
-      Broadcastheader: '&a+---------------------------------------------------+'
-      Broadcast: '       &4Der Chat wurde gemuted von %player_name%!'
-      Broadcastfooter: '&a+---------------------------------------------------+'
+      Header: '&a+---------------------------------------------------+'
+      Message: '       &4Der Chat wurde gemuted von %player_name%!'
+      Footer: '&a+---------------------------------------------------+'
     ChatUnMute:
-      Broadcastheader: '&a+---------------------------------------------------+'
-      Broadcast: '       &4Der Chat wurde entmuted von %player_name%!'
-      Broadcastfooter: '&a+---------------------------------------------------+'
+      Header: '&a+---------------------------------------------------+'
+      Message: '       &4Der Chat wurde entmuted von %player_name%!'
+      Footer: '&a+---------------------------------------------------+'
+    PluginManager:
+      FileNotFound: '%prefix% &9> &cDas Plugin wurde nicht gefunden!'
+      MissingDependencies: '%prefix% &9> &cDas Plugin wurde gedownloaded, aber es fehlen die Dependencies!'
+      ResourceIDSelected: '%prefix% &9> &aDie ResourceID %resourceid% wurde ausgewählt!'
+      FileNameSelected: '%prefix% &9> &aDer Datei Name %filename% wurde ausgewählt!'
+      TypeResourceIDInChat: '%prefix% &9> &aBitte gib die Resource ID an!'
+      TypeFileNameInChat: '%prefix% &9> &aBitte gib den Datei Namen an!'
+      SuccessfullyInstalled: '%prefix% &9> &aDas Plugin %resourceid% wurde erfoglreich in die Datei %filename%.jar gedownloaded!'
+      ErrorInInstallProccess: '%prefix% &9> &cWährend des Installationsvorgangs ist ein Fehler aufgetreten!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
-  TomanyArguments: '&4Zu viele Argumente!'
+  ToManyArguments: '&4Zu viele Argumente!'
   TooFewArguments: '&4Zu wenig Argumente!'
 Items:
   General:
@@ -580,11 +598,184 @@ Items:
         - '&aStoppt den Server!'
     HintItem:
       material: PAPER
-      displayName: '&aAdmin Panel Infos'
+      displayName: '&aAdmin Panel Info'
       lore:
         - '&aIn diesem Menu kann man auf Items klicken,'
         - '&adie einen dann in Untermenüs weiterleiten!'
-
+  ServerManager:
+    WhiteListMenuItem:
+      material: OAK_FENCE_GATE
+      displayName: '&aWhitelist'
+      lore:
+        - '&aVerwalte die Whitelist!'
+    WhitelistMenu:
+      AddPlayer:
+        material: GREEN_CONCRETE
+        displayName: '&aHinzufügen'
+        lore:
+          - '&aFüge einen Spieler zur Whitelist hinzu!'
+      RemovePlayer:
+        material: RED_CONCRETE
+        displayName: '&cEntfernen'
+        lore:
+          - '&cEntferne einen Spieler von der Whitelist!'
+      ListPlayers:
+        material: BLUE_CONCRETE
+        displayName: '&3List'
+        lore:
+          - '&3Liste aller Spieler auf der Whitelist!'
+      TurnOn:
+        material: EMERALD_BLOCK
+        displayName: '&aAn'
+        lore:
+          - '&aMacht die Whitelist an!'
+      TurnOff:
+        material: COAL_BLOCK
+        displayName: '&cAus'
+        lore:
+          - '&aTurns the Whitelist aus!'
+      Reload:
+        material: BEACON
+        displayName: '&3Reload'
+        lore:
+          - '&3Reloaded die Whitelist!'
+    Broadcast:
+      material: WRITABLE_BOOK
+      displayName: '&3Broadcaste eine Nachricht'
+      lore:
+        - '&aSende eine Nachricht an den ganzen Server!'
+    ChatManagerItem:
+      material: ARMOR_STAND
+      displayName: '&aChat Manager'
+      lore:
+        - '&aÖffnet den Chat Manager!'
+    KickAllPlayers:
+      material: IRON_SWORD
+      displayName: '&cKicke alle Spieler'
+      lore:
+        - '&aKicke alle Spieler vom Server!'
+    MaintenanceMode:
+      true:
+        material: GLOWSTONE_DUST
+        displayName: '&a&lWartungsmodus'
+        lore:
+          - '&aSchalte den Wartungsmodus aus!'
+      false:
+        material: REDSTONE
+        displayName: '&c&lWartungsmodus'
+        lore:
+          - '&aSchalte den Wartungsmodus an!'
+  ChatManager:
+    ClearChat:
+      material: DIAMOND_SWORD
+      displayName: '&2Lösche den Chat'
+      lore:
+        - '&aLösche den gesamten Chat!'
+    MuteChat:
+      material: GREEN_DYE
+      displayName: '&2Mute den Chat'
+      lore:
+        - '&aMute den Chat!'
+    UnMuteChat:
+      material: RED_DYE
+      displayName: '&2Entmute den Chat'
+      lore:
+        - '&aEntmute den Chat!'
+  PluginManager:
+    Install:
+      material: ENCHANTING_TABLE
+      displayName: '&2Plugins Installieren'
+      lore:
+        - '&2Installiere andere Spigot Plugins!'
+    InstallMenu:
+      ResourceID:
+        material: BOOKSHELF
+        displayName: '&2Resource ID'
+        lore:
+          - '&2Bitte die Resource von Spigot eingeben!'
+          - '&6%resourceid%'
+      Name:
+        material: OAK_SIGN
+        displayName: '&2Datei Name'
+        lore:
+          - '&2Bitte den Namen der Jar Datei angeben!'
+          - '&6%filename%'
+      EnableAfterInstall:
+        true:
+          material: BEACON
+          displayName: '&2Aktivieren nach Installation'
+          lore:
+            - '&2Lasse das Plugin automatisch sich aktivieren,'
+            - '&2nach der Installation!'
+        false:
+          material: BEACON
+          displayName: '&cAktivieren nach Installation'
+          lore:
+            - '&cLasse das Plugin automatisch sich aktivieren,'
+            - '&cnach der Installation!'
+      InstallButton:
+        material: CAULDRON
+        displayName: '&2Installieren'
+        lore:
+          - '&2Installiere das Plugin!'
+          - '&cWenn Argumente fehlen dann wird es nicht funktionieren!'
+    Settings:
+      Enable:
+        material: GREEN_WOOL
+        displayName: '&aAktivieren'
+        lore:
+          - '&aAktiviere das Plugin!'
+      Disable:
+        material: RED_WOOL
+        displayName: '&cDeaktivieren'
+        lore:
+          - '&cDeaktiviere das Plugin!'
+      Reload:
+        material: REDSTONE_BLOCK
+        displayName: '&3Reloaden'
+        lore:
+          - '&3Lade das Plugin neu!'
+      Unload:
+        material: COAL_BLOCK
+        displayName: '&2Entladen'
+        lore:
+          - '&2Entlade das Plugin!'
+          - '&2Nach dem Entladen ist es weg!'
+          - '&2Um das Plugin wieder zu nutzen,'
+          - '&2muss man den Server reloaden/restarten!'
+      Load:
+        material: EMERALD_BLOCK
+        displayName: '&2Laden'
+        lore:
+          - '&2Lade das Plugin!'
+      Commands:
+        Item:
+          material: COMMAND_BLOCK
+          displayName: '&2Commands'
+          lore:
+            - '&2Liste aller Commands!'
+        Settings:
+          Register:
+            material: GREEN_CONCRETE
+            displayName: '&aRegister'
+            lore:
+              - '&2Registriert den Command!'
+          Unregister:
+            material: RED_CONCRETE
+            displayName: '&aUnregister'
+            lore:
+              - '&2Entregistriert den Command!'
+          Execute:
+            material: BOOK
+            displayName: '&2Ausführen'
+            lore:
+              - '&2Führt den Command aus mit keinen Arguemten!'
+      Permissions:
+        Item:
+          material: WRITABLE_BOOK
+          displayName: '&2Permissions'
+          lore:
+            - '&2Liste aller Permissions!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   PlayerManager:
@@ -598,9 +789,22 @@ MenuTitles:
     MoneyMenu: '&a&lGeld'
     BannedPlayers: '&cGebannte Spieler'
   WorldManager:
-    WorldSelector: '&aSelect a World'
+    WorldSelector: '&aWähle eine Welt'
     WorldSettings: '&3Einstellungen'
     WorldCreateMenu: '&3Welt erstellen'
     GameRuleMenu: '&3Gamerules'
     TimeMenu: '&3Zeit'
     WeatherMenu: '&3Wetter'
+  ServerManager:
+    Menu: '&5Server Manager'
+    ChatManagerMenu: '&aChat Manager'
+  PluginManager:
+    Selector: '&aWähle ein Plugin'
+    Settings: '&3Einstellungen'
+    InstallMenu: '&6Installieren'
+    Commands:
+      Menu: '&6Commmands'
+      Settings: '&3Einstellungen'
+    Permissions:
+      Menu: '&6Permissions'
+      Settings: '&3Einstellungen'

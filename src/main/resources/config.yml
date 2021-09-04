@@ -35,7 +35,7 @@ Plugin:
   # This is the language option you can add language files to the "languages" folder,
   # and then enter the name of the file (without .yml) here. Note upper and lower case!
   # Example: /plugins/Admin-Panel/languages/Language.yml | language (in the config): Language
-  language: de
+  language: en
   Updater:
     # If this option is activated, the updater will automatically check for updates
     # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
@@ -43,7 +43,7 @@ Plugin:
     checkForUpdates: true
     # If this option is activated, the updater will automatically download the update (if available) from Spigot.
     # The update can then be found in plugins/Admin-Panel/downladed-update/Admin-Panel-<UpdateVersion>.jar!
-    downloadPluginUpdate: true
+    downloadPluginUpdate: false
     # If this option and the downloadPluginUpdate option is activated,
     # then the updater will automatically replace the plugin with the new version!
     automaticReplace: false

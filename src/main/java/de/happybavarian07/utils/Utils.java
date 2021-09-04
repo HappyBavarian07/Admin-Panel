@@ -32,26 +32,10 @@ public class Utils {
 		this.config = plugin.getConfig();
 	}
 
-	/**
-	 * Replace Alternate Color Codes to the Color Code from the Server
-	 * @param s Message to format
-	 * @return ColorCode Formatted String
-	 */
 	public String chat(String s) {
 		return ChatColor.translateAlternateColorCodes('&', s);
 	}
 
-	/**
-	 * Creates an Item and sets that Item into the Inventory param in the Slot (invSlot - 1).
-	 * That means that instead of 0, 1, 2, 3, ... you can use 1, 2, 3, 4, 5, ...
-	 * @param inv Inv
-	 * @param materialString Material
-	 * @param amount Amount
-	 * @param invSlot Slot in Inv
-	 * @param displayName Display name
-	 * @param loreString Lore
-	 * @return Item Stack without a Byte
-	 */
 	public ItemStack createItem(Inventory inv, String materialString, int amount, int invSlot, String displayName, String... loreString) {
 		
 		ItemStack item;
@@ -71,18 +55,6 @@ public class Utils {
 		return item;
 	}
 
-	/**
-	 * Creates an Item with a Byte and sets that Item into the Inventory param in the Slot (invSlot - 1).
-	 * That means that instead of 0, 1, 2, 3, ... you can use 1, 2, 3, 4, 5, ...
-	 * @param inv Inv
-	 * @param materialString Material
-	 * @param byteId Byte
-	 * @param amount Amount
-	 * @param invSlot Slot in Inv
-	 * @param displayName Display name
-	 * @param loreString Lore
-	 * @return Item Stack with a Byte
-	 */
 	@SuppressWarnings("deprecation")
 	public ItemStack createItemByte(Inventory inv, String materialString, int byteId, int amount, int invSlot, String displayName, String... loreString) {
 		
@@ -103,21 +75,6 @@ public class Utils {
 		return item;
 	}
 
-	/**
-	 * Bans the Player (target), by Source (p) or if given the Source Name, the Reason (reason).
-	 * Pattern:
-	 *                                  You got banned from that Server!
-	 *
-	 *                                              By: Source
-	 *
-	 *                                            Reason: Reason
-	 *
-	 *                                         Permanently banned!
-	 * @param p sourceplayer
-	 * @param target target
-	 * @param reason reason
-	 * @param sourcename sourcename
-	 */
 	@SuppressWarnings({"deprecation" })
 	public void ban(final Player p, final String target, final String reason, final String sourcename) {
 		try {
@@ -161,12 +118,6 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Unban the Player with the Name (target) and if something went wrong the Message,
-	 * will be send to the Player (player).
-	 * @param Player player
-	 * @param target target
-	 */
 	@SuppressWarnings({"deprecation"})
 	public void unban(Player Player, String target) {
 		try {
@@ -190,21 +141,6 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Kick a Player (target) with the Source Player (player) or if given the sourcename (sourcename)
-	 * Pattern:
-	 *                              You got kicked! \n
-	 *                                     \n
-	 *                               By: sourcename\n
-	 *                                     \n
-	 *                              Reason: Reason\n
-	 *                                     \n
-	 *                             Please join again!\n
-	 * @param p player
-	 * @param target target
-	 * @param reason reason
-	 * @param sourcename sourcename
-	 */
 	public void kick(final Player p, final String target, final String reason, final String sourcename) {
 		try {
 			Player kickedPlayer = Bukkit.getPlayerExact(target);
@@ -232,43 +168,34 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Stops the Server after a specific amount of time and kicks all Players
-	 * @param p the Player the that is needed by the ClearChat Method
-	 * @param time time between actions (millis)
-	 * @param time2 time before all players get kicked (millis)
-	 * @throws InterruptedException When the Times to wait are not going well
-	 */
-	public void serverStop(Player p, int time, int time2) throws InterruptedException {
-		List<Player> players = new ArrayList<Player>();
-		players.addAll(Bukkit.getOnlinePlayers());
-		for(int i = 0; i < players.size(); i++) {
-			players.get(i).closeInventory();
+	public void serverStop(int time, int time2) throws InterruptedException {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			player.closeInventory();
 		}
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lThe server will now shut down and all players will be kicked!");
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§aServerstop in: §c§l6");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§aServerstop in: §c§l5");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§6Serverstop in: §c§l4");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§6Serverstop in: §c§l3");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§4Serverstop in: §c§l2");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§4Serverstop in: §c§l1");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lServer Stop initiated!");
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
@@ -279,39 +206,34 @@ public class Utils {
 		Bukkit.shutdown();
 	}
 
-	/**
-	 * Reloads the Server after a specific amount of time
-	 *
-	 * @param p the Player the that is needed by the ClearChat Method
-	 * @param time time between actions (millis)
-	 * @throws InterruptedException When the Times to wait are not going well
-	 */
-	public void serverReload(Player p, int time) throws InterruptedException {
-		p.closeInventory();
-		clearChat(100, false, p);
+	public void serverReload(int time) throws InterruptedException {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			player.closeInventory();
+		}
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lThe server is about to reload, please do not move or write in the chat until the reload is finished");
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Thread.sleep(3000);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§aServerreload in: §c§l6");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§aServerreload in: §c§l5");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§6Serverreload in: §c§l4");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§6Serverreload in: §c§l3");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§4Serverreload in: §c§l2");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§4Serverreload in: §c§l1");
 		Thread.sleep(time);
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.addScoreboardTag("reload");
 			player.closeInventory();
@@ -320,32 +242,18 @@ public class Utils {
 		Bukkit.broadcastMessage("        §r[§4§lAnnouncement§r] " + "§c§lReload started!");
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Bukkit.reload();
-		clearChat(100, false, p);
+		clearChat(100, false, null);
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 		Bukkit.broadcastMessage("        §r[§4§lAnnouncement§r] " + "§c§lReload finished!");
 		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
 	}
 
-	/**
-	 * Replaces all PlaceHolderAPI placeholders (player) and the Prefix from the AdminPanel Plugin
-	 * and alternate Color Codes
-	 * @param player Player that gets used by PlaceholderAPI
-	 * @param message The Message to replace the Things
-	 * @param prefix The Prefix to replace %prefix%
-	 * @return Formatted String
-	 */
 	public String replacePlaceHolders(Player player, String message, String prefix) {
 		return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
 	}
 
-	/**
-	 * Clears the Chat for the amount of lines
-	 * @param lines amount of lines that should be cleared
-	 * @param showplayername should the Playername get broadcasted
-	 * @param player Player as the Source
-	 */
-	public void clearChat(int lines, boolean showplayername, Player player) {
-		if(!showplayername) {
+	public void clearChat(int lines, boolean broadcastChatClear, Player player) {
+		if(!broadcastChatClear) {
 			for(int i = 0; i <= lines; i++) {
 				Bukkit.getServer().broadcastMessage("");
 			}
@@ -353,15 +261,15 @@ public class Utils {
 			for(int i = 0; i <= lines; i++) {
 				Bukkit.getServer().broadcastMessage("");
 			}
-			Bukkit.getServer().broadcastMessage(replacePlaceHolders(player, plugin.getMessages().getString("ServerManager.ChatClearHeader"), Main.getPrefix()));
-			Bukkit.getServer().broadcastMessage(replacePlaceHolders(player, plugin.getMessages().getString("ServerManager.ChatClearMessage"), Main.getPrefix()));
-			Bukkit.getServer().broadcastMessage(replacePlaceHolders(player, plugin.getMessages().getString("ServerManager.ChatClearFooter"), Main.getPrefix()));
+			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Header", player));
+			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Message", player));
+			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Footer", player));
 		}
 	}
 
 	public static Utils getInstance() { return instance; }
 
-	private void setInstance(Utils instance) { this.instance = instance; }
+	private void setInstance(Utils instance) { Utils.instance = instance; }
 
 	public Economy getEconomy() {
 		return plugin.eco;

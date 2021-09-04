@@ -1,8 +1,12 @@
 package de.happybavarian07.menusystem;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.general.PanelOpenEvent;
 import de.happybavarian07.main.Main;
+import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -60,16 +64,34 @@ public abstract class Menu implements InventoryHolder {
         if(!playerMenuUtility.getOwner().hasPermission(this.openingPermission)) {
             playerMenuUtility.getOwner().sendMessage(
                     Main.getPlugin().getLanguageManager().getMessage("Player.General.NoPermissions", playerMenuUtility.getOwner()));
+            playerMenuUtility.getOwner().closeInventory();
             return;
         }
-        inventory = Bukkit.createInventory(this, getSlots(), getMenuName());
-        inventorys.add(inventory);
 
-        //grab all the items specified to be used for this menu and add to inventory
-        this.setMenuItems();
+        PanelOpenEvent panelOpenEvent = new PanelOpenEvent(playerMenuUtility.getOwner(), this, playerMenuUtility);
+        try {
+            Main.getAPI().callAdminPanelEvent(panelOpenEvent);
+            if(!panelOpenEvent.isCancelled()) {
+                inventory = Bukkit.createInventory(this, getSlots(), getMenuName());
+                inventorys.add(inventory);
 
-        //open the inventory for the player
-        playerMenuUtility.getOwner().openInventory(inventory);
+                //grab all the items specified to be used for this menu and add to inventory
+                this.setMenuItems();
+
+                if(Listener.class.isAssignableFrom(this.getClass())) {
+                    Bukkit.getPluginManager().registerEvents((Listener) this, Main.getPlugin());
+                }
+
+                //open the inventory for the player
+                playerMenuUtility.getOwner().openInventory(inventory);
+                if(this instanceof AdminPanelStartMenu) {
+                    playerMenuUtility.getOwner().sendMessage(
+                            Main.getPlugin().getLanguageManager().getMessage("Player.General.OpeningMessageSelf", playerMenuUtility.getOwner()));
+                }
+            }
+        } catch (NotAPanelEventException e) {
+            e.printStackTrace();
+        }
     }
 
     //Overridden method from the InventoryHolder interface

@@ -1,20 +1,20 @@
 package de.happybavarian07.events.player;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class PlayerBanEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class PlayerBanEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
-    private final Player playerToBan;
-    private String reason;
-    private String sourcename;
+    private final String playerToBan;
+    private final String reason;
+    private final String sourcename;
 
-    public PlayerBanEvent(Player player, Player playerToBan, String reason, String sourcename) {
+    public PlayerBanEvent(Player player, String playerToBan, String reason, String sourcename) {
         this.player = player;
         this.playerToBan = playerToBan;
         this.reason = reason;
@@ -29,20 +29,12 @@ public class PlayerBanEvent extends Event implements Cancellable {
         return reason;
     }
 
-    public Player getPlayerToBan() {
+    public String getPlayerToBan() {
         return playerToBan;
     }
 
     public String getSourcename() {
         return sourcename;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public void setSourcename(String sourcename) {
-        this.sourcename = sourcename;
     }
 
     @Override
@@ -54,7 +46,7 @@ public class PlayerBanEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

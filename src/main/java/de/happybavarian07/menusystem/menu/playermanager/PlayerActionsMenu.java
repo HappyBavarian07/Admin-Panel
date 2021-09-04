@@ -1,20 +1,17 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
-import de.happybavarian07.api.Fireworkgenerator;
+import de.happybavarian07.utils.Fireworkgenerator;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
-import de.happybavarian07.menusystem.menu.playermanager.money.PlayerActionSelectMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -102,19 +99,19 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerTrollMenu(playerMenuUtility, targetUUID).open();
+            new PlayerTrollMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.Potions", target))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PotionMenu(playerMenuUtility, targetUUID).open();
+            new PotionMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.Spawning", target))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new SpawningMenu(playerMenuUtility, targetUUID).open();
+            new SpawningMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.PlayerSpawnLocation", target))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation")) {
                 player.sendMessage(noPerms);
@@ -190,13 +187,13 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new ArmorMenu(playerMenuUtility, targetUUID).open();
+            new ArmorMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("General.Close", target))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionSelectMenu(playerMenuUtility, targetUUID).open();
+            new PlayerActionSelectMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         }
     }
 

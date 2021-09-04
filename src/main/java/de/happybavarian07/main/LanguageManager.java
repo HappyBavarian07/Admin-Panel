@@ -25,15 +25,17 @@ public class LanguageManager {
         addLanguagesToList();
     }
 
-    public void setCurrentLang(LanguageFile currentLang) {
+    public void setCurrentLang(LanguageFile currentLang) throws NullPointerException {
         if(currentLang == null) {
             List<Map.Entry<String, LanguageFile>> list = new ArrayList<>(registeredLanguages.entrySet());
             Map.Entry<String, LanguageFile> firstInsertedEntry = list.get(0);
             this.currentLang = firstInsertedEntry.getValue();
+            this.currentLangName = firstInsertedEntry.getValue().getLangName();
+            throw new NullPointerException("Language not found!");
         } else {
+            this.currentLangName = currentLang.getLangName();
             this.currentLang = currentLang;
         }
-        this.currentLangName = currentLang.getLangName();
         System.out.println("Current Language: " + currentLangName);
     }
 
@@ -71,7 +73,7 @@ public class LanguageManager {
         System.out.println("Language: " + langFile.getLangFile() + " successfully registered!");
     }
 
-    public LanguageFile getLang(String langName) {
+    public LanguageFile getLang(String langName) throws NullPointerException {
         if(!registeredLanguages.containsKey(langName))
             throw new NullPointerException("Language: " + langName + " not found!");
         return registeredLanguages.get(langName);

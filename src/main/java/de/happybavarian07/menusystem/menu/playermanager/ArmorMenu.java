@@ -58,6 +58,10 @@ public class ArmorMenu extends Menu {
             target.updateInventory();
             inventory.setItem(3, lgm.getItem("General.EmptySlot", target));
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             open();
         }
     }

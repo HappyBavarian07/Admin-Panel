@@ -1,5 +1,7 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.player.GiveEffectToPlayerEvent;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
@@ -47,13 +49,25 @@ public class PotionMenu extends PaginatedMenu {
         List<PotionType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionType.values());
         if(item.getType().equals(Material.POTION)) {
+            PotionEffect effect = new PotionEffect(PotionType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()).getEffectType(),
+                    5*60*20, 2, false, false, false);
+            GiveEffectToPlayerEvent giveEffectToPlayerEvent = new GiveEffectToPlayerEvent(player, effect);
             try {
-                Bukkit.getPlayer(targetUUID).addPotionEffect(
-                        new PotionEffect(PotionType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()).getEffectType(),
-                                5*60*20, 2, false, false, false));
-            } catch (NullPointerException | IllegalArgumentException ignored) {}
+                Main.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
+                if(!giveEffectToPlayerEvent.isCancelled()) {
+                    try {
+                        Bukkit.getPlayer(targetUUID).addPotionEffect(effect);
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            new PlayerActionsMenu(playerMenuUtility, targetUUID).open();
+            if(!player.hasPermission("AdminPanel.Button.Close")) {
+                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
+                return;
+            }
+            new PlayerActionsMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null))) {
             for(PotionEffect effect : Bukkit.getPlayer(targetUUID).getActivePotionEffects()) {
                 Bukkit.getPlayer(targetUUID).removePotionEffect(effect.getType());

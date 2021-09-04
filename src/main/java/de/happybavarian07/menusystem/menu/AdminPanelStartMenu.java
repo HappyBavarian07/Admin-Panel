@@ -1,13 +1,13 @@
 package de.happybavarian07.menusystem.menu;
 
-import de.happybavarian07.gui.PluginStopGUI;
-import de.happybavarian07.gui.ServerManagment;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
+import de.happybavarian07.menusystem.menu.servermanager.ServerManagerMenu;
 import de.happybavarian07.menusystem.menu.worldmanager.WorldSelectMenu;
+import de.happybavarian07.menusystem.menu.pluginmanager.PluginSelectMenu;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -46,7 +46,7 @@ public class AdminPanelStartMenu extends Menu {
                 return;
             }
             try {
-                Utils.getInstance().serverReload(player, 1000);
+                Utils.getInstance().serverReload(1000);
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
             }
@@ -56,7 +56,7 @@ public class AdminPanelStartMenu extends Menu {
                 return;
             }
             try {
-                Utils.getInstance().serverStop(player, 1000, 2000);
+                Utils.getInstance().serverStop(1000, 2000);
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
             }
@@ -65,25 +65,25 @@ public class AdminPanelStartMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSelectMenu(Main.getPlayerMenuUtility(player)).open();
+            new WorldSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "PlayerManager", player))) {
             if (!player.hasPermission("AdminPanel.ServerStop")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerSelectMenu(Main.getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "PluginManager", player))) {
             if (!player.hasPermission("AdminPanel.PluginManager.open")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            PluginStopGUI.openInv(player);
+            new PluginSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "ServerManager", player))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            ServerManagment.openInv(player);
+            new ServerManagerMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 

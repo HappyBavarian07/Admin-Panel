@@ -1,13 +1,13 @@
 package de.happybavarian07.events.player;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MoneyGiveEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class MoneyGiveEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
@@ -45,7 +45,7 @@ public class MoneyGiveEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
     @Override

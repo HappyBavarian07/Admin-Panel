@@ -1,30 +1,30 @@
 package de.happybavarian07.events.server;
 
+import de.happybavarian07.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import java.util.List;
 
-public class KickAllPlayersEvent extends Event implements Cancellable {
-    private final HandlerList handlers = new HandlerList();
+public class KickAllPlayersEvent extends AdminPanelEvent implements Cancellable {
+    private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
 
     private final Player player;
-    private final List<Player> kickedPlayers;
+    private final List<Player> playersToKick;
 
-    public KickAllPlayersEvent(Player player, List<Player> kickedPlayers) {
+    public KickAllPlayersEvent(Player player, List<Player> playersToKick) {
         this.player = player;
-        this.kickedPlayers = kickedPlayers;
+        this.playersToKick = playersToKick;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public List<Player> getKickedPlayers() {
-        return kickedPlayers;
+    public List<Player> getPlayersToKick() {
+        return playersToKick;
     }
 
     @Override
@@ -36,9 +36,10 @@ public class KickAllPlayersEvent extends Event implements Cancellable {
         this.cancelled = cancel;
 
     }
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;

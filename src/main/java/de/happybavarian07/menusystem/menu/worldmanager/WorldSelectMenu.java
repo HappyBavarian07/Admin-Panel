@@ -1,6 +1,9 @@
 package de.happybavarian07.menusystem.menu.worldmanager;
 
-import de.happybavarian07.main.Heads;
+import de.happybavarian07.events.NotAPanelEventException;
+import de.happybavarian07.events.world.MenuGameruleChangeEvent;
+import de.happybavarian07.events.world.WorldSelectEvent;
+import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
@@ -45,55 +48,59 @@ public class WorldSelectMenu extends PaginatedMenu {
         Player player = (Player) e.getWhoClicked();
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
 
-        ItemStack head = plugin.createSkull(Heads.WORLD.getPrefix() + Heads.WORLD.getTexture(), "World");
-
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
-        if(item.getType().equals(Material.PLAYER_HEAD)) {
-            if(player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
-                return;
+        if (item.getType().equals(Material.PLAYER_HEAD)) {
+            WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, Bukkit.getWorld(item.getItemMeta().getDisplayName()));
+            try {
+                Main.getAPI().callAdminPanelEvent(worldSelectEvent);
+                if(!worldSelectEvent.isCancelled()) {
+                    new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), Bukkit.getWorld(item.getItemMeta().getDisplayName())).open();
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
             }
-            new WorldSettingsMenu(playerMenuUtility, getWorld(item.getItemMeta().getDisplayName())).open();
         } else if (item.equals(lgm.getItem("WorldManager.Create", player))) {
-            new WorldCreateMenu(playerMenuUtility).open();
+            new WorldCreateMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new AdminPanelStartMenu(Main.getPlayerMenuUtility(player)).open();
-        } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
-            if (item.equals(lgm.getItem("General.Left", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageleft")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
-                } else {
-                    page = page - 1;
-                    super.open();
-                }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageright")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (!((index + 1) >= worlds.size())) {
-                    page = page + 1;
-                    super.open();
-                } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
-                }
+            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+        } else if (item.equals(lgm.getItem("General.Left", null))) {
+            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            if (page == 0) {
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+            } else {
+                page = page - 1;
+                super.open();
+            }
+        } else if (item.equals(lgm.getItem("General.Right", null))) {
+            if (!player.hasPermission("AdminPanel.Button.pageright")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            if (!((index + 1) >= worlds.size())) {
+                page = page + 1;
+                super.open();
+            } else {
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
             }
         } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            if (!player.hasPermission("AdminPanel.Button.refresh")) {
+                player.sendMessage(noPerms);
+                return;
+            }
             super.open();
         }
     }
 
     public World getWorld(String name) {
-        for(World world : getServer().getWorlds()) {
-            if(world.getName().equals(name)) {
+        for (World world : getServer().getWorlds()) {
+            if (world.getName().equals(name)) {
                 return world;
             }
         }
@@ -111,14 +118,14 @@ public class WorldSelectMenu extends PaginatedMenu {
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
 
         ///////////////////////////////////// Pagination loop template
-        if(worlds != null && !worlds.isEmpty()) {
-            for(int i = 0; i < super.maxItemsPerPage; i++) {
+        if (worlds != null && !worlds.isEmpty()) {
+            for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
-                if(index >= worlds.size()) break;
-                if (worlds.get(index) != null){
+                if (index >= worlds.size()) break;
+                if (worlds.get(index) != null) {
                     ///////////////////////////
 
-                    ItemStack head = plugin.createSkull(Heads.WORLD.getPrefix() + Heads.WORLD.getTexture(), worlds.get(index).getName());
+                    ItemStack head = Main.getAPI().createSkull(Head.WORLD, worlds.get(index).getName());
                     ItemMeta meta = head.getItemMeta();
                     List<String> lore = new ArrayList<>();
                     lore.add(Utils.getInstance().chat("&6Players: &b" + worlds.get(index).getPlayers().size()));
