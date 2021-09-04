@@ -10,6 +10,7 @@ import de.happybavarian07.utils.ChatUtil;
 import de.happybavarian07.utils.StartUpLogger;
 import de.happybavarian07.utils.Updater;
 import de.happybavarian07.utils.Utils;
+import io.CodedByYou.spiget.Resource;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
