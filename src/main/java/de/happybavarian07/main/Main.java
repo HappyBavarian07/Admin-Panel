@@ -24,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -122,7 +123,8 @@ public class Main extends JavaPlugin implements Listener {
                 );
         logger.coloredSpacer(ChatColor.DARK_RED).message("§4§lInitialize Plugin Main Variable to this!§r");
         setPlugin(this);
-        API = new LocalAdminPanelAPI(getPlugin());
+        languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"));
+        API = new LocalAdminPanelAPI(this);
         new ChatUtil();
         new Utils(getPlugin());
         new File(this.getDataFolder() + "/languages").mkdir();
@@ -189,7 +191,7 @@ public class Main extends JavaPlugin implements Listener {
         // Language Manager Enabling
         LanguageFile deLang = new LanguageFile(this, "de");
         LanguageFile enLang = new LanguageFile(this, "en");
-        languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"));
+        languageManager.addLanguagesToList();
         languageManager.addLang(deLang, deLang.getLangName());
         languageManager.addLang(enLang, enLang.getLangName());
         languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language")));
@@ -204,11 +206,11 @@ public class Main extends JavaPlugin implements Listener {
             updater = new Updater(this, 91800);
             updater.checkForUpdates();
             if (updater.updateAvailable()) {
-                updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"));
+                updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false);
             }
-            Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
-            Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
         }
+        Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
+        Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
     }
 
     public @NotNull File getFile() {
@@ -244,7 +246,6 @@ public class Main extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
         }
-
     }
 
     private void setupPermission() {

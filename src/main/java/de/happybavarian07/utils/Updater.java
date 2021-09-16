@@ -222,36 +222,36 @@ public class Updater implements Listener {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Updates Available!"));
     }
 
-    public void downloadPlugin(boolean replace) {
-        if (!plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate")) return;
+    public void downloadPlugin(boolean replace, boolean force) {
+        if (!plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !force) return;
         try {
-            File downloadPath = new File(plugin.getDataFolder() + "/downladed-update/91800.jar");
+            File downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/91800.jar");
             File oldPluginFile = new File("plugins/Admin-Panel-" + getPluginVersion() + ".jar");
             File newPluginFile = new File("plugins/Admin-Panel-" + getLatestVersionName() + ".jar");
-            downloadPath.getParentFile().mkdir();
+            if (!new File(plugin.getDataFolder() + "/downloaded-update").exists()) {
+                new File(plugin.getDataFolder() + "/downloaded-update").mkdir();
+            }
             if (!downloadPath.exists()) {
                 downloadPath.createNewFile();
             }
             URL downloadURL = new URL("https://api.spiget.org/v2/resources/91800/download");
             FileUtils.copyURLToFile(downloadURL, downloadPath);
-            downloadPath.renameTo(new File(plugin.getDataFolder() + "/downladed-update/Admin-Panel-" + getLatestVersionName() + ".jar"));
-            downloadPath = new File(plugin.getDataFolder() + "/downladed-update/Admin-Panel-" + getLatestVersionName() + ".jar");
-            new File(plugin.getDataFolder() + "/downladed-update/91800.jar").delete();
-            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !replace) {
+            downloadPath.renameTo(new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar"));
+            downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar");
+            new File(plugin.getDataFolder() + "/downloaded-update/91800.jar").delete();
+            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force && !replace) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
-                return;
-            }
-            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && replace) {
+            } else if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) {
 
                 try {
                     pluginUtils.unload(plugin);
                     oldPluginFile.delete();
-                    FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
+                    FileUtils.moveFileToDirectory(newPluginFile, plugin.getDataFolder().getParentFile(), false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                pluginUtils.load(Bukkit.getPluginManager().getPlugin("Admin-Panel"));
+                pluginUtils.load(newPluginFile);
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
                         "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
                                 "&aAnd The New Version started automatically! If you can please check Console for Errors!"));

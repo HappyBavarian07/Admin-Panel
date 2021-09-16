@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -59,7 +60,6 @@ public class BannedPlayersMenu extends PaginatedMenu {
             }
             OfflinePlayer current = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName());
             Utils.getInstance().unban(player, current.getName());
-            System.out.println(updatedPlayers);
             inventory.setItem(e.getSlot(), null);
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if(!player.hasPermission("AdminPanel.Button.Close")) {

@@ -157,8 +157,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     target.getInventory().clear();
 
                     for(ItemStack itemDrop : items) {
-                        ThreadLocalRandom r = ThreadLocalRandom.current();
-                        target.getWorld().dropItem(target.getLocation(), itemDrop).setVelocity(new Vector(r.nextDouble(1.0), r.nextDouble(1.0), r.nextDouble(1.0)));
+                        target.getWorld().dropItem(target.getLocation(), itemDrop);
                     }
 
                     items.clear();
@@ -451,9 +450,8 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 hurtingWaterRunnable.runTaskTimer(plugin, 20L, 100L);
             }
         } else {
-            if(hurtingWaterRunnable != null || !hurtingWaterRunnable.isCancelled() || Bukkit.getScheduler().isCurrentlyRunning(hurtingWaterRunnable.getTaskId())) {
-                hurtingWaterRunnable.cancel();
-            }
+            hurtingWaterRunnable.cancel();
+            hurtingWaterRunnable = null;
         }
     }
 

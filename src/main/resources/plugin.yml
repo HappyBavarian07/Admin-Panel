@@ -13,7 +13,6 @@ commands:
     description: Opens the Adminpanel
     usage: /adminpanel [<Player>]
     aliases: [apanel, adminp, ap]
-  test:
   update:
     description: The Update Command
     usage: /update <Check|Download|Replace>
@@ -22,6 +21,7 @@ permissions:
   AdminPanel.*:
     default: op
     children:
+      AdminPanel.ReloadConfig: true
       AdminPanel.updatenotify: true
       AdminPanel.update: true
       AdminPanel.Bypass.*:

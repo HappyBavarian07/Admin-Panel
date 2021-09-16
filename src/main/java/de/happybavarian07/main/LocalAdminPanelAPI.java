@@ -10,6 +10,7 @@ import de.happybavarian07.utils.PluginUtils;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +20,7 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -73,7 +75,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
 
         profile.getProperties().put("textures", new Property("textures", headTexture));
-
+        
         try {
             Field field = meta.getClass().getDeclaredField("profile");
             field.setAccessible(true);
@@ -109,13 +111,8 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void loadPlugin(Plugin plugin) {
-        pluginUtils.load(plugin);
-    }
-
-    @Override
-    public void loadPlugin(String pluginName) {
-        pluginUtils.load(pluginUtils.getPluginByName(pluginName));
+    public void loadPlugin(File pluginFile) throws InvalidPluginException, InvalidDescriptionException {
+        pluginUtils.load(pluginFile);
     }
 
     @Override
@@ -196,6 +193,18 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     @Override
     public void setCurrentLanguage(LanguageFile languageFile) throws NullPointerException {
         lgm.setCurrentLang(languageFile);
+    }
+
+    @Override
+    public void reloadConfigurationFiles(Player messageReceiver) {
+        plugin.reloadConfig();
+        messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
+        lgm.reloadLanguages(messageReceiver);
+        try {
+            plugin.getBanConfig().load(plugin.getBanFile());
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
     }
 
     // Events

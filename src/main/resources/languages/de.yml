@@ -4,18 +4,20 @@ Messages:
     DisablingMessage: '[Admin-Panel] erfolgreich deaktiviert!'
   Player:
     General:
+      ReloadedConfig: '%prefix% &9> &aErfolgreich die Config reloaded!'
+      ReloadedLanguageFile: '%prefix% &9> &aErfolgreich die Sprache %language% reloaded!'
       AlreadyOnFirstPage: '%prefix% &9> &cDu bist schon auf der ersten Seite!'
       AlreadyOnLastPage: '%prefix% &9> &cDu bist schon auf der letzten Seite!'
       NoPermissions: '%prefix% &9> &cDu hast keinen Zugriff auf diesen Command!'
-      OpeningMessageSelf: '%prefix% &9> &cDu hast das Admin-Panel für dich geöffnet!'
-      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel für dich geöffnet!'
+      OpeningMessageSelf: '%prefix% &9> &cDu hast das Admin-Panel fÃ¼r dich geÃ¶ffnet!'
+      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel fÃ¼r dich geÃ¶ffnet!'
       TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert nicht!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aBitte gib einen Namen in den Chat ein!'
     PlayerManager:
-      Bypass: '%prefix% &9> &cDiesen Spieler kann man nicht auswählen, da er die Permission dazu hat!'
-      ChooseYourself: '%prefix% &9> &cDu kannst dich nicht selber auswählen!'
+      Bypass: '%prefix% &9> &cDiesen Spieler kann man nicht auswÃ¤hlen, da er die Permission dazu hat!'
+      ChooseYourself: '%prefix% &9> &cDu kannst dich nicht selber auswÃ¤hlen!'
       SelfBanning: '%prefix% &9> &cDu kannst dich nicht selber bannen!'
       KickReason: '&cKick zur Sicherheit'
       KickSource: '%player_name%'
@@ -27,13 +29,13 @@ Messages:
       DeoppedMessage: '&cDu hast dem Spieler die Operatorrechte weggenommen!'
       Money:
         PleaseEnterAmount: '%prefix% &9> &aBitte gebe den Betrag in den Chat ein mit dem du arbeiten willst!'
-        NotEnoughMoney: '%prefix% &9> &c%player_name% hat nicht genug Geld dafür! (%vault_eco_balance%)'
+        NotEnoughMoney: '%prefix% &9> &c%player_name% hat nicht genug Geld dafÃ¼r! (%vault_eco_balance%)'
         NotANumber: '%prefix% &9> &c%player_name%, das ist keine Nummer!'
         GiveMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% gegeben!'
         TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
     ServerManager:
       MaintenanceModeOff: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
-      MaintenanceModeOn: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler können wieder beitreten!'
+      MaintenanceModeOn: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler kÃ¶nnen wieder beitreten!'
       AllPlayersKicked: '%prefix% &9> &aAlle Spieler wurden vom Server gekickt!'
       PleaseEnterAMessage: '%prefix% &9> &aBitte gebe eine Nachricht in den Chat ein!'
       BroadcastHeader: '&a+---------------------------------------------------+'
@@ -45,7 +47,7 @@ Messages:
       MaintenanceModeMOTD: '%prefix% &9> &cDer Server ist momentan im &4&lWartungsmodus!'
       WhitelistManager:
         PleaseEnterName: '%prefix% &9> &aBitte gib einen Spieler ein (Name oder UUID)!'
-        AddedPlayer: '%prefix% &9> &aErfolgreich Spieler hinzugefügt!'
+        AddedPlayer: '%prefix% &9> &aErfolgreich Spieler hinzugefÃ¼gt!'
         RemovedPlayer: '%prefix% &9> &aErfolgreich Spieler entfernt!'
     Chat:
       Header: '&a+---------------------------------------------------+'
@@ -63,12 +65,12 @@ Messages:
     PluginManager:
       FileNotFound: '%prefix% &9> &cDas Plugin wurde nicht gefunden!'
       MissingDependencies: '%prefix% &9> &cDas Plugin wurde gedownloaded, aber es fehlen die Dependencies!'
-      ResourceIDSelected: '%prefix% &9> &aDie ResourceID %resourceid% wurde ausgewählt!'
-      FileNameSelected: '%prefix% &9> &aDer Datei Name %filename% wurde ausgewählt!'
+      ResourceIDSelected: '%prefix% &9> &aDie ResourceID %resourceid% wurde ausgewÃ¤hlt!'
+      FileNameSelected: '%prefix% &9> &aDer Datei Name %filename% wurde ausgewÃ¤hlt!'
       TypeResourceIDInChat: '%prefix% &9> &aBitte gib die Resource ID an!'
       TypeFileNameInChat: '%prefix% &9> &aBitte gib den Datei Namen an!'
       SuccessfullyInstalled: '%prefix% &9> &aDas Plugin %resourceid% wurde erfoglreich in die Datei %filename%.jar gedownloaded!'
-      ErrorInInstallProccess: '%prefix% &9> &cWährend des Installationsvorgangs ist ein Fehler aufgetreten!'
+      ErrorInInstallProccess: '%prefix% &9> &cWÃ¤hrend des Installationsvorgangs ist ein Fehler aufgetreten!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
   ToManyArguments: '&4Zu viele Argumente!'
@@ -84,7 +86,7 @@ Items:
       material: BARRIER
       displayName: '&cClose'
       lore:
-        - '&cSchließe diese Seite!'
+        - '&cSchlieÃŸe diese Seite!'
     Left:
       material: DARK_OAK_BUTTON
       displayName: '&cLeft'
@@ -94,7 +96,7 @@ Items:
       material: DARK_OAK_BUTTON
       displayName: '&cRight'
       lore:
-        - '&cGehe zur nächsten Seite!'
+        - '&cGehe zur nÃ¤chsten Seite!'
     EmptySlot:
       material: BARRIER
       displayName: ' '
@@ -119,14 +121,14 @@ Items:
       VillagerSounds:
         true:
           material: VILLAGER_SPAWN_EGG
-          displayName: '&aNervige Dorfbewohner Geräusche'
+          displayName: '&aNervige Dorfbewohner GerÃ¤usche'
           lore:
-            - '&6Nerve den Spieler mit Dorfbewohner Geräuschen!'
+            - '&6Nerve den Spieler mit Dorfbewohner GerÃ¤uschen!'
         false:
           material: VILLAGER_SPAWN_EGG
-          displayName: '&cNervige Dorfbewohner Geräusche'
+          displayName: '&cNervige Dorfbewohner GerÃ¤usche'
           lore:
-            - '&6Nerve den Spieler mit Dorfbewohner Geräuschen!'
+            - '&6Nerve den Spieler mit Dorfbewohner GerÃ¤uschen!'
       BreakPlacePrevent:
         true:
           material: DIAMOND_PICKAXE
@@ -165,35 +167,35 @@ Items:
           material: BLAZE_SPAWN_EGG
           displayName: '&aMob Dupe'
           lore:
-            - '&6Sobald der Spieler eine Entität tötet wird sie verdoppelt!'
+            - '&6Sobald der Spieler eine EntitÃ¤t tÃ¶tet wird sie verdoppelt!'
         false:
           material: BLAZE_SPAWN_EGG
           displayName: '&cMob Dupe'
           lore:
-            - '&6Sobald der Spieler eine Entität tötet wird sie verdoppelt!'
+            - '&6Sobald der Spieler eine EntitÃ¤t tÃ¶tet wird sie verdoppelt!'
       Kick:
         ConnectionReset:
           material: PISTON
-          displayName: '&aKick für ...Connection Reset'
+          displayName: '&aKick fÃ¼r ...Connection Reset'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
             - '&7"&aInternal exception: java.net.SocketException: Connection reset.&7"'
         ServerStoppedError:
           material: PISTON
-          displayName: '&aKick für Error'
+          displayName: '&aKick fÃ¼r Error'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
             - '&7"&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection
             refused: no further informations:&7"'
         Serverstop:
           material: PISTON
-          displayName: '&aKick für Serverstop'
+          displayName: '&aKick fÃ¼r Serverstop'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
             - '&7"&aServer closed!&7"'
         Whitelist:
           material: PISTON
-          displayName: '&aKick für Whitelist'
+          displayName: '&aKick fÃ¼r Whitelist'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
             - '&7"&aYou are not whitelisted on this server!&7"'
@@ -211,7 +213,7 @@ Items:
         material: TNT
         displayName: '&4Fake Tnt'
         lore:
-          - '&6Spawne ein TNT vor den Füßen des Spielers!'
+          - '&6Spawne ein TNT vor den FÃ¼ÃŸen des Spielers!'
       DropPlayerInv:
         material: DIAMOND_CHESTPLATE
         displayName: '&a&lDrop Inventar'
@@ -220,9 +222,9 @@ Items:
     ActionsMenu:
       Kill:
         material: DIAMOND_SWORD
-        displayName: '&cSpieler töten!'
+        displayName: '&cSpieler tÃ¶ten!'
         lore:
-          - '&cTöte den Spieler!'
+          - '&cTÃ¶te den Spieler!'
       Heal:
         material: GOLDEN_APPLE
         displayName: '&cSpieler heilen!'
@@ -230,24 +232,24 @@ Items:
           - '&cHeile den Spieler!'
       Feed:
         material: COOKED_BEEF
-        displayName: '&cSpieler füttern!'
+        displayName: '&cSpieler fÃ¼ttern!'
         lore:
-          - '&cFülle die Hungersleiste des Spielers wieder auf!'
+          - '&cFÃ¼lle die Hungersleiste des Spielers wieder auf!'
       Burn:
         material: FLINT_AND_STEEL
-        displayName: '&cSpieler anzünden!'
+        displayName: '&cSpieler anzÃ¼nden!'
         lore:
-          - '&cZünde den Spieler an!'
+          - '&cZÃ¼nde den Spieler an!'
       Lightning:
         material: BLAZE_ROD
-        displayName: '&cBlitze schießen!'
+        displayName: '&cBlitze schieÃŸen!'
         lore:
-          - '&cSchieße einen Blitz auf den Spieler!'
+          - '&cSchieÃŸe einen Blitz auf den Spieler!'
       Firework:
         material: FIREWORK_ROCKET
-        displayName: '&1F&2e&3u&4e&5r&6w&7e&8r&9k &az&bü&cn&dd&ee&fn!'
+        displayName: '&1F&2e&3u&4e&5r&6w&7e&8r&9k &az&bÃ¼&cn&dd&ee&fn!'
         lore:
-          - '&cZünde buntes Feuerwerk über dem Spieler!'
+          - '&cZÃ¼nde buntes Feuerwerk Ã¼ber dem Spieler!'
       TeleportYouToPlayer:
         material: ENDER_PEARL
         displayName: '&2Teleportiere dich zum Spieler!'
@@ -270,9 +272,9 @@ Items:
           - '&cNehme dem Spieler die Operatorrechte weg!'
       Armor:
         material: DIAMOND_CHESTPLATE
-        displayName: '&2Rüstung'
+        displayName: '&2RÃ¼stung'
         lore:
-          - '&cZeige die Rüstung des Spielers!'
+          - '&cZeige die RÃ¼stung des Spielers!'
       Inventory:
         material: COBBLESTONE
         displayName: '&2Inventar'
@@ -280,25 +282,25 @@ Items:
           - '&aZeige das Inventar des Spielers!'
       Potions:
         material: POTION
-        displayName: '&5Tränke!'
+        displayName: '&5TrÃ¤nke!'
         lore:
           - '&aGebe dem Spieler Effekte!'
       ClearPotions:
         material: RED_CONCRETE
-        displayName: '&4Lösche alle Effekte'
+        displayName: '&4LÃ¶sche alle Effekte'
         lore:
-          - '&aLöscht alle Effekte des Spielers!'
+          - '&aLÃ¶scht alle Effekte des Spielers!'
       Spawning:
         material: SPAWNER
         displayName: '&aSpawner'
         lore:
-          - '&cErschaffe Entitäten in dem Spieler!'
+          - '&cErschaffe EntitÃ¤ten in dem Spieler!'
       Troll:
         material: TNT
-        displayName: '&4&lTroll Menü'
+        displayName: '&4&lTroll MenÃ¼'
         lore:
           - '&cTrolle den Spieler!'
-          - '&cRot &6= &3aus | &aGrün &6= &3an'
+          - '&cRot &6= &3aus | &aGrÃ¼n &6= &3an'
       PlayerSpawnLocation:
         material: RED_BED
         displayName: '&aPlayer Spawn Location'
@@ -329,12 +331,12 @@ Items:
         material: PAPER
         displayName: '&aGeld Inventar'
         lore:
-          - '&aÖffnet das Geld Inventar!'
+          - '&aÃ–ffnet das Geld Inventar!'
       ActionsItem:
         material: DIAMOND_SWORD
         displayName: '&aAktionen Menu'
         lore:
-          - '&aÖffnet das Aktionen Menu!'
+          - '&aÃ–ffnet das Aktionen Menu!'
       BannedPlayers:
         material: RED_CONCRETE
         displayName: '&cGebannte Spieler'
@@ -402,14 +404,14 @@ Items:
           - '&aSpeichere die Welt!'
       Delete:
         material: TNT
-        displayName: '&4Löschen'
+        displayName: '&4LÃ¶schen'
         lore:
-          - '&4Lösche die Welt!'
+          - '&4LÃ¶sche die Welt!'
       GameRule:
         material: COMMAND_BLOCK
         displayName: '&aGamerules'
         lore:
-          - '&aÄndere alle Gamerules die einen true/false Wert haben!'
+          - '&aÃ„ndere alle Gamerules die einen true/false Wert haben!'
       TPToSpawn:
         material: ENDER_PEARL
         displayName: '&aTeleport to World Spawn'
@@ -566,6 +568,12 @@ Items:
         lore:
           - '&cWechsle zu gewittrigem Wetter!'
   StartMenu:
+    ReloadConfig:
+      material: GREEN_WOOL
+      displayName: '&aReload Config'
+      lore:
+        - '&aReloade die Admin-Panel Config'
+        - '&a(Sprach Dateien, Config)'
     WorldManager:
       material: GRASS_BLOCK
       displayName: '&2World Manager'
@@ -601,7 +609,7 @@ Items:
       displayName: '&aAdmin Panel Info'
       lore:
         - '&aIn diesem Menu kann man auf Items klicken,'
-        - '&adie einen dann in Untermenüs weiterleiten!'
+        - '&adie einen dann in UntermenÃ¼s weiterleiten!'
   ServerManager:
     WhiteListMenuItem:
       material: OAK_FENCE_GATE
@@ -611,9 +619,9 @@ Items:
     WhitelistMenu:
       AddPlayer:
         material: GREEN_CONCRETE
-        displayName: '&aHinzufügen'
+        displayName: '&aHinzufÃ¼gen'
         lore:
-          - '&aFüge einen Spieler zur Whitelist hinzu!'
+          - '&aFÃ¼ge einen Spieler zur Whitelist hinzu!'
       RemovePlayer:
         material: RED_CONCRETE
         displayName: '&cEntfernen'
@@ -648,7 +656,7 @@ Items:
       material: ARMOR_STAND
       displayName: '&aChat Manager'
       lore:
-        - '&aÖffnet den Chat Manager!'
+        - '&aÃ–ffnet den Chat Manager!'
     KickAllPlayers:
       material: IRON_SWORD
       displayName: '&cKicke alle Spieler'
@@ -668,9 +676,9 @@ Items:
   ChatManager:
     ClearChat:
       material: DIAMOND_SWORD
-      displayName: '&2Lösche den Chat'
+      displayName: '&2LÃ¶sche den Chat'
       lore:
-        - '&aLösche den gesamten Chat!'
+        - '&aLÃ¶sche den gesamten Chat!'
     MuteChat:
       material: GREEN_DYE
       displayName: '&2Mute den Chat'
@@ -767,9 +775,9 @@ Items:
               - '&2Entregistriert den Command!'
           Execute:
             material: BOOK
-            displayName: '&2Ausführen'
+            displayName: '&2AusfÃ¼hren'
             lore:
-              - '&2Führt den Command aus mit keinen Arguemten!'
+              - '&2FÃ¼hrt den Command aus mit keinen Arguemten!'
       Permissions:
         Item:
           material: WRITABLE_BOOK
@@ -779,17 +787,17 @@ Items:
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   PlayerManager:
-    PlayerSelector: '&aSpieler auswählen'
+    PlayerSelector: '&aSpieler auswÃ¤hlen'
     PlayerActions: '&aAktionen: %player_name%'
     SelectPlayerAction: '&aAktionen: %player_name%'
-    SpawningMenu: '&Entitäten spawnen'
-    PotionMenu: '&aTränke geben'
-    TrollMenu: '&1T&2r&3o&4l&5l &6M&7e&8n&9ü'
-    ArmorView: '&4Rüstung'
+    SpawningMenu: '&EntitÃ¤ten spawnen'
+    PotionMenu: '&aTrÃ¤nke geben'
+    TrollMenu: '&1T&2r&3o&4l&5l &6M&7e&8n&9Ã¼'
+    ArmorView: '&4RÃ¼stung'
     MoneyMenu: '&a&lGeld'
     BannedPlayers: '&cGebannte Spieler'
   WorldManager:
-    WorldSelector: '&aWähle eine Welt'
+    WorldSelector: '&aWÃ¤hle eine Welt'
     WorldSettings: '&3Einstellungen'
     WorldCreateMenu: '&3Welt erstellen'
     GameRuleMenu: '&3Gamerules'
@@ -799,7 +807,7 @@ MenuTitles:
     Menu: '&5Server Manager'
     ChatManagerMenu: '&aChat Manager'
   PluginManager:
-    Selector: '&aWähle ein Plugin'
+    Selector: '&aWÃ¤hle ein Plugin'
     Settings: '&3Einstellungen'
     InstallMenu: '&6Installieren'
     Commands:

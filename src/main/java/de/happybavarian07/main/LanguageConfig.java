@@ -31,10 +31,12 @@ public class LanguageConfig {
 
         this.config = YamlConfiguration.loadConfiguration(this.file);
 
-        InputStream defaultStream = this.plugin.getResource(this.langName + ".yml");
-        if(defaultStream != null) {
-            YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
-            this.config.setDefaults(defaultConfig);
+        if(this.plugin.getResource("languages/" + this.langName + ".yml") != null) {
+            InputStream defaultStream = this.plugin.getResource("languages/" + this.langName + ".yml");
+            if (defaultStream != null) {
+                YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
+                this.config.setDefaults(defaultConfig);
+            }
         }
     }
 

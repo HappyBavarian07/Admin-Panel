@@ -12,6 +12,7 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -69,17 +70,10 @@ public interface AdminPanelAPI {
      * Lädt ein Plugin (wenn gefunden)
      * Der Parameter pluginName ist der Name des Plugins
      * Und dieses Plugin wird dann geladen!
+     * Aber Nicht aktiviert!!!
      * @param pluginName der Plugin Name
      */
-    void loadPlugin(String pluginName);
-
-    /**
-     * Lädt ein Plugin (wenn gefunden)
-     * Der Parameter plugin ist das Plugin
-     * Und dieses Plugin wird dann geladen!
-     * @param plugin das Plugin
-     */
-    void loadPlugin(Plugin plugin);
+    void loadPlugin(File pluginName) throws InvalidPluginException, InvalidDescriptionException;
 
     /**
      * Reloaded ein Plugin (wenn gefunden)
@@ -223,6 +217,14 @@ public interface AdminPanelAPI {
      * @throws NullPointerException Wenn die Sprache {@code null} ist
      */
     void setCurrentLanguage(LanguageFile languageFile) throws NullPointerException;
+
+    /**
+     * Reloaded die Config
+     * (Sprach Files, Config)
+     * @param messageReceiver Der Spieler der Nachrichten erhält
+     * Der Speiler darf nicht null sein!
+     */
+    void reloadConfigurationFiles(Player messageReceiver);
 
     // Events
 

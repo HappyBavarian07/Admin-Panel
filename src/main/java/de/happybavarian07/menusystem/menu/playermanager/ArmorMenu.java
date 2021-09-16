@@ -41,28 +41,18 @@ public class ArmorMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
         if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if(e.getSlot() == 0) {
-            target.getInventory().getArmorContents()[0] = null;
-            target.updateInventory();
-            inventory.setItem(0, lgm.getItem("General.EmptySlot", target));
-        } else if (e.getSlot() == 1) {
-            target.getInventory().getArmorContents()[1] = null;
-            target.updateInventory();
-            inventory.setItem(1, lgm.getItem("General.EmptySlot", target));
-        } else if (e.getSlot() == 2) {
-            target.getInventory().getArmorContents()[2] = null;
-            target.updateInventory();
-            inventory.setItem(2, lgm.getItem("General.EmptySlot", target));
-        } else if (e.getSlot() == 3) {
-            target.getInventory().getArmorContents()[3] = null;
-            target.updateInventory();
-            inventory.setItem(3, lgm.getItem("General.EmptySlot", target));
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        if (item.equals(lgm.getItem("General.Refresh", null))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            open();
+            super.open();
+        } else if (item.equals(lgm.getItem("General.Close", null))) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            new PlayerActionsMenu(playerMenuUtility, targetUUID).open();
         }
     }
 

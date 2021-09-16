@@ -90,8 +90,8 @@ public class ServerManagerMenu extends Menu implements Listener {
                 if (!kickAllPlayersEvent.isCancelled()) {
                     for(Player online : playersToKick) {
                         Utils.getInstance().kick(player, online.getName(),
-                                lgm.getMessage("PlayServerManager.KickAllPlayersReason", online),
-                                lgm.getMessage("ServerManager.KickAllPlayersSource", online));
+                                lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online),
+                                lgm.getMessage("Player.ServerManager.KickAllPlayersSource", player));
                     }
                     player.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", player));
                 }
@@ -181,7 +181,7 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (plugin.isInMaintenanceMode()) {
+        if (plugin.isInMaintenanceMode() && !player.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player));
         }
     }

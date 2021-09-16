@@ -84,6 +84,13 @@ public class AdminPanelStartMenu extends Menu {
                 return;
             }
             new ServerManagerMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+        } else if (item.equals(lgm.getItem(path + "ReloadConfig", player))) {
+            if (!player.hasPermission("AdminPanel.ReloadConfig")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            Main.getAPI().reloadConfigurationFiles(player);
+            super.open();
         }
     }
 
@@ -93,6 +100,7 @@ public class AdminPanelStartMenu extends Menu {
         Player player = playerMenuUtility.getOwner();
         String path = "StartMenu.";
 
+        inventory.setItem(18, lgm.getItem(path + "ReloadConfig", player));
         inventory.setItem(4, lgm.getItem(path + "ServerReload", player));
         inventory.setItem(10, lgm.getItem(path + "WorldManager", player));
         inventory.setItem(12, lgm.getItem(path + "PlayerManager", player));

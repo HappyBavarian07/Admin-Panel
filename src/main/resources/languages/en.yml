@@ -4,6 +4,8 @@ Messages:
     DisablingMessage: '[Admin-Panel] successfully disabled!'
   Player:
     General:
+      ReloadedConfig: '%prefix% &9> &aSuccessfully reloaded the Config!'
+      ReloadedLanguageFile: '%prefix% &9> &aSuccessfully reloaded Language: %language%!'
       AlreadyOnFirstPage: '%prefix% &9> &cYou''re already on the first page!'
       AlreadyOnLastPage: '%prefix% &9> &cYou''re already on the last page!'
       NoPermissions: '%prefix% &9> &cYou do not have access to this command!'
@@ -566,6 +568,12 @@ Items:
         lore:
           - '&cChange to Midnight!'
   StartMenu:
+    ReloadConfig:
+      material: GREEN_WOOL
+      displayName: '&aReload Config'
+      lore:
+        - '&aReload the Admin-Panel Config'
+        - '&a(Language Files, Config)'
     WorldManager:
       material: GRASS_BLOCK
       displayName: '&2World Manager'
