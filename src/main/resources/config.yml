@@ -23,10 +23,10 @@
 
 Plugin:
   # This is the prefix used by the plugin in the console when starting or stopping
-  StartPrefix: '&r[&4Admin&d-&8Panel&r]'
+  StartPrefix: '&r[&4Admin&d-&8Panel&r] '
   # This is the prefix used by the plugin for chat messages
   # These messages can be edited in the messages.yml file
-  Prefix: '&r[&4Admin&d-&8Panel&r]'
+  Prefix: '&r[&4Admin&d-&8Panel&r] '
 
   # Currently Disabled
   ## If your server uses Supervanish then please enter the version here.This is important for identification because I cannot simply create a method for each individual version:)
@@ -36,6 +36,9 @@ Plugin:
   # and then enter the name of the file (without .yml) here. Note upper and lower case!
   # Example: /plugins/Admin-Panel/languages/Language.yml | language (in the config): Language
   language: en
+  # This Option makes it that all Actions (Plugin Update, Admin Panel Open, ...) get logged
+  # in the plugin.log File If You don't want this please disable this Option!
+  LogActions: true
   Updater:
     # If this option is activated, the updater will automatically check for updates
     # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
@@ -47,6 +50,9 @@ Plugin:
     # If this option and the downloadPluginUpdate option is activated,
     # then the updater will automatically replace the plugin with the new version!
     automaticReplace: false
+    # With this Option you can control how often the Updater should check!
+    # You can configure here the Time between Checks (in Minutes)
+    UpdateCheckTime: 5
 
 # These are the settings for the panel
 Panel:
@@ -104,60 +110,3 @@ Pman:
   Money:
     # This is the currency used for the money part in the Pman
     currency: $
-
-# Here you can set what you can spawn for mobs via the Player Manager in the Actions menu under Spawn Gui
-# just set those you don't want to false
-Spawn:
-  Bat: true
-  Bee: true
-  Blaze: true
-  Cat: true
-  Cave_Spider: true
-  Chicken: true
-  Cod: true
-  Cow: true
-  Creeper: true
-  Dolphin: true
-  Donkey: true
-  Drowned: true
-  Elder_Guardian: true
-  Enderman: true
-  Endermite: true
-  Evoker: true
-  Fox: true
-  Ghast: true
-  Guardian: true
-  Horse: true
-  Husk: true
-  Llama: true
-  Magma_Cube: true
-  Mooshroom: true
-  Mule: true
-  Ocelot: true
-  Panda: true
-  Parrot: true
-  Phantom: true
-  Pig: true
-  Pillager: true
-  Polar_Bear: true
-  Pufferfish: true
-  Rabbit: true
-  Ravager: true
-  Salmon: true
-  Sheep: true
-  Shulker: true
-  Silverfish: true
-  Skeleton: true
-  Skeleton_Horse: true
-  Slime: true
-  Spider: true
-  Squid: true
-  Stray: true
-  Tropical_Fish: true
-  Turtle: true
-  Vex: true
-  Villager: true
-  Vindicator: true
-  Witch: true
-  Wolf: true
-  Zombie: true

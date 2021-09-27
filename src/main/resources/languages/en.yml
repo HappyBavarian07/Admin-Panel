@@ -352,6 +352,17 @@ Items:
         displayName: '&cKick the Player'
         lore:
           - '&aKick the Player!'
+      Vanish:
+        true:
+          material: FEATHER
+          displayName: '&aVanish'
+          lore:
+            - '&aTurn the Vanish off for the Player!'
+        false:
+          material: FEATHER
+            displayName: '&cVanish'
+            lore:
+              - '&aTurn the Vanish on for the Player!'
     MoneyMenu:
       Give:
         material: GREEN_WOOL

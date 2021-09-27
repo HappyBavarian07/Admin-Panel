@@ -92,6 +92,7 @@ public abstract class Menu implements InventoryHolder {
         } catch (NotAPanelEventException e) {
             e.printStackTrace();
         }
+        Main.getPlugin().writeToLog(playerMenuUtility.getOwner().getName() + "(UUID: " + playerMenuUtility.getOwner().getUniqueId() + ") opened the Panel: " + this.getClass().getName());
     }
 
     //Overridden method from the InventoryHolder interface

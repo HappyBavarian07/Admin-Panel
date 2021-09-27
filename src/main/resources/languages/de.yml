@@ -301,6 +301,17 @@ Items:
         lore:
           - '&cTrolle den Spieler!'
           - '&cRot &6= &3aus | &aGrün &6= &3an'
+      Vanish:
+        true:
+          material: FEATHER
+          displayName: '&aVanish'
+          lore:
+            - '&aSchalte Vanish für den Spieler aus!'
+        false:
+          material: FEATHER
+            displayName: '&cVanish'
+            lore:
+              - '&cSchalte Vanish für den Spieler an!'
       PlayerSpawnLocation:
         material: RED_BED
         displayName: '&aPlayer Spawn Location'

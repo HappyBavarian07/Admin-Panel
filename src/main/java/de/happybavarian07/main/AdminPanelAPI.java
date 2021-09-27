@@ -72,6 +72,8 @@ public interface AdminPanelAPI {
      * Und dieses Plugin wird dann geladen!
      * Aber Nicht aktiviert!!!
      * @param pluginName der Plugin Name
+     * @throws InvalidPluginException Wenn das Plugin kein Plugin ist
+     * @throws InvalidDescriptionException Wenn das Plugin keine plugin.yml hat
      */
     void loadPlugin(File pluginName) throws InvalidPluginException, InvalidDescriptionException;
 
@@ -146,7 +148,7 @@ public interface AdminPanelAPI {
      * Automatisch aktiviert werden soll oder nicht!
      * @param resourceID Resource Id des Plugins
      * @param fileName Datei Name
-     * @param enableAfterInstall Automatik Start
+     * @param enableAfterInstall Automatic Start
      * @return Das heruntergeladene Plugin
      * @throws IOException Wenn irgendwas mit der Website nicht geht
      * @throws InvalidPluginException Wenn das Plugin kein Plugin ist

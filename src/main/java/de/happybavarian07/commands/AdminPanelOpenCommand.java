@@ -25,6 +25,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
                     new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+                    Main.getPlugin().writeToLog("Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")");
                 } else {
                     sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null));
                 }
@@ -38,6 +39,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                         try {
                             new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(target)).open();
                             player.sendMessage(openingMessageSelfOpenedForOther);
+                            Main.getPlugin().writeToLog(player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
                         } catch (NullPointerException e) {
                             player.sendMessage(targetPlayerIsNull);
                         }
@@ -53,6 +55,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     try {
                         new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(target)).open();
                         console.sendMessage(openingMessageSelfOpenedForOther);
+                        Main.getPlugin().writeToLog("Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
                     } catch (NullPointerException e) {
                         console.sendMessage(targetplayerisnull);
                     }

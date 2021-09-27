@@ -3,7 +3,7 @@ main: de.happybavarian07.main.Main
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07
-depend: [Vault, PlaceholderAPI]
+depend: [Vault, PlaceholderAPI, SuperVanish]
 load: POSTWORLD
 loadbefore:
   - Vault
@@ -161,6 +161,8 @@ permissions:
                 default: op
                 children:
                   AdminPanel.PlayerManager.PlayerSettings.Actions.Burn:
+                    default: op
+                  AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish:
                     default: op
                   AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.*:
                     default: op

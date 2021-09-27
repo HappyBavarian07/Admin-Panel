@@ -5,6 +5,7 @@ import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
+import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -100,6 +101,20 @@ public class PlayerActionsMenu extends Menu {
                 return;
             }
             new PlayerTrollMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.Vanish.false", target))) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            VanishAPI.hidePlayer(target);
+            super.open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.Vanish.true", target))) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            VanishAPI.showPlayer(target);
+            super.open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.Potions", target))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
                 player.sendMessage(noPerms);
@@ -228,6 +243,11 @@ public class PlayerActionsMenu extends Menu {
         inventory.setItem(29, lgm.getItem("PlayerManager.ActionsMenu.Burn", target));
         inventory.setItem(31, lgm.getItem("PlayerManager.ActionsMenu.Troll", target));
         inventory.setItem(33, lgm.getItem("PlayerManager.ActionsMenu.Lightning", target));
+        if(VanishAPI.isInvisible(target)) {
+            inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.true", target));
+        } else {
+            inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.false", target));
+        }
         // Fourth Row
         inventory.setItem(37, lgm.getItem("PlayerManager.ActionsMenu.Firework", target));
         inventory.setItem(39, lgm.getItem("PlayerManager.ActionsMenu.TeleportYouToPlayer", target));

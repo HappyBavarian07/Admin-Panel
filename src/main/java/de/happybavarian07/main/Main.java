@@ -10,7 +10,6 @@ import de.happybavarian07.utils.ChatUtil;
 import de.happybavarian07.utils.StartUpLogger;
 import de.happybavarian07.utils.Updater;
 import de.happybavarian07.utils.Utils;
-import io.CodedByYou.spiget.Resource;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -21,16 +20,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -46,15 +46,16 @@ public class Main extends JavaPlugin implements Listener {
     public final Map<Player, Boolean> dupeMobsOnKill = new HashMap<>();
     final StartUpLogger logger = StartUpLogger.create();
     private final FileConfiguration banConfig = YamlConfiguration.loadConfiguration(banfile);
+    private final List<String> disabledCommands = new ArrayList<>();
+    private final File logFile = new File(this.getDataFolder(), "plugin.log");
+    private final File configFile = new File(this.getDataFolder(), "config.yml");
     public Economy eco = null;
     public Permission perms = null;
     public Chat chat = null;
     public boolean inMaintenanceMode = false;
     public boolean chatMuted = false;
-    File configFile = new File(this.getDataFolder(), "config.yml");
     private Updater updater;
     private LanguageManager languageManager;
-    private final List<String> disabledCommands = new ArrayList<>();
 
     public static String getPrefix() {
         return prefix;
@@ -113,7 +114,6 @@ public class Main extends JavaPlugin implements Listener {
 
         // bStats
         int bStatsID = 11778;
-
         Metrics metrics = new Metrics(this, bStatsID);
 
         logger
@@ -137,6 +137,13 @@ public class Main extends JavaPlugin implements Listener {
         } else {
             logger.coloredSpacer(ChatColor.RED);
             logger.message("§4§lCould not find PlaceholderAPI!!");
+            logger.message("§4§lPlugin can not work without it!");
+            logger.coloredSpacer(ChatColor.RED);
+            getServer().getPluginManager().disablePlugin(this);
+        }
+        if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
+            logger.coloredSpacer(ChatColor.RED);
+            logger.message("§4§lCould not find SuperVanish!!");
             logger.message("§4§lPlugin can not work without it!");
             logger.coloredSpacer(ChatColor.RED);
             getServer().getPluginManager().disablePlugin(this);
@@ -176,8 +183,17 @@ public class Main extends JavaPlugin implements Listener {
             }
             logger.message("§e§lDone!§r");
         }
+        if (!logFile.exists()) {
+            logger.spacer().message("§c§lCreating plugin.log file!§r");
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            logger.message("§e§lDone!§r");
+        }
         logger.message("§3§lMain.Prefix §9= §7Config.Plugin.Prefix§r");
-        setPrefix(ChatColor.translateAlternateColorCodes('&', getConfig().getString("Plugin.Prefix")));
+        setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
         logger.message("§e§lPrefix Done!§r");
         logger.coloredSpacer(ChatColor.DARK_RED).message("§2§lStarting Registration of Events:§r");
         PluginManager pm = this.getServer().getPluginManager();
@@ -202,18 +218,41 @@ public class Main extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
+        updater = new Updater(getPlugin(), 91800);
         if (getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
-            updater = new Updater(this, 91800);
-            updater.checkForUpdates();
+            updater.checkForUpdates(true);
             if (updater.updateAvailable()) {
-                updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false);
+                updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
             }
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    updater.checkForUpdates(false);
+                    if (updater.updateAvailable()) {
+                        updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
+                    }
+                }
+            }.runTaskTimer(plugin, (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
         Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
         Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
     }
 
-    public @NotNull File getFile() {
+    public void writeToLog(String stringToLog) {
+        if (!getConfig().getBoolean("Plugin.LogActions")) return;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
+            Date d = Calendar.getInstance().getTime();
+            String prefix = d.getYear() + ":" + d.getMonth() + ":" + d.getDay() + " [" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " INFO]: [Updater] -> ";
+            bw.write(prefix + stringToLog);
+            bw.newLine();
+            bw.close();
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        }
+    }
+
+    public @NotNull File getPluginFile() {
         return this.getFile();
     }
 
@@ -221,19 +260,18 @@ public class Main extends JavaPlugin implements Listener {
         return logger;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onLogin(PlayerLoginEvent e) {
         Player player = e.getPlayer();
-        if (player.isBanned()) {
-            e.setKickMessage("§cDu wurdest vom Server gebannt!\n" +
+        if (player.isBanned() && banConfig.getBoolean(player.getUniqueId().toString())) {
+            e.setKickMessage("§cYou are banned from this Server!\n" +
                     "\n" +
                     "§3Von: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getSource() + "\n" +
                     "\n" +
                     "§3Reason: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getReason() + "\n" +
                     "\n" +
-                    "§3Permanently banned!" + "\n" +
-                    "\n" +
-                    "§3Du kannst §c§nkeinen§3 Entbannungsantrag stellen!");
+                    "§3Permanently banned!");
+            writeToLog("Player: " + player.getName() + "(UUID: " + player.getUniqueId() + ") tryed to Join but is banned");
         }
     }
 

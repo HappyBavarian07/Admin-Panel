@@ -13,11 +13,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import sun.rmi.log.ReliableLog;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Updater implements Listener {
     private final Main plugin;
@@ -49,6 +52,7 @@ public class Updater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
+        plugin.writeToLog("Requested Latest Version ID -> " + version);
         return version;
     }
 
@@ -61,6 +65,7 @@ public class Updater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
+        plugin.writeToLog("Requested Latest Version Name -> " + version);
         return version;
     }
 
@@ -139,20 +144,26 @@ public class Updater implements Listener {
                                           minorVersions[0] + "|" + minorVersions[1] + " : " +
                                           patchVersions[0] + "|" + patchVersions[1]);*/
         if(!major) {
+            plugin.writeToLog("Checked if an Update is available -> false");
             return false;
         } else {
             if(!minor) {
+                plugin.writeToLog("Checked if an Update is available -> false");
                 return false;
             } else {
+                plugin.writeToLog("Checked if an Update is available -> " + patch);
                 return patch;
             }
         }
     }
 
-    public void checkForUpdates() {
+    public void checkForUpdates(boolean logInConsole) {
         boolean updateAvailable = updateAvailable();
         if (!updateAvailable) {
-            plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + " &a No Update available!"));
+            if(logInConsole) {
+                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Update available!"));
+            }
+            plugin.writeToLog("Checked For Updates -> There is no Update Available!");
         } else {
             JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
             Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -169,6 +180,7 @@ public class Updater implements Listener {
                                 "&bNew Version ID: &c" + getLatestVersionID() + "&r\n" +
                                 "&bNew Version Title: &c" + jsonObject.getString("title") + "&r\n" +
                                 "&bNew Version Description: &c" + descriptionDecoded));
+                plugin.writeToLog("Checked For Updates -> There is an Update Available! (New Version: " + getLatestVersionName() + ", Old Version: " + getPluginVersion() + ")");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -222,7 +234,13 @@ public class Updater implements Listener {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Updates Available!"));
     }
 
-    public void downloadPlugin(boolean replace, boolean force) {
+    /**
+     *
+     * @param replace Ob die alte Version automatisch erneuert werden soll
+     * @param force Ob das System dazu gezwungen wird
+     * @param logInConsole Ob das Plugin eine Nachricht ausgeben soll oder nur in den plugin.log File schreiben soll
+     */
+    public void downloadPlugin(boolean replace, boolean force, boolean logInConsole) {
         if (!plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !force) return;
         try {
             File downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/91800.jar");
@@ -240,8 +258,11 @@ public class Updater implements Listener {
             downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar");
             new File(plugin.getDataFolder() + "/downloaded-update/91800.jar").delete();
             if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force && !replace) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
+                if(logInConsole) {
+                    plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
+                    plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
+                }
+                plugin.writeToLog("New Version (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Old Version: " + getPluginVersion() + ")");
             } else if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) {
 
                 try {
@@ -252,9 +273,12 @@ public class Updater implements Listener {
                     e.printStackTrace();
                 }
                 pluginUtils.load(newPluginFile);
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
-                        "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
-                                "&aAnd The New Version started automatically! If you can please check Console for Errors!"));
+                if(logInConsole) {
+                    plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
+                            "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
+                                    "&aAnd The New Version started automatically! If you can please check Console for Errors!"));
+                }
+                plugin.writeToLog("New Version (" + getLatestVersionName() + ") got downloaded and replaced with the Old Version (" + getPluginVersion() + ")!");
             }
         } catch (Exception e) {
             e.printStackTrace();
