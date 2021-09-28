@@ -18,7 +18,7 @@ import java.nio.file.NotDirectoryException;
 import java.util.*;
 
 public class PluginUtils {
-    private Main plugin;
+    private final Main plugin;
 
     public PluginUtils() {
         this.plugin = Main.getPlugin();
@@ -30,7 +30,7 @@ public class PluginUtils {
 
     public void load(String name, String version) {
 
-        Plugin target = null;
+        Plugin target;
 
         File pluginDir = new File("plugins");
 

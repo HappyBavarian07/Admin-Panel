@@ -15,7 +15,7 @@ commands:
     aliases: [apanel, adminp, ap]
   update:
     description: The Update Command
-    usage: /update <Check|Download|Replace>
+    usage: /update <Check|Download|ForceDownload|Replace|ForceReplace|GetLatest>
 
 permissions:
   AdminPanel.*:

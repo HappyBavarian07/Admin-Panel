@@ -5,19 +5,20 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
 
 public class LanguageManager {
 
-    private final Main plugin;
+    private final JavaPlugin plugin;
     private final File langFolder;
     private final Map<String, LanguageFile> registeredLanguages;
     private String currentLangName;
     private LanguageFile currentLang;
 
-    public LanguageManager(Main plugin, File langFolder) {
+    public LanguageManager(JavaPlugin plugin, File langFolder) {
         this.plugin = plugin;
         this.langFolder = langFolder;
         this.registeredLanguages = new LinkedHashMap<>();

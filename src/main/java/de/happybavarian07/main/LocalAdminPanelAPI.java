@@ -196,6 +196,36 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
+    public String getMessage(String path, Player player) {
+        return lgm.getMessage(path, player);
+    }
+
+    @Override
+    public String getMessage(String path, Player player, String langName) {
+        return lgm.getMessage(path, player, langName);
+    }
+
+    @Override
+    public ItemStack getItem(String path, Player player) {
+        return lgm.getItem(path, player);
+    }
+
+    @Override
+    public ItemStack getItem(String path, Player player, String langName) {
+        return lgm.getItem(path, player, langName);
+    }
+
+    @Override
+    public String getMenuTitle(String path, Player player) {
+        return lgm.getMenuTitle(path, player);
+    }
+
+    @Override
+    public String getMenuTitle(String path, Player player, String langName) {
+        return lgm.getMenuTitle(path, player, langName);
+    }
+
+    @Override
     public void reloadConfigurationFiles(Player messageReceiver) {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
@@ -214,7 +244,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
             Bukkit.getPluginManager().callEvent(event);
             return (AdminPanelEvent) event;
         } else {
-            throw new NotAPanelEventException("The Event: " + event + " is not a Admin-Panel Event");
+            throw new NotAPanelEventException("The Event: " + event + " is not an Admin-Panel Event!\nThis Error usually happens if a Plugin tryes to call a Normal Bukkit Event with the callAdminPanelEvent Method in the API!\nPlease contact the Developer of this Plugin!");
         }
     }
 }

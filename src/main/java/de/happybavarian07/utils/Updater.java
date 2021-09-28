@@ -13,20 +13,17 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import sun.rmi.log.ReliableLog;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Updater implements Listener {
     private final Main plugin;
     private final int resourceID;
-    Resource resource;
     private final PluginUtils pluginUtils;
+    Resource resource;
 
     public Updater(Main plugin, int resourceID) {
         this.plugin = plugin;
@@ -143,11 +140,11 @@ public class Updater implements Listener {
         System.out.println("Versions: " + majorVersions[0] + "|" + majorVersions[1] + " : " +
                                           minorVersions[0] + "|" + minorVersions[1] + " : " +
                                           patchVersions[0] + "|" + patchVersions[1]);*/
-        if(!major) {
+        if (!major) {
             plugin.writeToLog("Checked if an Update is available -> false");
             return false;
         } else {
-            if(!minor) {
+            if (!minor) {
                 plugin.writeToLog("Checked if an Update is available -> false");
                 return false;
             } else {
@@ -160,7 +157,7 @@ public class Updater implements Listener {
     public void checkForUpdates(boolean logInConsole) {
         boolean updateAvailable = updateAvailable();
         if (!updateAvailable) {
-            if(logInConsole) {
+            if (logInConsole) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Update available!"));
             }
             plugin.writeToLog("Checked For Updates -> There is no Update Available!");
@@ -235,9 +232,8 @@ public class Updater implements Listener {
     }
 
     /**
-     *
-     * @param replace Ob die alte Version automatisch erneuert werden soll
-     * @param force Ob das System dazu gezwungen wird
+     * @param replace      Ob die alte Version automatisch erneuert werden soll
+     * @param force        Ob das System dazu gezwungen wird
      * @param logInConsole Ob das Plugin eine Nachricht ausgeben soll oder nur in den plugin.log File schreiben soll
      */
     public void downloadPlugin(boolean replace, boolean force, boolean logInConsole) {
@@ -257,23 +253,25 @@ public class Updater implements Listener {
             downloadPath.renameTo(new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar"));
             downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar");
             new File(plugin.getDataFolder() + "/downloaded-update/91800.jar").delete();
-            if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force && !replace) {
-                if(logInConsole) {
+            if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && !replace) {
+                if (logInConsole) {
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
                 }
                 plugin.writeToLog("New Version (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Old Version: " + getPluginVersion() + ")");
-            } else if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) {
+            } else if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && replace) {
 
                 try {
                     pluginUtils.unload(plugin);
                     oldPluginFile.delete();
-                    FileUtils.moveFileToDirectory(newPluginFile, plugin.getDataFolder().getParentFile(), false);
+                    newPluginFile.delete();
+                    FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 pluginUtils.load(newPluginFile);
-                if(logInConsole) {
+                Bukkit.getPluginManager().enablePlugin(pluginUtils.getPluginByName("Admin-Panel"));
+                if (logInConsole) {
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
                             "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
                                     "&aAnd The New Version started automatically! If you can please check Console for Errors!"));

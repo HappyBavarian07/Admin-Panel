@@ -54,7 +54,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("download")) {
                     if (check) {
                         try {
-                            updater.downloadPlugin(false, true, false);
+                            updater.downloadPlugin(false, true, true);
                             sender.sendMessage(Utils.getInstance().chat(
                                     "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
                         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                     }
                 } else if (args[0].equalsIgnoreCase("forcedownload")) {
                     try {
-                        updater.downloadPlugin(false, true, false);
+                        updater.downloadPlugin(false, true, true);
                         sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aForce Download finished!"));
                         sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() +
                                 "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
@@ -81,7 +81,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("replace")) {
                     if (check) {
                         try {
-                            updater.downloadPlugin(true, true, false);
+                            updater.downloadPlugin(true, true, true);
                             sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -96,7 +96,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                     }
                 } else if (args[0].equalsIgnoreCase("forcereplace")) {
                     try {
-                        updater.downloadPlugin(true, true, false);
+                        updater.downloadPlugin(true, true, true);
                         sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aForce Replace finished!"));
                         sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                     } catch (Exception e) {

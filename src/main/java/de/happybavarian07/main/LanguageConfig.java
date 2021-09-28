@@ -2,6 +2,7 @@ package de.happybavarian07.main;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +12,12 @@ import java.util.logging.Level;
 
 public class LanguageConfig {
 
-    private final Main plugin;
+    private final JavaPlugin plugin;
     private final String langName;
     private File file;
     private FileConfiguration config;
 
-    public LanguageConfig(File langFile, String langName, Main plugin) {
+    public LanguageConfig(File langFile, String langName, JavaPlugin plugin) {
         this.plugin = plugin;
         this.langName = langName;
         this.file = langFile;
