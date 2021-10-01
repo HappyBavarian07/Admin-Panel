@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.worldmanager.time;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.world.TimeChangeEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.worldmanager.WorldSettingsMenu;
@@ -13,7 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class TimeChangeMenu extends Menu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
@@ -46,8 +46,8 @@ public class TimeChangeMenu extends Menu {
         if (item.equals(lgm.getItem(itemPath + Time.SUNRISE, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNRISE);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.SUNRISE.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -56,8 +56,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.DAY, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.DAY);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.DAY.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -66,8 +66,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.MORNING, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MORNING);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.MORNING.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -76,8 +76,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.NOON, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NOON);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.NOON.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -86,8 +86,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.AFTERNOON, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.AFTERNOON);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.AFTERNOON.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -96,8 +96,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.SUNSET, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNSET);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.SUNSET.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -106,8 +106,8 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.NIGHT, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NIGHT);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.NIGHT.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -116,19 +116,19 @@ public class TimeChangeMenu extends Menu {
         } else if (item.equals(lgm.getItem(itemPath + Time.MIDNIGHT, player))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MIDNIGHT);
             try {
-                Main.getAPI().callAdminPanelEvent(changeEvent);
-                if(!changeEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
+                if (!changeEvent.isCancelled()) {
                     world.setTime(Time.MIDNIGHT.getTime());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
+            new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
         }
     }
 

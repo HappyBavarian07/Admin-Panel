@@ -31,7 +31,7 @@ public class ChatUtil {
         // Perworld broadcast
         message = ChatColor.translateAlternateColorCodes('&', message);
 
-        for(Player players : world.getPlayers()) {
+        for (Player players : world.getPlayers()) {
             players.sendMessage(message);
         }
     }
@@ -54,7 +54,7 @@ public class ChatUtil {
         // Perworld broadcast
         message = ChatColor.translateAlternateColorCodes('&', message);
 
-        for(Player players : world.getPlayers()) {
+        for (Player players : world.getPlayers()) {
             players.sendMessage(prefix + message);
         }
     }
@@ -67,7 +67,11 @@ public class ChatUtil {
         player.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', rawmessage));
     }
 
-    public static ChatUtil getInstance() { return instance; }
+    public static ChatUtil getInstance() {
+        return instance;
+    }
 
-    private void setInstance(ChatUtil instance) { this.instance = instance; }
+    private void setInstance(ChatUtil instance) {
+        ChatUtil.instance = instance;
+    }
 }

@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.plugins.PluginInstallEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PluginInstallMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     private int resourceID = 0;
@@ -54,7 +54,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
-        for(String s : resourceIDMeta.getLore()) {
+        for (String s : resourceIDMeta.getLore()) {
             updatedResourceIDLore.add(s.replace("%resourceid%", String.valueOf(this.resourceID)));
         }
         resourceIDMeta.setLore(updatedResourceIDLore);
@@ -63,7 +63,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack nameItem = lgm.getItem(path + "Name", player);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
-        for(String s : nameMeta.getLore()) {
+        for (String s : nameMeta.getLore()) {
             updatedNameLore.add(s.replace("%filename%", this.fileName));
         }
         nameMeta.setLore(updatedNameLore);
@@ -88,10 +88,10 @@ public class PluginInstallMenu extends Menu implements Listener {
         } else if (item.equals(lgm.getItem(path + "InstallButton", player))) {
             PluginInstallEvent installEvent = new PluginInstallEvent(player, resourceID, fileName, enableAfterInstall);
             try {
-                Main.getAPI().callAdminPanelEvent(installEvent);
-                if(!installEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(installEvent);
+                if (!installEvent.isCancelled()) {
                     try {
-                        Main.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
+                        AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
                         player.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", player));
@@ -131,7 +131,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
-        for(String s : resourceIDMeta.getLore()) {
+        for (String s : resourceIDMeta.getLore()) {
             updatedResourceIDLore.add(s.replace("%resourceid%", String.valueOf(this.resourceID)));
         }
         resourceIDMeta.setLore(updatedResourceIDLore);
@@ -141,14 +141,14 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack nameItem = lgm.getItem(path + "Name", player);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
-        for(String s : nameMeta.getLore()) {
+        for (String s : nameMeta.getLore()) {
             updatedNameLore.add(s.replace("%filename%", this.fileName));
         }
         nameMeta.setLore(updatedNameLore);
         nameItem.setItemMeta(nameMeta);
         inventory.setItem(1, nameItem);
 
-        if(enableAfterInstall) {
+        if (enableAfterInstall) {
             inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.true", player));
         } else {
             inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.false", player));

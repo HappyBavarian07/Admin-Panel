@@ -18,15 +18,29 @@ Messages:
     PlayerManager:
       Bypass: '%prefix% &9> &cDiesen Spieler kann man nicht auswählen, da er die Permission dazu hat!'
       ChooseYourself: '%prefix% &9> &cDu kannst dich nicht selber auswählen!'
-      SelfBanning: '%prefix% &9> &cDu kannst dich nicht selber bannen!'
-      KickReason: '&cKick zur Sicherheit'
-      KickSource: '%player_name%'
-      BanReason: '&cBan zur Sicherheit!'
-      BanSource: '%player_name%'
       AlreadyOp: '&cDieser Spieler ist bereits Operator!'
       NotOp: '&cDieser Spieler ist kein Operator!'
       OppedMessage: '&aDu hast den Spieler zum Operator gemacht!'
       DeoppedMessage: '&cDu hast dem Spieler die Operatorrechte weggenommen!'
+      KickMenu:
+        TargetKickMessage: '%prefix% &9> &4Du wurdest vom Server geworfen! Grund: %reason%'
+        NotKickable: '%prefix% &9> &cDieser Spieler kann nicht gekickt werden!'
+        SuccessfullyKicked: '%prefix% &9> &aDu hast diesen Spieler erfolgreich getkickt!'
+        Reason:
+          EnterNewReason: '%prefix% &9> &aBitte gibt einen neuen Grund in den Chat ein!'
+          NewReasonSet: '%prefix% &9> &aDer neue Grund wurde gesetzt!'
+      BanMenu:
+        TargetKickMessage: "%prefix% &9> &4Du wurdest von diesem Server gebannt \n
+        &4Zeit: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds% \n
+        &4Grund: &4%reason%"
+        SuccessfullyUnbanned: '%prefix% &9> &aDu hast den Spieler erfolgreich entbannt!'
+        SuccessfullyBanned: '%prefix% &9> &aDu hast diesen Spieler erfolgreich gebannt!'
+        AlreadyBanned: '%prefix% &9> &cDieser Spieler ist schon gebannt!'
+        NotBanned: '%prefix% &9> &cDieser Spieler ist nicht gebannt!'
+        NotBannable: '%prefix% &9> &cDieser Spieler kann nicht gebannt werden!'
+        Reason:
+          EnterNewReason: '%prefix% &9> &aBitte gibt einen neuen Grund in den Chat ein!'
+          NewReasonSet: '%prefix% &9> &aDer neue Grund wurde gesetzt!'
       Money:
         PleaseEnterAmount: '%prefix% &9> &aBitte gebe den Betrag in den Chat ein mit dem du arbeiten willst!'
         NotEnoughMoney: '%prefix% &9> &c%player_name% hat nicht genug Geld dafür! (%vault_eco_balance%)'
@@ -309,9 +323,9 @@ Items:
             - '&aSchalte Vanish für den Spieler aus!'
         false:
           material: FEATHER
-            displayName: '&cVanish'
-            lore:
-              - '&cSchalte Vanish für den Spieler an!'
+          displayName: '&cVanish'
+          lore:
+            - '&cSchalte Vanish für den Spieler an!'
       PlayerSpawnLocation:
         material: RED_BED
         displayName: '&aPlayer Spawn Location'
@@ -358,6 +372,75 @@ Items:
         displayName: '&cBanne den Spieler'
         lore:
           - '&cBanne den Spieler!'
+      BanMenu:
+        Reason:
+          material: PAPER
+          displayName: '&cSetze den Grund des Bans'
+          lore:
+            - '&cSetze den Grund des Bans'
+            - '&c%reason%'
+        Seconds:
+          material: CLOCK
+          displayName: '&aSekunden'
+          lore:
+            - '&7Links-Klick: +10 Sekunden'
+            - '&7Rechts-Klick: -10 Sekunden'
+            - '&a%seconds%'
+        Minutes:
+          material: CLOCK
+          displayName: '&aMinuten'
+          lore:
+            - '&7Links-Klick: +5 Minuten'
+            - '&7Rechts-Klick: -5 Minuten'
+            - '&a%minutes%'
+        Hours:
+          material: CLOCK
+          displayName: '&aStunden'
+          lore:
+            - '&7Links-Klick: +1 Stunden'
+            - '&7Rechts-Klick: -1 Stunden'
+            - '&a%hours%'
+        Days:
+          material: CLOCK
+          displayName: '&aTage'
+          lore:
+            - '&7Links-Klick: +1 Tage'
+            - '&7Rechts-Klick: -1 Tage'
+            - '&a%days%'
+        Months:
+          material: CLOCK
+          displayName: '&aMonate'
+          lore:
+            - '&7Links-Klick: +1 Monate'
+            - '&7Rechts-Klick: -1 Monate'
+            - '&a%months%'
+        Years:
+          material: CLOCK
+          displayName: '&aJahre'
+          lore:
+            - '&7Links-Klick: +1 Jahre'
+            - '&7Rechts-Klick: -1 Jahre'
+            - '&a%years%'
+        Ban:
+          material: BEDROCK
+          displayName: '&cBanne den Spieler'
+          lore:
+            - '&cBanne den Spieler:'
+            - '&cZeit: &6%time%'
+            - '&cGrund: &6%reason%'
+      KickMenu:
+        Reason:
+          material: PAPER
+          displayName: '&cSetze den Grund des Bans'
+          lore:
+            - '&cSetze den Grund des Bans'
+            - '&c%reason%'
+        Kick:
+          material: PISTON
+          displayName: '&cKicke den Spieler'
+          lore:
+            - '&ccKicke den Spieler:'
+            - '&cGrund: &6%reason%'
       KickItem:
         material: PISTON
         displayName: '&cKicke den Spieler'
@@ -807,6 +890,8 @@ MenuTitles:
     ArmorView: '&4Rüstung'
     MoneyMenu: '&a&lGeld'
     BannedPlayers: '&cGebannte Spieler'
+    BanMenu: '&cBan'
+    KickMenu: '&cKick'
   WorldManager:
     WorldSelector: '&aWähle eine Welt'
     WorldSettings: '&3Einstellungen'

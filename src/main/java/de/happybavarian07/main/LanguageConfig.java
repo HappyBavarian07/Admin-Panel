@@ -27,12 +27,12 @@ public class LanguageConfig {
     }
 
     public void reloadConfig() {
-        if(this.file == null)
+        if (this.file == null)
             this.file = new File(this.plugin.getDataFolder() + "/languages", this.langName + ".yml");
 
         this.config = YamlConfiguration.loadConfiguration(this.file);
 
-        if(this.plugin.getResource("languages/" + this.langName + ".yml") != null) {
+        if (this.plugin.getResource("languages/" + this.langName + ".yml") != null) {
             InputStream defaultStream = this.plugin.getResource("languages/" + this.langName + ".yml");
             if (defaultStream != null) {
                 YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
@@ -42,14 +42,14 @@ public class LanguageConfig {
     }
 
     public FileConfiguration getConfig() {
-        if(this.config == null)
+        if (this.config == null)
             reloadConfig();
 
         return this.config;
     }
 
     public void saveConfig() {
-        if(this.config == null || this.file == null)
+        if (this.config == null || this.file == null)
             return;
 
         try {
@@ -60,10 +60,10 @@ public class LanguageConfig {
     }
 
     public void saveDefaultConfig() {
-        if(this.file == null)
+        if (this.file == null)
             this.file = new File(this.plugin.getDataFolder() + "/languages", this.langName + ".yml");
 
-        if(!this.file.exists()) {
+        if (!this.file.exists()) {
             this.plugin.saveResource("languages/" + this.langName + ".yml", false);
         }
     }

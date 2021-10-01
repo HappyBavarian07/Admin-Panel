@@ -1,6 +1,6 @@
 package de.happybavarian07.utils;
 
-import de.happybavarian07.main.Main;
+import de.happybavarian07.main.AdminPanelMain;
 import io.CodedByYou.spiget.Resource;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -20,12 +20,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Updater implements Listener {
-    private final Main plugin;
+    private final AdminPanelMain plugin;
     private final int resourceID;
     private final PluginUtils pluginUtils;
     Resource resource;
 
-    public Updater(Main plugin, int resourceID) {
+    public Updater(AdminPanelMain plugin, int resourceID) {
         this.plugin = plugin;
         this.pluginUtils = new PluginUtils();
         this.resourceID = resourceID;
@@ -138,27 +138,22 @@ public class Updater implements Listener {
         System.out.println("Minor: " + minor);
         System.out.println("Patch: " + patch);
         System.out.println("Versions: " + majorVersions[0] + "|" + majorVersions[1] + " : " +
-                                          minorVersions[0] + "|" + minorVersions[1] + " : " +
-                                          patchVersions[0] + "|" + patchVersions[1]);*/
-        if (!major) {
-            plugin.writeToLog("Checked if an Update is available -> false");
-            return false;
-        } else {
-            if (!minor) {
-                plugin.writeToLog("Checked if an Update is available -> false");
-                return false;
-            } else {
-                plugin.writeToLog("Checked if an Update is available -> " + patch);
-                return patch;
-            }
+                minorVersions[0] + "|" + minorVersions[1] + " : " +
+                patchVersions[0] + "|" + patchVersions[1]);
+        System.out.println("Insgesamt: " + ((!major && !minor) && patch));*/
+        if (((!major && !minor) && patch)) {
+            plugin.writeToLog("Checked if an Update is available -> true");
+            return true;
         }
+        plugin.writeToLog("Checked if an Update is available -> false");
+        return false;
     }
 
     public void checkForUpdates(boolean logInConsole) {
         boolean updateAvailable = updateAvailable();
         if (!updateAvailable) {
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Update available!"));
+                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Update available!"));
             }
             plugin.writeToLog("Checked For Updates -> There is no Update Available!");
         } else {
@@ -224,11 +219,11 @@ public class Updater implements Listener {
     }
 
     public void sendNoUpdateMessage(Player sender) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Updates Available!"));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Updates Available!"));
     }
 
     public void sendNoUpdateMessage(ConsoleCommandSender sender) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getPrefix() + "&a No Updates Available!"));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Updates Available!"));
     }
 
     /**
@@ -263,8 +258,12 @@ public class Updater implements Listener {
 
                 try {
                     pluginUtils.unload(plugin);
-                    oldPluginFile.delete();
-                    newPluginFile.delete();
+                    if (oldPluginFile.exists()) {
+                        oldPluginFile.delete();
+                    }
+                    if (newPluginFile.exists()) {
+                        newPluginFile.delete();
+                    }
                     FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
                 } catch (IOException e) {
                     e.printStackTrace();

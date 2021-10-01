@@ -1,14 +1,9 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
-import de.happybavarian07.events.NotAPanelEventException;
-import de.happybavarian07.events.player.PlayerBanEvent;
-import de.happybavarian07.events.player.PlayerKickEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
-import de.happybavarian07.menusystem.menu.playermanager.PlayerActionsMenu;
-import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.menusystem.menu.playermanager.money.MoneyMenu;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Bukkit;
@@ -19,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 public class PlayerActionSelectMenu extends Menu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
@@ -45,42 +40,20 @@ public class PlayerActionSelectMenu extends Menu {
         Player target = Bukkit.getPlayer(targetUUID);
         ItemStack item = e.getCurrentItem();
 
-        if(item.equals(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target))) {
-            new PlayerActionsMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
-        } else if(item.equals(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target))) {
-            new MoneyMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
-        } else if(item.equals(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target))) {
-            String reason = lgm.getMessage("Player.PlayerManager.BanReason", target);
-            String source = lgm.getMessage("Player.PlayerManager.BanSource", player);
-            String targetName = target.getName();
-            PlayerBanEvent banEvent = new PlayerBanEvent(player, targetName, reason, source);
-            try {
-                Main.getAPI().callAdminPanelEvent(banEvent);
-                if (!banEvent.isCancelled()) {
-                    Utils.getInstance().ban(player, targetName, reason, source);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if(item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target))) {
-            String reason = lgm.getMessage("Player.PlayerManager.KickReason", target);
-            String source = lgm.getMessage("Player.PlayerManager.KickSource", player);
-            String targetName = target.getName();
-            PlayerKickEvent kickEvent = new PlayerKickEvent(player, targetName, reason, source);
-            try {
-                Main.getAPI().callAdminPanelEvent(kickEvent);
-                if (!kickEvent.isCancelled()) {
-                    Utils.getInstance().kick(player, targetName, reason, source);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
+        if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target))) {
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target))) {
+            new MoneyMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target))) {
+            new PlayerBanMenu(playerMenuUtility, targetUUID).open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target))) {
+            new PlayerKickMenu(playerMenuUtility, targetUUID).open();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
                 return;
             }
-            new PlayerSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 

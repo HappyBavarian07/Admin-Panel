@@ -2,9 +2,9 @@ package de.happybavarian07.menusystem.menu.worldmanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.world.MenuGameruleChangeEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.Utils;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GameRuleMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
@@ -54,15 +54,15 @@ public class GameRuleMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
         if (item == null || !item.hasItemMeta()) return;
-        if(item.getType().equals(Material.PLAYER_HEAD)) {
+        if (item.getType().equals(Material.PLAYER_HEAD)) {
             int count = 0;
-            for(String gmName : gamerules) {
-                if(Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
+            for (String gmName : gamerules) {
+                if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
                     MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
                             player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
                     try {
-                        Main.getAPI().callAdminPanelEvent(gameruleChangeEvent);
-                        if(!gameruleChangeEvent.isCancelled()) {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(gameruleChangeEvent);
+                        if (!gameruleChangeEvent.isCancelled()) {
                             world.setGameRuleValue(gmName, "false");
                             super.open();
                             return;
@@ -74,8 +74,8 @@ public class GameRuleMenu extends PaginatedMenu {
                     MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
                             player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
                     try {
-                        Main.getAPI().callAdminPanelEvent(gameruleChangeEvent);
-                        if(!gameruleChangeEvent.isCancelled()) {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(gameruleChangeEvent);
+                        if (!gameruleChangeEvent.isCancelled()) {
                             world.setGameRuleValue(gmName, "true");
                             super.open();
                             return;
@@ -87,14 +87,14 @@ public class GameRuleMenu extends PaginatedMenu {
                 count++;
             }
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), world).open();
+            new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
             if (item.equals(lgm.getItem("General.Left", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageleft")) {
+                if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                     player.sendMessage(noPerms);
                     return;
                 }
@@ -105,7 +105,7 @@ public class GameRuleMenu extends PaginatedMenu {
                     super.open();
                 }
             } else if (item.equals(lgm.getItem("General.Right", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageright")) {
+                if (!player.hasPermission("AdminPanel.Button.pageright")) {
                     player.sendMessage(noPerms);
                     return;
                 }
@@ -148,10 +148,10 @@ public class GameRuleMenu extends PaginatedMenu {
                     ItemStack head = lgm.getItem("General.EmptySlot", playerMenuUtility.getOwner());
                     if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
                         head = Head.BLANK_GREEN.getAsItem();
-                        lore.add(Utils.getInstance().chat("&6Value: &atrue"));
+                        lore.add(Utils.chat("&6Value: &atrue"));
                     } else if (!Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
                         head = Head.BLANK_RED.getAsItem();
-                        lore.add(Utils.getInstance().chat("&6Value: &cfalse"));
+                        lore.add(Utils.chat("&6Value: &cfalse"));
                     }
                     ItemMeta meta = head.getItemMeta();
                     meta.setDisplayName(gamerules.get(index));

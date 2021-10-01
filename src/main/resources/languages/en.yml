@@ -18,15 +18,29 @@ Messages:
     PlayerManager:
       Bypass: '%prefix% &9> &cThis player cannot be selected because he has the permission to do so!'
       ChooseYourself: '%prefix% &9> &cYou cannot choose yourself!'
-      SelfBanning: '%prefix% &9> &cYou cannot ban yourself!'
-      KickReason: '&cKick for Safety'
-      KickSource: '%player_name%'
-      BanReason: '&cBan for Safety!'
-      BanSource: '%player_name%'
       AlreadyOp: '&cThis player is already an operator!'
       NotOp: '&cThis player is not an operator!'
       OppedMessage: '&aYou made the player an operator!'
       DeoppedMessage: '&cYou took away the operator''s rights from the player!'
+      KickMenu:
+        TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
+        NotKickable: '%prefix% &9> &cThis Player is not kickable!'
+        SuccessfullyKicked: '%prefix% &9> &aYou kicked the Player successfully!'
+        Reason:
+          EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
+          NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
+      BanMenu:
+        TargetKickMessage: '%prefix% &9> &4You got banned from this Server!
+        &4Time: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds%
+        &4Reason: &4%reason%'
+        SuccessfullyUnbanned: '%prefix% &9> &aYou unbanned the Player successfully!'
+        SuccessfullyBanned: '%prefix% &9> &aYou banned the Player successfully!'
+        AlreadyBanned: '%prefix% &9> &cThis Player is already banned!'
+        NotBanned: '%prefix% &9> &cThis Player is not banned!'
+        NotBannable: '%prefix% &9> &cThis Player is not bannable!'
+        Reason:
+          EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
+          NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
       Money:
         PleaseEnterAmount: '%prefix% &9> &aPlease enter the amount you want to work with in the chat!'
         NotEnoughMoney: '%prefix% &9> &c%player_name% doesn''t have enough money for it! (%vault_eco_balance%)'
@@ -347,6 +361,75 @@ Items:
         displayName: '&cBan the Player'
         lore:
           - '&cBan the Player forever!'
+      BanMenu:
+        Reason:
+          material: PAPER
+          displayName: '&cSet the Reason of the Ban'
+          lore:
+            - '&cSet the Reason of the Ban'
+            - '&c%reason%'
+        Seconds:
+          material: CLOCK
+          displayName: '&aSeconds'
+          lore:
+            - '&7Left-Click: +10 Seconds'
+            - '&7Right-Click: -10 Seconds'
+            - '&a%seconds%'
+        Minutes:
+          material: CLOCK
+          displayName: '&aMinutes'
+          lore:
+            - '&7Left-Click: +5 Minutes'
+            - '&7Right-Click: -5 Minutes'
+            - '&a%minutes%'
+        Hours:
+          material: CLOCK
+          displayName: '&aHours'
+          lore:
+            - '&7Left-Click: +1 Hours'
+            - '&7Right-Click: -1 Hours'
+            - '&a%hours%'
+        Days:
+          material: CLOCK
+          displayName: '&aDays'
+          lore:
+            - '&7Links-Klick: +1 Days'
+            - '&7Rechts-Klick: -1 Days'
+            - '&a%days%'
+        Months:
+          material: CLOCK
+          displayName: '&aMonths'
+          lore:
+            - '&7Links-Klick: +1 Months'
+            - '&7Rechts-Klick: -1 Months'
+            - '&a%months%'
+        Years:
+          material: CLOCK
+          displayName: '&aYears'
+          lore:
+            - '&7Left-Click: +1 Years'
+            - '&7Right-Click: -1 Years'
+            - '&a%years%'
+        Ban:
+          material: BEDROCK
+          displayName: '&cBan the Player'
+          lore:
+            - '&cBan the Player:'
+            - '&cTime: &6%time%'
+            - '&cReason: &6%reason%'
+      KickMenu:
+        Reason:
+          material: PAPER
+          displayName: '&cSet the Reason of the Ban'
+          lore:
+            - '&cSet the Reason of the Ban'
+            - '&c%reason%'
+        Kick:
+          material: BEDROCK
+          displayName: '&cKick the Player'
+          lore:
+            - '&cKick the Player:'
+            - '&cReason: &6%reason%'
       KickItem:
         material: PISTON
         displayName: '&cKick the Player'
@@ -360,9 +443,9 @@ Items:
             - '&aTurn the Vanish off for the Player!'
         false:
           material: FEATHER
-            displayName: '&cVanish'
-            lore:
-              - '&aTurn the Vanish on for the Player!'
+          displayName: '&cVanish'
+          lore:
+            - '&aTurn the Vanish on for the Player!'
     MoneyMenu:
       Give:
         material: GREEN_WOOL
@@ -807,6 +890,8 @@ MenuTitles:
     ArmorView: '&4Armor'
     MoneyMenu: '&a&lMoney'
     BannedPlayers: '&cBanned Players'
+    BanMenu: '&cBan'
+    KickMenu: '&cKick'
   WorldManager:
     WorldSelector: '&aSelect a World'
     WorldSettings: '&3Settings'

@@ -1,7 +1,6 @@
 package de.happybavarian07.events.player;
 
 import de.happybavarian07.events.AdminPanelEvent;
-import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -32,14 +31,17 @@ public class GiveEffectToPlayerEvent extends AdminPanelEvent implements Cancella
     public boolean isCancelled() {
         return cancelled;
     }
+
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
 
     }
+
     public static HandlerList getHandlerList() {
         return handlers;
     }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;

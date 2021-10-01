@@ -1,7 +1,7 @@
 package de.happybavarian07.menusystem.menu.servermanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
@@ -18,7 +18,7 @@ import java.util.List;
 import static org.bukkit.Bukkit.getServer;
 
 public class WhitelistedPlayersMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public WhitelistedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
@@ -83,15 +83,15 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
         Collections.addAll(players, getServer().getOfflinePlayers());
 
         ///////////////////////////////////// Pagination loop template
-        if(players != null && !players.isEmpty()) {
-            for(int i = 0; i < super.maxItemsPerPage; i++) {
+        if (players != null && !players.isEmpty()) {
+            for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
-                if(index >= players.size()) break;
-                if (players.get(index) != null){
+                if (index >= players.size()) break;
+                if (players.get(index) != null) {
                     ///////////////////////////
 
                     OfflinePlayer current = players.get(index);
-                    if(!current.isWhitelisted()) continue;
+                    if (!current.isWhitelisted()) continue;
                     ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setDisplayName(current.getName());

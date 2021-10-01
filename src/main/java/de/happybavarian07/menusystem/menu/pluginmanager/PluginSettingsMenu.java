@@ -7,8 +7,8 @@ package de.happybavarian07.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.plugins.*;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.PluginUtils;
@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class PluginSettingsMenu extends Menu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
@@ -58,9 +58,9 @@ public class PluginSettingsMenu extends Menu {
             }
             PluginEnableEvent enableEvent = new PluginEnableEvent(player, currentPlugin);
             try {
-                Main.getAPI().callAdminPanelEvent(enableEvent);
-                if(!enableEvent.isCancelled()) {
-                    if(!enabled)
+                AdminPanelMain.getAPI().callAdminPanelEvent(enableEvent);
+                if (!enableEvent.isCancelled()) {
+                    if (!enabled)
                         Bukkit.getPluginManager().enablePlugin(currentPlugin);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -73,9 +73,9 @@ public class PluginSettingsMenu extends Menu {
             }
             PluginDisableEvent disableEvent = new PluginDisableEvent(player, currentPlugin);
             try {
-                Main.getAPI().callAdminPanelEvent(disableEvent);
-                if(!disableEvent.isCancelled()) {
-                    if(enabled)
+                AdminPanelMain.getAPI().callAdminPanelEvent(disableEvent);
+                if (!disableEvent.isCancelled()) {
+                    if (enabled)
                         Bukkit.getPluginManager().disablePlugin(currentPlugin);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -88,9 +88,9 @@ public class PluginSettingsMenu extends Menu {
             }
             PluginReloadEvent reloadEvent = new PluginReloadEvent(player, currentPlugin);
             try {
-                Main.getAPI().callAdminPanelEvent(reloadEvent);
-                if(!reloadEvent.isCancelled()) {
-                    if(enabled)
+                AdminPanelMain.getAPI().callAdminPanelEvent(reloadEvent);
+                if (!reloadEvent.isCancelled()) {
+                    if (enabled)
                         pluginUtils.reload(currentPlugin);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -103,9 +103,9 @@ public class PluginSettingsMenu extends Menu {
             }
             PluginUnloadEvent unloadEvent = new PluginUnloadEvent(player, currentPlugin);
             try {
-                Main.getAPI().callAdminPanelEvent(unloadEvent);
-                if(!unloadEvent.isCancelled()) {
-                    if(pluginUtils.getPluginByName(currentPlugin.getName()) != null)
+                AdminPanelMain.getAPI().callAdminPanelEvent(unloadEvent);
+                if (!unloadEvent.isCancelled()) {
+                    if (pluginUtils.getPluginByName(currentPlugin.getName()) != null)
                         pluginUtils.unload(currentPlugin);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -118,9 +118,9 @@ public class PluginSettingsMenu extends Menu {
             }
             PluginLoadEvent loadEvent = new PluginLoadEvent(player, currentPlugin);
             try {
-                Main.getAPI().callAdminPanelEvent(loadEvent);
-                if(!loadEvent.isCancelled()) {
-                    if(pluginUtils.getPluginByName(currentPlugin.getName()) == null)
+                AdminPanelMain.getAPI().callAdminPanelEvent(loadEvent);
+                if (!loadEvent.isCancelled()) {
+                    if (pluginUtils.getPluginByName(currentPlugin.getName()) == null)
                         pluginUtils.load(currentPlugin);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -143,7 +143,7 @@ public class PluginSettingsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 

@@ -10,6 +10,7 @@ public enum Head {
     private final String id;
     private final String texture;
     private final String prefix = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
+
     Head(String texture, String id) {
         this.texture = texture;
         this.id = id;
@@ -32,6 +33,6 @@ public enum Head {
     }
 
     public ItemStack getAsItem() {
-        return Main.getAPI().createSkull(this, getId());
+        return AdminPanelMain.getAPI().createSkull(this, getId());
     }
 }

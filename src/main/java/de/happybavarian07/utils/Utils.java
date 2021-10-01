@@ -1,6 +1,6 @@
 package de.happybavarian07.utils;
 
-import de.happybavarian07.main.Main;
+import de.happybavarian07.main.AdminPanelMain;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,265 +18,268 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Utils {
 
-	private final FileConfiguration config;
-	private final Main plugin;
-	private static Utils instance;
+    private static AdminPanelMain plugin;
+    private static Utils instance;
 
-	public Utils(Main main) {
-		this.plugin = main;
-		setInstance(this);
-		this.config = plugin.getConfig();
-	}
+    public Utils() {
+        plugin = AdminPanelMain.getPlugin();
+        setInstance(this);
+    }
 
-	public String chat(String s) {
-		return ChatColor.translateAlternateColorCodes('&', s);
-	}
+    public static String chat(String s) {
+        return ChatColor.translateAlternateColorCodes('&', s);
+    }
 
-	public ItemStack createItem(Inventory inv, String materialString, int amount, int invSlot, String displayName, String... loreString) {
-		
-		ItemStack item;
-		List<String> lore = new ArrayList<>();
-		
-		item = new ItemStack(Material.matchMaterial(materialString), amount);
-		
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(this.chat(displayName));
-		for(String s : loreString) {
-			lore.add(this.chat(s));
-		}
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		
-		inv.setItem(invSlot - 1, item);
-		return item;
-	}
+    public static ItemStack createItem(Inventory inv, String materialString, int amount, int invSlot, String displayName, String... loreString) {
 
-	@SuppressWarnings("deprecation")
-	public ItemStack createItemByte(Inventory inv, String materialString, int byteId, int amount, int invSlot, String displayName, String... loreString) {
-		
-		ItemStack item;
-		List<String> lore = new ArrayList<>();
-		
-		item = new ItemStack(Material.matchMaterial(materialString), amount, (short) byteId);
-		
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(this.chat(displayName));
-		for(String s : loreString) {
-			lore.add(this.chat(s));
-		}
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		
-		inv.setItem(invSlot - 1, item);
-		return item;
-	}
+        ItemStack item;
+        List<String> lore = new ArrayList<>();
 
-	@SuppressWarnings({"deprecation" })
-	public void ban(final Player p, final String target, final String reason, final String sourcename) {
-		try {
-			OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(target);
-			if(bannedPlayer.isBanned()) {
-				p.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c is already banned!");
-			} else {
-				if(sourcename.equals("")) {
-					Bukkit.getBanList(Type.NAME).addBan(bannedPlayer.getName(), reason, null, p.getName());
-					if(bannedPlayer.isOnline()) {
-						((Player) bannedPlayer).kickPlayer("§cYou got banned from that Server!\n" +
-						"\n" + 
-						"§3By: §e" + Bukkit.getBanList(Type.NAME).getBanEntry(bannedPlayer.getName()).getSource().toString() + "\n" +
-						"\n" + 
-						"§3Reason: §e" + Bukkit.getBanList(Type.NAME).getBanEntry(bannedPlayer.getName()).getReason().toString() + "\n" + 
-						"\n" + 
-						"§3Permanently banned!" + "\n");
-					}
-				} else if(sourcename != "") {
-					Bukkit.getBanList(Type.NAME).addBan(bannedPlayer.getName(), reason, null, sourcename);
-					if(bannedPlayer.isOnline()) {
-						((Player) bannedPlayer).kickPlayer("§cYou got banned from that Server!\n" +
-						"\n" + 
-						"§3By: §e" + sourcename + "\n" +
-						"\n" + 
-						"§3Reason: §e" + Bukkit.getBanList(Type.NAME).getBanEntry(bannedPlayer.getName()).getReason().toString() + "\n" + 
-						"\n" + 
-						"§3Permanently banned!" + "\n");
-					}
-				}
-				plugin.getBanConfig().set(bannedPlayer.getUniqueId().toString(), true);
-				try {
-					plugin.getBanConfig().save(plugin.getBanFile());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				p.sendMessage("§c§cYou have successfully banned §a" + bannedPlayer.getName() + " §cfor §a" + Bukkit.getBanList(Type.NAME).getBanEntry(bannedPlayer.getName()).getReason().toString() + "§c!");
-			}
-		} catch (NullPointerException e) {
-			p.sendMessage("§cThe Player is not online or doesn't exists!");
-		}
-	}
+        item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(materialString)), amount);
 
-	@SuppressWarnings({"deprecation"})
-	public void unban(Player Player, String target) {
-		try {
-			OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(target);
-			if(!bannedPlayer.isBanned()) {
-				Player.sendMessage("§cThe Player §a" + bannedPlayer.getName() + "§c is not banned!");
-				return;
-			}
-			if(bannedPlayer.isBanned()) {
-				Bukkit.getBanList(Type.NAME).pardon(bannedPlayer.getName());
-				Player.sendMessage("§cYou have successfully unbanned §a" + bannedPlayer.getName() + "§c!");
-				plugin.getBanConfig().set(bannedPlayer.getUniqueId().toString(), null);
-				try {
-					plugin.getBanConfig().save(plugin.getBanFile());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (NullPointerException e) {
-			Player.sendMessage("§cThe Player is not online or doesn't exists!");
-		}
-	}
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        meta.setDisplayName(chat(displayName));
+        for (String s : loreString) {
+            lore.add(chat(s));
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
 
-	public void kick(final Player p, final String target, final String reason, final String sourcename) {
-		try {
-			Player kickedPlayer = Bukkit.getPlayerExact(target);
-			if(kickedPlayer.isOnline()) {
-				if(sourcename != "") {
-					kickedPlayer.kickPlayer("§cYou got kicked!\n" + 
-					"\n" + 
-					"§3By: §e" + sourcename + "\n" + 
-					"\n" + 
-					"§3Reason: §e" + reason + "\n" + 
-					"\n" + 
-					"§3Please join again!");
-				} else if(sourcename == "") {
-					kickedPlayer.kickPlayer("§cYou got kicked!\n" + 
-					"\n" + 
-					"§3By: §e" + p.getName() + "\n" + 
-					"\n" + 
-					"§3Reason: §e" + reason + "\n" + 
-					"\n" + 
-					"§3Please join again!");
-				}
-			}
-		} catch (NullPointerException e) {
-			p.sendMessage("§cThe Player is not online or doesn't exists!");
-		}
-	}
+        inv.setItem(invSlot - 1, item);
+        return item;
+    }
 
-	public void serverStop(int time, int time2) throws InterruptedException {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.closeInventory();
-		}
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lThe server will now shut down and all players will be kicked!");
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§aServerstop in: §c§l6");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§aServerstop in: §c§l5");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§6Serverstop in: §c§l4");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§6Serverstop in: §c§l3");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§4Serverstop in: §c§l2");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§4Serverstop in: §c§l1");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lServer Stop initiated!");
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Thread.sleep(time2);
-		for(Player p2 : Bukkit.getServer().getOnlinePlayers()) {
-			p2.kickPlayer("§4§lThe server is now shuting down!");
-		}
-		Bukkit.shutdown();
-	}
+    @SuppressWarnings("deprecation")
+    public static ItemStack createItemByte(Inventory inv, String materialString, int byteId, int amount, int invSlot, String displayName, String... loreString) {
 
-	public void serverReload(int time) throws InterruptedException {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.closeInventory();
-		}
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.broadcastMessage("§r[§4§lWARNING§r] " + "§c§lThe server is about to reload, please do not move or write in the chat until the reload is finished");
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Thread.sleep(3000);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§aServerreload in: §c§l6");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§aServerreload in: §c§l5");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§6Serverreload in: §c§l4");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§6Serverreload in: §c§l3");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§4Serverreload in: §c§l2");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§4Serverreload in: §c§l1");
-		Thread.sleep(time);
-		clearChat(100, false, null);
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			player.addScoreboardTag("reload");
-			player.closeInventory();
-		}
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.broadcastMessage("        §r[§4§lAnnouncement§r] " + "§c§lReload started!");
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.reload();
-		clearChat(100, false, null);
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-		Bukkit.broadcastMessage("        §r[§4§lAnnouncement§r] " + "§c§lReload finished!");
-		Bukkit.broadcastMessage("§a+---------------------------------------------------+");
-	}
+        ItemStack item;
+        List<String> lore = new ArrayList<>();
 
-	public String replacePlaceHolders(Player player, String message, String prefix) {
-		return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
-	}
+        item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(materialString)), amount, (short) byteId);
 
-	public void clearChat(int lines, boolean broadcastChatClear, Player player) {
-		if(!broadcastChatClear) {
-			for(int i = 0; i <= lines; i++) {
-				Bukkit.getServer().broadcastMessage("");
-			}
-		} else {
-			for(int i = 0; i <= lines; i++) {
-				Bukkit.getServer().broadcastMessage("");
-			}
-			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Header", player));
-			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Message", player));
-			Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Footer", player));
-		}
-	}
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        meta.setDisplayName(chat(displayName));
+        for (String s : loreString) {
+            lore.add(chat(s));
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
 
-	public static Utils getInstance() { return instance; }
+        inv.setItem(invSlot - 1, item);
+        return item;
+    }
 
-	private void setInstance(Utils instance) { Utils.instance = instance; }
+    public static void unban(Player player, OfflinePlayer target) {
+        try {
+            if (!target.isBanned()) {
+                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.NotBanned", player));
+            } else {
+                Bukkit.getBanList(Type.NAME).pardon(Objects.requireNonNull(target.getName()));
+                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.SuccessfullyUnbanned", player));
+                plugin.getBanConfig().set(target.getUniqueId().toString(), null);
+                try {
+                    plugin.getBanConfig().save(plugin.getBanFile());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (NullPointerException e) {
+            player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player));
+        }
+    }
 
-	public Economy getEconomy() {
-		return plugin.eco;
-	}
-	public Permission getPermissions() {
-		return plugin.perms;
-	}
-	public Chat getChat() {
-		return plugin.chat;
-	}
+    public static void kick(final Player p, final String target, final String reason, final String sourcename) {
+        try {
+            Player kickedPlayer = Bukkit.getPlayerExact(target);
+            assert kickedPlayer != null;
+            if (kickedPlayer.isOnline()) {
+                if (!sourcename.equals("")) {
+                    kickedPlayer.kickPlayer("&cYou got kicked!\n" +
+                            "\n" +
+                            "&3By: &e" + sourcename + "\n" +
+                            "\n" +
+                            "&3Reason: &e" + reason + "\n" +
+                            "\n" +
+                            "&3Please join again!");
+                } else {
+                    kickedPlayer.kickPlayer("&cYou got kicked!\n" +
+                            "\n" +
+                            "&3By: &e" + p.getName() + "\n" +
+                            "\n" +
+                            "&3Reason: &e" + reason + "\n" +
+                            "\n" +
+                            "&3Please join again!");
+                }
+            }
+        } catch (NullPointerException e) {
+            p.sendMessage("&cThe Player is not online or doesn't exists!");
+        }
+    }
+
+    public static void serverStop(int time, int time2) throws InterruptedException {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server will now shut down and all players will be kicked!", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&aServerstop in: &c&l6", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&aServerstop in: &c&l5", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&6Serverstop in: &c&l4", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&6Serverstop in: &c&l3", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&4Serverstop in: &c&l2", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&4Serverstop in: &c&l1", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Stop initiated!", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Thread.sleep(time2);
+        for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
+            p2.kickPlayer(Utils.format(null, "&4&lThe server is now shuting down!", AdminPanelMain.getPrefix()));
+        }
+        Bukkit.shutdown();
+    }
+
+    public static void serverReload(int time) throws InterruptedException {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server is about to reload, please do not move or write in the chat until the reload is finished", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Thread.sleep(3000);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&aServerreload in: &c&l6", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&aServerreload in: &c&l5", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&6Serverreload in: &c&l4", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&6Serverreload in: &c&l3", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&4Serverreload in: &c&l2", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&4Serverreload in: &c&l1", AdminPanelMain.getPrefix()));
+        Thread.sleep(time);
+        clearChat(100, false, null);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "        &r[&4&lAnnouncement&r] " + "&c&lReload started!", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.reload();
+        clearChat(100, false, null);
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "        &r[&4&lAnnouncement&r] " + "&c&lReload finished!", AdminPanelMain.getPrefix()));
+        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+    }
+
+    public static String format(Player player, String message, String prefix) {
+        return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
+    }
+
+    public static void clearChat(int lines, boolean broadcastChatClear, Player player) {
+        if (!broadcastChatClear) {
+            for (int i = 0; i <= lines; i++) {
+                Bukkit.getServer().broadcastMessage("");
+            }
+        } else {
+            for (int i = 0; i <= lines; i++) {
+                Bukkit.getServer().broadcastMessage("");
+            }
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Header", player));
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Message", player));
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Footer", player));
+        }
+    }
+
+    public static Utils getInstance() {
+        return instance;
+    }
+
+    private void setInstance(Utils instance) {
+        Utils.instance = instance;
+    }
+
+    private void ban(final Player p, final OfflinePlayer target, final String reason, final String sourcename) {
+        try {
+            if (target.isBanned()) {
+                p.sendMessage(Utils.format(null, "&cThe Player &a" + target.getName() + "&c is already banned!", AdminPanelMain.getPrefix()));
+            } else {
+                if (sourcename.equals("")) {
+                    Bukkit.getBanList(Type.NAME).addBan(Objects.requireNonNull(target.getName()), reason, null, p.getName());
+                    if (target.isOnline()) {
+                        ((Player) target).kickPlayer(Utils.format(null, "&cYou got banned from that Server!\n" +
+                                "\n" +
+                                "&3By: &e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(target.getName())).getSource() + "\n" +
+                                "\n" +
+                                "&3Reason: &e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(target.getName())).getReason() + "\n" +
+                                "\n" +
+                                "&3Permanently banned!" + "\n", AdminPanelMain.getPrefix()));
+                    }
+                } else {
+                    Bukkit.getBanList(Type.NAME).addBan(Objects.requireNonNull(target.getName()), reason, null, sourcename);
+                    if (target.isOnline()) {
+                        ((Player) target).kickPlayer(Utils.format(null, "&cYou got banned from that Server!\n" +
+                                "\n" +
+                                "&3By: &e" + sourcename + "\n" +
+                                "\n" +
+                                "&3Reason: &e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(target.getName())).getReason() + "\n" +
+                                "\n" +
+                                "&3Permanently banned!" + "\n", AdminPanelMain.getPrefix()));
+                    }
+                }
+                plugin.getBanConfig().set(target.getUniqueId().toString(), true);
+                try {
+                    plugin.getBanConfig().save(plugin.getBanFile());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                p.sendMessage(Utils.format(null, "&c&cYou have successfully banned &a" +
+                        target.getName() + " &cfor &a" +
+                        Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(target.getName())).getReason() + "&c!", AdminPanelMain.getPrefix()));
+            }
+        } catch (NullPointerException e) {
+            p.sendMessage(Utils.format(null, "&cThe Player is not online or doesn't exists!", AdminPanelMain.getPrefix()));
+        }
+    }
+
+    public Economy getEconomy() {
+        return plugin.eco;
+    }
+
+    public Permission getPermissions() {
+        return plugin.perms;
+    }
+
+    public Chat getChat() {
+        return plugin.chat;
+    }
 }

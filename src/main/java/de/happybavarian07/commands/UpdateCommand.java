@@ -1,7 +1,7 @@
 package de.happybavarian07.commands;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.utils.Updater;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.ChatColor;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateCommand implements CommandExecutor, TabCompleter {
-    private final Main plugin;
+    private final AdminPanelMain plugin;
     private final Updater updater;
     private final LanguageManager lgm;
     List<String> completerArgs = new ArrayList<>();
 
     public UpdateCommand() {
-        this.plugin = Main.getPlugin();
+        this.plugin = AdminPanelMain.getPlugin();
         this.updater = plugin.getUpdater();
         this.lgm = plugin.getLanguageManager();
     }
@@ -55,11 +55,11 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                     if (check) {
                         try {
                             updater.downloadPlugin(false, true, true);
-                            sender.sendMessage(Utils.getInstance().chat(
+                            sender.sendMessage(Utils.chat(
                                     "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + " &cSomething went completely wrong!"));
+                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                         }
                     } else {
                         if (sender instanceof Player) {
@@ -71,21 +71,21 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("forcedownload")) {
                     try {
                         updater.downloadPlugin(false, true, true);
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aForce Download finished!"));
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() +
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aForce Download finished!"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() +
                                 "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else if (args[0].equalsIgnoreCase("replace")) {
                     if (check) {
                         try {
                             updater.downloadPlugin(true, true, true);
-                            sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
+                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + " &cSomething went completely wrong!"));
+                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                         }
                     } else {
                         if (sender instanceof Player) {
@@ -97,11 +97,11 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("forcereplace")) {
                     try {
                         updater.downloadPlugin(true, true, true);
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aForce Replace finished!"));
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aForce Replace finished!"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else if (args[0].equalsIgnoreCase("getlatest")) {
                     try {
@@ -124,13 +124,13 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                                         "&bNew Version Date: &c" + versionDate));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else {
-                    sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&c Usage: &6" + command.getUsage()));
+                    sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
                 }
             } else {
-                sender.sendMessage(Utils.getInstance().chat(Main.getPrefix() + "&c Usage: &6" + command.getUsage()));
+                sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
             }
             return true;
         }

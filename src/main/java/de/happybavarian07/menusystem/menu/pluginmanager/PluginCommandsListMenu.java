@@ -1,31 +1,25 @@
 package de.happybavarian07.menusystem.menu.pluginmanager;
 
-import de.happybavarian07.main.Head;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
-import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PluginCommandsListMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
 
@@ -113,19 +107,19 @@ public class PluginCommandsListMenu extends PaginatedMenu {
                     ///////////////////////////
 
                     PluginCommand currentCommand = ((JavaPlugin) currentPlugin).getCommand(cmdName);
-                    if(currentCommand == null) continue;
+                    if (currentCommand == null) continue;
                     ItemStack command = new ItemStack(Material.COMMAND_BLOCK, 1);
                     ItemMeta commandMeta = command.getItemMeta();
                     commandMeta.setDisplayName(cmdName);
                     List<String> lore = new ArrayList<>();
                     Utils utils = Utils.getInstance();
-                    lore.add(utils.chat("&6Permission: &a" + currentCommand.getPermission()));
-                    lore.add(utils.chat("&6Permission-Message: &a" + currentCommand.getPermissionMessage()));
-                    lore.add(utils.chat("&6Label: &a" + currentCommand.getLabel()));
-                    lore.add(utils.chat("&6Aliases: &a" + currentCommand.getAliases()));
-                    lore.add(utils.chat("&6Usage: &a" + currentCommand.getUsage()));
-                    lore.add(utils.chat("&6Description: &a" + currentCommand.getDescription()));
-                    lore.add(utils.chat("&6Registered: &a" + currentCommand.isRegistered()));
+                    lore.add(Utils.chat("&6Permission: &a" + currentCommand.getPermission()));
+                    lore.add(Utils.chat("&6Permission-Message: &a" + currentCommand.getPermissionMessage()));
+                    lore.add(Utils.chat("&6Label: &a" + currentCommand.getLabel()));
+                    lore.add(Utils.chat("&6Aliases: &a" + currentCommand.getAliases()));
+                    lore.add(Utils.chat("&6Usage: &a" + currentCommand.getUsage()));
+                    lore.add(Utils.chat("&6Description: &a" + currentCommand.getDescription()));
+                    lore.add(Utils.chat("&6Registered: &a" + currentCommand.isRegistered()));
                     commandMeta.setLore(lore);
                     command.setItemMeta(commandMeta);
                     inventory.addItem(command);

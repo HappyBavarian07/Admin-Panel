@@ -1,6 +1,6 @@
 package de.happybavarian07.utils;
 
-import de.happybavarian07.main.Main;
+import de.happybavarian07.main.AdminPanelMain;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,10 +18,10 @@ import java.nio.file.NotDirectoryException;
 import java.util.*;
 
 public class PluginUtils {
-    private final Main plugin;
+    private final AdminPanelMain plugin;
 
     public PluginUtils() {
-        this.plugin = Main.getPlugin();
+        this.plugin = AdminPanelMain.getPlugin();
     }
 
     public void load(Plugin plugin) {
@@ -144,10 +144,10 @@ public class PluginUtils {
 
         pluginManager.disablePlugin(plugin);
 
-        if (plugins != null && plugins.contains(plugin))
+        if (plugins != null)
             plugins.remove(plugin);
 
-        if (names != null && names.containsKey(name))
+        if (names != null)
             names.remove(name);
 
         if (listeners != null && reloadlisteners) {

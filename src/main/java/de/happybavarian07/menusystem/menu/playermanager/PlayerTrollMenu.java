@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.playermanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.troll.*;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.*;
@@ -19,16 +19,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerTrollMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
@@ -54,7 +51,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
         Player target = Bukkit.getPlayer(targetUUID);
         ItemStack item = e.getCurrentItem();
 
-        if(target == null || !target.isOnline()) return;
+        if (target == null || !target.isOnline()) return;
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
         /*
@@ -79,84 +76,84 @@ public class PlayerTrollMenu extends Menu implements Listener {
          */
         // Items
         PlayerKickBecauseErrorEvent kickBecauseErrorEvent;
-        if(item.equals(lgm.getItem("PlayerManager.TrollMenu.Kick.Serverstop", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop")) {
+        if (item.equals(lgm.getItem("PlayerManager.TrollMenu.Kick.Serverstop", target))) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop")) {
                 player.sendMessage(noPerms);
                 return;
             }
             kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(player, target, "Server closed");
             try {
-                Main.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
-                if(!kickBecauseErrorEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
+                if (!kickBecauseErrorEvent.isCancelled()) {
                     kickBecauseErrorEvent.getTarget().kickPlayer(kickBecauseErrorEvent.getErrorMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.Kick.ConnectionReset", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset")) {
                 player.sendMessage(noPerms);
                 return;
             }
             kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(player, target,
                     "Internal exception: java.net.SocketException: Connection reset.");
             try {
-                Main.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
-                if(!kickBecauseErrorEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
+                if (!kickBecauseErrorEvent.isCancelled()) {
                     kickBecauseErrorEvent.getTarget().kickPlayer(kickBecauseErrorEvent.getErrorMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.Kick.Whitelist", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist")) {
                 player.sendMessage(noPerms);
                 return;
             }
             kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(player, target, "You are not whitelisted on this server!");
             try {
-                Main.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
-                if(!kickBecauseErrorEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
+                if (!kickBecauseErrorEvent.isCancelled()) {
                     kickBecauseErrorEvent.getTarget().kickPlayer(kickBecauseErrorEvent.getErrorMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.Kick.ServerStoppedError", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError")) {
                 player.sendMessage(noPerms);
                 return;
             }
             kickBecauseErrorEvent = new PlayerKickBecauseErrorEvent(player, target,
                     "io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:");
             try {
-                Main.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
-                if(!kickBecauseErrorEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(kickBecauseErrorEvent);
+                if (!kickBecauseErrorEvent.isCancelled()) {
                     kickBecauseErrorEvent.getTarget().kickPlayer(kickBecauseErrorEvent.getErrorMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.DropPlayerInv", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DropPlayersInv")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DropPlayersInv")) {
                 player.sendMessage(noPerms);
                 return;
             }
             PlayerDropInvEvent dropInvEvent = new PlayerDropInvEvent(player, target);
             try {
-                Main.getAPI().callAdminPanelEvent(dropInvEvent);
-                if(!dropInvEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(dropInvEvent);
+                if (!dropInvEvent.isCancelled()) {
                     List<ItemStack> items = new ArrayList<>();
 
-                    for(int i = 0; i < target.getInventory().getSize(); i++) {
-                        if(target.getInventory().getItem(i) != null) {
+                    for (int i = 0; i < target.getInventory().getSize(); i++) {
+                        if (target.getInventory().getItem(i) != null) {
                             items.add(target.getInventory().getItem(i));
                         }
                     }
 
                     target.getInventory().clear();
 
-                    for(ItemStack itemDrop : items) {
+                    for (ItemStack itemDrop : items) {
                         target.getWorld().dropItem(target.getLocation(), itemDrop);
                     }
 
@@ -166,29 +163,29 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.FakeOp", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp")) {
                 player.sendMessage(noPerms);
                 return;
             }
             PlayerFakeOpEvent fakeOpEvent = new PlayerFakeOpEvent(player, target,
                     ChatColor.GRAY + "[Server: Made " + target.getName() + " a server operator]");
             try {
-                Main.getAPI().callAdminPanelEvent(fakeOpEvent);
-                if(!fakeOpEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(fakeOpEvent);
+                if (!fakeOpEvent.isCancelled()) {
                     target.sendMessage(fakeOpEvent.getMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.FakeTNT", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT")) {
                 player.sendMessage(noPerms);
                 return;
             }
             TrollTNTSpawnEvent fakeTNTEvent = new TrollTNTSpawnEvent(player, target);
             try {
-                Main.getAPI().callAdminPanelEvent(fakeTNTEvent);
-                if(!fakeTNTEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(fakeTNTEvent);
+                if (!fakeTNTEvent.isCancelled()) {
                     Location loc = target.getLocation();
                     TNTPrimed tnt = target.getWorld().spawn(loc, TNTPrimed.class);
                     tnt.setFuseTicks(20);
@@ -198,68 +195,68 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.FakeDeop", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop")) {
                 player.sendMessage(noPerms);
                 return;
             }
             PlayerFakeDeopEvent fakeDeopEvent = new PlayerFakeDeopEvent(player, target,
                     ChatColor.GRAY + "[Server: Made " + target.getName() + " no longer a server operator]");
             try {
-                Main.getAPI().callAdminPanelEvent(fakeDeopEvent);
-                if(!fakeDeopEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(fakeDeopEvent);
+                if (!fakeDeopEvent.isCancelled()) {
                     target.sendMessage(fakeDeopEvent.getMessage());
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("General.Close", target))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionsMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         }
         // Enable/Disable Optionen
         else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.HurtingWater.false", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater")) {
                 player.sendMessage(noPerms);
                 return;
             }
             inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target));
-            if(!plugin.hurtingwater.containsKey(target))
+            if (!plugin.hurtingwater.containsKey(target))
                 plugin.hurtingwater.put(target, true);
-        }else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater")) {
+        } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target))) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater")) {
                 player.sendMessage(noPerms);
                 return;
             }
             inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.HurtingWater.false", target));
             plugin.hurtingwater.remove(target);
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.false", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent")) {
                 player.sendMessage(noPerms);
                 return;
             }
             BlockBreakPreventEvent preventEvent = new BlockBreakPreventEvent(player, target, true);
             try {
-                Main.getAPI().callAdminPanelEvent(preventEvent);
-                if(!preventEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(preventEvent);
+                if (!preventEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.true", target));
-                    if(!plugin.blockBreakPrevent.containsKey(target))
+                    if (!plugin.blockBreakPrevent.containsKey(target))
                         plugin.blockBreakPrevent.put(target, true);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.true", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent")) {
                 player.sendMessage(noPerms);
                 return;
             }
             BlockBreakPreventEvent preventEvent = new BlockBreakPreventEvent(player, target, false);
             try {
-                Main.getAPI().callAdminPanelEvent(preventEvent);
-                if(!preventEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(preventEvent);
+                if (!preventEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.false", target));
                     plugin.blockBreakPrevent.remove(target);
                 }
@@ -267,19 +264,19 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.false", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
                 player.sendMessage(noPerms);
                 return;
             }
             VillagerSoundsToggleEvent soundsToggleEvent = new VillagerSoundsToggleEvent(player, target, true);
             try {
-                Main.getAPI().callAdminPanelEvent(soundsToggleEvent);
-                if(!soundsToggleEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(soundsToggleEvent);
+                if (!soundsToggleEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.true", target));
-                    if(!plugin.villagerSounds.containsKey(target))
+                    if (!plugin.villagerSounds.containsKey(target))
                         plugin.villagerSounds.put(target, true);
                     Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-                        if(plugin.villagerSounds.containsKey(target)) {
+                        if (plugin.villagerSounds.containsKey(target)) {
                             target.playSound(target.getLocation(), Sound.ENTITY_VILLAGER_AMBIENT, 50, (float) 1.0);
                         }
                     }, 0L, 10L);
@@ -288,14 +285,14 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.true", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds")) {
                 player.sendMessage(noPerms);
                 return;
             }
             VillagerSoundsToggleEvent soundsToggleEvent = new VillagerSoundsToggleEvent(player, target, true);
             try {
-                Main.getAPI().callAdminPanelEvent(soundsToggleEvent);
-                if(!soundsToggleEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(soundsToggleEvent);
+                if (!soundsToggleEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.false", target));
                     plugin.villagerSounds.remove(target);
                 }
@@ -303,45 +300,45 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.false", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs")) {
                 player.sendMessage(noPerms);
                 return;
             }
             inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.true", target));
-            if(!plugin.dupeMobsOnKill.containsKey(target))
+            if (!plugin.dupeMobsOnKill.containsKey(target))
                 plugin.dupeMobsOnKill.put(target, true);
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.true", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs")) {
                 player.sendMessage(noPerms);
                 return;
             }
             inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.false", target));
             plugin.dupeMobsOnKill.remove(target);
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.ChatMute.false", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
                 player.sendMessage(noPerms);
                 return;
             }
             PlayerChatMuteEvent muteEvent = new PlayerChatMuteEvent(player, target);
             try {
-                Main.getAPI().callAdminPanelEvent(muteEvent);
-                if(!muteEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(muteEvent);
+                if (!muteEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.ChatMute.true", target));
-                    if(!plugin.chatmute.containsKey(target))
+                    if (!plugin.chatmute.containsKey(target))
                         plugin.chatmute.put(target, true);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("PlayerManager.TrollMenu.ChatMute.true", target))) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat")) {
                 player.sendMessage(noPerms);
                 return;
             }
             PlayerChatUnMuteEvent unMuteEvent = new PlayerChatUnMuteEvent(player, target);
             try {
-                Main.getAPI().callAdminPanelEvent(unMuteEvent);
-                if(!unMuteEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(unMuteEvent);
+                if (!unMuteEvent.isCancelled()) {
                     inventory.setItem(e.getSlot(), lgm.getItem("PlayerManager.TrollMenu.ChatMute.false", target));
                     plugin.chatmute.remove(target);
                 }
@@ -359,31 +356,31 @@ public class PlayerTrollMenu extends Menu implements Listener {
         Player target = Bukkit.getPlayer(targetUUID);
 
         // Items
-        if(plugin.hurtingwater.containsKey(target)) {
+        if (plugin.hurtingwater.containsKey(target)) {
             inventory.setItem(4, lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target));
         } else {
             inventory.setItem(4, lgm.getItem("PlayerManager.TrollMenu.HurtingWater.false", target));
         }
 
-        if(plugin.blockBreakPrevent.containsKey(target)) {
+        if (plugin.blockBreakPrevent.containsKey(target)) {
             inventory.setItem(12, lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.true", target));
         } else {
             inventory.setItem(12, lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.false", target));
         }
 
-        if(plugin.villagerSounds.containsKey(target)) {
+        if (plugin.villagerSounds.containsKey(target)) {
             inventory.setItem(13, lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.true", target));
         } else {
             inventory.setItem(13, lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.false", target));
         }
 
-        if(plugin.dupeMobsOnKill.containsKey(target)) {
+        if (plugin.dupeMobsOnKill.containsKey(target)) {
             inventory.setItem(20, lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.true", target));
         } else {
             inventory.setItem(20, lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.false", target));
         }
 
-        if(plugin.chatmute.containsKey(target)) {
+        if (plugin.chatmute.containsKey(target)) {
             inventory.setItem(24, lgm.getItem("PlayerManager.TrollMenu.ChatMute.true", target));
         } else {
             inventory.setItem(24, lgm.getItem("PlayerManager.TrollMenu.ChatMute.false", target));
@@ -406,21 +403,21 @@ public class PlayerTrollMenu extends Menu implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent e) {
-        if(plugin.blockBreakPrevent.containsKey(e.getPlayer())) {
+        if (plugin.blockBreakPrevent.containsKey(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-        if(plugin.chatmute.containsKey(e.getPlayer())) {
+        if (plugin.chatmute.containsKey(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
-        if(plugin.blockBreakPrevent.containsKey(e.getPlayer())) {
+        if (plugin.blockBreakPrevent.containsKey(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
@@ -429,12 +426,12 @@ public class PlayerTrollMenu extends Menu implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if(plugin.hurtingwater.containsKey(e.getPlayer())) {
-            if(hurtingWaterRunnable == null || hurtingWaterRunnable.isCancelled() || !Bukkit.getScheduler().isCurrentlyRunning(hurtingWaterRunnable.getTaskId())) {
+        if (plugin.hurtingwater.containsKey(e.getPlayer())) {
+            if (hurtingWaterRunnable == null || hurtingWaterRunnable.isCancelled() || !Bukkit.getScheduler().isCurrentlyRunning(hurtingWaterRunnable.getTaskId())) {
                 hurtingWaterRunnable = new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if(!plugin.hurtingwater.containsKey(e.getPlayer())) {
+                        if (!plugin.hurtingwater.containsKey(e.getPlayer())) {
                             cancel();
                             hurtingWaterRunnable = null;
                             return;
@@ -457,7 +454,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
 
     @EventHandler
     public void onKill(EntityDeathEvent e) {
-        if(e.getEntity().getKiller() != null) {
+        if (e.getEntity().getKiller() != null) {
             e.getEntity();
             if (plugin.dupeMobsOnKill.containsKey(e.getEntity().getKiller())) {
                 e.getDrops().clear();

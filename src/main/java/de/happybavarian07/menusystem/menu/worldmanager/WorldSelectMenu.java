@@ -1,11 +1,10 @@
 package de.happybavarian07.menusystem.menu.worldmanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
-import de.happybavarian07.events.world.MenuGameruleChangeEvent;
 import de.happybavarian07.events.world.WorldSelectEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
@@ -24,7 +23,7 @@ import java.util.List;
 import static org.bukkit.Bukkit.getServer;
 
 public class WorldSelectMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public WorldSelectMenu(PlayerMenuUtility playerMenuUtility) {
@@ -34,7 +33,7 @@ public class WorldSelectMenu extends PaginatedMenu {
 
     @Override
     public String getMenuName() {
-        return Main.getPlugin().getLanguageManager().getMenuTitle("WorldManager.WorldSelector", null);
+        return AdminPanelMain.getPlugin().getLanguageManager().getMenuTitle("WorldManager.WorldSelector", null);
     }
 
     @Override
@@ -52,21 +51,21 @@ public class WorldSelectMenu extends PaginatedMenu {
         if (item.getType().equals(Material.PLAYER_HEAD)) {
             WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, Bukkit.getWorld(item.getItemMeta().getDisplayName()));
             try {
-                Main.getAPI().callAdminPanelEvent(worldSelectEvent);
-                if(!worldSelectEvent.isCancelled()) {
-                    new WorldSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), Bukkit.getWorld(item.getItemMeta().getDisplayName())).open();
+                AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);
+                if (!worldSelectEvent.isCancelled()) {
+                    new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getWorld(item.getItemMeta().getDisplayName())).open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("WorldManager.Create", player))) {
-            new WorldCreateMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
@@ -125,13 +124,13 @@ public class WorldSelectMenu extends PaginatedMenu {
                 if (worlds.get(index) != null) {
                     ///////////////////////////
 
-                    ItemStack head = Main.getAPI().createSkull(Head.WORLD, worlds.get(index).getName());
+                    ItemStack head = AdminPanelMain.getAPI().createSkull(Head.WORLD, worlds.get(index).getName());
                     ItemMeta meta = head.getItemMeta();
                     List<String> lore = new ArrayList<>();
-                    lore.add(Utils.getInstance().chat("&6Players: &b" + worlds.get(index).getPlayers().size()));
-                    lore.add(Utils.getInstance().chat("&6Type: &b" + worlds.get(index).getWorldType()));
-                    lore.add(Utils.getInstance().chat("&6Environment: &b" + worlds.get(index).getEnvironment()));
-                    lore.add(Utils.getInstance().chat("&6GameTime: &b" + worlds.get(index).getGameTime()));
+                    lore.add(Utils.chat("&6Players: &b" + worlds.get(index).getPlayers().size()));
+                    lore.add(Utils.chat("&6Type: &b" + worlds.get(index).getWorldType()));
+                    lore.add(Utils.chat("&6Environment: &b" + worlds.get(index).getEnvironment()));
+                    lore.add(Utils.chat("&6GameTime: &b" + worlds.get(index).getGameTime()));
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                     inventory.addItem(head);

@@ -39,14 +39,17 @@ public class PlayerKickBecauseErrorEvent extends AdminPanelEvent implements Canc
     public boolean isCancelled() {
         return cancelled;
     }
+
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
 
     }
+
     public static HandlerList getHandlerList() {
         return handlers;
     }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;

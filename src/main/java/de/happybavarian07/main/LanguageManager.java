@@ -103,7 +103,7 @@ public class LanguageManager {
         if (langConfig.getConfig().getString("Messages." + path) == null || !langConfig.getConfig().contains("Messages." + path))
             return "null path: Messages." + path;
 
-        return Utils.getInstance().replacePlaceHolders(player, Objects.requireNonNull(langConfig.getConfig().getString("Messages." + path)), Main.getPrefix());
+        return Utils.format(player, Objects.requireNonNull(langConfig.getConfig().getString("Messages." + path)), AdminPanelMain.getPrefix());
     }
 
     public String getMessage(String path, Player player, String langName) {
@@ -114,7 +114,7 @@ public class LanguageManager {
         if (langConfig.getConfig().getString("Messages." + path) == null || !langConfig.getConfig().contains("Messages." + path))
             return "null path: Messages." + path;
 
-        return Utils.getInstance().replacePlaceHolders(player, Objects.requireNonNull(langConfig.getConfig().getString("Messages." + path)), Main.getPrefix());
+        return Utils.format(player, Objects.requireNonNull(langConfig.getConfig().getString("Messages." + path)), AdminPanelMain.getPrefix());
     }
 
     public ItemStack getItem(String path, Player player) {
@@ -145,12 +145,12 @@ public class LanguageManager {
         item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         for (String s : lore) {
-            loreWithPlaceholders.add(Utils.getInstance().replacePlaceHolders(player, s, Main.getPrefix()));
+            loreWithPlaceholders.add(Utils.format(player, s, AdminPanelMain.getPrefix()));
         }
         assert meta != null;
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
-        meta.setDisplayName(Utils.getInstance().replacePlaceHolders(player, displayName, Main.getPrefix()));
+        meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
         item.setItemMeta(meta);
         return item;
     }
@@ -183,12 +183,12 @@ public class LanguageManager {
         item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         for (String s : lore) {
-            loreWithPlaceholders.add(Utils.getInstance().replacePlaceHolders(player, s, Main.getPrefix()));
+            loreWithPlaceholders.add(Utils.format(player, s, AdminPanelMain.getPrefix()));
         }
         assert meta != null;
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
-        meta.setDisplayName(Utils.getInstance().replacePlaceHolders(player, displayName, Main.getPrefix()));
+        meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
         item.setItemMeta(meta);
         return item;
     }
@@ -200,7 +200,7 @@ public class LanguageManager {
             return "null config";
         if (langConfig.getConfig().getString("MenuTitles." + path) == null || !langConfig.getConfig().contains("MenuTitles." + path))
             return "null path: MenuTitles." + path;
-        return Utils.getInstance().replacePlaceHolders(player, Objects.requireNonNull(langConfig.getConfig().getString("MenuTitles." + path)), Main.getPrefix());
+        return Utils.format(player, Objects.requireNonNull(langConfig.getConfig().getString("MenuTitles." + path)), AdminPanelMain.getPrefix());
     }
 
     public String getMenuTitle(String path, Player player) {
@@ -210,6 +210,6 @@ public class LanguageManager {
             return "null config";
         if (langConfig.getConfig().getString("MenuTitles." + path) == null || !langConfig.getConfig().contains("MenuTitles." + path))
             return "null path: MenuTitles." + path;
-        return Utils.getInstance().replacePlaceHolders(player, Objects.requireNonNull(langConfig.getConfig().getString("MenuTitles." + path)), Main.getPrefix());
+        return Utils.format(player, Objects.requireNonNull(langConfig.getConfig().getString("MenuTitles." + path)), AdminPanelMain.getPrefix());
     }
 }

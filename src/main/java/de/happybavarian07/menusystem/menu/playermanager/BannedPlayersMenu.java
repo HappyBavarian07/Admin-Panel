@@ -1,7 +1,7 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.Utils;
@@ -15,12 +15,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class BannedPlayersMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
@@ -53,23 +52,22 @@ public class BannedPlayersMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
         if (item == null || !item.hasItemMeta()) return;
-        if(item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
-            if(!player.hasPermission("AdminPanel.PlayerManager.BannedPlayers")) {
+        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
+            if (!player.hasPermission("AdminPanel.PlayerManager.BannedPlayers")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            OfflinePlayer current = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName());
-            Utils.getInstance().unban(player, current.getName());
+            Utils.unban(player, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()));
             inventory.setItem(e.getSlot(), null);
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerSelectMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
             if (item.equals(lgm.getItem("General.Left", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageleft")) {
+                if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                     player.sendMessage(noPerms);
                     return;
                 }
@@ -80,7 +78,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
                     super.open();
                 }
             } else if (item.equals(lgm.getItem("General.Right", null))) {
-                if(!player.hasPermission("AdminPanel.Button.pageright")) {
+                if (!player.hasPermission("AdminPanel.Button.pageright")) {
                     player.sendMessage(noPerms);
                     return;
                 }
@@ -114,11 +112,11 @@ public class BannedPlayersMenu extends PaginatedMenu {
         }
 
         ///////////////////////////////////// Pagination loop template
-        if(updatedPlayers != null && !updatedPlayers.isEmpty()) {
-            for(int i = 0; i < super.maxItemsPerPage; i++) {
+        if (updatedPlayers != null && !updatedPlayers.isEmpty()) {
+            for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
-                if(index >= updatedPlayers.size()) break;
-                if (updatedPlayers.get(index) != null){
+                if (index >= updatedPlayers.size()) break;
+                if (updatedPlayers.get(index) != null) {
                     ///////////////////////////
 
                     ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);

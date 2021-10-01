@@ -30,7 +30,9 @@ public class PanelOpenEvent extends AdminPanelEvent implements Cancellable {
         return openedMenu;
     }
 
-    public void setOpenedMenu(Menu menu) { this.openedMenu = menu; }
+    public void setOpenedMenu(Menu menu) {
+        this.openedMenu = menu;
+    }
 
     public PlayerMenuUtility getPlayerMenuUtility() {
         return playerMenuUtility;
@@ -48,10 +50,12 @@ public class PanelOpenEvent extends AdminPanelEvent implements Cancellable {
     public static HandlerList getHandlerList() {
         return handlers;
     }
+
     @Override
     public boolean isCancelled() {
         return cancelled;
     }
+
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;

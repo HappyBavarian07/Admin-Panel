@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.worldmanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.world.WorldCreateEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorldCreateMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private String worldName = "Name";
     private WorldType worldType = WorldType.NORMAL;
@@ -85,7 +85,7 @@ public class WorldCreateMenu extends Menu implements Listener {
             player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player));
             player.closeInventory();
         } else if (item.equals(typeItem)) {
-            if(this.worldType == WorldType.NORMAL) {
+            if (this.worldType == WorldType.NORMAL) {
                 this.worldType = WorldType.FLAT;
             } else if (this.worldType == WorldType.FLAT) {
                 this.worldType = WorldType.AMPLIFIED;
@@ -96,7 +96,7 @@ public class WorldCreateMenu extends Menu implements Listener {
             }
             super.open();
         } else if (item.equals(environmentItem)) {
-            if(this.worldEnvironment == World.Environment.NORMAL) {
+            if (this.worldEnvironment == World.Environment.NORMAL) {
                 this.worldEnvironment = World.Environment.NETHER;
             } else if (this.worldEnvironment == World.Environment.NETHER) {
                 this.worldEnvironment = World.Environment.THE_END;
@@ -117,7 +117,7 @@ public class WorldCreateMenu extends Menu implements Listener {
             this.hardcore = true;
             super.open();
         } else if (item.equals(lgm.getItem("General.Close", player))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
@@ -125,8 +125,8 @@ public class WorldCreateMenu extends Menu implements Listener {
         } else if (item.equals(lgm.getItem(itemPath + "CreateWorld", player))) {
             WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
             try {
-                Main.getAPI().callAdminPanelEvent(worldCreateEvent);
-                if(!worldCreateEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);
+                if (!worldCreateEvent.isCancelled()) {
                     WorldCreator worldCreator = new WorldCreator(worldCreateEvent.getName());
                     worldCreator.type(worldCreateEvent.getWorldType());
                     worldCreator.environment(worldCreateEvent.getWorldEnvironment());
@@ -179,13 +179,13 @@ public class WorldCreateMenu extends Menu implements Listener {
         environmentItem.setItemMeta(environmentMeta);
         inventory.setItem(14, environmentItem);
 
-        if(generateStructures) {
+        if (generateStructures) {
             inventory.setItem(16, lgm.getItem(itemPath + "GenerateStructures.true", player));
         } else {
             inventory.setItem(16, lgm.getItem(itemPath + "GenerateStructures.false", player));
         }
 
-        if(hardcore) {
+        if (hardcore) {
             inventory.setItem(22, lgm.getItem(itemPath + "Hardcore.true", player));
         } else {
             inventory.setItem(22, lgm.getItem(itemPath + "Hardcore.false", player));

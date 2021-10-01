@@ -1,12 +1,13 @@
 package de.happybavarian07.utils;
 
+import de.happybavarian07.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 
 public class StartUpLogger {
 
-    private final String SPACER_FORMAT = "+------------------------------------------------------------------+";
+    private final String SPACER_FORMAT = "+-------------------------------------------------------------+";
     private final String MESSAGE_FORMAT = "|------------------------------------------------------------------|";
 
     private final ConsoleCommandSender sender = Bukkit.getConsoleSender();
@@ -27,7 +28,8 @@ public class StartUpLogger {
     }
 
     public StartUpLogger message(String message) {
-        sender.sendMessage(getMessageWithFormat(message));
+        sender.sendMessage(Utils.format(null, getMessageWithFormat(message),
+                AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));
         return this;
     }
 
@@ -42,7 +44,8 @@ public class StartUpLogger {
     }
 
     public StartUpLogger messages(String... messages) {
-        for(String message : messages) sender.sendMessage(getMessageWithFormat(message));
+        for (String message : messages) sender.sendMessage(Utils.format(null, getMessageWithFormat(message),
+                AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));
         return this;
     }
 
@@ -56,7 +59,7 @@ public class StartUpLogger {
         final int messageLength = message.replaceAll("§([a-fA-F0-9]|r|l|m|n|o|k)", "").length();
 
         // Return the default message if it is too long for the actual spacer
-        if(messageLength > messageSpacerLength - 2) return message;
+        if (messageLength > messageSpacerLength - 2) return message;
 
         final int partLength = (messageSpacerLength - messageLength) / 2;
 

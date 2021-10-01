@@ -31,11 +31,11 @@ import java.util.UUID;
 class LocalAdminPanelAPI implements AdminPanelAPI {
 
     private static final Map<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
-    private final Main plugin;
+    private final AdminPanelMain plugin;
     private final LanguageManager lgm;
     private final PluginUtils pluginUtils;
 
-    public LocalAdminPanelAPI(Main plugin) {
+    public LocalAdminPanelAPI(AdminPanelMain plugin) {
         this.plugin = plugin;
         this.lgm = plugin.getLanguageManager();
         this.pluginUtils = new PluginUtils();
@@ -71,11 +71,11 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         if (headTexture.isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setDisplayName(Utils.getInstance().chat(name));
+        meta.setDisplayName(Utils.chat(name));
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
 
         profile.getProperties().put("textures", new Property("textures", headTexture));
-        
+
         try {
             Field field = meta.getClass().getDeclaredField("profile");
             field.setAccessible(true);
@@ -93,7 +93,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         if (headTexture.getFullTexture().isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setDisplayName(Utils.getInstance().chat(name));
+        meta.setDisplayName(Utils.chat(name));
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
 
         profile.getProperties().put("textures", new Property("textures", headTexture.getFullTexture()));
@@ -157,17 +157,17 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
     @Override
     public void clearChat(int lines, boolean broadcastChatClear, Player player) {
-        Utils.getInstance().clearChat(lines, broadcastChatClear, player);
+        Utils.clearChat(lines, broadcastChatClear, player);
     }
 
     @Override
     public void reloadServer(int time) throws InterruptedException {
-        Utils.getInstance().serverReload(time);
+        Utils.serverReload(time);
     }
 
     @Override
     public void stopServer(int time, int time2) throws InterruptedException {
-        Utils.getInstance().serverStop(time, time2);
+        Utils.serverStop(time, time2);
     }
 
     @Override

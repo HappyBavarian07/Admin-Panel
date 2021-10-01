@@ -1,26 +1,23 @@
 package de.happybavarian07.menusystem.menu.pluginmanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Material;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PluginPermissionsListMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
 
@@ -56,17 +53,17 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                 return;
             }
             Permission current = null;
-            for(Permission perm : permissions) {
-                if(perm.getName().equals(item.getItemMeta().getDisplayName())) {
+            for (Permission perm : permissions) {
+                if (perm.getName().equals(item.getItemMeta().getDisplayName())) {
                     current = perm;
                 }
             }
             Utils utils = Utils.getInstance();
-            player.sendMessage(utils.chat("&6Name: &a" + current.getName()));
-            player.sendMessage(utils.chat("&6Default: &a" + current.getDefault()));
-            player.sendMessage(utils.chat("&6Description: &a" + current.getDescription()));
-            player.sendMessage(utils.chat("&6Childrens: &a" + current.getChildren()));
-            player.sendMessage(utils.chat("&6Permissibles: &a" + current.getPermissibles()));
+            player.sendMessage(Utils.chat("&6Name: &a" + current.getName()));
+            player.sendMessage(Utils.chat("&6Default: &a" + current.getDefault()));
+            player.sendMessage(Utils.chat("&6Description: &a" + current.getDescription()));
+            player.sendMessage(Utils.chat("&6Childrens: &a" + current.getChildren()));
+            player.sendMessage(Utils.chat("&6Permissibles: &a" + current.getPermissibles()));
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
@@ -118,13 +115,13 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                     ///////////////////////////
 
                     Permission currentPermission = permissions.get(index);
-                    if(currentPermission == null) continue;
+                    if (currentPermission == null) continue;
                     ItemStack command = new ItemStack(Material.WRITABLE_BOOK, 1);
                     ItemMeta commandMeta = command.getItemMeta();
                     commandMeta.setDisplayName(currentPermission.getName());
                     List<String> lore = new ArrayList<>();
                     Utils utils = Utils.getInstance();
-                    lore.add(utils.chat("&6Click for Infos"));
+                    lore.add(Utils.chat("&6Click for Infos"));
                     commandMeta.setLore(lore);
                     command.setItemMeta(commandMeta);
                     inventory.addItem(command);

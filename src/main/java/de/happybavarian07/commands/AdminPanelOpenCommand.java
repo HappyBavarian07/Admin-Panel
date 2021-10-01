@@ -1,7 +1,7 @@
 package de.happybavarian07.commands;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,7 +15,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
     private final LanguageManager lgm;
 
     public AdminPanelOpenCommand() {
-        this.lgm = Main.getPlugin().getLanguageManager();
+        this.lgm = AdminPanelMain.getPlugin().getLanguageManager();
     }
 
     @Override
@@ -24,8 +24,8 @@ public class AdminPanelOpenCommand implements CommandExecutor {
             if (args.length == 0) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
-                    new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
-                    Main.getPlugin().writeToLog("Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")");
+                    new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                    AdminPanelMain.getPlugin().writeToLog("Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")");
                 } else {
                     sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null));
                 }
@@ -37,9 +37,9 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfOpenedForOther", target);
                     if (player.hasPermission("AdminPanel.open.other")) {
                         try {
-                            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(target)).open();
+                            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                             player.sendMessage(openingMessageSelfOpenedForOther);
-                            Main.getPlugin().writeToLog(player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
+                            AdminPanelMain.getPlugin().writeToLog(player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
                         } catch (NullPointerException e) {
                             player.sendMessage(targetPlayerIsNull);
                         }
@@ -53,9 +53,9 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     String targetplayerisnull = lgm.getMessage("Player.General.TargetedPlayerIsNull", null);
                     String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfOpenedForOther", target);
                     try {
-                        new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(target)).open();
+                        new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                         console.sendMessage(openingMessageSelfOpenedForOther);
-                        Main.getPlugin().writeToLog("Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
+                        AdminPanelMain.getPlugin().writeToLog("Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")");
                     } catch (NullPointerException e) {
                         console.sendMessage(targetplayerisnull);
                     }

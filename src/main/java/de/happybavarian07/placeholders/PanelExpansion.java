@@ -1,6 +1,6 @@
 package de.happybavarian07.placeholders;
 
-import de.happybavarian07.main.Main;
+import de.happybavarian07.main.AdminPanelMain;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +37,10 @@ public class PanelExpansion extends PlaceholderExpansion {
             return null;
         }
         if (params.equals("openingsound")) {
-            return Main.getPlugin().getConfig().getString("Panel.SoundWhenOpened");
+            return AdminPanelMain.getPlugin().getConfig().getString("Panel.SoundWhenOpened");
         }
         if (params.equals("effectwhileopen")) {
-            return Main.getPlugin().getConfig().getString("Panel.EffectWhenOpened");
+            return AdminPanelMain.getPlugin().getConfig().getString("Panel.EffectWhenOpened");
         }
         return null;
     }

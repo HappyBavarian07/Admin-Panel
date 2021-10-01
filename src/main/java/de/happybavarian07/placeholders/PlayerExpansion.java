@@ -1,6 +1,6 @@
 package de.happybavarian07.placeholders;
 
-import de.happybavarian07.main.Main;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -60,7 +60,7 @@ public class PlayerExpansion extends PlaceholderExpansion {
             return String.valueOf((int) player.getLocation().getZ());
         }
         if (params.equals("isbanned")) {
-            return String.valueOf(player.isBanned() && Main.getPlugin().getBanConfig().getBoolean(player.getUniqueId().toString()));
+            return String.valueOf(player.isBanned() && AdminPanelMain.getPlugin().getBanConfig().getBoolean(player.getUniqueId().toString()));
         }
         return null;
     }

@@ -1,9 +1,7 @@
 package de.happybavarian07.menusystem;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 
 public abstract class PaginatedMenu extends Menu {
 
@@ -19,8 +17,8 @@ public abstract class PaginatedMenu extends Menu {
     }
 
     //Set the border and menu buttons for the menu
-    public void addMenuBorder(){
-        LanguageManager lgm = Main.getPlugin().getLanguageManager();
+    public void addMenuBorder() {
+        LanguageManager lgm = AdminPanelMain.getPlugin().getLanguageManager();
         inventory.setItem(48, lgm.getItem("General.Left", null));
 
         inventory.setItem(49, lgm.getItem("General.Close", null));

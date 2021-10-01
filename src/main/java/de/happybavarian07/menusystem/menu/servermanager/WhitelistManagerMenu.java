@@ -1,7 +1,7 @@
 package de.happybavarian07.menusystem.menu.servermanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class WhitelistManagerMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public WhitelistManagerMenu(PlayerMenuUtility playerMenuUtility) {
@@ -82,10 +82,10 @@ public class WhitelistManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if(player.hasMetadata("WhitelistManagerAddPlayer")) {
+        if (player.hasMetadata("WhitelistManagerAddPlayer")) {
             String message = event.getMessage();
             OfflinePlayer playerToAdd = Bukkit.getOfflinePlayer(message);
-            if(!playerToAdd.isWhitelisted()) {
+            if (!playerToAdd.isWhitelisted()) {
                 playerToAdd.setWhitelisted(true);
             }
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.AddedPlayer", player));
@@ -93,10 +93,10 @@ public class WhitelistManagerMenu extends Menu implements Listener {
             super.open();
             event.setCancelled(true);
         }
-        if(player.hasMetadata("WhitelistManagerRemovePlayer")) {
+        if (player.hasMetadata("WhitelistManagerRemovePlayer")) {
             String message = event.getMessage();
             OfflinePlayer playerToRemove = Bukkit.getOfflinePlayer(message);
-            if(playerToRemove.isWhitelisted()) {
+            if (playerToRemove.isWhitelisted()) {
                 playerToRemove.setWhitelisted(false);
             }
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.RemovedPlayer", player));

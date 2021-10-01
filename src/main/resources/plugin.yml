@@ -1,5 +1,5 @@
 name: Admin-Panel
-main: de.happybavarian07.main.Main
+main: de.happybavarian07.main.AdminPanelMain
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07

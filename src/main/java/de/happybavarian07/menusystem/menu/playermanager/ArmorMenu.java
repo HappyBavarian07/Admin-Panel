@@ -1,7 +1,7 @@
 package de.happybavarian07.menusystem.menu.playermanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 public class ArmorMenu extends Menu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
@@ -62,22 +62,22 @@ public class ArmorMenu extends Menu {
             inventory.setItem(i, super.FILLER);
         }
         Player target = Bukkit.getPlayer(targetUUID);
-        if(target.getInventory().getArmorContents()[0] != null) {
+        if (target.getInventory().getArmorContents()[0] != null) {
             inventory.setItem(0, target.getInventory().getArmorContents()[0]);
         } else {
             inventory.setItem(0, lgm.getItem("General.EmptySlot", target));
         }
-        if(target.getInventory().getArmorContents()[1] != null) {
+        if (target.getInventory().getArmorContents()[1] != null) {
             inventory.setItem(1, target.getInventory().getArmorContents()[1]);
         } else {
             inventory.setItem(1, lgm.getItem("General.EmptySlot", target));
         }
-        if(target.getInventory().getArmorContents()[2] != null) {
+        if (target.getInventory().getArmorContents()[2] != null) {
             inventory.setItem(2, target.getInventory().getArmorContents()[2]);
         } else {
             inventory.setItem(2, lgm.getItem("General.EmptySlot", target));
         }
-        if(target.getInventory().getArmorContents()[3] != null) {
+        if (target.getInventory().getArmorContents()[3] != null) {
             inventory.setItem(3, target.getInventory().getArmorContents()[3]);
         } else {
             inventory.setItem(3, lgm.getItem("General.EmptySlot", target));

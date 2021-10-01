@@ -13,15 +13,12 @@ import de.happybavarian07.utils.Utils;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,11 +31,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class Main extends JavaPlugin implements Listener {
+public class AdminPanelMain extends JavaPlugin implements Listener {
     private static final File banfile = new File("plugins/Admin-Panel", "bans.yml");
     private static String prefix;
     private static AdminPanelAPI API;
-    private static Main plugin;
+    private static AdminPanelMain plugin;
     public final Map<Player, Boolean> hurtingwater = new HashMap<>();
     public final Map<Player, Boolean> chatmute = new HashMap<>();
     public final Map<Player, Boolean> villagerSounds = new HashMap<>();
@@ -62,19 +59,19 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public static void setPrefix(String prefix) {
-        Main.prefix = prefix;
+        AdminPanelMain.prefix = prefix;
     }
 
     public static AdminPanelAPI getAPI() {
         return API;
     }
 
-    public static Main getPlugin() {
+    public static AdminPanelMain getPlugin() {
         return plugin;
     }
 
-    private void setPlugin(Main plugin) {
-        Main.plugin = plugin;
+    private void setPlugin(AdminPanelMain plugin) {
+        AdminPanelMain.plugin = plugin;
     }
 
     public boolean isInMaintenanceMode() {
@@ -119,39 +116,39 @@ public class Main extends JavaPlugin implements Listener {
         logger
                 .coloredSpacer(ChatColor.GREEN)
                 .messages(
-                        "§e§lStarting Admin Panel Plugin:§r"
+                        "&e&lStarting Admin Panel Plugin:&r"
                 );
-        logger.coloredSpacer(ChatColor.DARK_RED).message("§4§lInitialize Plugin Main Variable to this!§r");
+        logger.coloredSpacer(ChatColor.DARK_RED).message("&4&lInitialize Plugin Main Variable to this!&r");
         setPlugin(this);
         languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"));
         API = new LocalAdminPanelAPI(this);
         new ChatUtil();
-        new Utils(getPlugin());
+        new Utils();
         new File(this.getDataFolder() + "/languages").mkdir();
-        logger.message("§e§lVariable Done!§r");
+        logger.message("&e&lVariable Done!&r");
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlayerExpansion().register();
             new PluginExpansion().register();
             new PanelExpansion().register();
-            logger.message("§a§lInitialized PlaceHolderAPI with Placeholders!");
+            logger.message("&a&lInitialized PlaceHolderAPI with Placeholders!&r");
         } else {
             logger.coloredSpacer(ChatColor.RED);
-            logger.message("§4§lCould not find PlaceholderAPI!!");
-            logger.message("§4§lPlugin can not work without it!");
+            logger.message("&4&lCould not find PlaceholderAPI!!&r");
+            logger.message("&4&lPlugin can not work without it!&r");
             logger.coloredSpacer(ChatColor.RED);
             getServer().getPluginManager().disablePlugin(this);
         }
         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
             logger.coloredSpacer(ChatColor.RED);
-            logger.message("§4§lCould not find SuperVanish!!");
-            logger.message("§4§lPlugin can not work without it!");
+            logger.message("&4&lCould not find SuperVanish!!&r");
+            logger.message("&4&lPlugin can not work without it!&r");
             logger.coloredSpacer(ChatColor.RED);
             getServer().getPluginManager().disablePlugin(this);
         }
         logger
                 .coloredSpacer(ChatColor.DARK_RED)
                 .messages(
-                        "§c§lStarting Vault initialization!§r"
+                        "&c&lStarting Vault initialization!&r"
                 );
         if (!setupEconomy()) {
             logger
@@ -167,42 +164,42 @@ public class Main extends JavaPlugin implements Listener {
         setupChat();
         logger
                 .messages(
-                        "§c§lFinished Vault initialization!§r"
+                        "&c&lFinished Vault initialization!&r"
                 );
         if (!configFile.exists()) {
-            logger.coloredSpacer(ChatColor.DARK_RED).message("§c§lCreating Default Config!§r");
+            logger.coloredSpacer(ChatColor.DARK_RED).message("&c&lCreating Default Config!&r");
         }
         saveDefaultConfig();
-        logger.message("§e§lDone!§r");
+        logger.message("&e&lDone!&r");
         if (!banfile.exists()) {
-            logger.spacer().message("§c§lCreating bans.yml file!§r");
+            logger.spacer().message("&c&lCreating bans.yml file!&r");
             try {
                 banfile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            logger.message("§e§lDone!§r");
+            logger.message("&e&lDone!&r");
         }
         if (!logFile.exists()) {
-            logger.spacer().message("§c§lCreating plugin.log file!§r");
+            logger.spacer().message("&c&lCreating plugin.log file!&r");
             try {
                 logFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            logger.message("§e§lDone!§r");
+            logger.message("&e&lDone!&r");
         }
-        logger.message("§3§lMain.Prefix §9= §7Config.Plugin.Prefix§r");
+        logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
         setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
-        logger.message("§e§lPrefix Done!§r");
-        logger.coloredSpacer(ChatColor.DARK_RED).message("§2§lStarting Registration of Events:§r");
+        logger.message("&e&lPrefix Done!&r");
+        logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Registration of Events:&r");
         PluginManager pm = this.getServer().getPluginManager();
-        logger.message("§3§lLoading Menu Listener Events!§r");
+        logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), this);
-        logger.message("§3§lLoading Main Class Listener Events!§r");
+        logger.message("&3&lLoading Main Class Listener Events!&r");
         pm.registerEvents(this, this);
-        logger.message("§4§lEventregistration: Done!§r");
-        logger.coloredSpacer(ChatColor.DARK_RED).message("§e§lStarting Done!§r");
+        logger.message("&4&lEventregistration: Done!&r");
+        logger.coloredSpacer(ChatColor.DARK_RED).message("&e&lStarting Done!&r");
         logger.coloredSpacer(ChatColor.GREEN);
         // Language Manager Enabling
         LanguageFile deLang = new LanguageFile(this, "de");
@@ -258,21 +255,6 @@ public class Main extends JavaPlugin implements Listener {
 
     public StartUpLogger getStartUpLogger() {
         return logger;
-    }
-
-    @EventHandler
-    public void onLogin(PlayerLoginEvent e) {
-        Player player = e.getPlayer();
-        if (player.isBanned() && banConfig.getBoolean(player.getUniqueId().toString())) {
-            e.setKickMessage("§cYou are banned from this Server!\n" +
-                    "\n" +
-                    "§3Von: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getSource() + "\n" +
-                    "\n" +
-                    "§3Reason: §e" + Objects.requireNonNull(Bukkit.getBanList(Type.NAME).getBanEntry(player.getName())).getReason() + "\n" +
-                    "\n" +
-                    "§3Permanently banned!");
-            writeToLog("Player: " + player.getName() + "(UUID: " + player.getUniqueId() + ") tryed to Join but is banned");
-        }
     }
 
     @Override

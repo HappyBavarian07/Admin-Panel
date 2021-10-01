@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.playermanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.player.GiveEffectToPlayerEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class PotionMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
@@ -48,28 +48,29 @@ public class PotionMenu extends PaginatedMenu {
         Player player = (Player) e.getWhoClicked();
         List<PotionType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionType.values());
-        if(item.getType().equals(Material.POTION)) {
+        if (item.getType().equals(Material.POTION)) {
             PotionEffect effect = new PotionEffect(PotionType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()).getEffectType(),
-                    5*60*20, 2, false, false, false);
+                    5 * 60 * 20, 2, false, false, false);
             GiveEffectToPlayerEvent giveEffectToPlayerEvent = new GiveEffectToPlayerEvent(player, effect);
             try {
-                Main.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
-                if(!giveEffectToPlayerEvent.isCancelled()) {
+                AdminPanelMain.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
+                if (!giveEffectToPlayerEvent.isCancelled()) {
                     try {
                         Bukkit.getPlayer(targetUUID).addPotionEffect(effect);
-                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                    } catch (NullPointerException | IllegalArgumentException ignored) {
+                    }
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
                 return;
             }
-            new PlayerActionsMenu(Main.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null))) {
-            for(PotionEffect effect : Bukkit.getPlayer(targetUUID).getActivePotionEffects()) {
+            for (PotionEffect effect : Bukkit.getPlayer(targetUUID).getActivePotionEffects()) {
                 Bukkit.getPlayer(targetUUID).removePotionEffect(effect.getType());
             }
         } else if (item.equals(lgm.getItem("General.Left", null)) ||
@@ -101,11 +102,11 @@ public class PotionMenu extends PaginatedMenu {
         List<PotionType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionType.values());
 
-        if(potionList != null && !potionList.isEmpty()) {
-            for(int i = 0; i < super.maxItemsPerPage; i++) {
+        if (potionList != null && !potionList.isEmpty()) {
+            for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
-                if(index >= potionList.size()) break;
-                if (potionList.get(index) != null){
+                if (index >= potionList.size()) break;
+                if (potionList.get(index) != null) {
                     ///////////////////////////
 
                     if (potionList.get(index).getEffectType() != null) {

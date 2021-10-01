@@ -2,8 +2,8 @@ package de.happybavarian07.menusystem.menu.playermanager;
 
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.player.SelectPlayerEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
@@ -20,7 +20,7 @@ import java.util.UUID;
 import static org.bukkit.Bukkit.getServer;
 
 public class PlayerSelectMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public PlayerSelectMenu(PlayerMenuUtility playerMenuUtility) {
@@ -46,27 +46,27 @@ public class PlayerSelectMenu extends PaginatedMenu {
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
-        if(item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
+        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
             UUID target = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()).getUniqueId();
             SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, target);
             try {
-                Main.getAPI().callAdminPanelEvent(selectPlayerEvent);
+                AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
                 if (!selectPlayerEvent.isCancelled()) {
-                    if(player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
+                    if (player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
                         player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
                         return;
                     }
-                    new PlayerActionSelectMenu(Main.getAPI().getPlayerMenuUtility(player), target).open();
+                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), target).open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("General.Close", null))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
@@ -96,7 +96,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
             }
             super.open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null))) {
-            new BannedPlayersMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 
@@ -109,14 +109,14 @@ public class PlayerSelectMenu extends PaginatedMenu {
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
 
         ///////////////////////////////////// Pagination loop template
-        if(players != null && !players.isEmpty()) {
-            for(int i = 0; i < super.maxItemsPerPage; i++) {
+        if (players != null && !players.isEmpty()) {
+            for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
-                if(index >= players.size()) break;
-                if (players.get(index) != null){
+                if (index >= players.size()) break;
+                if (players.get(index) != null) {
                     ///////////////////////////
 
-                    ItemStack head = Main.getPlugin().getLanguageManager().getItem("PlayerManager.PlayerHead", players.get(index));
+                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("PlayerManager.PlayerHead", players.get(index));
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setOwningPlayer(players.get(index));
                     head.setItemMeta(meta);

@@ -5,10 +5,9 @@ package de.happybavarian07.menusystem.menu.pluginmanager;
  * @Date 02.09.2021
  */
 
-import de.happybavarian07.events.plugins.PluginInstallEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PluginSelectMenu extends PaginatedMenu {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
     private final LanguageManager lgm = plugin.getLanguageManager();
 
@@ -62,7 +61,7 @@ public class PluginSelectMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSettingsMenu(Main.getAPI().getPlayerMenuUtility(player), Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName()))).open();
+            new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName()))).open();
         } else if (item.equals(lgm.getItem(path + "Install", player))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
@@ -74,7 +73,7 @@ public class PluginSelectMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new AdminPanelStartMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
@@ -129,19 +128,19 @@ public class PluginSelectMenu extends PaginatedMenu {
                         item = Head.BLANK_RED.getAsItem();
                     }
                     ItemMeta meta = item.getItemMeta();
-                    meta.setDisplayName(Utils.getInstance().chat("&a" + currentPlugin.getName()));
+                    meta.setDisplayName(Utils.chat("&a" + currentPlugin.getName()));
                     List<String> lore = new ArrayList<>();
                     Utils utils = Utils.getInstance();
-                    lore.add(utils.chat("&6Enabled: &a" + enabled));
-                    lore.add(utils.chat("&6Version: &a" + currentPlugin.getDescription().getVersion()));
+                    lore.add(Utils.chat("&6Enabled: &a" + enabled));
+                    lore.add(Utils.chat("&6Version: &a" + currentPlugin.getDescription().getVersion()));
                     if (currentPlugin.getDescription().getAuthors().size() == 1) {
-                        lore.add(utils.chat("&6Author: &a" + currentPlugin.getDescription().getAuthors().get(0)));
+                        lore.add(Utils.chat("&6Author: &a" + currentPlugin.getDescription().getAuthors().get(0)));
                     } else {
-                        lore.add(utils.chat("&6Authors: &a" + currentPlugin.getDescription().getAuthors()));
+                        lore.add(Utils.chat("&6Authors: &a" + currentPlugin.getDescription().getAuthors()));
                     }
-                    lore.add(utils.chat("&6Website: &a" + currentPlugin.getDescription().getWebsite()));
-                    lore.add(utils.chat("&6API-Version: &a" + currentPlugin.getDescription().getAPIVersion()));
-                    lore.add(utils.chat("&6Full-Name: &a" + currentPlugin.getDescription().getFullName()));
+                    lore.add(Utils.chat("&6Website: &a" + currentPlugin.getDescription().getWebsite()));
+                    lore.add(Utils.chat("&6API-Version: &a" + currentPlugin.getDescription().getAPIVersion()));
+                    lore.add(Utils.chat("&6Full-Name: &a" + currentPlugin.getDescription().getFullName()));
                     meta.setLore(lore);
                     item.setItemMeta(meta);
                     inventory.addItem(item);

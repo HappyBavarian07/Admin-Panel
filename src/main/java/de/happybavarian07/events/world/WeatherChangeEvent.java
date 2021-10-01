@@ -1,7 +1,6 @@
 package de.happybavarian07.events.world;
 
 import de.happybavarian07.events.AdminPanelEvent;
-import de.happybavarian07.menusystem.menu.worldmanager.time.Time;
 import de.happybavarian07.menusystem.menu.worldmanager.weather.Weather;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

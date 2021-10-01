@@ -8,8 +8,8 @@ package de.happybavarian07.menusystem.menu.servermanager;
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.server.ClearChatEvent;
 import de.happybavarian07.events.server.MuteChatEvent;
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.Utils;
@@ -22,7 +22,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ChatManagerMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
     public ChatManagerMenu(PlayerMenuUtility playerMenuUtility) {
@@ -50,15 +50,15 @@ public class ChatManagerMenu extends Menu implements Listener {
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(lgm.getItem(path + "ClearChat", player))) {
-            if(!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
+            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
                 player.sendMessage(noPerms);
                 return;
             }
             ClearChatEvent clearChatEvent = new ClearChatEvent(player, 100);
             try {
-                Main.getAPI().callAdminPanelEvent(clearChatEvent);
+                AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
                 if (!clearChatEvent.isCancelled()) {
-                    Utils.getInstance().clearChat(clearChatEvent.getLines(), false, player);
+                    Utils.clearChat(clearChatEvent.getLines(), false, player);
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", player));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", player));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", player));
@@ -67,13 +67,13 @@ public class ChatManagerMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem(path + "UnMuteChat", player))) {
-            if(!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
+            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
             }
             MuteChatEvent muteChatEvent = new MuteChatEvent(player, false);
             try {
-                Main.getAPI().callAdminPanelEvent(muteChatEvent);
+                AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
                 if (!muteChatEvent.isCancelled()) {
                     plugin.setChatMuted(false);
                     super.open();
@@ -85,13 +85,13 @@ public class ChatManagerMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem(path + "MuteChat", player))) {
-            if(!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
+            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
             }
             MuteChatEvent muteChatEvent = new MuteChatEvent(player, true);
             try {
-                Main.getAPI().callAdminPanelEvent(muteChatEvent);
+                AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
                 if (!muteChatEvent.isCancelled()) {
                     plugin.setChatMuted(true);
                     super.open();
@@ -103,11 +103,11 @@ public class ChatManagerMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem("General.Close", player))) {
-            if(!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new ServerManagerMenu(Main.getAPI().getPlayerMenuUtility(player)).open();
+            new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 
@@ -118,7 +118,7 @@ public class ChatManagerMenu extends Menu implements Listener {
         String path = "ChatManager.";
 
         inventory.setItem(12, lgm.getItem(path + "ClearChat", player));
-        if(plugin.isChatMuted()) {
+        if (plugin.isChatMuted()) {
             inventory.setItem(14, lgm.getItem(path + "UnMuteChat", player));
         } else {
             inventory.setItem(14, lgm.getItem(path + "MuteChat", player));
@@ -129,7 +129,7 @@ public class ChatManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        if(plugin.isChatMuted()) {
+        if (plugin.isChatMuted()) {
             event.setCancelled(true);
             player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player));
         }

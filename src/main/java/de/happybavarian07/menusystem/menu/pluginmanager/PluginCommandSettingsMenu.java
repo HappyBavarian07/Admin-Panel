@@ -1,7 +1,7 @@
 package de.happybavarian07.menusystem.menu.pluginmanager;
 
+import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
-import de.happybavarian07.main.Main;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
@@ -15,11 +15,9 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PluginCommandSettingsMenu extends Menu implements Listener {
-    private final Main plugin = Main.getPlugin();
+    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
     private final PluginCommand currentCommand;
 
@@ -49,18 +47,18 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(lgm.getItem(path + "Register", player))) {
-            if(!currentCommand.isRegistered()) {
+            if (!currentCommand.isRegistered()) {
                 currentCommand.register(getCommandMap());
                 plugin.getDisabledCommands().remove(currentCommand.getName());
             }
         } else if (item.equals(lgm.getItem(path + "Unregister", player))) {
-            if(currentCommand.isRegistered()) {
+            if (currentCommand.isRegistered()) {
                 currentCommand.unregister(getCommandMap());
                 plugin.getDisabledCommands().add(currentCommand.getName());
             }
         } else if (item.equals(lgm.getItem(path + "Execute", player))) {
-            if(currentCommand.isRegistered()) {
-                currentCommand.execute(player, currentCommand.getLabel(), new String[] {});
+            if (currentCommand.isRegistered()) {
+                currentCommand.execute(player, currentCommand.getLabel(), new String[]{});
             }
         } else if (item.equals(lgm.getItem("General.Close", player))) {
             new PluginCommandsListMenu(playerMenuUtility, currentCommand.getPlugin()).open();
@@ -84,7 +82,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
 
             bukkitCommandMap.setAccessible(true);
             return (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -93,7 +91,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
     @EventHandler
     public void onCmdPreprocess(PlayerCommandPreprocessEvent event) {
         String command = event.getMessage().replaceFirst("/", "");
-        if(plugin.getDisabledCommands().contains(command)) {
+        if (plugin.getDisabledCommands().contains(command)) {
             event.setCancelled(true);
         }
     }
