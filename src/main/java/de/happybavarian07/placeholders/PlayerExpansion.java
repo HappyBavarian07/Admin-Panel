@@ -59,9 +59,6 @@ public class PlayerExpansion extends PlaceholderExpansion {
         if (params.equals("z")) {
             return String.valueOf((int) player.getLocation().getZ());
         }
-        if (params.equals("isbanned")) {
-            return String.valueOf(player.isBanned() && AdminPanelMain.getPlugin().getBanConfig().getBoolean(player.getUniqueId().toString()));
-        }
         return null;
     }
 }

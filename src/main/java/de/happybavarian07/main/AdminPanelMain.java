@@ -15,8 +15,6 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -32,7 +30,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class AdminPanelMain extends JavaPlugin implements Listener {
-    private static final File banfile = new File("plugins/Admin-Panel", "bans.yml");
     private static String prefix;
     private static AdminPanelAPI API;
     private static AdminPanelMain plugin;
@@ -42,7 +39,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public final Map<Player, Boolean> blockBreakPrevent = new HashMap<>();
     public final Map<Player, Boolean> dupeMobsOnKill = new HashMap<>();
     final StartUpLogger logger = StartUpLogger.create();
-    private final FileConfiguration banConfig = YamlConfiguration.loadConfiguration(banfile);
     private final List<String> disabledCommands = new ArrayList<>();
     private final File logFile = new File(this.getDataFolder(), "plugin.log");
     private final File configFile = new File(this.getDataFolder(), "config.yml");
@@ -92,10 +88,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public Updater getUpdater() {
         return updater;
-    }
-
-    public FileConfiguration getBanConfig() {
-        return banConfig;
     }
 
     public LanguageManager getLanguageManager() {
@@ -170,14 +162,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             logger.coloredSpacer(ChatColor.DARK_RED).message("&c&lCreating Default Config!&r");
         }
         saveDefaultConfig();
-        logger.message("&e&lDone!&r");
-        if (!banfile.exists()) {
-            logger.spacer().message("&c&lCreating bans.yml file!&r");
-            try {
-                banfile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (!configFile.exists()) {
             logger.message("&e&lDone!&r");
         }
         if (!logFile.exists()) {
@@ -285,9 +270,5 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         if (economy != null)
             eco = economy.getProvider();
         return eco != null;
-    }
-
-    public File getBanFile() {
-        return banfile;
     }
 }

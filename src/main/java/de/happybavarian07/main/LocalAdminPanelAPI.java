@@ -230,11 +230,6 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
         lgm.reloadLanguages(messageReceiver);
-        try {
-            plugin.getBanConfig().load(plugin.getBanFile());
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
     }
 
     // Events
