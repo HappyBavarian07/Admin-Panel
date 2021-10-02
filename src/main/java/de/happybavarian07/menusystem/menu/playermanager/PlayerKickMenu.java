@@ -74,12 +74,6 @@ public class PlayerKickMenu extends Menu implements Listener {
             if (target.isOnline()) {
                 target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.KickMenu.TargetKickMessage", target.getPlayer())));
             }
-            plugin.getBanConfig().set(target.getUniqueId().toString(), true);
-            try {
-                plugin.getBanConfig().save(plugin.getBanFile());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
             player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.SuccessfullyKicked", player));
             new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Close", player))) {

@@ -82,12 +82,6 @@ public class Utils {
             } else {
                 Bukkit.getBanList(Type.NAME).pardon(Objects.requireNonNull(target.getName()));
                 player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.SuccessfullyUnbanned", player));
-                plugin.getBanConfig().set(target.getUniqueId().toString(), null);
-                try {
-                    plugin.getBanConfig().save(plugin.getBanFile());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         } catch (NullPointerException e) {
             player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player));
@@ -255,12 +249,6 @@ public class Utils {
                                 "\n" +
                                 "&3Permanently banned!" + "\n", AdminPanelMain.getPrefix()));
                     }
-                }
-                plugin.getBanConfig().set(target.getUniqueId().toString(), true);
-                try {
-                    plugin.getBanConfig().save(plugin.getBanFile());
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
                 p.sendMessage(Utils.format(null, "&c&cYou have successfully banned &a" +
                         target.getName() + " &cfor &a" +

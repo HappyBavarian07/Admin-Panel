@@ -29,7 +29,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("PluginManager.Commands.Menu", null);
+        return lgm.getMenuTitle("PluginManager.Permissions.Menu", null);
     }
 
     @Override

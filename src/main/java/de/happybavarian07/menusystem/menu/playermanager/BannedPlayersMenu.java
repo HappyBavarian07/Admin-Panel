@@ -44,7 +44,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
         List<OfflinePlayer> updatedPlayers = new ArrayList<>();
 
         for (OfflinePlayer current : getServer().getOfflinePlayers()) {
-            if (current.isBanned() || plugin.getBanConfig().getBoolean(current.getUniqueId().toString()) && !current.isOnline()) {
+            if (current.isBanned() && !current.isOnline()) {
                 updatedPlayers.add(current);
             }
         }
@@ -106,7 +106,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
         List<OfflinePlayer> updatedPlayers = new ArrayList<>();
 
         for (OfflinePlayer current : getServer().getOfflinePlayers()) {
-            if (current.isBanned() || plugin.getBanConfig().getBoolean(current.getUniqueId().toString()) && !current.isOnline()) {
+            if (current.isBanned() && !current.isOnline()) {
                 updatedPlayers.add(current);
             }
         }

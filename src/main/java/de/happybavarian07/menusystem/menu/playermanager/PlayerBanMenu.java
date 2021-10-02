@@ -146,18 +146,12 @@ public class PlayerBanMenu extends Menu implements Listener {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.NotBannable", player));
                 return;
             }
-            if (target.isBanned() || plugin.getBanConfig().contains(targetUUID.toString())) {
+            if (target.isBanned()) {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.AlreadyBanned", player));
                 return;
             }
             if (target.isOnline()) {
                 target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.BanMenu.TargetKickMessage", target.getPlayer())));
-            }
-            plugin.getBanConfig().set(target.getUniqueId().toString(), true);
-            try {
-                plugin.getBanConfig().save(plugin.getBanFile());
-            } catch (IOException ex) {
-                ex.printStackTrace();
             }
             Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(Bukkit.getOfflinePlayer(targetUUID).getName()), reason, banEnd, player.getName());
             years = 0;
