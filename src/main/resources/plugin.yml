@@ -59,6 +59,8 @@ permissions:
             default: op
           AdminPanel.PluginManager.InstallPlugins:
             default: op
+          AdminPanel.PluginManager.LoadPlugins:
+            default: op
           AdminPanel.PluginManager.PluginSettings.*:
             default: op
             children:

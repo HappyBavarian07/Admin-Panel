@@ -83,8 +83,12 @@ Messages:
       FileNameSelected: '%prefix% &9> &aDer Datei Name %filename% wurde ausgewählt!'
       TypeResourceIDInChat: '%prefix% &9> &aBitte gib die Resource ID an!'
       TypeFileNameInChat: '%prefix% &9> &aBitte gib den Datei Namen an!'
+      TypePluginFileNameToLoadInChat: '%prefix% &9> &aBitte gib den Plugin Datei Namen (name.jar) an!'
+      PluginFileNameSelected: '%prefix% &9> &aDas Plugin %filename% wurde geladen!'
       SuccessfullyInstalled: '%prefix% &9> &aDas Plugin %resourceid% wurde erfoglreich in die Datei %filename%.jar gedownloaded!'
       ErrorInInstallProccess: '%prefix% &9> &cWährend des Installationsvorgangs ist ein Fehler aufgetreten!'
+      LoadPluginError: '%prefix% &9> &cWährend des Ladevorgangs ist ein Fehler aufgetreten!'
+      FileToLoadDoesNotExist: '%prefix% &9> &cDie Plugin Datei %filename% existiert nicht!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
   ToManyArguments: '&4Zu viele Argumente!'
@@ -789,6 +793,12 @@ Items:
       displayName: '&2Plugins Installieren'
       lore:
         - '&2Installiere andere Spigot Plugins!'
+    Load:
+      material: CAULDRON
+      displayName: '&2Plugins laden'
+      lore:
+        - '&2Lade andere Plugins während der Server läuft!'
+        - '&2Du brauchst nur den Datei Namen!'
     InstallMenu:
       ResourceID:
         material: BOOKSHELF

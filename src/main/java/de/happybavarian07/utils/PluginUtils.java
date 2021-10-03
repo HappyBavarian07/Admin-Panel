@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.NotDirectoryException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class PluginUtils {
     private final AdminPanelMain plugin;
@@ -66,6 +67,8 @@ public class PluginUtils {
     }
 
     public Plugin load(File pluginFile) throws InvalidPluginException, InvalidDescriptionException, UnknownDependencyException {
+        plugin.getFileLogger().writeToLog(Level.WARNING,
+                "Loaded Plugin File \"" + pluginFile + "\"", "ActionsLogger - Plugin");
         return Bukkit.getPluginManager().loadPlugin(pluginFile);
     }
 
@@ -206,12 +209,16 @@ public class PluginUtils {
         // Will not work on processes started with the -XX:+DisableExplicitGC flag, but lets try it anyway.
         // This tries to get around the issue where Windows refuses to unlock jar files that were previously loaded into the JVM.
         System.gc();
+        this.plugin.getFileLogger().writeToLog(Level.WARNING,
+                "Unloaded the Plugin \"" + plugin + "\"", "ActionsLogger - Plugin");
     }
 
     public void reload(Plugin plugin) {
         if (plugin != null) {
             unload(plugin);
             load(plugin);
+            this.plugin.getFileLogger().writeToLog(Level.WARNING,
+                    "Reloaded the Plugin \"" + plugin + "\"", "ActionsLogger - Plugin");
         } else {
             throw new NullPointerException("Plugin is null!");
         }
@@ -231,6 +238,9 @@ public class PluginUtils {
         if (enableAfterStart) {
             Bukkit.getPluginManager().enablePlugin(target);
         }
+        plugin.getFileLogger().writeToLog(Level.WARNING,
+                "Installed the Plugin \"" + resourceID + "\" under the Name \"" +
+                        "/plugins/" + fileName + ".jar" + "\"", "ActionsLogger - Plugin");
         return target;
     }
 }

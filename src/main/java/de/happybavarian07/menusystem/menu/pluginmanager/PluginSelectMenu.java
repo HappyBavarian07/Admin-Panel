@@ -17,15 +17,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PluginSelectMenu extends PaginatedMenu {
+public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
     private final LanguageManager lgm = plugin.getLanguageManager();
@@ -63,11 +70,19 @@ public class PluginSelectMenu extends PaginatedMenu {
             }
             new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName()))).open();
         } else if (item.equals(lgm.getItem(path + "Install", player))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
+            if (!player.hasPermission("AdminPanel.PluginManager.InstallPlugins")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginInstallMenu(playerMenuUtility).open();
+        } else if (item.equals(lgm.getItem(path + "Load", player))) {
+            if (!player.hasPermission("AdminPanel.PluginManager.LoadPlugins")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            player.setMetadata("TypePluginFileNameToLoadInChat", new FixedMetadataValue(plugin, true));
+            player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player));
+            player.closeInventory();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
@@ -108,6 +123,7 @@ public class PluginSelectMenu extends PaginatedMenu {
     @Override
     public void setMenuItems() {
         addMenuBorder();
+        inventory.setItem(46, lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner()));
         inventory.setItem(47, lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner()));
         List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
 
@@ -150,5 +166,28 @@ public class PluginSelectMenu extends PaginatedMenu {
             }
         }
         ////////////////////////
+    }
+
+    @EventHandler
+    public void onChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasMetadata("TypePluginFileNameToLoadInChat")) {
+            event.setCancelled(true);
+            String message = event.getMessage().replace(" ", "-");
+            File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
+            if(!pluginFile.exists()) {
+                player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player).replace("%filename%", message + ".jar"));
+                return;
+            }
+            try {
+                pluginUtils.load(pluginFile);
+            } catch (Exception e) {
+                player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player).replace("%filename%", message + ".jar"));
+                return;
+            }
+            player.removeMetadata("TypePluginFileNameToLoadInChat", plugin);
+            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player).replace("%filename%", message + ".jar"));
+            super.open();
+        }
     }
 }

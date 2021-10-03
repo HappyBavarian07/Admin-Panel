@@ -6,10 +6,7 @@ import de.happybavarian07.listeners.MenuListener;
 import de.happybavarian07.placeholders.PanelExpansion;
 import de.happybavarian07.placeholders.PlayerExpansion;
 import de.happybavarian07.placeholders.PluginExpansion;
-import de.happybavarian07.utils.ChatUtil;
-import de.happybavarian07.utils.StartUpLogger;
-import de.happybavarian07.utils.Updater;
-import de.happybavarian07.utils.Utils;
+import de.happybavarian07.utils.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -33,6 +30,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private static String prefix;
     private static AdminPanelAPI API;
     private static AdminPanelMain plugin;
+    private static PluginFileLogger fileLogger;
     public final Map<Player, Boolean> hurtingwater = new HashMap<>();
     public final Map<Player, Boolean> chatmute = new HashMap<>();
     public final Map<Player, Boolean> villagerSounds = new HashMap<>();
@@ -40,7 +38,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public final Map<Player, Boolean> dupeMobsOnKill = new HashMap<>();
     final StartUpLogger logger = StartUpLogger.create();
     private final List<String> disabledCommands = new ArrayList<>();
-    private final File logFile = new File(this.getDataFolder(), "plugin.log");
     private final File configFile = new File(this.getDataFolder(), "config.yml");
     public Economy eco = null;
     public Permission perms = null;
@@ -165,13 +162,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         if (!configFile.exists()) {
             logger.message("&e&lDone!&r");
         }
-        if (!logFile.exists()) {
+        fileLogger = new PluginFileLogger();
+        if (!fileLogger.getLogFile().exists()) {
             logger.spacer().message("&c&lCreating plugin.log file!&r");
-            try {
-                logFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            fileLogger.createLogFile();
             logger.message("&e&lDone!&r");
         }
         logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
@@ -220,18 +214,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
     }
 
-    public void writeToLog(String stringToLog) {
-        if (!getConfig().getBoolean("Plugin.LogActions")) return;
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
-            Date d = Calendar.getInstance().getTime();
-            String prefix = d.getYear() + ":" + d.getMonth() + ":" + d.getDay() + " [" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " INFO]: [Updater] -> ";
-            bw.write(prefix + stringToLog);
-            bw.newLine();
-            bw.close();
-        } catch (IOException fileNotFoundException) {
-            fileNotFoundException.printStackTrace();
-        }
+    public PluginFileLogger getFileLogger() {
+        return fileLogger;
     }
 
     public @NotNull File getPluginFile() {

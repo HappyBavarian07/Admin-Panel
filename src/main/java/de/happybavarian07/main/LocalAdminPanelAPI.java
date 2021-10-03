@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 class LocalAdminPanelAPI implements AdminPanelAPI {
 
@@ -230,6 +231,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
         lgm.reloadLanguages(messageReceiver);
+        plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", "API");
     }
 
     // Events
@@ -237,6 +239,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     public AdminPanelEvent callAdminPanelEvent(Event event) throws NotAPanelEventException {
         if (event instanceof AdminPanelEvent) {
             Bukkit.getPluginManager().callEvent(event);
+            plugin.getFileLogger().writeToLog(Level.CONFIG, "Called the Admin-Panel Event " + event, "API");
             return (AdminPanelEvent) event;
         } else {
             throw new NotAPanelEventException("The Event: " + event + " is not an Admin-Panel Event!\nThis Error usually happens if a Plugin tryes to call a Normal Bukkit Event with the callAdminPanelEvent Method in the API!\nPlease contact the Developer of this Plugin!");

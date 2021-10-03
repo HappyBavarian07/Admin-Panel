@@ -18,6 +18,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.logging.Level;
 
 public class Updater implements Listener {
     private final AdminPanelMain plugin;
@@ -49,7 +50,7 @@ public class Updater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
-        plugin.writeToLog("Requested Latest Version ID -> " + version);
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version ID -> " + version, "Updater");
         return version;
     }
 
@@ -62,7 +63,7 @@ public class Updater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
-        plugin.writeToLog("Requested Latest Version Name -> " + version);
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version Name -> " + version, "Updater");
         return version;
     }
 
@@ -134,19 +135,40 @@ public class Updater implements Listener {
         boolean major = majorVersions[0] > majorVersions[1];
         boolean minor = minorVersions[0] > minorVersions[1];
         boolean patch = patchVersions[0] > patchVersions[1];
+        // Debug
         /*System.out.println("Major: " + major);
         System.out.println("Minor: " + minor);
         System.out.println("Patch: " + patch);
         System.out.println("Versions: " + majorVersions[0] + "|" + majorVersions[1] + " : " +
                 minorVersions[0] + "|" + minorVersions[1] + " : " +
                 patchVersions[0] + "|" + patchVersions[1]);
-        System.out.println("Insgesamt: " + ((!major && !minor) && patch));*/
-        if (((!major && !minor) && patch)) {
-            plugin.writeToLog("Checked if an Update is available -> true");
+        System.out.println("Versions (normal): " +
+                majorVersions[0] + "." + minorVersions[0] + "." + patchVersions[0] + " | " +
+                majorVersions[1] + "." + minorVersions[1] + "." + patchVersions[1]);
+        if (major) {
+            System.out.println("Insgesamt: true");
+        } else {
+            if (majorVersions[0] >= majorVersions[1]) {
+                System.out.println("Insgesamt: " + (minor || patch && patchVersions[0] >= patchVersions[1]));
+            }
+            System.out.println("Insgesamt: " + (minor && patch));
+        }*/
+
+        if (major) {
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked if an Update is available -> true", "Updater");
             return true;
+        } else {
+            if (majorVersions[0] >= majorVersions[1]) {
+                if (minorVersions[0] >= minorVersions[1]) {
+                    plugin.getFileLogger().writeToLog(Level.WARNING, "Checked if an Update is available -> " + (minor || patch), "Updater");
+                    return minor || patch;
+                }
+                plugin.getFileLogger().writeToLog(Level.WARNING, "Checked if an Update is available -> false", "Updater");
+                return false;
+            }
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked if an Update is available -> " + (minor && patch), "Updater");
+            return minor && patch;
         }
-        plugin.writeToLog("Checked if an Update is available -> false");
-        return false;
     }
 
     public void checkForUpdates(boolean logInConsole) {
@@ -155,7 +177,7 @@ public class Updater implements Listener {
             if (logInConsole) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Update available!"));
             }
-            plugin.writeToLog("Checked For Updates -> There is no Update Available!");
+            plugin.getFileLogger().writeToLog(Level.INFO, "Checked For Updates -> There is no Update Available!", "Updater");
         } else {
             JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
             Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -172,7 +194,7 @@ public class Updater implements Listener {
                                 "&bNew Version ID: &c" + getLatestVersionID() + "&r\n" +
                                 "&bNew Version Title: &c" + jsonObject.getString("title") + "&r\n" +
                                 "&bNew Version Description: &c" + descriptionDecoded));
-                plugin.writeToLog("Checked For Updates -> There is an Update Available! (New Version: " + getLatestVersionName() + ", Old Version: " + getPluginVersion() + ")");
+                plugin.getFileLogger().writeToLog(Level.WARNING, "Checked For Updates -> There is an Update Available! (Version Change: " + getPluginVersion() + " -> " + getLatestVersionName() + ")", "Updater");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -253,7 +275,7 @@ public class Updater implements Listener {
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
                 }
-                plugin.writeToLog("New Version (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Old Version: " + getPluginVersion() + ")");
+                plugin.getFileLogger().writeToLog(Level.INFO, "New Version (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", "Updater");
             } else if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && replace) {
 
                 try {
@@ -275,9 +297,10 @@ public class Updater implements Listener {
                             "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
                                     "&aAnd The New Version started automatically! If you can please check Console for Errors!"));
                 }
-                plugin.writeToLog("New Version (" + getLatestVersionName() + ") got downloaded and replaced with the Old Version (" + getPluginVersion() + ")!");
+                plugin.getFileLogger().writeToLog(Level.INFO, "New Version (" + getLatestVersionName() + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", "Updater");
             }
         } catch (Exception e) {
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e, "Updater");
             e.printStackTrace();
         }
     }
@@ -287,6 +310,7 @@ public class Updater implements Listener {
     }
 
     public String getPluginVersion() {
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Plugin Version -> " + plugin.getDescription().getVersion(), "Updater");
         return plugin.getDescription().getVersion();
     }
 

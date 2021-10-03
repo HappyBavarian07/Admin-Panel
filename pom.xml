@@ -4,7 +4,7 @@
 
     <groupId>io.github.happybavarian07</groupId>
     <artifactId>Admin-Panel</artifactId>
-    <version>6.0.2</version>
+    <version>6.1.0</version>
 
     <name>Admin-Panel</name>
     <description>An Minecraft Plugin to control your Server!</description>
@@ -114,7 +114,6 @@
     <developers>
         <developer>
             <name>Quirin Hosse</name>
-            <email>quirinhosse@gmail.com</email>
             <organization>io.github.HappyBavarian07</organization>
             <organizationUrl>https://github.com/HappyBavarian07/</organizationUrl>
         </developer>

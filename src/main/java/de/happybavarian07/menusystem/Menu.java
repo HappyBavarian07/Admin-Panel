@@ -18,6 +18,7 @@ import org.bukkit.plugin.RegisteredListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /*
     Defines the behavior and attributes of all menus in our plugin
@@ -95,7 +96,7 @@ public abstract class Menu implements InventoryHolder {
         } catch (NotAPanelEventException e) {
             e.printStackTrace();
         }
-        plugin.writeToLog(playerMenuUtility.getOwner().getName() + "(UUID: " + playerMenuUtility.getOwner().getUniqueId() + ") opened the Panel: " + this.getClass().getName());
+        plugin.getFileLogger().writeToLog(Level.INFO, playerMenuUtility.getOwner().getName() + "(UUID: " + playerMenuUtility.getOwner().getUniqueId() + ") opened the Panel: " + this.getClass().getName(), "ActionsLogger - Panel");
     }
 
     //Overridden method from the InventoryHolder interface
