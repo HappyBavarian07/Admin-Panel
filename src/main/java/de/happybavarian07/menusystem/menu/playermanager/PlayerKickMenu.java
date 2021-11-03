@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerKickMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     private final UUID targetUUID;
     private String reason = "";

@@ -23,7 +23,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class ChatManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public ChatManagerMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);

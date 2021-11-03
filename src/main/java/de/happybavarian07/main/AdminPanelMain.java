@@ -9,20 +9,23 @@ import de.happybavarian07.placeholders.PluginExpansion;
 import de.happybavarian07.utils.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -39,11 +42,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     final StartUpLogger logger = StartUpLogger.create();
     private final List<String> disabledCommands = new ArrayList<>();
     private final File configFile = new File(this.getDataFolder(), "config.yml");
+    private final File permissionFile = new File(this.getDataFolder(), "permissions.yml");
+    private final Map<UUID, PermissionAttachment> playerPermissionsAttachments = new HashMap<>();
+    private final Map<UUID, Map<String, Boolean>> playerPermissions = new HashMap<>();
     public Economy eco = null;
-    public Permission perms = null;
+    public net.milkbowl.vault.permission.Permission perms = null;
     public Chat chat = null;
     public boolean inMaintenanceMode = false;
     public boolean chatMuted = false;
+    private FileConfiguration permissionsConfig;
     private Updater updater;
     private LanguageManager languageManager;
 
@@ -95,6 +102,14 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return disabledCommands;
     }
 
+    public Map<UUID, PermissionAttachment> getPlayerPermissionsAttachments() {
+        return playerPermissionsAttachments;
+    }
+
+    public Map<UUID, Map<String, Boolean>> getPlayerPermissions() {
+        return playerPermissions;
+    }
+
     @Override
     public void onEnable() {
 
@@ -121,36 +136,37 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             new PanelExpansion().register();
             logger.message("&a&lInitialized PlaceHolderAPI with Placeholders!&r");
         } else {
-            logger.coloredSpacer(ChatColor.RED);
-            logger.message("&4&lCould not find PlaceholderAPI!!&r");
-            logger.message("&4&lPlugin can not work without it!&r");
-            logger.coloredSpacer(ChatColor.RED);
+            logger
+                    .spacer()
+                    .coloredMessage(ChatColor.RED, "")
+                    .coloredMessage(ChatColor.RED, "No PlaceholderAPI found please install PlaceholderAPI before starting again!")
+                    .coloredMessage(ChatColor.RED, "The Plugin cannot work without this Plugin!")
+                    .coloredMessage(ChatColor.RED, "");
             getServer().getPluginManager().disablePlugin(this);
         }
         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
-            logger.coloredSpacer(ChatColor.RED);
-            logger.message("&4&lCould not find SuperVanish!!&r");
-            logger.message("&4&lPlugin can not work without it!&r");
-            logger.coloredSpacer(ChatColor.RED);
-            getServer().getPluginManager().disablePlugin(this);
+            logger
+                    .spacer()
+                    .coloredMessage(ChatColor.RED, "")
+                    .coloredMessage(ChatColor.RED, "No SuperVanish found please install SuperVanish,")
+                    .coloredMessage(ChatColor.RED, "if you want to use the Vanish Feature!")
+                    .coloredMessage(ChatColor.RED, "");
         }
         logger
                 .coloredSpacer(ChatColor.DARK_RED)
                 .messages(
                         "&c&lStarting Vault initialization!&r"
                 );
-        if (!setupEconomy()) {
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
             logger
                     .spacer()
                     .coloredMessage(ChatColor.RED, "")
-                    .coloredMessage(ChatColor.RED, "No Vault found please install Vault before starting again!")
-                    .coloredMessage(ChatColor.RED, "and you must have an Economy Plugin installed!")
+                    .coloredMessage(ChatColor.RED, "No Vault found please install Vault and an Economy Plugin,")
+                    .coloredMessage(ChatColor.RED, "if you want to use the Money Features!")
                     .coloredMessage(ChatColor.RED, "");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        } else {
+            setupEconomy();
         }
-        setupPermission();
-        setupChat();
         logger
                 .messages(
                         "&c&lFinished Vault initialization!&r"
@@ -168,6 +184,32 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             fileLogger.createLogFile();
             logger.message("&e&lDone!&r");
         }
+        if (!permissionFile.exists()) {
+            logger.spacer().message("&c&lCreating permissions.yml file!&r");
+            try {
+                permissionFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            logger.message("&e&lDone!&r");
+        }
+        permissionsConfig = YamlConfiguration.loadConfiguration(permissionFile);
+        if (!permissionsConfig.isConfigurationSection("Permissions")) {
+            permissionsConfig.createSection("Permissions");
+            try {
+                permissionsConfig.save(permissionFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        permissionsConfig.getConfigurationSection("Permissions").getKeys(false).forEach(player -> {
+            String path = "Permissions." + player + ".Permissions";
+            Map<String, Boolean> perms = new HashMap<>();
+            permissionsConfig.getConfigurationSection(path).getKeys(false).forEach(perm -> {
+                perms.put(perm.replace("(<->)", "."), permissionsConfig.getBoolean(path + "." + perm));
+            });
+            playerPermissions.put(UUID.fromString(player), perms);
+        });
         logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
         setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
         logger.message("&e&lPrefix Done!&r");
@@ -210,6 +252,26 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
             }.runTaskTimer(plugin, (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    if (!playerPermissionsAttachments.containsKey(online.getUniqueId())) {
+                        if(!playerPermissions.containsKey(online.getUniqueId())) {
+                            playerPermissions.put(online.getUniqueId(), new HashMap<>());
+                        }
+                        PermissionAttachment attachment = online.addAttachment(plugin);
+                        Map<String, Boolean> permissions = playerPermissions.get(online.getUniqueId());
+                        for (String perms : permissions.keySet()) {
+                            attachment.setPermission(perms, permissions.get(perms));
+                        }
+                        playerPermissionsAttachments.put(online.getUniqueId(), attachment);
+                        online.recalculatePermissions();
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0, 180);
         Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
         Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
     }
@@ -235,18 +297,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
         }
-    }
-
-    private void setupPermission() {
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        if (rsp != null)
-            perms = rsp.getProvider();
-    }
-
-    private void setupChat() {
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        if (rsp != null)
-            chat = rsp.getProvider();
+        savePerms();
     }
 
     private boolean setupEconomy() {
@@ -254,5 +305,85 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         if (economy != null)
             eco = economy.getProvider();
         return eco != null;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        PermissionAttachment attachment = player.addAttachment(plugin);
+        if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
+            if(!playerPermissions.containsKey(player.getUniqueId())) {
+                playerPermissions.put(player.getUniqueId(), new HashMap<>());
+            }
+            Map<String, Boolean> permissions = playerPermissions.get(player.getUniqueId());
+            for (String perms : permissions.keySet()) {
+                attachment.setPermission(perms, permissions.get(perms));
+            }
+            playerPermissionsAttachments.put(player.getUniqueId(), attachment);
+            player.recalculatePermissions();
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
+            player.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
+        }
+    }
+
+    public void savePerms() {
+        for (UUID uuid : playerPermissions.keySet()) {
+            String path = "Permissions." + uuid + ".Permissions.";
+            Map<String, Boolean> perms = playerPermissions.get(uuid);
+            permissionsConfig.set("Permissions." + uuid + ".Permissions", null);
+            for (String permissions : perms.keySet()) {
+                permissionsConfig.set(path + permissions.replace(".", "(<->)"), perms.get(permissions));
+            }
+        }
+        try {
+            permissionsConfig.save(permissionFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadPerms(Player player) {
+        if(player != null) {
+            if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
+                player.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
+            }
+            PermissionAttachment attachment = player.addAttachment(plugin);
+            if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
+                if(!playerPermissions.containsKey(player.getUniqueId())) {
+                    playerPermissions.put(player.getUniqueId(), new HashMap<>());
+                }
+                Map<String, Boolean> permissions = playerPermissions.get(player.getUniqueId());
+                for (String perms : permissions.keySet()) {
+                    attachment.setPermission(perms, permissions.get(perms));
+                }
+                playerPermissionsAttachments.put(player.getUniqueId(), attachment);
+                player.recalculatePermissions();
+            }
+        } else {
+            for(Player online : Bukkit.getOnlinePlayers()) {
+                if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
+                    online.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
+                }
+                PermissionAttachment attachment = online.addAttachment(plugin);
+                if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
+                    if(!playerPermissions.containsKey(online.getUniqueId())) {
+                        playerPermissions.put(online.getUniqueId(), new HashMap<>());
+                        continue;
+                    }
+                    Map<String, Boolean> permissions = playerPermissions.get(online.getUniqueId());
+                    for (String perms : permissions.keySet()) {
+                        attachment.setPermission(perms, permissions.get(perms));
+                    }
+                    playerPermissionsAttachments.put(online.getUniqueId(), attachment);
+                    online.recalculatePermissions();
+                }
+            }
+        }
     }
 }

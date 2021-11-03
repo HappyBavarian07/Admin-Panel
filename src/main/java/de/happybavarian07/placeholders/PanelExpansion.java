@@ -18,7 +18,7 @@ public class PanelExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "3.2";
+        return AdminPanelMain.getPlugin().getDescription().getVersion();
     }
 
     @Override

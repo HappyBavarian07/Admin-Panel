@@ -24,7 +24,6 @@ import static org.bukkit.Bukkit.getServer;
 
 public class WorldSettingsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
     public WorldSettingsMenu(PlayerMenuUtility playerMenuUtility, World world) {

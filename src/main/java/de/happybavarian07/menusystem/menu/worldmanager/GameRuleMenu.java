@@ -21,7 +21,6 @@ import java.util.List;
 
 public class GameRuleMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
     public GameRuleMenu(PlayerMenuUtility playerMenuUtility, World world) {

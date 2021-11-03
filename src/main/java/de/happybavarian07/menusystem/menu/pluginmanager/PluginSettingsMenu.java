@@ -21,7 +21,6 @@ import org.bukkit.plugin.Plugin;
 public class PluginSettingsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
 
     public PluginSettingsMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {

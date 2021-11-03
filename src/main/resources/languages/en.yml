@@ -22,6 +22,12 @@ Messages:
       NotOp: '&cThis player is not an operator!'
       OppedMessage: '&aYou made the player an operator!'
       DeoppedMessage: '&cYou took away the operator''s rights from the player!'
+      Permissions:
+        AddedPermission: '%prefix% &9> &aPermission added!'
+        RemovedPermission: '%prefix% &9> &cPermission removed!'
+        ListMenu:
+          EnterSort: '%prefix% &9> &aPlease enter your Sorting in the Chat!'
+          SortResult: '%prefix% &9> &aThe Sorting gets applied!'
       KickMenu:
         TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
         NotKickable: '%prefix% &9> &cThis Player is not kickable!'
@@ -59,6 +65,7 @@ Messages:
       KickAllPlayersSource: '%player_name%'
       MaintenanceMode: '%prefix% &9> &5%player_name% &cThe server is in &4&lmaintenance mode!'
       MaintenanceModeMOTD: '%prefix% &9> &cThe server is currently in &4&lmaintenance mode!'
+      MaintenanceMaxPlayerCount: 0
       WhitelistManager:
         PleaseEnterName: '%prefix% &9> &aPlease enter the Name of the Player!'
         AddedPlayer: '%prefix% &9> &aSuccessfully added that Player!'
@@ -319,6 +326,17 @@ Items:
         lore:
           - '&cTroll the Player!'
           - '&cRed &6= &3off | &aGreen &6= &3on'
+      Vanish:
+        true:
+          material: FEATHER
+          displayName: '&aVanish'
+          lore:
+            - '&aTurn the Vanish off for the Player!'
+        false:
+          material: FEATHER
+          displayName: '&cVanish'
+          lore:
+            - '&aTurn the Vanish on for the Player!'
       PlayerSpawnLocation:
         material: RED_BED
         displayName: '&aPlayer Spawn Location'
@@ -439,17 +457,53 @@ Items:
         displayName: '&cKick the Player'
         lore:
           - '&aKick the Player!'
-      Vanish:
-        true:
-          material: FEATHER
-          displayName: '&aVanish'
+      PermissionItem:
+        material: WRITABLE_BOOK
+        displayName: '&cManage the Permissions of the Player'
+        lore:
+          - '&aManage the Permissions of the Player!'
+      Permissions:
+        Add:
+          material: GREEN_CONCRETE
+          displayName: '&cAdd Permissions'
           lore:
-            - '&aTurn the Vanish off for the Player!'
-        false:
-          material: FEATHER
-          displayName: '&cVanish'
+            - '&aAdd Permissions to the Player!'
+            - '&6Left-Click &9= &6Value: &atrue'
+            - '&6Right-Click &9= &6Value: &cfalse'
+        Remove:
+          material: RED_CONCRETE
+          displayName: '&cRemove Permissions'
           lore:
-            - '&aTurn the Vanish on for the Player!'
+            - '&aRemove Permissions from the Player!'
+        Info:
+          material: WRITABLE_BOOK
+          displayName: '&cFind out about permissions'
+          lore:
+            - '&aGet some information about permissions!'
+        List:
+          material: BOOKSHELF
+          displayName: '&cList all permissions'
+          lore:
+            - '&aList all permissions:'
+            - '&aMode 1: All Permissions'
+            - '&aMode 2: Player Permissions'
+        ListMenu:
+          Sort:
+            material: OAK_SIGN
+            displayName: '&cSort'
+            lore:
+              - '&aSort by certain permissions'
+          Mode:
+            All:
+              material: LEVER
+              displayName: '&cChange mode'
+              lore:
+                - '&aMode: &7All Permissions'
+            Player:
+              material: LEVER
+              displayName: '&cChange mode'
+              lore:
+                - '&aMode: &7Player Permissions'
     MoneyMenu:
       Give:
         material: GREEN_WOOL
@@ -902,6 +956,9 @@ MenuTitles:
     BannedPlayers: '&cBanned Players'
     BanMenu: '&cBan'
     KickMenu: '&cKick'
+    Permissions:
+      ListMenu: '&aPermission List'
+      ActionSelectMenu: '&aActions'
   WorldManager:
     WorldSelector: '&aSelect a World'
     WorldSettings: '&3Settings'

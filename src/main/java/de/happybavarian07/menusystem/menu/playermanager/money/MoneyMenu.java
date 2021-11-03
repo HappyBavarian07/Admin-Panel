@@ -22,7 +22,6 @@ import java.util.UUID;
 
 public class MoneyMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public MoneyMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {

@@ -3,7 +3,10 @@ main: de.happybavarian07.main.AdminPanelMain
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07
-depend: [Vault, PlaceholderAPI, SuperVanish]
+depend: [PlaceholderAPI]
+softdepend:
+  - SuperVanish
+  - Vault
 load: POSTWORLD
 loadbefore:
   - Vault
@@ -143,6 +146,14 @@ permissions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Kick:
                 default: op
+              AdminPanel.PlayerManager.PlayerSettings.Permissions:
+                default: op
+                children:
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Add: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Info: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.List: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Open: true
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick:

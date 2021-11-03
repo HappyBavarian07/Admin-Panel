@@ -18,7 +18,6 @@ import java.lang.reflect.Field;
 
 public class PluginCommandSettingsMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final PluginCommand currentCommand;
 
     public PluginCommandSettingsMenu(PlayerMenuUtility playerMenuUtility, PluginCommand currentCommand) {

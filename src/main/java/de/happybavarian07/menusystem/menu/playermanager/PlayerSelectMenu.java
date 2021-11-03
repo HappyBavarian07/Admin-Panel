@@ -21,7 +21,6 @@ import static org.bukkit.Bukkit.getServer;
 
 public class PlayerSelectMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public PlayerSelectMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);

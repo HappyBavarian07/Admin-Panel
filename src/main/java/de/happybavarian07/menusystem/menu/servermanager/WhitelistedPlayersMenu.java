@@ -4,6 +4,7 @@ import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
+import de.happybavarian07.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -19,7 +20,6 @@ import static org.bukkit.Bukkit.getServer;
 
 public class WhitelistedPlayersMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public WhitelistedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -28,7 +28,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("ServerManager.WhitelistManager.Menu", null);
+        return lgm.getMenuTitle("ServerManager.WhitelistManager.PlayerList", null);
     }
 
     @Override
@@ -78,6 +78,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
     @Override
     public void setMenuItems() {
         addMenuBorder();
+        Player player = playerMenuUtility.getOwner();
         //The thing you will be looping through to place items
         List<OfflinePlayer> players = new ArrayList<>();
         Collections.addAll(players, getServer().getOfflinePlayers());
@@ -97,12 +98,12 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
                     meta.setDisplayName(current.getName());
                     meta.setOwningPlayer(current);
                     List<String> lore = new ArrayList<>();
-                    lore.add("&6Online: &a" + current.isOnline());
-                    lore.add("&6Banned: &a" + current.isBanned());
-                    lore.add("&6Op: &a" + current.isOp());
-                    lore.add("&6UUID: &a" + current.getUniqueId());
-                    lore.add("&6Last-Played: &a" + current.getLastPlayed());
-                    lore.add("&6Played-Before: &a" + current.hasPlayedBefore());
+                    lore.add(Utils.format(player, "&6Online: &a" + current.isOnline(), ""));
+                    lore.add(Utils.format(player, "&6Banned: &a" + current.isBanned(), ""));
+                    lore.add(Utils.format(player, "&6Op: &a" + current.isOp(), ""));
+                    lore.add(Utils.format(player, "&6UUID: &a" + current.getUniqueId(), ""));
+                    lore.add(Utils.format(player, "&6Last-Played: &a" + current.getLastPlayed(), ""));
+                    lore.add(Utils.format(player, "&6Played-Before: &a" + current.hasPlayedBefore(), ""));
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                     inventory.addItem(head);

@@ -20,7 +20,6 @@ import java.util.UUID;
 
 public class PlayerActionsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public PlayerActionsMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
@@ -243,10 +242,12 @@ public class PlayerActionsMenu extends Menu {
         inventory.setItem(29, lgm.getItem("PlayerManager.ActionsMenu.Burn", target));
         inventory.setItem(31, lgm.getItem("PlayerManager.ActionsMenu.Troll", target));
         inventory.setItem(33, lgm.getItem("PlayerManager.ActionsMenu.Lightning", target));
-        if (VanishAPI.isInvisible(target)) {
-            inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.true", target));
-        } else {
-            inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.false", target));
+        if(Bukkit.getPluginManager().getPlugin("SuperVanish") != null) {
+            if (VanishAPI.isInvisible(target)) {
+                inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.true", target));
+            } else {
+                inventory.setItem(35, lgm.getItem("PlayerManager.ActionsMenu.Vanish.false", target));
+            }
         }
         // Fourth Row
         inventory.setItem(37, lgm.getItem("PlayerManager.ActionsMenu.Firework", target));

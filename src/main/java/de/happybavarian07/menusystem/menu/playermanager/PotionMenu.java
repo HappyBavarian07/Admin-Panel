@@ -23,7 +23,6 @@ import java.util.UUID;
 
 public class PotionMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public PotionMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {

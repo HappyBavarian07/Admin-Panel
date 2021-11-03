@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class TimeChangeMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
     public TimeChangeMenu(PlayerMenuUtility playerMenuUtility, World world) {

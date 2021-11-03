@@ -13,7 +13,6 @@ import java.util.UUID;
 
 public class ArmorMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public ArmorMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {

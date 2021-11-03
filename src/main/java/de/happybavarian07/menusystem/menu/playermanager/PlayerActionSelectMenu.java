@@ -5,6 +5,9 @@ import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.playermanager.money.MoneyMenu;
+import de.happybavarian07.menusystem.menu.playermanager.permissions.PermissionAction;
+import de.happybavarian07.menusystem.menu.playermanager.permissions.PermissionActionSelectMenu;
+import de.happybavarian07.menusystem.menu.playermanager.permissions.PermissionListMenu;
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +18,6 @@ import java.util.UUID;
 
 public class PlayerActionSelectMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public PlayerActionSelectMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
@@ -48,6 +50,8 @@ public class PlayerActionSelectMenu extends Menu {
             new PlayerBanMenu(playerMenuUtility, targetUUID).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target))) {
             new PlayerKickMenu(playerMenuUtility, targetUUID).open();
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target))) {
+            new PermissionActionSelectMenu(playerMenuUtility, targetUUID).open();
         } else if (item.equals(lgm.getItem("General.Close", null))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
@@ -64,9 +68,12 @@ public class PlayerActionSelectMenu extends Menu {
         }
         Player target = Bukkit.getPlayer(targetUUID);
         inventory.setItem(10, lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target));
-        inventory.setItem(12, lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target));
+        if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
+            inventory.setItem(12, lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target));
+        }
         inventory.setItem(14, lgm.getItem("PlayerManager.ActionsMenu.BanItem", target));
         inventory.setItem(16, lgm.getItem("PlayerManager.ActionsMenu.KickItem", target));
+        inventory.setItem(4, lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target));
         inventory.setItem(26, lgm.getItem("General.Close", target));
     }
 }

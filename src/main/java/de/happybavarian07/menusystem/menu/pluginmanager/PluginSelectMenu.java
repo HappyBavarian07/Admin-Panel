@@ -35,7 +35,6 @@ import java.util.List;
 public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public PluginSelectMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);

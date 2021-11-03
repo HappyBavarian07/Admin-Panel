@@ -3,6 +3,7 @@ package de.happybavarian07.menusystem;
 import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.general.PanelOpenEvent;
 import de.happybavarian07.main.AdminPanelMain;
+import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,11 +28,12 @@ public abstract class Menu implements InventoryHolder {
 
     //Protected values that can be accessed in the menus
     protected final AdminPanelMain plugin = AdminPanelMain.getPlugin();
+    protected final LanguageManager lgm = plugin.getLanguageManager();
     protected String openingPermission = "";
     protected PlayerMenuUtility playerMenuUtility;
     protected Inventory inventory;
     protected List<Inventory> inventorys = new ArrayList<>();
-    protected ItemStack FILLER = AdminPanelMain.getPlugin().getLanguageManager().getItem("General.FillerItem", null);
+    protected ItemStack FILLER = lgm.getItem("General.FillerItem", null);
 
     //Constructor for Menu. Pass in a PlayerMenuUtility so that
     // we have information on who's menu this is and

@@ -25,7 +25,6 @@ import java.util.List;
 
 public class PluginInstallMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     private int resourceID = 0;
     private String fileName = "InstalledPlugin";

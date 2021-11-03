@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class WeatherChangeMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final World world;
 
     public WeatherChangeMenu(PlayerMenuUtility playerMenuUtility, World world) {

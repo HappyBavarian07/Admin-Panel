@@ -16,7 +16,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class WhitelistManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public WhitelistManagerMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -83,26 +82,26 @@ public class WhitelistManagerMenu extends Menu implements Listener {
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
         if (player.hasMetadata("WhitelistManagerAddPlayer")) {
+            event.setCancelled(true);
             String message = event.getMessage();
             OfflinePlayer playerToAdd = Bukkit.getOfflinePlayer(message);
             if (!playerToAdd.isWhitelisted()) {
                 playerToAdd.setWhitelisted(true);
+                player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.AddedPlayer", player));
+                player.removeMetadata("WhitelistManagerAddPlayer", plugin);
+                super.open();
             }
-            player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.AddedPlayer", player));
-            player.removeMetadata("WhitelistManagerAddPlayer", plugin);
-            super.open();
-            event.setCancelled(true);
         }
         if (player.hasMetadata("WhitelistManagerRemovePlayer")) {
+            event.setCancelled(true);
             String message = event.getMessage();
             OfflinePlayer playerToRemove = Bukkit.getOfflinePlayer(message);
             if (playerToRemove.isWhitelisted()) {
                 playerToRemove.setWhitelisted(false);
+                player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.RemovedPlayer", player));
+                player.removeMetadata("WhitelistManagerRemovePlayer", plugin);
+                super.open();
             }
-            player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.RemovedPlayer", player));
-            player.removeMetadata("WhitelistManagerRemovePlayer", plugin);
-            super.open();
-            event.setCancelled(true);
         }
     }
 }

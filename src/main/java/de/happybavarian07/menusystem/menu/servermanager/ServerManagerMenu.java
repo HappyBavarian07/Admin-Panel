@@ -26,7 +26,6 @@ import java.util.List;
 
 public class ServerManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public ServerManagerMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -190,8 +189,10 @@ public class ServerManagerMenu extends Menu implements Listener {
     public void onServerPing(ServerListPingEvent event) {
         if (plugin.isInMaintenanceMode()) {
             event.setMotd(lgm.getMessage("Player.ServerManager.MaintenanceModeMOTD", null));
+            event.setMaxPlayers(lgm.getCurrentLang().getLangConfig().getConfig().getInt("Messages.Player.ServerManager.MaintenanceMaxPlayerCount"));
         } else {
             event.setMotd(Bukkit.getMotd());
+            event.setMaxPlayers(Bukkit.getMaxPlayers());
         }
     }
 }

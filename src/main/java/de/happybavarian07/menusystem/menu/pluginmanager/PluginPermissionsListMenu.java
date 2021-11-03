@@ -18,7 +18,6 @@ import java.util.List;
 
 public class PluginPermissionsListMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
 
     public PluginPermissionsListMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {

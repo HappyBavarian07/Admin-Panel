@@ -22,6 +22,12 @@ Messages:
       NotOp: '&cDieser Spieler ist kein Operator!'
       OppedMessage: '&aDu hast den Spieler zum Operator gemacht!'
       DeoppedMessage: '&cDu hast dem Spieler die Operatorrechte weggenommen!'
+      Permissions:
+        AddedPermission: '%prefix% &9> &aPermission hinzugefügt!'
+        RemovedPermission: '%prefix% &9> &cPermission entfernt!'
+        ListMenu:
+          EnterSort: '%prefix% &9> &aBitte gib die Sortierung in den Chat ein!'
+          SortResult: '%prefix% &9> &aDie Sortierung wird angegewended!'
       KickMenu:
         TargetKickMessage: '%prefix% &9> &4Du wurdest vom Server geworfen! Grund: %reason%'
         NotKickable: '%prefix% &9> &cDieser Spieler kann nicht gekickt werden!'
@@ -59,6 +65,7 @@ Messages:
       KickAllPlayersSource: '%player_name%'
       MaintenanceMode: '%prefix% &9> &5%player_name% &cDer Server ist im &4&lWartungsmodus!'
       MaintenanceModeMOTD: '%prefix% &9> &cDer Server ist momentan im &4&lWartungsmodus!'
+      MaintenanceMaxPlayerCount: 0
       WhitelistManager:
         PleaseEnterName: '%prefix% &9> &aBitte gib einen Spieler ein (Name oder UUID)!'
         AddedPlayer: '%prefix% &9> &aErfolgreich Spieler hinzugefügt!'
@@ -450,6 +457,53 @@ Items:
         displayName: '&cKicke den Spieler'
         lore:
           - '&aKicke den Spieler!'
+      PermissionItem:
+        material: WRITABLE_BOOK
+        displayName: '&cVerwalte die Rechte des Spielers'
+        lore:
+          - '&aVerwalte alle Rechte des Spielers!'
+      Permissions:
+        Add:
+          material: GREEN_CONCRETE
+          displayName: '&cGebe dem Spieler Rechte'
+          lore:
+            - '&aGebe dem Spieler bestimmte Rechte!'
+            - '&6Links-Klick &9= &6Value: &atrue'
+            - '&6Rechts-Klick &9= &6Value: &cfalse'
+        Remove:
+          material: RED_CONCRETE
+          displayName: '&cNehme dem Spieler Rechte weg'
+          lore:
+            - '&aNehme dem Spieler bestimmte Rechte weg!'
+        Info:
+          material: WRITABLE_BOOK
+          displayName: '&cInformiere dich über Permissions'
+          lore:
+            - '&aLasse dir ein paar Infos über Permissions ausgeben!'
+        List:
+          material: BOOKSHELF
+          displayName: '&cListe alle Permissions auf'
+          lore:
+            - '&aListe alle Permissions auf:'
+            - '&aModus 1: All Permissions'
+            - '&aModus 2: Player Permissions'
+        ListMenu:
+          Sort:
+            material: OAK_SIGN
+            displayName: '&cSortieren'
+            lore:
+              - '&aSortiere nach bestimmten Permissions'
+          Mode:
+            All:
+              material: LEVER
+              displayName: '&cModus ändern'
+              lore:
+                - '&aModus: &7All Permissions'
+            Player:
+              material: LEVER
+              displayName: '&cModus ändern'
+              lore:
+                - '&aModus: &7Player Permissions'
     MoneyMenu:
       Give:
         material: GREEN_WOOL
@@ -902,6 +956,9 @@ MenuTitles:
     BannedPlayers: '&cGebannte Spieler'
     BanMenu: '&cBan'
     KickMenu: '&cKick'
+    Permissions:
+      ListMenu: '&aPermission Liste'
+      ActionSelectMenu: '&aAktionen'
   WorldManager:
     WorldSelector: '&aWähle eine Welt'
     WorldSettings: '&3Einstellungen'
@@ -912,6 +969,9 @@ MenuTitles:
   ServerManager:
     Menu: '&5Server Manager'
     ChatManagerMenu: '&aChat Manager'
+    WhitelistManager:
+      Menu: '&3Whitelist Manager'
+      PlayerList: '&3Spieler Liste'
   PluginManager:
     Selector: '&aWähle ein Plugin'
     Settings: '&3Einstellungen'

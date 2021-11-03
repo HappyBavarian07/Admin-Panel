@@ -20,7 +20,6 @@ import static org.bukkit.Bukkit.getServer;
 
 public class BannedPlayersMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);

@@ -1,7 +1,6 @@
 package de.happybavarian07.menusystem.menu;
 
 import de.happybavarian07.main.AdminPanelMain;
-import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.playermanager.PlayerSelectMenu;
@@ -15,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class AdminPanelStartMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
 
     public AdminPanelStartMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -40,57 +38,59 @@ public class AdminPanelStartMenu extends Menu {
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
-        if (item.equals(lgm.getItem(path + "ServerReload", player))) {
-            if (!player.hasPermission("AdminPanel.ServerReload")) {
-                player.sendMessage(noPerms);
-                return;
+        if (item != null) {
+            if (item.equals(lgm.getItem(path + "ServerReload", player))) {
+                if (!player.hasPermission("AdminPanel.ServerReload")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                try {
+                    Utils.serverReload(1000);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+            } else if (item.equals(lgm.getItem(path + "ServerStop", player))) {
+                if (!player.hasPermission("AdminPanel.ServerStop")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                try {
+                    Utils.serverStop(1000, 2000);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+            } else if (item.equals(lgm.getItem(path + "WorldManager", player))) {
+                if (!player.hasPermission("AdminPanel.ServerStop")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            } else if (item.equals(lgm.getItem(path + "PlayerManager", player))) {
+                if (!player.hasPermission("AdminPanel.ServerStop")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            } else if (item.equals(lgm.getItem(path + "PluginManager", player))) {
+                if (!player.hasPermission("AdminPanel.PluginManager.open")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            } else if (item.equals(lgm.getItem(path + "ServerManager", player))) {
+                if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            } else if (item.equals(lgm.getItem(path + "ReloadConfig", player))) {
+                if (!player.hasPermission("AdminPanel.ReloadConfig")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                AdminPanelMain.getAPI().reloadConfigurationFiles(player);
+                super.open();
             }
-            try {
-                Utils.serverReload(1000);
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
-        } else if (item.equals(lgm.getItem(path + "ServerStop", player))) {
-            if (!player.hasPermission("AdminPanel.ServerStop")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            try {
-                Utils.serverStop(1000, 2000);
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
-        } else if (item.equals(lgm.getItem(path + "WorldManager", player))) {
-            if (!player.hasPermission("AdminPanel.ServerStop")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "PlayerManager", player))) {
-            if (!player.hasPermission("AdminPanel.ServerStop")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "PluginManager", player))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.open")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "ServerManager", player))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "ReloadConfig", player))) {
-            if (!player.hasPermission("AdminPanel.ReloadConfig")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            AdminPanelMain.getAPI().reloadConfigurationFiles(player);
-            super.open();
         }
     }
 

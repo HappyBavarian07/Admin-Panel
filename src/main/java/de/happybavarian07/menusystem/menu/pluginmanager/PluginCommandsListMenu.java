@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class PluginCommandsListMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final Plugin currentPlugin;
 
     public PluginCommandsListMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {

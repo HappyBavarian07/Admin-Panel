@@ -23,7 +23,6 @@ import java.util.List;
 
 public class WorldCreateMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private String worldName = "Name";
     private WorldType worldType = WorldType.NORMAL;
     private World.Environment worldEnvironment = World.Environment.NORMAL;

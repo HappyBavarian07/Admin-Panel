@@ -26,7 +26,6 @@ import java.util.UUID;
 
 public class PlayerTrollMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final LanguageManager lgm = plugin.getLanguageManager();
     private final UUID targetUUID;
 
     public PlayerTrollMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
@@ -447,8 +446,10 @@ public class PlayerTrollMenu extends Menu implements Listener {
                 hurtingWaterRunnable.runTaskTimer(plugin, 20L, 100L);
             }
         } else {
-            hurtingWaterRunnable.cancel();
-            hurtingWaterRunnable = null;
+            if(hurtingWaterRunnable != null) {
+                hurtingWaterRunnable.cancel();
+                hurtingWaterRunnable = null;
+            }
         }
     }
 
