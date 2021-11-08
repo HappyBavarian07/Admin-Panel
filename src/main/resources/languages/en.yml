@@ -746,11 +746,11 @@ Items:
       displayName: '&6Server Manager'
       lore:
         - '&aManages the Server!'
-    ServerReload:
+    ServerRestart:
       material: ACACIA_BOAT
-      displayName: '&6Server reload'
+      displayName: '&6Server restart'
       lore:
-        - '&aReloads the Server!'
+        - '&aRestarts the Server!'
     ServerStop:
       material: DIAMOND
       displayName: '&4Server Stop'

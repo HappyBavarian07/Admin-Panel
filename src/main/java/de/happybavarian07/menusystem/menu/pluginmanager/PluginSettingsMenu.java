@@ -153,14 +153,14 @@ public class PluginSettingsMenu extends Menu {
         String path = "PluginManager.Settings.";
 
         // Items
-        inventory.setItem(10, lgm.getItem(path + "Enable", player));
-        inventory.setItem(11, lgm.getItem(path + "Disable", player));
-        inventory.setItem(12, lgm.getItem(path + "Reload", player));
-        inventory.setItem(13, lgm.getItem(path + "Unload", player));
-        inventory.setItem(14, lgm.getItem(path + "Load", player));
-        inventory.setItem(15, lgm.getItem(path + "Commands.Item", player));
-        inventory.setItem(16, lgm.getItem(path + "Permissions.Item", player));
+        inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player));
+        inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player));
+        inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player));
+        inventory.setItem(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player));
+        inventory.setItem(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player));
+        inventory.setItem(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player));
+        inventory.setItem(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player));
 
-        inventory.setItem(26, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
     }
 }

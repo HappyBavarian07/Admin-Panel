@@ -122,8 +122,8 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     @Override
     public void setMenuItems() {
         addMenuBorder();
-        inventory.setItem(46, lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner()));
-        inventory.setItem(47, lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner()));
+        inventory.setItem(getSlot("PluginManager.Load", 46), lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner()));
+        inventory.setItem(getSlot("PluginManager.Install", 47), lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner()));
         List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
 
         ///////////////////////////////////// Pagination loop template

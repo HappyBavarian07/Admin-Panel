@@ -161,8 +161,8 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void reloadServer(int time) throws InterruptedException {
-        Utils.serverReload(time);
+    public void restartServer(int time, int time2) throws InterruptedException {
+        Utils.serverRestart(time, time2);
     }
 
     @Override

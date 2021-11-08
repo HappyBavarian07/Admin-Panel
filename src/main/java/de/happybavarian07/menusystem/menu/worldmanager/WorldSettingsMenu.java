@@ -201,27 +201,27 @@ public class WorldSettingsMenu extends Menu {
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
-        String itemPath = "WorldManager.Settings.";
+        String path = "WorldManager.Settings.";
         if (world.getPVP()) {
-            inventory.setItem(10, lgm.getItem(itemPath + "PVP.true", player));
+            inventory.setItem(getSlot(path + "PVP.true", 10), lgm.getItem(path + "PVP.true", player));
         } else {
-            inventory.setItem(10, lgm.getItem(itemPath + "PVP.false", player));
+            inventory.setItem(getSlot(path + "PVP.false", 10), lgm.getItem(path + "PVP.false", player));
         }
         if (world.isAutoSave()) {
-            inventory.setItem(12, lgm.getItem(itemPath + "AutoSave.true", player));
+            inventory.setItem(getSlot(path + "AutoSave.true", 12), lgm.getItem(path + "AutoSave.true", player));
         } else {
-            inventory.setItem(12, lgm.getItem(itemPath + "AutoSave.false", player));
+            inventory.setItem(getSlot(path + "AutoSave.false", 12), lgm.getItem(path + "AutoSave.false", player));
         }
-        inventory.setItem(14, lgm.getItem(itemPath + "Time", player));
-        inventory.setItem(16, lgm.getItem(itemPath + "Weather", player));
-        inventory.setItem(20, lgm.getItem(itemPath + "Load", player));
-        inventory.setItem(22, lgm.getItem(itemPath + "Unload", player));
-        inventory.setItem(24, lgm.getItem(itemPath + "Save", player));
-        inventory.setItem(8, lgm.getItem(itemPath + "Delete", player));
-        inventory.setItem(4, lgm.getItem(itemPath + "GameRule", player));
-        inventory.setItem(0, lgm.getItem(itemPath + "TPToSpawn", player));
-        inventory.setItem(18, lgm.getItem("General.Refresh", player));
-        inventory.setItem(26, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "Time", 14), lgm.getItem(path + "Time", player));
+        inventory.setItem(getSlot(path + "Weather", 16), lgm.getItem(path + "Weather", player));
+        inventory.setItem(getSlot(path + "Load", 20), lgm.getItem(path + "Load", player));
+        inventory.setItem(getSlot(path + "Unload", 22), lgm.getItem(path + "Unload", player));
+        inventory.setItem(getSlot(path + "Save", 24), lgm.getItem(path + "Save", player));
+        inventory.setItem(getSlot(path + "Delete", 8), lgm.getItem(path + "Delete", player));
+        inventory.setItem(getSlot(path + "GameRule", 4), lgm.getItem(path + "GameRule", player));
+        inventory.setItem(getSlot(path + "TPToSpawn", 0), lgm.getItem(path + "TPToSpawn", player));
+        inventory.setItem(getSlot("General.Refresh", 18), lgm.getItem("General.Refresh", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
     }
 
     public boolean deleteWorldFolder(File path) {

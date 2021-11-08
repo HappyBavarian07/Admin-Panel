@@ -69,10 +69,10 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
         String path = "PluginManager.Settings.Commands.Settings.";
-        inventory.setItem(0, lgm.getItem(path + "Register", player));
-        inventory.setItem(1, lgm.getItem(path + "Unregister", player));
-        inventory.setItem(2, lgm.getItem(path + "Execute", player));
-        inventory.setItem(8, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "Register", 0), lgm.getItem(path + "Register", player));
+        inventory.setItem(getSlot(path + "Unregister", 1), lgm.getItem(path + "Unregister", player));
+        inventory.setItem(getSlot(path + "Execute", 2), lgm.getItem(path + "Execute", player));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
     }
 
     public CommandMap getCommandMap() {

@@ -116,13 +116,13 @@ public class ChatManagerMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "ChatManager.";
 
-        inventory.setItem(12, lgm.getItem(path + "ClearChat", player));
+        inventory.setItem(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player));
         if (plugin.isChatMuted()) {
-            inventory.setItem(14, lgm.getItem(path + "UnMuteChat", player));
+            inventory.setItem(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player));
         } else {
-            inventory.setItem(14, lgm.getItem(path + "MuteChat", player));
+            inventory.setItem(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player));
         }
-        inventory.setItem(22, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player));
     }
 
     @EventHandler

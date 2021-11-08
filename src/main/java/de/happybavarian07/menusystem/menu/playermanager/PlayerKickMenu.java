@@ -115,7 +115,7 @@ public class PlayerKickMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(0, stack);
+        inventory.setItem(getSlot(path + "Reason", 0), stack);
 
         // Ban
         stack = lgm.getItem(path + "Kick", player);
@@ -128,10 +128,10 @@ public class PlayerKickMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(7, stack);
+        inventory.setItem(getSlot(path + "Kick", 7), stack);
 
         // General
-        inventory.setItem(8, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
     }
 
     public String format(Player player, String message) {

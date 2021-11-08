@@ -2,7 +2,9 @@ package de.happybavarian07.main;
 
 import de.happybavarian07.utils.Utils;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -151,6 +153,10 @@ public class LanguageManager {
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
         meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
+        if(langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
+            meta.addEnchant(Enchantment.DURABILITY, 0, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
         item.setItemMeta(meta);
         return item;
     }
@@ -189,6 +195,10 @@ public class LanguageManager {
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
         meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
+        if(langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
+            meta.addEnchant(Enchantment.DURABILITY, 0, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
         item.setItemMeta(meta);
         return item;
     }

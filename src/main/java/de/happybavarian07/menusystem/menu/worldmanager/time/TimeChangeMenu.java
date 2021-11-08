@@ -135,16 +135,16 @@ public class TimeChangeMenu extends Menu {
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
-        String itemPath = "WorldManager.Time.";
+        String path = "WorldManager.Time.";
 
-        inventory.setItem(0, lgm.getItem(itemPath + Time.SUNRISE, player));
-        inventory.setItem(1, lgm.getItem(itemPath + Time.DAY, player));
-        inventory.setItem(2, lgm.getItem(itemPath + Time.MORNING, player));
-        inventory.setItem(3, lgm.getItem(itemPath + Time.NOON, player));
-        inventory.setItem(4, lgm.getItem(itemPath + Time.AFTERNOON, player));
-        inventory.setItem(5, lgm.getItem(itemPath + Time.SUNSET, player));
-        inventory.setItem(6, lgm.getItem(itemPath + Time.NIGHT, player));
-        inventory.setItem(7, lgm.getItem(itemPath + Time.MIDNIGHT, player));
-        inventory.setItem(8, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 0), lgm.getItem(path + Time.SUNRISE, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 1), lgm.getItem(path + Time.DAY, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 2), lgm.getItem(path + Time.MORNING, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 3), lgm.getItem(path + Time.NOON, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 4), lgm.getItem(path + Time.AFTERNOON, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 5), lgm.getItem(path + Time.SUNSET, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 6), lgm.getItem(path + Time.NIGHT, player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 7), lgm.getItem(path + Time.MIDNIGHT, player));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
     }
 }

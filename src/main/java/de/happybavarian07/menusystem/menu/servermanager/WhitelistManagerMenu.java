@@ -68,14 +68,14 @@ public class WhitelistManagerMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "ServerManager.WhitelistMenu.";
 
-        inventory.setItem(11, lgm.getItem(path + "AddPlayer", player));
-        inventory.setItem(13, lgm.getItem(path + "RemovePlayer", player));
-        inventory.setItem(15, lgm.getItem(path + "ListPlayers", player));
-        inventory.setItem(3, lgm.getItem(path + "TurnOn", player));
-        inventory.setItem(5, lgm.getItem(path + "TurnOff", player));
-        inventory.setItem(4, lgm.getItem(path + "Reload", player));
+        inventory.setItem(getSlot(path + "AddPlayer", 11), lgm.getItem(path + "AddPlayer", player));
+        inventory.setItem(getSlot(path + "AddPlayer", 13), lgm.getItem(path + "RemovePlayer", player));
+        inventory.setItem(getSlot(path + "AddPlayer", 15), lgm.getItem(path + "ListPlayers", player));
+        inventory.setItem(getSlot(path + "TurnOn", 3), lgm.getItem(path + "TurnOn", player));
+        inventory.setItem(getSlot(path + "TurnOff", 5), lgm.getItem(path + "TurnOff", player));
+        inventory.setItem(getSlot(path + "Reload", 4), lgm.getItem(path + "Reload", player));
 
-        inventory.setItem(26, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
     }
 
     @EventHandler

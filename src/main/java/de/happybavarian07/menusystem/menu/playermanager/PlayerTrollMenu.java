@@ -352,49 +352,50 @@ public class PlayerTrollMenu extends Menu implements Listener {
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, super.FILLER);
         }
+        String path = "PlayerManager.TrollMenu.";
         Player target = Bukkit.getPlayer(targetUUID);
 
         // Items
         if (plugin.hurtingwater.containsKey(target)) {
-            inventory.setItem(4, lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target));
+            inventory.setItem(getSlot(path + "HurtingWater.true", 4), lgm.getItem("PlayerManager.TrollMenu.HurtingWater.true", target));
         } else {
-            inventory.setItem(4, lgm.getItem("PlayerManager.TrollMenu.HurtingWater.false", target));
+            inventory.setItem(getSlot(path + "HurtingWater.false", 4), lgm.getItem(path + "HurtingWater.false", target));
         }
 
         if (plugin.blockBreakPrevent.containsKey(target)) {
-            inventory.setItem(12, lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.true", target));
+            inventory.setItem(getSlot(path + "BreakPlacePrevent.true", 12), lgm.getItem(path + "BreakPlacePrevent.true", target));
         } else {
-            inventory.setItem(12, lgm.getItem("PlayerManager.TrollMenu.BreakPlacePrevent.false", target));
+            inventory.setItem(getSlot(path + "BreakPlacePrevent.true", 12), lgm.getItem(path + "BreakPlacePrevent.false", target));
         }
 
         if (plugin.villagerSounds.containsKey(target)) {
-            inventory.setItem(13, lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.true", target));
+            inventory.setItem(getSlot(path + "VillagerSounds.true", 13), lgm.getItem(path + "VillagerSounds.true", target));
         } else {
-            inventory.setItem(13, lgm.getItem("PlayerManager.TrollMenu.VillagerSounds.false", target));
+            inventory.setItem(getSlot(path + "VillagerSounds.true", 13), lgm.getItem(path + "VillagerSounds.false", target));
         }
 
         if (plugin.dupeMobsOnKill.containsKey(target)) {
-            inventory.setItem(20, lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.true", target));
+            inventory.setItem(getSlot(path + "DupeMobsOnKill.true", 20), lgm.getItem(path + "DupeMobsOnKill.true", target));
         } else {
-            inventory.setItem(20, lgm.getItem("PlayerManager.TrollMenu.DupeMobsOnKill.false", target));
+            inventory.setItem(getSlot(path + "DupeMobsOnKill.true", 20), lgm.getItem(path + "DupeMobsOnKill.false", target));
         }
 
         if (plugin.chatmute.containsKey(target)) {
-            inventory.setItem(24, lgm.getItem("PlayerManager.TrollMenu.ChatMute.true", target));
+            inventory.setItem(getSlot(path + "ChatMute.true", 24), lgm.getItem(path + "ChatMute.true", target));
         } else {
-            inventory.setItem(24, lgm.getItem("PlayerManager.TrollMenu.ChatMute.false", target));
+            inventory.setItem(getSlot(path + "ChatMute.true", 24), lgm.getItem(path + "ChatMute.false", target));
         }
 
         // Kicks
-        inventory.setItem(29, lgm.getItem("PlayerManager.TrollMenu.Kick.Serverstop", target));
-        inventory.setItem(30, lgm.getItem("PlayerManager.TrollMenu.Kick.ConnectionReset", target));
-        inventory.setItem(32, lgm.getItem("PlayerManager.TrollMenu.Kick.Whitelist", target));
-        inventory.setItem(33, lgm.getItem("PlayerManager.TrollMenu.Kick.ServerStoppedError", target));
+        inventory.setItem(getSlot(path + "Kick.Serverstop", 29), lgm.getItem(path + "Kick.Serverstop", target));
+        inventory.setItem(getSlot(path + "Kick.ConnectionReset", 30), lgm.getItem(path + "Kick.ConnectionReset", target));
+        inventory.setItem(getSlot(path + "Kick.Whitelist", 32), lgm.getItem(path + "Kick.Whitelist", target));
+        inventory.setItem(getSlot(path + "Kick.ServerStoppedError", 33), lgm.getItem(path + "Kick.ServerStoppedError", target));
         // Items
-        inventory.setItem(14, lgm.getItem("PlayerManager.TrollMenu.DropPlayerInv", target));
-        inventory.setItem(21, lgm.getItem("PlayerManager.TrollMenu.FakeOp", target));
-        inventory.setItem(22, lgm.getItem("PlayerManager.TrollMenu.FakeTNT", target));
-        inventory.setItem(23, lgm.getItem("PlayerManager.TrollMenu.FakeDeop", target));
+        inventory.setItem(getSlot(path + "DropPlayerInv", 14), lgm.getItem(path + "DropPlayerInv", target));
+        inventory.setItem(getSlot(path + "FakeOp", 21), lgm.getItem(path + "FakeOp", target));
+        inventory.setItem(getSlot(path + "FakeTNT", 22), lgm.getItem(path + "FakeTNT", target));
+        inventory.setItem(getSlot(path + "FakeDeop", 23), lgm.getItem(path + "FakeDeop", target));
 
         // Close Item
         inventory.setItem(53, lgm.getItem("General.Close", target));

@@ -7,6 +7,7 @@ import de.happybavarian07.main.LanguageManager;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.worldmanager.WorldSettingsMenu;
+import de.happybavarian07.menusystem.menu.worldmanager.time.Time;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -88,11 +89,11 @@ public class WeatherChangeMenu extends Menu {
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
-        String itemPath = "WorldManager.Weather.";
+        String path = "WorldManager.Weather.";
 
-        inventory.setItem(0, lgm.getItem(itemPath + Weather.CLEAR, player));
-        inventory.setItem(1, lgm.getItem(itemPath + Weather.RAINING, player));
-        inventory.setItem(2, lgm.getItem(itemPath + Weather.THUNDERING, player));
-        inventory.setItem(8, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + Weather.CLEAR, 0), lgm.getItem(path + Weather.CLEAR, player));
+        inventory.setItem(getSlot(path + Weather.RAINING, 1), lgm.getItem(path + Weather.RAINING, player));
+        inventory.setItem(getSlot(path + Weather.THUNDERING, 2), lgm.getItem(path + Weather.THUNDERING, player));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
     }
 }

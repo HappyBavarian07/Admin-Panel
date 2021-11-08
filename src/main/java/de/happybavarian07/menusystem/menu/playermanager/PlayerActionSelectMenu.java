@@ -66,14 +66,15 @@ public class PlayerActionSelectMenu extends Menu {
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, super.FILLER);
         }
+        String path = "PlayerManager.ActionsMenu.";
         Player target = Bukkit.getPlayer(targetUUID);
-        inventory.setItem(10, lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target));
+        inventory.setItem(getSlot(path + "ActionsItem", 10), lgm.getItem(path + "ActionsItem", target));
         if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            inventory.setItem(12, lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target));
+            inventory.setItem(getSlot(path + "ActionsItem", 12), lgm.getItem(path + "MoneyItem", target));
         }
-        inventory.setItem(14, lgm.getItem("PlayerManager.ActionsMenu.BanItem", target));
-        inventory.setItem(16, lgm.getItem("PlayerManager.ActionsMenu.KickItem", target));
-        inventory.setItem(4, lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target));
-        inventory.setItem(26, lgm.getItem("General.Close", target));
+        inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target));
+        inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target));
+        inventory.setItem(getSlot(path + "PermissionItem", 4), lgm.getItem(path + "PermissionItem", target));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target));
     }
 }

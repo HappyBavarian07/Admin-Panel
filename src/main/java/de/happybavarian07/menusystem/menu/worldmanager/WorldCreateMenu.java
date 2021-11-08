@@ -146,9 +146,9 @@ public class WorldCreateMenu extends Menu implements Listener {
     @Override
     public void setMenuItems() {
         Player player = playerMenuUtility.getOwner();
-        String itemPath = "WorldManager.CreateMenu.";
+        String path = "WorldManager.CreateMenu.";
         setFillerGlass();
-        ItemStack nameItem = lgm.getItem(itemPath + "Name", player);
+        ItemStack nameItem = lgm.getItem(path + "Name", player);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> nameLore = new ArrayList<>();
         for (String string : nameMeta.getLore()) {
@@ -156,9 +156,9 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         nameMeta.setLore(nameLore);
         nameItem.setItemMeta(nameMeta);
-        inventory.setItem(10, nameItem);
+        inventory.setItem(getSlot(path + "Name", 10), nameItem);
 
-        ItemStack typeItem = lgm.getItem(itemPath + "Type." + worldType.toString(), player);
+        ItemStack typeItem = lgm.getItem(path + "Type." + worldType.toString(), player);
         ItemMeta typeMeta = typeItem.getItemMeta();
         List<String> typeLore = new ArrayList<>();
         for (String string : typeMeta.getLore()) {
@@ -166,9 +166,9 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         typeMeta.setLore(typeLore);
         typeItem.setItemMeta(typeMeta);
-        inventory.setItem(12, typeItem);
+        inventory.setItem(getSlot(path + "Type." + worldType.toString(), 12), typeItem);
 
-        ItemStack environmentItem = lgm.getItem(itemPath + "Environment." + worldEnvironment.toString(), player);
+        ItemStack environmentItem = lgm.getItem(path + "Environment." + worldEnvironment.toString(), player);
         ItemMeta environmentMeta = environmentItem.getItemMeta();
         List<String> environmentLore = new ArrayList<>();
         for (String string : environmentMeta.getLore()) {
@@ -176,22 +176,22 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         environmentMeta.setLore(environmentLore);
         environmentItem.setItemMeta(environmentMeta);
-        inventory.setItem(14, environmentItem);
+        inventory.setItem(getSlot(path + "Environment." + worldEnvironment.toString(), 14), environmentItem);
 
         if (generateStructures) {
-            inventory.setItem(16, lgm.getItem(itemPath + "GenerateStructures.true", player));
+            inventory.setItem(getSlot(path + "GenerateStructures.true", 16), lgm.getItem(path + "GenerateStructures.true", player));
         } else {
-            inventory.setItem(16, lgm.getItem(itemPath + "GenerateStructures.false", player));
+            inventory.setItem(getSlot(path + "GenerateStructures.false", 16), lgm.getItem(path + "GenerateStructures.false", player));
         }
 
         if (hardcore) {
-            inventory.setItem(22, lgm.getItem(itemPath + "Hardcore.true", player));
+            inventory.setItem(getSlot(path + "Hardcore.true", 22), lgm.getItem(path + "Hardcore.true", player));
         } else {
-            inventory.setItem(22, lgm.getItem(itemPath + "Hardcore.false", player));
+            inventory.setItem(getSlot(path + "Hardcore.false", 22), lgm.getItem(path + "Hardcore.false", player));
         }
 
-        inventory.setItem(26, lgm.getItem("General.Close", player));
-        inventory.setItem(18, lgm.getItem(itemPath + "CreateWorld", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player));
 
 
     }

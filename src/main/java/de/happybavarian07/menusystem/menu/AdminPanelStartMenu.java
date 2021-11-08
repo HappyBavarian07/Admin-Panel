@@ -39,13 +39,13 @@ public class AdminPanelStartMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
 
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "ServerReload", player))) {
-                if (!player.hasPermission("AdminPanel.ServerReload")) {
+            if (item.equals(lgm.getItem(path + "ServerRestart", player))) {
+                if (!player.hasPermission("AdminPanel.ServerRestart")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 try {
-                    Utils.serverReload(1000);
+                    Utils.serverRestart(20, 60);
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
@@ -100,13 +100,13 @@ public class AdminPanelStartMenu extends Menu {
         Player player = playerMenuUtility.getOwner();
         String path = "StartMenu.";
 
-        inventory.setItem(18, lgm.getItem(path + "ReloadConfig", player));
-        inventory.setItem(4, lgm.getItem(path + "ServerReload", player));
-        inventory.setItem(10, lgm.getItem(path + "WorldManager", player));
-        inventory.setItem(12, lgm.getItem(path + "PlayerManager", player));
-        inventory.setItem(13, lgm.getItem(path + "PluginManager", player));
-        inventory.setItem(14, lgm.getItem(path + "ServerStop", player));
-        inventory.setItem(16, lgm.getItem(path + "ServerManager", player));
-        inventory.setItem(22, lgm.getItem(path + "HintItem", player));
+        inventory.setItem(getSlot(path + "ReloadConfig", 18), lgm.getItem(path + "ReloadConfig", player));
+        inventory.setItem(getSlot(path + "ServerRestart", 4), lgm.getItem(path + "ServerRestart", player));
+        inventory.setItem(getSlot(path + "WorldManager", 10), lgm.getItem(path + "WorldManager", player));
+        inventory.setItem(getSlot(path + "PlayerManager", 12), lgm.getItem(path + "PlayerManager", player));
+        inventory.setItem(getSlot(path + "PluginManager", 13), lgm.getItem(path + "PluginManager", player));
+        inventory.setItem(getSlot(path + "ServerStop", 14), lgm.getItem(path + "ServerStop", player));
+        inventory.setItem(getSlot(path + "ServerManager", 16), lgm.getItem(path + "ServerManager", player));
+        inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player));
     }
 }

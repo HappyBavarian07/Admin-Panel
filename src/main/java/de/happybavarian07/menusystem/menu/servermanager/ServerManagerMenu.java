@@ -151,16 +151,16 @@ public class ServerManagerMenu extends Menu implements Listener {
         String path = "ServerManager.";
 
         // Items
-        inventory.setItem(2, lgm.getItem(path + "Broadcast", player));
-        inventory.setItem(4, lgm.getItem(path + "ChatManagerItem", player));
-        inventory.setItem(6, lgm.getItem(path + "WhiteListMenuItem", player));
-        inventory.setItem(12, lgm.getItem(path + "KickAllPlayers", player));
+        inventory.setItem(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player));
+        inventory.setItem(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player));
+        inventory.setItem(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player));
+        inventory.setItem(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player));
         if (plugin.isInMaintenanceMode()) {
-            inventory.setItem(14, lgm.getItem(path + "MaintenanceMode.true", player));
+            inventory.setItem(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player));
         } else {
-            inventory.setItem(14, lgm.getItem(path + "MaintenanceMode.false", player));
+            inventory.setItem(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player));
         }
-        inventory.setItem(22, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player));
     }
 
     @EventHandler

@@ -128,5 +128,9 @@ public abstract class Menu implements InventoryHolder {
         return item;
     }
 
+
+    public int getSlot(String path, int defaultInt) {
+        return lgm.getCurrentLang().getLangConfig().getConfig().getInt("Items." + path + ".slot", defaultInt);
+    }
 }
 

@@ -184,12 +184,13 @@ public interface AdminPanelAPI {
     void clearChat(int lines, boolean broadcastChatClear, Player player);
 
     /**
-     * Reloaded den Server
+     * Restartet den Server
      *
      * @param time Zeit zwischen den Aktionen und Nachrichten
-     * @throws InterruptedException Wenn es unterbrochen wird
+     * @param time Zeit zwischen dem Restart und Player Kick
+     * @throws InterruptedException Wenn der Restart unterbrochen wird
      */
-    void reloadServer(int time) throws InterruptedException;
+    void restartServer(int time, int time2) throws InterruptedException;
 
     /**
      * Stoppt den Server

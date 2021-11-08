@@ -110,7 +110,7 @@ public class WorldSelectMenu extends PaginatedMenu {
         Player player = playerMenuUtility.getOwner();
         addMenuBorder();
 
-        inventory.setItem(47, lgm.getItem("WorldManager.Create", player));
+        inventory.setItem(getSlot("WorldManager.Create", 47), lgm.getItem("WorldManager.Create", player));
 
         //The thing you will be looping through to place items
         List<World> worlds = new ArrayList<>(getServer().getWorlds());

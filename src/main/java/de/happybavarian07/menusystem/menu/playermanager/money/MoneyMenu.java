@@ -80,9 +80,9 @@ public class MoneyMenu extends Menu implements Listener {
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, super.FILLER);
         }
-        inventory.setItem(11, lgm.getItem("PlayerManager.MoneyMenu.Give", target));
-        inventory.setItem(15, lgm.getItem("PlayerManager.MoneyMenu.Take", target));
-        inventory.setItem(26, lgm.getItem("General.Close", target));
+        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target));
+        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target));
     }
 
     @EventHandler

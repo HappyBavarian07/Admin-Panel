@@ -154,48 +154,7 @@ public class Utils {
         Bukkit.shutdown();
     }
 
-    public static void serverReload(int time) throws InterruptedException {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.closeInventory();
-        }
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server is about to reload, please do not move, write in the chat or do something else!", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Thread.sleep(3000);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerreload in: &c&l6", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerreload in: &c&l5", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverreload in: &c&l4", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverreload in: &c&l3", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverreload in: &c&l2", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverreload in: &c&l1", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.closeInventory();
-        }
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "        &r[&4&lAnnouncement&r] " + "&c&lReload started!", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.reload();
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "        &r[&4&lAnnouncement&r] " + "&c&lReload finished!", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-    }
-
-    public static void serverRestart(int time) throws InterruptedException {
+    public static void serverRestart(int time, int time2) throws InterruptedException {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
         }
@@ -203,33 +162,42 @@ public class Utils {
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server is about to restart!", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Thread.sleep(3000);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l6", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l5", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l4", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l3", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l2", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l1", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Restart initiated!", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
-            p2.kickPlayer(Utils.format(null, "&4&lThe server is now restarting!", AdminPanelMain.getPrefix()));
-        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l6", AdminPanelMain.getPrefix()));
+        }, time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l5", AdminPanelMain.getPrefix()));
+        }, 2L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l4", AdminPanelMain.getPrefix()));
+        }, 3L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l3", AdminPanelMain.getPrefix()));
+        }, 4L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l2", AdminPanelMain.getPrefix()));
+        }, 5L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l1", AdminPanelMain.getPrefix()));
+        }, 6L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+            Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Restart initiated!", AdminPanelMain.getPrefix()));
+            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        }, 7L *time);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
+                p2.kickPlayer(Utils.format(null, "&4&lThe server is now restarting!", AdminPanelMain.getPrefix()));
+            }
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "restart");
+        }, 7L *time+time2);
     }
 
     public static String format(Player player, String message, String prefix) {

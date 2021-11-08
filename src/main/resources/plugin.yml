@@ -85,7 +85,7 @@ permissions:
                 default: op
       AdminPanel.ServerStop:
         default: op
-      AdminPanel.ServerReload:
+      AdminPanel.ServerRestart:
         default: op
       AdminPanel.WorldManagment.*:
         default: op

@@ -201,7 +201,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(13, stack);
+        inventory.setItem(getSlot(path + "Reason", 13), stack);
 
         // Years
         stack = lgm.getItem(path + "Years", player);
@@ -214,7 +214,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(2, stack);
+        inventory.setItem(getSlot(path + "Years", 2), stack);
 
         // Months
         stack = lgm.getItem(path + "Months", player);
@@ -227,7 +227,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(3, stack);
+        inventory.setItem(getSlot(path + "Months", 3), stack);
 
         // Days
         stack = lgm.getItem(path + "Days", player);
@@ -240,7 +240,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(4, stack);
+        inventory.setItem(getSlot(path + "Days", 4), stack);
 
         // Hours
         stack = lgm.getItem(path + "Hours", player);
@@ -253,7 +253,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(5, stack);
+        inventory.setItem(getSlot(path + "Hours", 5), stack);
 
         // Minutes
         stack = lgm.getItem(path + "Minutes", player);
@@ -266,7 +266,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(6, stack);
+        inventory.setItem(getSlot(path + "Minutes", 6), stack);
 
         // Seconds
         stack = lgm.getItem(path + "Seconds", player);
@@ -279,7 +279,7 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(7, stack);
+        inventory.setItem(getSlot(path + "Seconds", 7), stack);
 
         // Ban
         stack = lgm.getItem(path + "Ban", player);
@@ -292,10 +292,10 @@ public class PlayerBanMenu extends Menu implements Listener {
         }
         meta.setLore(updatedLore);
         stack.setItemMeta(meta);
-        inventory.setItem(22, stack);
+        inventory.setItem(getSlot(path + "Ban", 22), stack);
 
         // General
-        inventory.setItem(26, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
     }
 
     public String format(Player player, String message) {

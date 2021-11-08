@@ -96,7 +96,7 @@ public class PotionMenu extends PaginatedMenu {
     public void setMenuItems() {
         addMenuBorder();
 
-        inventory.setItem(47, lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null));
+        inventory.setItem(getSlot("PlayerManager.ActionsMenu.ClearPotions", 47), lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null));
 
         List<PotionType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionType.values());

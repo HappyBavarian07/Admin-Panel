@@ -102,7 +102,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
     @Override
     public void setMenuItems() {
         addMenuBorder();
-        inventory.setItem(47, lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null));
+        inventory.setItem(getSlot("PlayerManager.ActionsMenu.BannedPlayers", 47), lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null));
 
         //The thing you will be looping through to place items
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());

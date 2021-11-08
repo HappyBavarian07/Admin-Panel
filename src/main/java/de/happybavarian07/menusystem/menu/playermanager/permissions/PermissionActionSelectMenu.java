@@ -85,10 +85,10 @@ public class PermissionActionSelectMenu extends Menu {
         String path = "PlayerManager.ActionsMenu.Permissions.";
         Player player = playerMenuUtility.getOwner();
         setFillerGlass();
-        inventory.setItem(10, lgm.getItem(path + "Add", player));
-        inventory.setItem(12, lgm.getItem(path + "Info", player));
-        inventory.setItem(14, lgm.getItem(path + "List", player));
-        inventory.setItem(16, lgm.getItem(path + "Remove", player));
-        inventory.setItem(26, lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "Add", 10), lgm.getItem(path + "Add", player));
+        inventory.setItem(getSlot(path + "Info", 12), lgm.getItem(path + "Info", player));
+        inventory.setItem(getSlot(path + "List", 14), lgm.getItem(path + "List", player));
+        inventory.setItem(getSlot(path + "Remove", 16), lgm.getItem(path + "Remove", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
     }
 }
