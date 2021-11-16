@@ -1,3 +1,6 @@
+# The Language File for English Language
+LanguageFullName: 'English'
+LanguageVersion: '7.3.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
@@ -6,6 +9,7 @@ Messages:
     General:
       ReloadedConfig: '%prefix% &9> &aSuccessfully reloaded the Config!'
       ReloadedLanguageFile: '%prefix% &9> &aSuccessfully reloaded Language: %language%!'
+      SetCurrentLanguage: '%prefix% &9> &aSuccessfully set current Language to %fullname%!'
       AlreadyOnFirstPage: '%prefix% &9> &cYou''re already on the first page!'
       AlreadyOnLastPage: '%prefix% &9> &cYou''re already on the last page!'
       NoPermissions: '%prefix% &9> &cYou do not have access to this command!'
@@ -720,6 +724,26 @@ Items:
         lore:
           - '&cChange to Midnight!'
   StartMenu:
+    SwitchLanguageMenuItem:
+      material: BLUE_WOOL
+      displayName: '&aChange the language temporarily'
+      lore:
+        - '&aWith this you can change the language.'
+        - '&cUnfortunately this is only temporary and'
+        - '&conly as long as the plugin is not reloaded!'
+    SwitchLanguageMenu:
+      # Placeholders:
+      # %fullname% = Language Full Name
+      # %shortname% = Language Short Name (File Name)
+      # %version% = Language Version
+      # %path% = Language File Path
+      LanguageItem:
+        material: PAPER
+        displayName: '&a%fullname%'
+        lore:
+          - '&aShort Name: &6%shortname%'
+          - '&aVersion: &6%version%'
+          - '&aPfad: &6%path%'
     ReloadConfig:
       material: GREEN_WOOL
       displayName: '&aReload Config'
@@ -944,6 +968,7 @@ Items:
             - '&2List of all Permissions!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
+  SwitchLanguageMenu: '&aLanguages'
   PlayerManager:
     PlayerSelector: '&aSelect a Player'
     PlayerActions: '&aActions: %player_name%'

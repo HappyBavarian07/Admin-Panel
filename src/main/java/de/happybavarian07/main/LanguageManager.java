@@ -42,7 +42,7 @@ public class LanguageManager {
         return currentLang;
     }
 
-    public void setCurrentLang(LanguageFile currentLang) throws NullPointerException {
+    public void setCurrentLang(LanguageFile currentLang, boolean log) throws NullPointerException {
         if (currentLang == null) {
             List<Map.Entry<String, LanguageFile>> list = new ArrayList<>(registeredLanguages.entrySet());
             Map.Entry<String, LanguageFile> firstInsertedEntry = list.get(0);
@@ -53,29 +53,32 @@ public class LanguageManager {
             this.currentLangName = currentLang.getLangName();
             this.currentLang = currentLang;
         }
-        System.out.println("Current Language: " + currentLangName);
+        if (log)
+            System.out.println("Current Language: " + currentLangName);
     }
 
-    public void addLanguagesToList() {
+    public void addLanguagesToList(boolean log) {
         File[] fileArray = langFolder.listFiles();
         if (fileArray != null) {
             for (File file : fileArray) {
                 LanguageFile languageFile = new LanguageFile(plugin, file.getName().replace(".yml", ""));
                 if (!registeredLanguages.containsValue(languageFile))
                     this.registeredLanguages.put(languageFile.getLangName(), languageFile);
-                System.out.println("Language: " + languageFile.getLangFile() + " successfully registered!");
+                if (log)
+                    System.out.println("Language: " + languageFile.getLangFile() + " successfully registered!");
             }
         }
     }
 
-    public void reloadLanguages(Player messageReceiver) {
-        addLanguagesToList();
+    public void reloadLanguages(Player messageReceiver, Boolean log) {
+        addLanguagesToList(log);
         for (String langFiles : registeredLanguages.keySet()) {
             getLang(langFiles).getLangConfig().reloadConfig();
-            messageReceiver.sendMessage(getMessage("Player.General.ReloadedLanguageFile", messageReceiver)
-                    .replace("%language%", "" + getLang(langFiles).getLangFile()));
+            if (messageReceiver != null)
+                messageReceiver.sendMessage(getMessage("Player.General.ReloadedLanguageFile", messageReceiver)
+                        .replace("%language%", "" + getLang(langFiles).getLangFile()));
         }
-        setCurrentLang(getLang(plugin.getConfig().getString("Plugin.language")));
+        setCurrentLang(getLang(plugin.getConfig().getString("Plugin.language")), log);
     }
 
     public void addLang(LanguageFile langFile, String langName) {
@@ -153,7 +156,7 @@ public class LanguageManager {
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
         meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
-        if(langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
+        if (langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
             meta.addEnchant(Enchantment.DURABILITY, 0, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
@@ -195,7 +198,7 @@ public class LanguageManager {
         meta.setLore(loreWithPlaceholders);
         assert displayName != null;
         meta.setDisplayName(Utils.format(player, displayName, AdminPanelMain.getPrefix()));
-        if(langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
+        if (langConfig.getConfig().getBoolean("Items." + path + ".enchanted", false)) {
             meta.addEnchant(Enchantment.DURABILITY, 0, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }

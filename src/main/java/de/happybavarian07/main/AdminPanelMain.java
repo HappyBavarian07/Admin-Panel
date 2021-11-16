@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class AdminPanelMain extends JavaPlugin implements Listener {
@@ -53,6 +55,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private FileConfiguration permissionsConfig;
     private Updater updater;
     private LanguageManager languageManager;
+    private OldLanguageFileUpdater langFileUpdater;
 
     public static String getPrefix() {
         return prefix;
@@ -106,6 +109,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return playerPermissionsAttachments;
     }
 
+    public OldLanguageFileUpdater getLangFileUpdater() {
+        return langFileUpdater;
+    }
+
     public Map<UUID, Map<String, Boolean>> getPlayerPermissions() {
         return playerPermissions;
     }
@@ -116,6 +123,23 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // bStats
         int bStatsID = 11778;
         Metrics metrics = new Metrics(this, bStatsID);
+        metrics.addCustomChart(new Metrics.SimplePie("used_language", () -> languageManager.getCurrentLang().getLangName()));
+        metrics.addCustomChart(new Metrics.SimplePie("language_count", () -> {
+            int value = 0;
+            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
+                if (lang.getPlugin() == this)
+                    value++;
+            }
+            return String.valueOf(value);
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("external_api_language_count", () -> {
+            int value = 0;
+            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
+                if (lang.getPlugin() != this)
+                    value++;
+            }
+            return String.valueOf(value);
+        }));
 
         logger
                 .coloredSpacer(ChatColor.GREEN)
@@ -125,6 +149,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         logger.coloredSpacer(ChatColor.DARK_RED).message("&4&lInitialize Plugin Main Variable to this!&r");
         setPlugin(this);
         languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"));
+        langFileUpdater = new OldLanguageFileUpdater(this);
         API = new LocalAdminPanelAPI(this);
         new ChatUtil();
         new Utils();
@@ -213,7 +238,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
         setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
         logger.message("&e&lPrefix Done!&r");
-        logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Registration of Events:&r");
+        logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Region of Evnts:&r");
         PluginManager pm = this.getServer().getPluginManager();
         logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), this);
@@ -225,10 +250,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // Language Manager Enabling
         LanguageFile deLang = new LanguageFile(this, "de");
         LanguageFile enLang = new LanguageFile(this, "en");
-        languageManager.addLanguagesToList();
+        languageManager.addLanguagesToList(true);
         languageManager.addLang(deLang, deLang.getLangName());
         languageManager.addLang(enLang, enLang.getLangName());
-        languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language")));
+        languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language")), true);
         if (languageManager != null && languageManager.getMessage("Plugin.EnablingMessage", null) != null &&
                 !languageManager.getMessage("Plugin.EnablingMessage", null).equals("null config") &&
                 !languageManager.getMessage("Plugin.EnablingMessage", null).startsWith("null path: Messages.")) {
@@ -236,6 +261,43 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
+        if (getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating")) {
+            for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
+                File oldFile = langFiles.getLangFile();
+                File newFile = new File(langFiles.getLangFile().getParentFile().getPath() + "/" + langFiles.getLangName() + "-new.yml");
+                YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
+                InputStream defaultStream = plugin.getResource("languages/" + langFiles.getLangName() + ".yml");
+                if (defaultStream != null) {
+                    YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
+                    newConfig.setDefaults(defaultConfig);
+                }
+                newConfig.options().copyDefaults(true);
+                try {
+                    newConfig.save(newFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                langFileUpdater.updateFile(oldFile, newConfig, langFiles.getLangName());
+                newFile.delete();
+                languageManager.reloadLanguages(null, false);
+            }
+            /*for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
+                File file = langFiles.getLangFile();
+                String resource = "languages/" + langFiles.getLangFile().getName();
+                try {
+                    List<String> ignoredSections = new ArrayList<>();
+                    for (int i = 1; i < 54; i++) {
+                        ignoredSections.add("slot: " + i);
+                    }
+                    ignoredSections.add("enchanted: true");
+                    ignoredSections.add("enchanted: false");
+                    ConfigUpdater.update(plugin, resource, file, ignoredSections);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }*/
+        }
+        languageManager.reloadLanguages(null, false);
         updater = new Updater(getPlugin(), 91800);
         if (getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
             updater.checkForUpdates(true);
@@ -258,7 +320,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             public void run() {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     if (!playerPermissionsAttachments.containsKey(online.getUniqueId())) {
-                        if(!playerPermissions.containsKey(online.getUniqueId())) {
+                        if (!playerPermissions.containsKey(online.getUniqueId())) {
                             playerPermissions.put(online.getUniqueId(), new HashMap<>());
                         }
                         PermissionAttachment attachment = online.addAttachment(plugin);
@@ -312,7 +374,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         PermissionAttachment attachment = player.addAttachment(plugin);
         if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
-            if(!playerPermissions.containsKey(player.getUniqueId())) {
+            if (!playerPermissions.containsKey(player.getUniqueId())) {
                 playerPermissions.put(player.getUniqueId(), new HashMap<>());
             }
             Map<String, Boolean> permissions = playerPermissions.get(player.getUniqueId());
@@ -349,13 +411,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     public void reloadPerms(Player player) {
-        if(player != null) {
+        if (player != null) {
             if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
                 player.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
             }
             PermissionAttachment attachment = player.addAttachment(plugin);
             if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
-                if(!playerPermissions.containsKey(player.getUniqueId())) {
+                if (!playerPermissions.containsKey(player.getUniqueId())) {
                     playerPermissions.put(player.getUniqueId(), new HashMap<>());
                 }
                 Map<String, Boolean> permissions = playerPermissions.get(player.getUniqueId());
@@ -366,13 +428,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 player.recalculatePermissions();
             }
         } else {
-            for(Player online : Bukkit.getOnlinePlayers()) {
+            for (Player online : Bukkit.getOnlinePlayers()) {
                 if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
                     online.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
                 }
                 PermissionAttachment attachment = online.addAttachment(plugin);
                 if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
-                    if(!playerPermissions.containsKey(online.getUniqueId())) {
+                    if (!playerPermissions.containsKey(online.getUniqueId())) {
                         playerPermissions.put(online.getUniqueId(), new HashMap<>());
                         continue;
                     }

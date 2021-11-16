@@ -21,11 +21,11 @@ public abstract class PaginatedMenu extends Menu {
         LanguageManager lgm = AdminPanelMain.getPlugin().getLanguageManager();
         inventory.setItem(getSlot("General.Left", 48), lgm.getItem("General.Left", null));
 
-        inventory.setItem(getSlot("General.Left", 49), lgm.getItem("General.Close", null));
+        inventory.setItem(getSlot("General.Close", 49), lgm.getItem("General.Close", null));
 
-        inventory.setItem(getSlot("General.Left", 50), lgm.getItem("General.Right", null));
+        inventory.setItem(getSlot("General.Right", 50), lgm.getItem("General.Right", null));
 
-        inventory.setItem(getSlot("General.Left", 51), lgm.getItem("General.Refresh", null));
+        inventory.setItem(getSlot("General.Refresh", 51), lgm.getItem("General.Refresh", null));
 
         for (int i = 0; i < 10; i++) {
             if (inventory.getItem(i) == null) {

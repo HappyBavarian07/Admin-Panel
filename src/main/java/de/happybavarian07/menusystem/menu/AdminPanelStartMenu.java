@@ -90,6 +90,12 @@ public class AdminPanelStartMenu extends Menu {
                 }
                 AdminPanelMain.getAPI().reloadConfigurationFiles(player);
                 super.open();
+            } else if (item.equals(lgm.getItem(path + "SwitchLanguageMenuItem", player))) {
+                if (!player.hasPermission("AdminPanel.SwitchLanguage")) {
+                    player.sendMessage(noPerms);
+                    return;
+                }
+                new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
             }
         }
     }
@@ -108,5 +114,6 @@ public class AdminPanelStartMenu extends Menu {
         inventory.setItem(getSlot(path + "ServerStop", 14), lgm.getItem(path + "ServerStop", player));
         inventory.setItem(getSlot(path + "ServerManager", 16), lgm.getItem(path + "ServerManager", player));
         inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player));
+        inventory.setItem(getSlot(path + "SwitchLanguageMenuItem", 26), lgm.getItem(path + "SwitchLanguageMenuItem", player));
     }
 }

@@ -29,4 +29,16 @@ public class LanguageFile {
     public LanguageConfig getLangConfig() {
         return langConfig;
     }
+
+    public String getFullName() {
+        return langConfig.getConfig().getString("LanguageFullName");
+    }
+
+    public String getFileVersion() {
+        return langConfig.getConfig().getString("LanguageVersion");
+    }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
 }

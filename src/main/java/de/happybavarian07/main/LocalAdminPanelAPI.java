@@ -192,7 +192,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
     @Override
     public void setCurrentLanguage(LanguageFile languageFile) throws NullPointerException {
-        lgm.setCurrentLang(languageFile);
+        lgm.setCurrentLang(languageFile, true);
     }
 
     @Override
@@ -229,7 +229,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     public void reloadConfigurationFiles(Player messageReceiver) {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
-        lgm.reloadLanguages(messageReceiver);
+        lgm.reloadLanguages(messageReceiver, true);
         plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", "API");
     }
 

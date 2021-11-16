@@ -1,3 +1,6 @@
+# Der Sprach Datei für Deutsche Sprache
+LanguageFullName: 'Deutsch'
+LanguageVersion: '7.3.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
@@ -6,6 +9,7 @@ Messages:
     General:
       ReloadedConfig: '%prefix% &9> &aErfolgreich die Config reloaded!'
       ReloadedLanguageFile: '%prefix% &9> &aErfolgreich die Sprache %language% reloaded!'
+      SetCurrentLanguage: '%prefix% &9> &aErfolgreich die gerade ausgewählte Sprache zu %fullname% geändert!'
       AlreadyOnFirstPage: '%prefix% &9> &cDu bist schon auf der ersten Seite!'
       AlreadyOnLastPage: '%prefix% &9> &cDu bist schon auf der letzten Seite!'
       NoPermissions: '%prefix% &9> &cDu hast keinen Zugriff auf diesen Command!'
@@ -720,6 +724,26 @@ Items:
         lore:
           - '&cWechsle zu gewittrigem Wetter!'
   StartMenu:
+    SwitchLanguageMenuItem:
+      material: BLUE_WOOL
+      displayName: '&aWechsle die Sprache temporär'
+      lore:
+        - '&aHiermit kannst du die Sprache ändern.'
+        - '&cLeider ist dies nur temporär und nur solange'
+        - '&cdas Plugin nicht gereloaded wird!'
+    SwitchLanguageMenu:
+      # Placeholders:
+      # %fullname% = Language Full Name
+      # %shortname% = Language Short Name (File Name)
+      # %version% = Language Version
+      # %path% = Language File Path
+      LanguageItem:
+        material: PAPER
+        displayName: '&a%fullname%'
+        lore:
+          - '&aShort Name: &6%shortname%'
+          - '&aVersion: &6%version%'
+          - '&aPfad: &6%path%'
     ReloadConfig:
       material: GREEN_WOOL
       displayName: '&aReload Config'
@@ -944,6 +968,7 @@ Items:
             - '&2Liste aller Permissions!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
+  SwitchLanguageMenu: '&aSprachen'
   PlayerManager:
     PlayerSelector: '&aSpieler auswählen'
     PlayerActions: '&aAktionen: %player_name%'

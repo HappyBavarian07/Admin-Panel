@@ -53,6 +53,8 @@ Plugin:
     # With this Option you can control how often the Updater should check!
     # You can configure here the Time between Checks (in Minutes)
     UpdateCheckTime: 5
+    # This Option will enable/disable if the Plugin should automatically update the Language Files
+    AutomaticLanguageFileUpdating: true
 
 # These are the settings for the panel
 Panel:

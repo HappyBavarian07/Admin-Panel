@@ -24,6 +24,7 @@ permissions:
   AdminPanel.*:
     default: op
     children:
+      AdminPanel.SwitchLanguage: true
       AdminPanel.ReloadConfig: true
       AdminPanel.updatenotify: true
       AdminPanel.update: true
