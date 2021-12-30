@@ -23,8 +23,8 @@ public class AdminPanelOpenCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("adminpanel") || command.getName().equalsIgnoreCase("apanel") || command.getName().equalsIgnoreCase("adminp") || command.getName().equalsIgnoreCase("ap")) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("adminpanel")) {
             if (args.length == 0) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;

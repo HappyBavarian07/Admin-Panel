@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
+import java.util.logging.Level;
 
 public class LanguageManager {
 
@@ -54,7 +55,7 @@ public class LanguageManager {
             this.currentLang = currentLang;
         }
         if (log)
-            System.out.println("Current Language: " + currentLangName);
+            plugin.getLogger().log(Level.INFO, "Current Language: " + currentLangName);
     }
 
     public void addLanguagesToList(boolean log) {
@@ -65,7 +66,7 @@ public class LanguageManager {
                 if (!registeredLanguages.containsValue(languageFile))
                     this.registeredLanguages.put(languageFile.getLangName(), languageFile);
                 if (log)
-                    System.out.println("Language: " + languageFile.getLangFile() + " successfully registered!");
+                    plugin.getLogger().log(Level.INFO, "Language: " + languageFile.getLangFile() + " successfully registered!");
             }
         }
     }
@@ -85,7 +86,7 @@ public class LanguageManager {
         if (registeredLanguages.containsKey(langName))
             return;
         registeredLanguages.put(langName, langFile);
-        System.out.println("Language: " + langFile.getLangFile() + " successfully registered!");
+        plugin.getLogger().log(Level.INFO, "Language: " + langFile.getLangFile() + " successfully registered!");
     }
 
     public LanguageFile getLang(String langName) throws NullPointerException {

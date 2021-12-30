@@ -3,9 +3,7 @@ package de.happybavarian07.utils;/*
  * @Date 02.10.2021 | 13:15
  */
 
-import de.happybavarian07.main.AdminPanelAPI;
 import de.happybavarian07.main.AdminPanelMain;
-import de.happybavarian07.main.LanguageManager;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,16 +15,12 @@ import java.util.logging.Level;
 
 public class PluginFileLogger {
     private static AdminPanelMain plugin;
-    private static LanguageManager lgm;
-    private static AdminPanelAPI api;
     private static File logFile;
     private static PluginFileLogger instance;
 
     public PluginFileLogger() {
         instance = this;
         plugin = AdminPanelMain.getPlugin();
-        lgm = plugin.getLanguageManager();
-        api = AdminPanelMain.getAPI();
         logFile = new File(plugin.getDataFolder(), "plugin.log");
     }
 
@@ -51,7 +45,7 @@ public class PluginFileLogger {
     }
 
     public void createLogFile() {
-        if(!logFile.exists()) {
+        if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
             } catch (IOException e) {

@@ -98,33 +98,24 @@ public class PluginUtils {
     }
 
     public void unload(Plugin plugin) {
-
         String name = plugin.getName();
-
         PluginManager pluginManager = Bukkit.getPluginManager();
-
         SimpleCommandMap commandMap = null;
-
         List<Plugin> plugins = null;
-
         Map<String, Plugin> names = null;
         Map<String, Command> commands = null;
         Map<Event, SortedSet<RegisteredListener>> listeners = null;
-
         boolean reloadlisteners = true;
 
         pluginManager.disablePlugin(plugin);
 
         try {
-
             Field pluginsField = Bukkit.getPluginManager().getClass().getDeclaredField("plugins");
             pluginsField.setAccessible(true);
             plugins = (List<Plugin>) pluginsField.get(pluginManager);
-
             Field lookupNamesField = Bukkit.getPluginManager().getClass().getDeclaredField("lookupNames");
             lookupNamesField.setAccessible(true);
             names = (Map<String, Plugin>) lookupNamesField.get(pluginManager);
-
             try {
                 Field listenersField = Bukkit.getPluginManager().getClass().getDeclaredField("listeners");
                 listenersField.setAccessible(true);
@@ -136,7 +127,6 @@ public class PluginUtils {
             Field commandMapField = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
             commandMapField.setAccessible(true);
             commandMap = (SimpleCommandMap) commandMapField.get(pluginManager);
-
             Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
             knownCommandsField.setAccessible(true);
             commands = (Map<String, Command>) knownCommandsField.get(commandMap);

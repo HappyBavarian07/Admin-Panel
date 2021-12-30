@@ -2,6 +2,7 @@ package de.happybavarian07.main;
 
 import de.happybavarian07.commands.AdminPanelOpenCommand;
 import de.happybavarian07.commands.UpdateCommand;
+import de.happybavarian07.configupdater.ConfigUpdater;
 import de.happybavarian07.listeners.MenuListener;
 import de.happybavarian07.placeholders.PanelExpansion;
 import de.happybavarian07.placeholders.PlayerExpansion;
@@ -123,23 +124,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // bStats
         int bStatsID = 11778;
         Metrics metrics = new Metrics(this, bStatsID);
-        metrics.addCustomChart(new Metrics.SimplePie("used_language", () -> languageManager.getCurrentLang().getLangName()));
-        metrics.addCustomChart(new Metrics.SimplePie("language_count", () -> {
-            int value = 0;
-            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
-                if (lang.getPlugin() == this)
-                    value++;
-            }
-            return String.valueOf(value);
-        }));
-        metrics.addCustomChart(new Metrics.SimplePie("external_api_language_count", () -> {
-            int value = 0;
-            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
-                if (lang.getPlugin() != this)
-                    value++;
-            }
-            return String.valueOf(value);
-        }));
 
         logger
                 .coloredSpacer(ChatColor.GREEN)
@@ -155,6 +139,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         new Utils();
         new File(this.getDataFolder() + "/languages").mkdir();
         logger.message("&e&lVariable Done!&r");
+        try {
+            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlayerExpansion().register();
             new PluginExpansion().register();
@@ -168,6 +157,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                     .coloredMessage(ChatColor.RED, "The Plugin cannot work without this Plugin!")
                     .coloredMessage(ChatColor.RED, "");
             getServer().getPluginManager().disablePlugin(this);
+            return;
         }
         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
             logger
@@ -263,6 +253,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         }
         if (getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating")) {
             for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
+                if(plugin.getResource("languages/" + langFiles.getLangName() + ".yml") == null) continue;
                 File oldFile = langFiles.getLangFile();
                 File newFile = new File(langFiles.getLangFile().getParentFile().getPath() + "/" + langFiles.getLangName() + "-new.yml");
                 YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
@@ -279,15 +270,16 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
                 langFileUpdater.updateFile(oldFile, newConfig, langFiles.getLangName());
                 newFile.delete();
-                languageManager.reloadLanguages(null, false);
             }
             /*for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
                 File file = langFiles.getLangFile();
                 String resource = "languages/" + langFiles.getLangFile().getName();
                 try {
                     List<String> ignoredSections = new ArrayList<>();
-                    for (int i = 1; i < 54; i++) {
+                    int i = 1;
+                    while (i < 54) {
                         ignoredSections.add("slot: " + i);
+                        i++;
                     }
                     ignoredSections.add("enchanted: true");
                     ignoredSections.add("enchanted: false");
@@ -296,8 +288,27 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                     e.printStackTrace();
                 }
             }*/
+            languageManager.reloadLanguages(null, false);
         }
-        languageManager.reloadLanguages(null, false);
+
+        metrics.addCustomChart(new Metrics.SimplePie("used_language", () -> languageManager.getCurrentLang().getLangName()));
+        metrics.addCustomChart(new Metrics.SimplePie("language_count", () -> {
+            int value = 0;
+            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
+                if (lang.getPlugin() == this)
+                    value++;
+            }
+            return String.valueOf(value);
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("external_api_language_count", () -> {
+            int value = 0;
+            for (LanguageFile lang : getLanguageManager().getRegisteredLanguages().values()) {
+                if (lang.getPlugin() != this)
+                    value++;
+            }
+            return String.valueOf(value);
+        }));
+
         updater = new Updater(getPlugin(), 91800);
         if (getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
             updater.checkForUpdates(true);

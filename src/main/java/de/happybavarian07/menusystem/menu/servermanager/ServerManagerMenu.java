@@ -106,9 +106,11 @@ public class ServerManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.setInMaintenanceMode(false);
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player));
-                    super.open();
+                    if(plugin.isInMaintenanceMode() && kickAllPlayersEvent.isMaintenanceMode()) {
+                        plugin.setInMaintenanceMode(kickAllPlayersEvent.isMaintenanceMode());
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player));
+                        super.open();
+                    }
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
@@ -123,13 +125,15 @@ public class ServerManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    for (Player online : Bukkit.getOnlinePlayers()) {
-                        if (!online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
-                            online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online));
+                    plugin.setInMaintenanceMode(kickAllPlayersEvent.isMaintenanceMode());
+                    if(!plugin.isInMaintenanceMode() && !kickAllPlayersEvent.isMaintenanceMode()) {
+                        for (Player online : Bukkit.getOnlinePlayers()) {
+                            if (!online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
+                                online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online));
+                            }
                         }
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player));
                     }
-                    plugin.setInMaintenanceMode(true);
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player));
                     super.open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
@@ -180,8 +184,11 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (plugin.isInMaintenanceMode() && !player.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
+        if(player.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) return;
+        if (plugin.isInMaintenanceMode()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player));
+        } else {
+            event.allow();
         }
     }
 

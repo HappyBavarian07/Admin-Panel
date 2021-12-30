@@ -1,7 +1,6 @@
 package de.happybavarian07.utils;
 
 import de.happybavarian07.main.AdminPanelMain;
-import io.CodedByYou.spiget.Resource;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,17 +23,11 @@ public class Updater implements Listener {
     private final AdminPanelMain plugin;
     private final int resourceID;
     private final PluginUtils pluginUtils;
-    Resource resource;
 
     public Updater(AdminPanelMain plugin, int resourceID) {
         this.plugin = plugin;
         this.pluginUtils = new PluginUtils();
         this.resourceID = resourceID;
-        try {
-            this.resource = new Resource(resourceID);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public String html2text(String html) {
@@ -149,13 +142,15 @@ public class Updater implements Listener {
             System.out.println("Insgesamt: true");
         } else {
             if (majorVersions[0] >= majorVersions[1]) {
-                System.out.println("Insgesamt: " + (minor || patch && patchVersions[0] >= patchVersions[1]));
+                if (minorVersions[0] >= minorVersions[1]) {
+                    System.out.println("Insgesamt: " + (minor || patch));
+                }
+                System.out.println("Insgesamt: false");
             }
             System.out.println("Insgesamt: " + (minor && patch));
         }*/
 
         if (major) {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked if an Update is available -> true", "Updater");
             return true;
         } else {
             if (majorVersions[0] >= majorVersions[1]) {
@@ -256,7 +251,7 @@ public class Updater implements Listener {
     public void downloadPlugin(boolean replace, boolean force, boolean logInConsole) {
         if (!plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !force) return;
         try {
-            File downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/91800.jar");
+            File downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/" + resourceID + ".jar");
             File oldPluginFile = new File("plugins/Admin-Panel-" + getPluginVersion() + ".jar");
             File newPluginFile = new File("plugins/Admin-Panel-" + getLatestVersionName() + ".jar");
             if (!new File(plugin.getDataFolder() + "/downloaded-update").exists()) {
@@ -265,11 +260,11 @@ public class Updater implements Listener {
             if (!downloadPath.exists()) {
                 downloadPath.createNewFile();
             }
-            URL downloadURL = new URL("https://api.spiget.org/v2/resources/91800/download");
+            URL downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
             FileUtils.copyURLToFile(downloadURL, downloadPath);
             downloadPath.renameTo(new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar"));
             downloadPath = new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + getLatestVersionName() + ".jar");
-            new File(plugin.getDataFolder() + "/downloaded-update/91800.jar").delete();
+            new File(plugin.getDataFolder() + "/downloaded-update/" + resourceID + ".jar").delete();
             if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && !replace) {
                 if (logInConsole) {
                     plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
@@ -303,10 +298,6 @@ public class Updater implements Listener {
             plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e, "Updater");
             e.printStackTrace();
         }
-    }
-
-    public Resource getResource() {
-        return resource;
     }
 
     public String getPluginVersion() {

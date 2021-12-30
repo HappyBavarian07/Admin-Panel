@@ -18,24 +18,25 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MenuListener implements Listener {
+    private BukkitRunnable br;
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent e) {
 
         InventoryHolder holder = e.getInventory().getHolder();
-        //If the inventoryholder of the inventory clicked on
+        // If the inventoryholder of the inventory clicked on
         // is an instance of Menu, then gg. The reason that
         // an InventoryHolder can be a Menu is because our Menu
         // class implements InventoryHolder!!
         if (holder instanceof Menu) {
-            e.setCancelled(true); //prevent them from fucking with the inventory
-            if (e.getCurrentItem() == null) { //deal with null exceptions
+            e.setCancelled(true); // prevent them from fucking with the inventory
+            if (e.getCurrentItem() == null) { // deal with null exceptions
                 return;
             }
-            //Since we know our inventoryholder is a menu, get the Menu Object representing
+            // Since we know our inventoryholder is a menu, get the Menu Object representing
             // the menu we clicked on
             Menu menu = (Menu) holder;
-            //Call the handleMenu object which takes the event and processes it
+            // Call the handleMenu object which takes the event and processes it
             menu.handleMenu(e);
         }
     }
@@ -53,8 +54,8 @@ public class MenuListener implements Listener {
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
         if (event.getInventory().getHolder() instanceof Menu) {
-            if (!event.getPlayer().hasMetadata("AdminPanelOpen")) {
-                event.getPlayer().setMetadata("AdminPanelOpen", new FixedMetadataValue(AdminPanelMain.getPlugin(), true));
+            if (!player.hasMetadata("AdminPanelOpen")) {
+                player.setMetadata("AdminPanelOpen", new FixedMetadataValue(AdminPanelMain.getPlugin(), true));
             }
             FileConfiguration cfg = AdminPanelMain.getPlugin().getConfig();
             if (cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {
@@ -65,24 +66,30 @@ public class MenuListener implements Listener {
                             (float) cfg.getDouble("Panel.SoundPitch"));
                 }
             }
-            new BukkitRunnable() {
+            br = new BukkitRunnable() {
                 @SuppressWarnings("deprecation")
                 @Override
                 public void run() {
-                    if (player.getScoreboardTags().contains("AdminPanelOpen")) {
+                    if (player.hasMetadata("AdminPanelOpen")) {
                         if (cfg.getBoolean("Panel.ShowEffectWhenOpened")) {
+                            if(br.isCancelled()) return;
+
                             Location loc = player.getLocation();
                             loc.setY(loc.getY() + 3);
                             player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
-                            player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
                             for (Player online : Bukkit.getOnlinePlayers()) {
-                                online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
                                 online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
                             }
                         }
+                    } else {
+                        if(br != null) {
+                            br.cancel();
+                            br = null;
+                        }
                     }
                 }
-            }.runTaskTimer(AdminPanelMain.getPlugin(), 0L, 50L);
+            };
+            br.runTaskTimer(AdminPanelMain.getPlugin(), 0L, 50L);
         }
     }
 

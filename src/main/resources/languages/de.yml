@@ -40,9 +40,7 @@ Messages:
           EnterNewReason: '%prefix% &9> &aBitte gibt einen neuen Grund in den Chat ein!'
           NewReasonSet: '%prefix% &9> &aDer neue Grund wurde gesetzt!'
       BanMenu:
-        TargetKickMessage: "%prefix% &9> &4Du wurdest von diesem Server gebannt \n
-        &4Zeit: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds% \n
-        &4Grund: &4%reason%"
+        TargetKickMessage: '%prefix% &9> &4Du wurdest von diesem Server gebannt! \r\n &4Zeit: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds% \r\n &4Grund: &4%reason%'
         SuccessfullyUnbanned: '%prefix% &9> &aDu hast den Spieler erfolgreich entbannt!'
         SuccessfullyBanned: '%prefix% &9> &aDu hast diesen Spieler erfolgreich gebannt!'
         AlreadyBanned: '%prefix% &9> &cDieser Spieler ist schon gebannt!'

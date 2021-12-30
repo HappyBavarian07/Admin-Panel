@@ -8,9 +8,6 @@ softdepend:
   - SuperVanish
   - Vault
 load: POSTWORLD
-loadbefore:
-  - Vault
-  - PlaceholderAPI
 commands:
   adminpanel:
     description: Opens the Adminpanel

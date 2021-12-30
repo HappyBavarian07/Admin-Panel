@@ -12,8 +12,9 @@
 
 # Plugin By HappyBavarian07
 
-# The Bans.yml file is only important for the plugin !!! so please don't change anything in there, otherwise part of the plugin might break.
+# The permissions.yml file is only important for the plugin!!! so please don't change anything in there, otherwise part of the plugin might break.
 # As soon as you delete a file, it will reset itself to the default with the next reload and will create itself again
+# All Files are self updating, only the Language File Updater can be turned off. If you delete an Option or rename it, it will delete the other one (if exists) and take the Default Value
 
 ##########################################################
 #+------------------------------------------------------+#
@@ -28,17 +29,14 @@ Plugin:
   # These messages can be edited in the messages.yml file
   Prefix: '&r[&4Admin&d-&8Panel&r] '
 
-  # Currently Disabled
-  ## If your server uses Supervanish then please enter the version here.This is important for identification because I cannot simply create a method for each individual version:)
-  # SuperVanishVersion: 6.2.5
-
   # This is the language option you can add language files to the "languages" folder,
   # and then enter the name of the file (without .yml) here. Note upper and lower case!
-  # Example: /plugins/Admin-Panel/languages/Language.yml | language (in the config): Language
+  # Example: /plugins/Admin-Panel/languages/<Language>.yml | language (in the config): Language
   language: en
   # This Option makes it that all Actions (Plugin Update, Admin Panel Open, ...) get logged
   # in the plugin.log File If You don't want this please disable this Option!
   LogActions: true
+  # The Auto Plugin Updater Section
   Updater:
     # If this option is activated, the updater will automatically check for updates
     # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
@@ -60,7 +58,7 @@ Plugin:
 Panel:
 
   # Here you can set whether there are sounds when opening an inventory of the plugin should be played
-  PlaySoundsWhenOpened: false
+  PlaySoundsWhenOpened: true
   # This is the sound that is played when you open a panel / inventory
   # it is only played if the previous query is true
   SoundWhenOpened: ENTITY_BAT_TAKEOFF
@@ -75,7 +73,7 @@ Panel:
 
   # Here you can set whether an effect should be played when someone has a panel open
   # Of course only if you are not in the Vanish (not possible at the moment!)
-  ShowEffectWhenOpened: false
+  ShowEffectWhenOpened: true
   # Here you can set the effect
   EffectWhenOpened: ENDER_SIGNAL
 
