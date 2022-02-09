@@ -139,11 +139,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         new Utils();
         new File(this.getDataFolder() + "/languages").mkdir();
         logger.message("&e&lVariable Done!&r");
-        try {
-            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlayerExpansion().register();
             new PluginExpansion().register();
@@ -251,9 +246,14 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
+        try {
+            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating")) {
             for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
-                if(plugin.getResource("languages/" + langFiles.getLangName() + ".yml") == null) continue;
+                if (plugin.getResource("languages/" + langFiles.getLangName() + ".yml") == null) continue;
                 File oldFile = langFiles.getLangFile();
                 File newFile = new File(langFiles.getLangFile().getParentFile().getPath() + "/" + langFiles.getLangName() + "-new.yml");
                 YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
@@ -353,7 +353,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return fileLogger;
     }
 
-    public @NotNull File getPluginFile() {
+    public @NotNull
+    File getPluginFile() {
         return this.getFile();
     }
 
