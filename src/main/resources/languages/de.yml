@@ -923,6 +923,11 @@ Items:
         displayName: '&3Reloaden'
         lore:
           - '&3Lade das Plugin neu!'
+      Restart:
+        material: BEACON
+        displayName: '&3Restarten'
+        lore:
+          - '&3Starte das Plugin neu!'
       Unload:
         material: COAL_BLOCK
         displayName: '&2Entladen'

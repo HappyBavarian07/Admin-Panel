@@ -71,6 +71,8 @@ permissions:
                 default: op
               AdminPanel.PluginManager.PluginSettings.Disable:
                 default: op
+              AdminPanel.PluginManager.PluginSettings.Reload:
+                default: op
               AdminPanel.PluginManager.PluginSettings.Restart:
                 default: op
               AdminPanel.PluginManager.PluginSettings.Unload:

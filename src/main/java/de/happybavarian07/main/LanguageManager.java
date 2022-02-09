@@ -143,11 +143,17 @@ public class LanguageManager {
             return error;
         }
         ItemStack item;
-        Material material = Material.matchMaterial(Objects.requireNonNull(langConfig.getConfig().getString("Items." + path + ".material")));
+        Material material = Material.matchMaterial(langConfig.getConfig().getString("Items." + path + ".material"));
+        if (material == null) {
+            assert errorMeta != null;
+            errorMeta.setDisplayName("Material not found! (" + langConfig.getConfig().getString("Items." + path + ".material") + ")");
+            errorMeta.setLore(Arrays.asList("If this happens,", "please change the Material from this Item", "to something existing", "Path: Items." + path + ".material"));
+            error.setItemMeta(errorMeta);
+            return error;
+        }
         String displayName = langConfig.getConfig().getString("Items." + path + ".displayName");
         List<String> lore = langConfig.getConfig().getStringList("Items." + path + ".lore");
         List<String> loreWithPlaceholders = new ArrayList<>();
-        assert material != null;
         item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         for (String s : lore) {
@@ -185,11 +191,17 @@ public class LanguageManager {
             return error;
         }
         ItemStack item;
-        Material material = Material.matchMaterial(Objects.requireNonNull(langConfig.getConfig().getString("Items." + path + ".material")));
+        Material material = Material.matchMaterial(langConfig.getConfig().getString("Items." + path + ".material"));
+        if (material == null) {
+            assert errorMeta != null;
+            errorMeta.setDisplayName("Material not found! (" + langConfig.getConfig().getString("Items." + path + ".material") + ")");
+            errorMeta.setLore(Arrays.asList("If this happens,", "please change the Material from this Item", "to something existing", "Path: Items." + path + ".material"));
+            error.setItemMeta(errorMeta);
+            return error;
+        }
         String displayName = langConfig.getConfig().getString("Items." + path + ".displayName");
         List<String> lore = langConfig.getConfig().getStringList("Items." + path + ".lore");
         List<String> loreWithPlaceholders = new ArrayList<>();
-        assert material != null;
         item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         for (String s : lore) {

@@ -81,7 +81,7 @@ public class PluginSettingsMenu extends Menu {
                 notAPanelEventException.printStackTrace();
             }
         } else if (item.equals(lgm.getItem(path + "Reload", player))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
+            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Reload")) {
                 player.sendMessage(noPerms);
                 return;
             }
@@ -91,6 +91,23 @@ public class PluginSettingsMenu extends Menu {
                 if (!reloadEvent.isCancelled()) {
                     if (enabled)
                         pluginUtils.reload(currentPlugin);
+                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
+            }
+        } else if (item.equals(lgm.getItem(path + "Restart", player))) {
+            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            PluginRestartEvent restartEvent = new PluginRestartEvent(player, currentPlugin);
+            try {
+                AdminPanelMain.getAPI().callAdminPanelEvent(restartEvent);
+                if (!restartEvent.isCancelled()) {
+                    if (enabled) {
+                        Bukkit.getPluginManager().disablePlugin(currentPlugin);
+                        Bukkit.getPluginManager().enablePlugin(currentPlugin);
+                    }
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
@@ -156,6 +173,7 @@ public class PluginSettingsMenu extends Menu {
         inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player));
         inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player));
         inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player));
+        inventory.setItem(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player));
         inventory.setItem(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player));
         inventory.setItem(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player));
         inventory.setItem(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player));

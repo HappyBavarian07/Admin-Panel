@@ -20,6 +20,30 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class MenuListener implements Listener {
     private BukkitRunnable br;
 
+    public MenuListener() {
+        FileConfiguration cfg = AdminPanelMain.getPlugin().getConfig();
+        if (cfg.getBoolean("Panel.ShowEffectWhenOpened")) {
+            br = new BukkitRunnable() {
+                @SuppressWarnings("deprecation")
+                @Override
+                public void run() {
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (player.hasMetadata("AdminPanelOpen")) {
+                            if (br.isCancelled()) return;
+
+                            Location loc = player.getLocation();
+                            loc.setY(loc.getY() + 3);
+                            player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
+                            for (Player online : Bukkit.getOnlinePlayers()) {
+                                online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
+                            }
+                        }
+                }
+            };
+            br.runTaskTimer(AdminPanelMain.getPlugin(), 0L, 50L);
+        }
+    }
+
     @EventHandler
     public void onMenuClick(InventoryClickEvent e) {
 
@@ -66,30 +90,6 @@ public class MenuListener implements Listener {
                             (float) cfg.getDouble("Panel.SoundPitch"));
                 }
             }
-            br = new BukkitRunnable() {
-                @SuppressWarnings("deprecation")
-                @Override
-                public void run() {
-                    if (player.hasMetadata("AdminPanelOpen")) {
-                        if (cfg.getBoolean("Panel.ShowEffectWhenOpened")) {
-                            if(br.isCancelled()) return;
-
-                            Location loc = player.getLocation();
-                            loc.setY(loc.getY() + 3);
-                            player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
-                            for (Player online : Bukkit.getOnlinePlayers()) {
-                                online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
-                            }
-                        }
-                    } else {
-                        if(br != null) {
-                            br.cancel();
-                            br = null;
-                        }
-                    }
-                }
-            };
-            br.runTaskTimer(AdminPanelMain.getPlugin(), 0L, 50L);
         }
     }
 
