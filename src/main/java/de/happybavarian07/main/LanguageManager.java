@@ -142,6 +142,10 @@ public class LanguageManager {
             error.setItemMeta(errorMeta);
             return error;
         }
+        if(langConfig.getConfig().getBoolean("Items." + path + ".disabled", false) &&
+                !Objects.equals(path, "General.DisabledItem")) {
+            return this.getItem("General.DisabledItem", player);
+        }
         ItemStack item;
         Material material = Material.matchMaterial(langConfig.getConfig().getString("Items." + path + ".material"));
         if (material == null) {
@@ -189,6 +193,10 @@ public class LanguageManager {
             errorMeta.setLore(Arrays.asList("If this happens often,", "please report to the Discord", "Path: Items." + path));
             error.setItemMeta(errorMeta);
             return error;
+        }
+        if(langConfig.getConfig().getBoolean("Items." + path + ".disabled", false) &&
+                !Objects.equals(path, "General.DisabledItem")) {
+            return this.getItem("General.DisabledItem", player);
         }
         ItemStack item;
         Material material = Material.matchMaterial(langConfig.getConfig().getString("Items." + path + ".material"));

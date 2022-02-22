@@ -2,6 +2,7 @@ package de.happybavarian07.listeners;
 
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.menusystem.Menu;
+import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -28,14 +29,19 @@ public class MenuListener implements Listener {
                 @Override
                 public void run() {
                     for (Player player : Bukkit.getOnlinePlayers())
-                        if (player.hasMetadata("AdminPanelOpen")) {
-                            if (br.isCancelled()) return;
+                        if(Bukkit.getPluginManager().getPlugin("SuperVanish") != null &&
+                                VanishAPI.isInvisible(player)) {
+                            continue;
+                        } else {
+                            if (player.hasMetadata("AdminPanelOpen")) {
+                                if (br.isCancelled()) return;
 
-                            Location loc = player.getLocation();
-                            loc.setY(loc.getY() + 3);
-                            player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
-                            for (Player online : Bukkit.getOnlinePlayers()) {
-                                online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
+                                Location loc = player.getLocation();
+                                loc.setY(loc.getY() + 3);
+                                player.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
+                                for (Player online : Bukkit.getOnlinePlayers()) {
+                                    online.playEffect(loc, Effect.valueOf(cfg.getString("Panel.EffectWhenOpened")), 0);
+                                }
                             }
                         }
                 }

@@ -109,6 +109,11 @@ Items:
       displayName: ' '
       lore:
         - ''
+    DisabledItem:
+      material: BARRIER
+      displayName: '&8Diese Funktion wurde deaktiviert!'
+      lore:
+        - '&7Diese Funktion wurde in der Config deaktiviert!'
     Close:
       material: BARRIER
       displayName: '&cClose'

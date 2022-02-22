@@ -109,6 +109,12 @@ Items:
       displayName: ' '
       lore:
         - ''
+    DisabledItem:
+      material: BARRIER
+      displayName: '&8This Feature has been disabled!'
+      lore:
+        - '&7This Feature has been disabled in the Config'
+        - '&7of this Plugin!'
     Close:
       material: BARRIER
       displayName: '&cClose'
