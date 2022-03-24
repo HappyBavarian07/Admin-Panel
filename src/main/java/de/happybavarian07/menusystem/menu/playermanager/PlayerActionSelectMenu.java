@@ -70,7 +70,7 @@ public class PlayerActionSelectMenu extends Menu {
         Player target = Bukkit.getPlayer(targetUUID);
         inventory.setItem(getSlot(path + "ActionsItem", 10), lgm.getItem(path + "ActionsItem", target));
         if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            inventory.setItem(getSlot(path + "ActionsItem", 12), lgm.getItem(path + "MoneyItem", target));
+            inventory.setItem(getSlot(path + "MoneyItem", 12), lgm.getItem(path + "MoneyItem", target));
         }
         inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target));
         inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target));

@@ -84,13 +84,15 @@ Panel:
 ##########################################################
 # Pman = Player Manager
 Pman:
+  # This Features makes it so you can select yourself in the Player Manager
+  # ! Use this at your own Risk !
+  SelfSelect: false
   # Here you can set everything that can be set at Trolls
   Troll:
     # Here you can set how many entities are spawned when the Mob Dupe option is activated in the Troll menu
     # And the player kills an entity!
     # If you do too much, the game will likely lag
     MobDupe: 1
-  
   Actions:
     # Here you can set how much life you get if someone opens up for you
     # click the Heal Item in the Actions menu in Pman

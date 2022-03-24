@@ -51,7 +51,8 @@ public class PlayerSelectMenu extends PaginatedMenu {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
                 if (!selectPlayerEvent.isCancelled()) {
-                    if (player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()))) {
+                    if (player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName())) &&
+                    !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
                         player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
                         return;
                     }

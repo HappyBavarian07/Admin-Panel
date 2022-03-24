@@ -52,8 +52,10 @@ Messages:
       Money:
         PleaseEnterAmount: '%prefix% &9> &aBitte gebe den Betrag in den Chat ein mit dem du arbeiten willst!'
         NotEnoughMoney: '%prefix% &9> &c%player_name% hat nicht genug Geld dafür! (%vault_eco_balance%)'
+        TransactionError: '%prefix% &9> &c%player_name% Bei der Transaktion is etwas schiefgelaufen!'
         NotANumber: '%prefix% &9> &c%player_name%, das ist keine Nummer!'
         GiveMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% gegeben!'
+        SetMoney: '%prefix% &9> &cDu hast gerade %player_name% auf %amount% gesetzt!'
         TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
     ServerManager:
       MaintenanceModeOff: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
@@ -517,6 +519,11 @@ Items:
         displayName: '&aGive Money'
         lore:
           - '&aGebe dem Spieler Geld!'
+      Set:
+        material: YELLOW_WOOL
+        displayName: '&cSet Money'
+        lore:
+          - '&cSetze dem Spieler das Geld auf einen Wert!'
       Take:
         material: RED_WOOL
         displayName: '&cTake Money'

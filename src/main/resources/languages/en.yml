@@ -52,8 +52,10 @@ Messages:
       Money:
         PleaseEnterAmount: '%prefix% &9> &aPlease enter the amount you want to work with in the chat!'
         NotEnoughMoney: '%prefix% &9> &c%player_name% doesn''t have enough money for it! (%vault_eco_balance%)'
+        TransactionError: '%prefix% &9> &c%player_name% There was an Error with the Transaction!'
         NotANumber: '%prefix% &9> &c%player_name%, that''s not a Number!'
         GiveMoney: '%prefix% &9> &cYou just gave %amount% to %player_name%!'
+        SetMoney: '%prefix% &9> &cYou just set the Money of %player_name% to %amount%!'
         TakeMoney: '%prefix% &9> &cYou just took away %amount% from %player_name%!'
     ServerManager:
       MaintenanceModeOff: '%prefix% &9> &cThe server is now in maintenance mode. All players who have no rights have been kicked!'
@@ -518,6 +520,11 @@ Items:
         displayName: '&aGive Money'
         lore:
           - '&aGive the Player Money!'
+      Set:
+        material: YELLOW_WOOL
+        displayName: '&cSet Money'
+        lore:
+          - '&cSet the Players Money to a specific Amount!'
       Take:
         material: RED_WOOL
         displayName: '&cTake Money'
