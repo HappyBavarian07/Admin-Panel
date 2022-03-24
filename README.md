@@ -15,5 +15,7 @@ Ich habe da wirklich ein anderes Plugin angefangen und habe mich nur inspirieren
 
 Mit diesem Plugin habe ich vor: viele Plugins wie Plugin Manager, Server Manager, World Manager, ... zu vereinen in ein großes Plugin.
 
+Das Admin-Panel
+
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.happybavarian07/Admin-Panel.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.happybavarian07%22%20AND%20a:%22Admin-Panel%22)
