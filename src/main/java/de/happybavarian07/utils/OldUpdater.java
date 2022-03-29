@@ -19,12 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
 
-public class Updater implements Listener {
+public class OldUpdater implements Listener {
     private final AdminPanelMain plugin;
     private final int resourceID;
     private final PluginUtils pluginUtils;
 
-    public Updater(AdminPanelMain plugin, int resourceID) {
+    public OldUpdater(AdminPanelMain plugin, int resourceID) {
         this.plugin = plugin;
         this.pluginUtils = new PluginUtils();
         this.resourceID = resourceID;

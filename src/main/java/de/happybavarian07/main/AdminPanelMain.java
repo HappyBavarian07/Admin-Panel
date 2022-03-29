@@ -1,5 +1,9 @@
 package de.happybavarian07.main;
 
+import de.happybavarian07.addonloader.api.Addon;
+import de.happybavarian07.addonloader.api.Dependency;
+import de.happybavarian07.addonloader.loadingutils.AddonLoader;
+import de.happybavarian07.addonloader.utils.FileUtils;
 import de.happybavarian07.commands.AdminPanelOpenCommand;
 import de.happybavarian07.commands.UpdateCommand;
 import de.happybavarian07.configupdater.ConfigUpdater;
@@ -25,12 +29,14 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.Level;
 
 public class AdminPanelMain extends JavaPlugin implements Listener {
     private static String prefix;
@@ -54,9 +60,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public boolean inMaintenanceMode = false;
     public boolean chatMuted = false;
     private FileConfiguration permissionsConfig;
-    private Updater updater;
+    private NewUpdater updater;
     private LanguageManager languageManager;
     private OldLanguageFileUpdater langFileUpdater;
+    private List<Addon> loadedAddons = new ArrayList<>();
 
     public static String getPrefix() {
         return prefix;
@@ -94,7 +101,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         this.chatMuted = chatMuted;
     }
 
-    public Updater getUpdater() {
+    public NewUpdater getUpdater() {
         return updater;
     }
 
@@ -117,6 +124,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public Map<UUID, Map<String, Boolean>> getPlayerPermissions() {
         return playerPermissions;
     }
+
+    private AddonLoader loader;
 
     @Override
     public void onEnable() {
@@ -258,7 +267,17 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 File newFile = new File(langFiles.getLangFile().getParentFile().getPath() + "/" + langFiles.getLangName() + "-new.yml");
                 YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
                 InputStream defaultStream = plugin.getResource("languages/" + langFiles.getLangName() + ".yml");
-                if (defaultStream != null) {
+                boolean nonDefaultLang = false;
+                //try {
+                //    defaultStream = plugin.getResource("languages/" + langFiles.getLangName() + ".yml");
+                //} catch (IllegalArgumentException e) {
+                //    String defaultLang = plugin.getConfig().getString("Plugin.languageForUpdates");
+                //    if (defaultLang == null || plugin.getResource(defaultLang) == null) defaultLang = "en";
+
+                //    defaultStream = plugin.getResource(defaultLang);
+                //    nonDefaultLang = true;
+                //}
+                if(defaultStream != null) {
                     YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
                     newConfig.setDefaults(defaultConfig);
                 }
@@ -268,7 +287,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                langFileUpdater.updateFile(oldFile, newConfig, langFiles.getLangName());
+                langFileUpdater.updateFile(oldFile, newConfig, langFiles.getLangName(), nonDefaultLang);
                 newFile.delete();
             }
             /*for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
@@ -309,18 +328,19 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             return String.valueOf(value);
         }));
 
-        updater = new Updater(getPlugin(), 91800);
+        updater = new NewUpdater(getPlugin(), 91800);
+        updater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
         if (getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
             updater.checkForUpdates(true);
             if (updater.updateAvailable()) {
-                updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
+                updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
             }
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     updater.checkForUpdates(false);
                     if (updater.updateAvailable()) {
-                        updater.downloadPlugin(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
+                        updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
                     }
                 }
             }.runTaskTimer(plugin, (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
@@ -345,8 +365,107 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 180);
-        Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
+        try {
+            Objects.requireNonNull(this.getCommand("update")).setExecutor(new UpdateCommand());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Objects.requireNonNull(this.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
+
+        //System.out.println("Init Addon Loader!!!!!!!!!!!!!!!!!!!!!!!!! 111111");
+        //System.out.println("Config Option: " + plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled"));
+        if(plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled")) {
+            //System.out.println("Init Addon Loader!!!!!!!!!!!!!!!!!!!!!!!!! 222222");
+            initAddonLoader();
+        }
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        getFileLogger().writeToLog(Level.INFO, "Admin-Panel successfully started on '" + dtf.format(now) + "'", "DateLogger");
+    }
+
+    private void initAddonLoader() {
+        logger.emptySpacer();
+        logger.emptySpacer();
+        logger.coloredSpacer(ChatColor.RED);
+        logger.message("&cIt could happen that an Addon needs another Plugin to work.&r");
+        logger.message("&cThen this Addon will not start and the Loader&r");
+        logger.message("&cwill continue loading!&r");
+        logger.coloredSpacer(ChatColor.RED);
+        logger.emptySpacer();
+        logger.coloredSpacer(ChatColor.BLUE);
+        logger.coloredMessage(ChatColor.GREEN, "Adding Addons to the List!");
+
+        loader = new AddonLoader(new File(this.getDataFolder() + "/addons"));
+
+        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 1/3! (Adding)");
+        logger.coloredSpacer(ChatColor.BLUE);
+        logger.emptySpacer();
+
+        File[] temp = loader.getAddonFolder().listFiles(pathname -> pathname.getName().endsWith(".jar"));
+
+        if(!loader.getAddonFolder().exists() || temp == null || temp.length == 0) {
+            logger.coloredSpacer(ChatColor.RED);
+            logger.message("&cThere are no Addons in that Folder! Stopping the Addon Loader!&r");
+            logger.coloredSpacer(ChatColor.RED);
+            loader.crashAddons();
+            return;
+        }
+
+        logger.coloredSpacer(ChatColor.BLUE);
+        logger.coloredMessage(ChatColor.GREEN, "Loading Addons!");
+
+        for (File jarFile : loader.getLoadedJarFiles().keySet()) {
+            getLogger().log(Level.INFO, "Loading Addon Jar File: " + jarFile.getName());
+            try {
+                loader.loadAddon(jarFile);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 2/3! (Loading)");
+        logger.coloredSpacer(ChatColor.BLUE);
+        logger.emptySpacer();
+        logger.coloredSpacer(ChatColor.BLUE);
+        logger.coloredMessage(ChatColor.GREEN, "Enabling Addons!");
+
+        for (File addonFile : loader.getLoadedJarFiles().keySet()) {
+            try {
+                //System.out.println("File: " + addonFile);
+                final Class<? extends Addon> addonClass = FileUtils.findClass(addonFile, Addon.class);
+
+                if (addonClass == null) {
+                    //System.out.println("Addon Class is null!");
+                    continue;
+                }
+
+                Addon addon = addonClass.getConstructor().newInstance();
+                //System.out.println("Resource:" + addon);
+
+                boolean allowedToStart = true;
+                if (!addon.getDependencies().isEmpty()) {
+                    for (Dependency dependency : addon.getDependencies()) {
+                        if (!Bukkit.getPluginManager().isPluginEnabled(dependency.getName())) {
+                            allowedToStart = false;
+                            logger.coloredMessage(ChatColor.DARK_RED, "Dependency Error enabling Addon: " + addon.getName());
+                            logger.coloredMessage(ChatColor.DARK_RED, "Please install the following Dependency '" + dependency.getName() + "' (Link: " + dependency.getLink() + ")!");
+                        }
+                    }
+                }
+                if (allowedToStart) {
+                    getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
+                    addon.onEnable();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 3/3! (Enabling)");
+        logger.coloredSpacer(ChatColor.BLUE);
     }
 
     public PluginFileLogger getFileLogger() {
@@ -364,6 +483,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        loader = null;
         if (languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null) != null &&
                 !languageManager.getMessage("Plugin.DisablingMessage", null).equals("null config") &&
                 !languageManager.getMessage("Plugin.DisablingMessage", null).startsWith("null path: Messages.")) {

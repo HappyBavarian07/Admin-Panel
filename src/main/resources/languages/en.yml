@@ -1,6 +1,6 @@
 # The Language File for English Language
 LanguageFullName: 'English'
-LanguageVersion: '7.3.0'
+LanguageVersion: '7.6.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
@@ -16,6 +16,7 @@ Messages:
       OpeningMessageSelf: '%prefix% &9> &cYou have opened the Admin-Panel for you!'
       OpeningMessageOther: '%prefix% &9> &c%player_name% opened the Admin-Panel for you!'
       TargetedPlayerIsNull: '%prefix% &9> &cThis player is not online or does not exist!'
+      NotAValidUpdateVersion: '%prefix% &9> &cThat''s not a valid Plugin Version to update to!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aPlease enter a Name in the Chat!'

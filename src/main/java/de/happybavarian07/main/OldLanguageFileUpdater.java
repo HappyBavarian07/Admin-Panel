@@ -8,9 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class OldLanguageFileUpdater {
@@ -22,47 +20,49 @@ public class OldLanguageFileUpdater {
         this.lgm = plugin.getLanguageManager();
     }
 
-    public Map<String, Object> checkForUpdates(File oldFile, FileConfiguration newConfig) {
+    public Map<String, Object> checkForUpdates(File oldFile, FileConfiguration newConfig, boolean nonDefaultLang) {
         FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldFile);
         Map<String, Object> updates = new HashMap<>();
 
-        if (!oldConfig.contains("LanguageFullName") ||
-                !oldConfig.getString("LanguageFullName", "").equals(newConfig.getString("LanguageFullName", "")))
-            updates.put("LanguageFullName", newConfig.getString("LanguageFullName"));
+        if (!nonDefaultLang) {
+            if (!oldConfig.contains("LanguageFullName") ||
+                    !oldConfig.getString("LanguageFullName", "").equals(newConfig.getString("LanguageFullName", "")))
+                updates.put("LanguageFullName", newConfig.getString("LanguageFullName"));
+        }
         if (!oldConfig.contains("LanguageVersion") ||
                 !oldConfig.getString("LanguageVersion", "").equals(newConfig.getString("LanguageVersion", "")))
             updates.put("LanguageVersion", newConfig.getString("LanguageVersion"));
 
         // Messages
         for (String path : newConfig.getConfigurationSection("Messages").getKeys(true)) {
-            if(!oldConfig.contains("Messages." + path) && !newConfig.isConfigurationSection("Messages." + path)) {
+            if (!oldConfig.contains("Messages." + path) && !newConfig.isConfigurationSection("Messages." + path)) {
                 updates.put("Messages." + path, newConfig.get("Messages." + path));
             }
         }
 
         // Items
         for (String path : newConfig.getConfigurationSection("Items").getKeys(true)) {
-            if(!oldConfig.contains("Items." + path) && !newConfig.isConfigurationSection("Items." + path)) {
+            if (!oldConfig.contains("Items." + path) && !newConfig.isConfigurationSection("Items." + path)) {
                 updates.put("Items." + path, newConfig.get("Items." + path));
             }
         }
 
         // MenuTitles
         for (String path : newConfig.getConfigurationSection("MenuTitles").getKeys(true)) {
-            if(!oldConfig.contains("MenuTitles." + path) && !newConfig.isConfigurationSection("MenuTitles." + path)) {
+            if (!oldConfig.contains("MenuTitles." + path) && !newConfig.isConfigurationSection("MenuTitles." + path)) {
                 updates.put("MenuTitles." + path, newConfig.get("MenuTitles." + path));
             }
         }
         return updates;
     }
 
-    public void updateFile(File oldFile, FileConfiguration newConfig, String langName) {
+    public void updateFile(File oldFile, FileConfiguration newConfig, String langName, boolean nonDefaultLang) {
         FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldFile);
-        Map<String, Object> checkedUpdates = checkForUpdates(oldFile, newConfig);
+        Map<String, Object> checkedUpdates = checkForUpdates(oldFile, newConfig, nonDefaultLang);
         //System.out.println("Language: " + langName);
-        if(checkedUpdates.isEmpty()) return;
-        for(String path : checkedUpdates.keySet()) {
-            if((!oldConfig.contains(path) || oldConfig.get(path) == null) && !oldConfig.isConfigurationSection(path)) {
+        if (checkedUpdates.isEmpty()) return;
+        for (String path : checkedUpdates.keySet()) {
+            if ((!oldConfig.contains(path) || oldConfig.get(path) == null) && !oldConfig.isConfigurationSection(path)) {
                 //System.out.println("Path: " + path);
                 oldConfig.set(path, checkedUpdates.get(path));
                 // Save the File

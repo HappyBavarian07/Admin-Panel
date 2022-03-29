@@ -8,12 +8,17 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.*;
+import sun.net.www.http.HttpClient;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.NotDirectoryException;
 import java.util.*;
 import java.util.logging.Level;
@@ -232,5 +237,34 @@ public class PluginUtils {
                 "Installed the Plugin \"" + resourceID + "\" under the Name \"" +
                         "/plugins/" + fileName + ".jar" + "\"", "ActionsLogger - Plugin");
         return target;
+    }
+
+    private final String USER_AGENT = "Admin-Panel-User-Agent";
+
+    public File downloadFileFromURL(File destination, String urlString) throws IOException {
+        URL website = new URL(urlString);
+        HttpURLConnection httpcon = (HttpURLConnection) website.openConnection();
+        httpcon.addRequestProperty("User-Agent", USER_AGENT);
+        httpcon.connect();
+
+        ReadableByteChannel rbc = Channels.newChannel(httpcon.getInputStream());
+        FileOutputStream fos = new FileOutputStream(destination);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        fos.close();
+        rbc.close();
+        return destination;
+    }
+
+    public File downloadFileFromURL(File destination, URL url) throws IOException {
+        HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+        httpcon.addRequestProperty("User-Agent", USER_AGENT);
+        httpcon.connect();
+
+        ReadableByteChannel rbc = Channels.newChannel(httpcon.getInputStream());
+        FileOutputStream fos = new FileOutputStream(destination);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        fos.close();
+        rbc.close();
+        return destination;
     }
 }
