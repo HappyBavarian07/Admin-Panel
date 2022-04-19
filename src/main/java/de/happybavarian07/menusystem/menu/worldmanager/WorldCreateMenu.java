@@ -49,7 +49,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         Player player = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         String itemPath = "WorldManager.CreateMenu.";
-        ItemStack nameItem = lgm.getItem(itemPath + "Name", player);
+        ItemStack nameItem = lgm.getItem(itemPath + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> nameLore = new ArrayList<>();
         for (String string : nameItem.getItemMeta().getLore()) {
@@ -58,7 +58,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         nameMeta.setLore(nameLore);
         nameItem.setItemMeta(nameMeta);
 
-        ItemStack typeItem = lgm.getItem(itemPath + "Type." + worldType.toString(), player);
+        ItemStack typeItem = lgm.getItem(itemPath + "Type." + worldType.toString(), player, false);
         ItemMeta typeMeta = typeItem.getItemMeta();
         List<String> typeLore = new ArrayList<>();
         for (String string : typeMeta.getLore()) {
@@ -67,7 +67,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         typeMeta.setLore(typeLore);
         typeItem.setItemMeta(typeMeta);
 
-        ItemStack environmentItem = lgm.getItem(itemPath + "Environment." + worldEnvironment.toString(), player);
+        ItemStack environmentItem = lgm.getItem(itemPath + "Environment." + worldEnvironment.toString(), player, false);
         ItemMeta environmentMeta = environmentItem.getItemMeta();
         List<String> environmentLore = new ArrayList<>();
         for (String string : environmentMeta.getLore()) {
@@ -76,12 +76,12 @@ public class WorldCreateMenu extends Menu implements Listener {
         environmentMeta.setLore(environmentLore);
         environmentItem.setItemMeta(environmentMeta);
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(nameItem)) {
             player.setMetadata("createWorldSetName", new FixedMetadataValue(plugin, true));
-            player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player));
+            player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player, true));
             player.closeInventory();
         } else if (item.equals(typeItem)) {
             if (this.worldType == WorldType.NORMAL) {
@@ -103,25 +103,25 @@ public class WorldCreateMenu extends Menu implements Listener {
                 this.worldEnvironment = World.Environment.NORMAL;
             }
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.true", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.true", player, false))) {
             this.generateStructures = false;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.false", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.false", player, false))) {
             this.generateStructures = true;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.true", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.true", player, false))) {
             this.hardcore = false;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.false", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.false", player, false))) {
             this.hardcore = true;
             super.open();
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new WorldSelectMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(itemPath + "CreateWorld", player))) {
+        } else if (item.equals(lgm.getItem(itemPath + "CreateWorld", player, false))) {
             WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);
@@ -148,7 +148,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "WorldManager.CreateMenu.";
         setFillerGlass();
-        ItemStack nameItem = lgm.getItem(path + "Name", player);
+        ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> nameLore = new ArrayList<>();
         for (String string : nameMeta.getLore()) {
@@ -158,7 +158,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         nameItem.setItemMeta(nameMeta);
         inventory.setItem(getSlot(path + "Name", 10), nameItem);
 
-        ItemStack typeItem = lgm.getItem(path + "Type." + worldType.toString(), player);
+        ItemStack typeItem = lgm.getItem(path + "Type." + worldType.toString(), player, false);
         ItemMeta typeMeta = typeItem.getItemMeta();
         List<String> typeLore = new ArrayList<>();
         for (String string : typeMeta.getLore()) {
@@ -168,7 +168,7 @@ public class WorldCreateMenu extends Menu implements Listener {
         typeItem.setItemMeta(typeMeta);
         inventory.setItem(getSlot(path + "Type." + worldType.toString(), 12), typeItem);
 
-        ItemStack environmentItem = lgm.getItem(path + "Environment." + worldEnvironment.toString(), player);
+        ItemStack environmentItem = lgm.getItem(path + "Environment." + worldEnvironment.toString(), player, false);
         ItemMeta environmentMeta = environmentItem.getItemMeta();
         List<String> environmentLore = new ArrayList<>();
         for (String string : environmentMeta.getLore()) {
@@ -179,19 +179,19 @@ public class WorldCreateMenu extends Menu implements Listener {
         inventory.setItem(getSlot(path + "Environment." + worldEnvironment.toString(), 14), environmentItem);
 
         if (generateStructures) {
-            inventory.setItem(getSlot(path + "GenerateStructures.true", 16), lgm.getItem(path + "GenerateStructures.true", player));
+            inventory.setItem(getSlot(path + "GenerateStructures.true", 16), lgm.getItem(path + "GenerateStructures.true", player, false));
         } else {
-            inventory.setItem(getSlot(path + "GenerateStructures.false", 16), lgm.getItem(path + "GenerateStructures.false", player));
+            inventory.setItem(getSlot(path + "GenerateStructures.false", 16), lgm.getItem(path + "GenerateStructures.false", player, false));
         }
 
         if (hardcore) {
-            inventory.setItem(getSlot(path + "Hardcore.true", 22), lgm.getItem(path + "Hardcore.true", player));
+            inventory.setItem(getSlot(path + "Hardcore.true", 22), lgm.getItem(path + "Hardcore.true", player, false));
         } else {
-            inventory.setItem(getSlot(path + "Hardcore.false", 22), lgm.getItem(path + "Hardcore.false", player));
+            inventory.setItem(getSlot(path + "Hardcore.false", 22), lgm.getItem(path + "Hardcore.false", player, false));
         }
 
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
-        inventory.setItem(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
+        inventory.setItem(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player, false));
 
 
     }

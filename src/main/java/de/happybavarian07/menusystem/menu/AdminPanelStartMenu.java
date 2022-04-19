@@ -36,10 +36,10 @@ public class AdminPanelStartMenu extends Menu {
         Player player = (Player) e.getWhoClicked();
         String path = "StartMenu.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "ServerRestart", player))) {
+            if (item.equals(lgm.getItem(path + "ServerRestart", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerRestart")) {
                     player.sendMessage(noPerms);
                     return;
@@ -49,7 +49,7 @@ public class AdminPanelStartMenu extends Menu {
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
-            } else if (item.equals(lgm.getItem(path + "ServerStop", player))) {
+            } else if (item.equals(lgm.getItem(path + "ServerStop", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
@@ -59,38 +59,38 @@ public class AdminPanelStartMenu extends Menu {
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
-            } else if (item.equals(lgm.getItem(path + "WorldManager", player))) {
+            } else if (item.equals(lgm.getItem(path + "WorldManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "PlayerManager", player))) {
+            } else if (item.equals(lgm.getItem(path + "PlayerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "PluginManager", player))) {
+            } else if (item.equals(lgm.getItem(path + "PluginManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.PluginManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "ServerManager", player))) {
+            } else if (item.equals(lgm.getItem(path + "ServerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "ReloadConfig", player))) {
+            } else if (item.equals(lgm.getItem(path + "ReloadConfig", player, false))) {
                 if (!player.hasPermission("AdminPanel.ReloadConfig")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 AdminPanelMain.getAPI().reloadConfigurationFiles(player);
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "SwitchLanguageMenuItem", player))) {
+            } else if (item.equals(lgm.getItem(path + "SwitchLanguageMenuItem", player, false))) {
                 if (!player.hasPermission("AdminPanel.SwitchLanguage")) {
                     player.sendMessage(noPerms);
                     return;
@@ -106,14 +106,14 @@ public class AdminPanelStartMenu extends Menu {
         Player player = playerMenuUtility.getOwner();
         String path = "StartMenu.";
 
-        inventory.setItem(getSlot(path + "ReloadConfig", 18), lgm.getItem(path + "ReloadConfig", player));
-        inventory.setItem(getSlot(path + "ServerRestart", 4), lgm.getItem(path + "ServerRestart", player));
-        inventory.setItem(getSlot(path + "WorldManager", 10), lgm.getItem(path + "WorldManager", player));
-        inventory.setItem(getSlot(path + "PlayerManager", 12), lgm.getItem(path + "PlayerManager", player));
-        inventory.setItem(getSlot(path + "PluginManager", 13), lgm.getItem(path + "PluginManager", player));
-        inventory.setItem(getSlot(path + "ServerStop", 14), lgm.getItem(path + "ServerStop", player));
-        inventory.setItem(getSlot(path + "ServerManager", 16), lgm.getItem(path + "ServerManager", player));
-        inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player));
-        inventory.setItem(getSlot(path + "SwitchLanguageMenuItem", 26), lgm.getItem(path + "SwitchLanguageMenuItem", player));
+        inventory.setItem(getSlot(path + "ReloadConfig", 18), lgm.getItem(path + "ReloadConfig", player, false));
+        inventory.setItem(getSlot(path + "ServerRestart", 4), lgm.getItem(path + "ServerRestart", player, false));
+        inventory.setItem(getSlot(path + "WorldManager", 10), lgm.getItem(path + "WorldManager", player, false));
+        inventory.setItem(getSlot(path + "PlayerManager", 12), lgm.getItem(path + "PlayerManager", player, false));
+        inventory.setItem(getSlot(path + "PluginManager", 13), lgm.getItem(path + "PluginManager", player, false));
+        inventory.setItem(getSlot(path + "ServerStop", 14), lgm.getItem(path + "ServerStop", player, false));
+        inventory.setItem(getSlot(path + "ServerManager", 16), lgm.getItem(path + "ServerManager", player, false));
+        inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player, false));
+        inventory.setItem(getSlot(path + "SwitchLanguageMenuItem", 26), lgm.getItem(path + "SwitchLanguageMenuItem", player, false));
     }
 }

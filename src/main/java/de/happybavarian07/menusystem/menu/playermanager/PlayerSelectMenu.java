@@ -43,9 +43,9 @@ public class PlayerSelectMenu extends PaginatedMenu {
         Player player = (Player) e.getWhoClicked();
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
-        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
+        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null, false).getType())) {
             UUID target = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()).getUniqueId();
             SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, target);
             try {
@@ -53,7 +53,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 if (!selectPlayerEvent.isCancelled()) {
                     if (player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName())) &&
                     !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
-                        player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player));
+                        player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player, true));
                         return;
                     }
                     new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), target).open();
@@ -61,24 +61,24 @@ public class PlayerSelectMenu extends PaginatedMenu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
             }
             if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
             } else {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null))) {
+        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -87,15 +87,15 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 page = page + 1;
                 super.open();
             } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
             }
             super.open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false))) {
             new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
@@ -103,7 +103,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
     @Override
     public void setMenuItems() {
         addMenuBorder();
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.BannedPlayers", 47), lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null));
+        inventory.setItem(getSlot("PlayerManager.ActionsMenu.BannedPlayers", 47), lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false));
 
         //The thing you will be looping through to place items
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
@@ -116,7 +116,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 if (players.get(index) != null) {
                     ///////////////////////////
 
-                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("PlayerManager.PlayerHead", players.get(index));
+                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("PlayerManager.PlayerHead", players.get(index), false);
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setOwningPlayer(players.get(index));
                     head.setItemMeta(meta);

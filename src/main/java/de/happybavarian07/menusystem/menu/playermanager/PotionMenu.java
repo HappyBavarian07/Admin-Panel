@@ -62,31 +62,31 @@ public class PotionMenu extends PaginatedMenu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
+                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
             new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false))) {
             for (PotionEffect effect : Bukkit.getPlayer(targetUUID).getActivePotionEffects()) {
                 Bukkit.getPlayer(targetUUID).removePotionEffect(effect.getType());
             }
-        } else if (item.equals(lgm.getItem("General.Left", null)) ||
-                item.equals(lgm.getItem("General.Right", null))) {
-            if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false)) ||
+                item.equals(lgm.getItem("General.Right", null, false))) {
+            if (item.equals(lgm.getItem("General.Left", null, false))) {
                 if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
                 } else {
                     page = page - 1;
                     super.open();
                 }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
+            } else if (item.equals(lgm.getItem("General.Right", null, false))) {
                 if (!((index + 1) >= potionList.size())) {
                     page = page + 1;
                     super.open();
                 } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
                 }
             }
         }
@@ -96,7 +96,7 @@ public class PotionMenu extends PaginatedMenu {
     public void setMenuItems() {
         addMenuBorder();
 
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.ClearPotions", 47), lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null));
+        inventory.setItem(getSlot("PlayerManager.ActionsMenu.ClearPotions", 47), lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false));
 
         List<PotionType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionType.values());

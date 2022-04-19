@@ -43,34 +43,34 @@ public class PermissionActionSelectMenu extends Menu {
         InventoryAction action2 = e.getAction();
         String path = "PlayerManager.ActionsMenu.Permissions.";
         Player player = (Player) e.getWhoClicked();
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
         ItemStack item = e.getCurrentItem();
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "Add", player))) {
+            if (item.equals(lgm.getItem(path + "Add", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Add")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionListMenu(playerMenuUtility, PermissionAction.ADD, PermissionListMode.ALL, "", targetUUID).open();
-            } else if (item.equals(lgm.getItem(path + "Remove", player))) {
+            } else if (item.equals(lgm.getItem(path + "Remove", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionListMenu(playerMenuUtility, PermissionAction.REMOVE, PermissionListMode.ALL, "", targetUUID).open();
-            } else if (item.equals(lgm.getItem(path + "Info", player))) {
+            } else if (item.equals(lgm.getItem(path + "Info", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Info")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionListMenu(playerMenuUtility, PermissionAction.INFO, PermissionListMode.ALL, "", targetUUID).open();
-            } else if (item.equals(lgm.getItem(path + "List", player))) {
+            } else if (item.equals(lgm.getItem(path + "List", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.List")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionListMenu(playerMenuUtility, PermissionAction.LIST, PermissionListMode.ALL, "", targetUUID).open();
-            } else if (item.equals(lgm.getItem("General.Close", null))) {
+            } else if (item.equals(lgm.getItem("General.Close", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;
@@ -85,10 +85,10 @@ public class PermissionActionSelectMenu extends Menu {
         String path = "PlayerManager.ActionsMenu.Permissions.";
         Player player = playerMenuUtility.getOwner();
         setFillerGlass();
-        inventory.setItem(getSlot(path + "Add", 10), lgm.getItem(path + "Add", player));
-        inventory.setItem(getSlot(path + "Info", 12), lgm.getItem(path + "Info", player));
-        inventory.setItem(getSlot(path + "List", 14), lgm.getItem(path + "List", player));
-        inventory.setItem(getSlot(path + "Remove", 16), lgm.getItem(path + "Remove", player));
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "Add", 10), lgm.getItem(path + "Add", player, false));
+        inventory.setItem(getSlot(path + "Info", 12), lgm.getItem(path + "Info", player, false));
+        inventory.setItem(getSlot(path + "List", 14), lgm.getItem(path + "List", player, false));
+        inventory.setItem(getSlot(path + "Remove", 16), lgm.getItem(path + "Remove", player, false));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
     }
 }

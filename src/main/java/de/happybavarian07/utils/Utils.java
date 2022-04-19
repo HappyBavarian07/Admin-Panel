@@ -78,13 +78,14 @@ public class Utils {
     public static void unban(Player player, OfflinePlayer target) {
         try {
             if (!target.isBanned()) {
-                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.NotBanned", player));
+                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.NotBanned", player, true));
             } else {
+
                 Bukkit.getBanList(Type.NAME).pardon(Objects.requireNonNull(target.getName()));
-                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.SuccessfullyUnbanned", player));
+                player.sendMessage(plugin.getLanguageManager().getMessage("Player.PlayerManager.BanMenu.SuccessfullyUnbanned", player, true));
             }
         } catch (NullPointerException e) {
-            player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player));
+            player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player, true));
         }
     }
 
@@ -112,7 +113,7 @@ public class Utils {
                 }
             }
         } catch (NullPointerException e) {
-            player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player));
+            player.sendMessage(plugin.getLanguageManager().getMessage("Player.General.TargetedPlayerIsNull", player, true));
         }
     }
 
@@ -201,7 +202,11 @@ public class Utils {
     }
 
     public static String format(Player player, String message, String prefix) {
-        return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
+        try {
+            return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
+        } catch (Exception e) {
+            return ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix));
+        }
     }
 
     public static void clearChat(int lines, boolean broadcastChatClear, Player player) {
@@ -213,9 +218,9 @@ public class Utils {
             for (int i = 0; i <= lines; i++) {
                 Bukkit.getServer().broadcastMessage("");
             }
-            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Header", player));
-            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Message", player));
-            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Footer", player));
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Header", player, true));
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Message", player, true));
+            Bukkit.getServer().broadcastMessage(plugin.getLanguageManager().getMessage("Player.Chat.Footer", player, true));
         }
     }
 

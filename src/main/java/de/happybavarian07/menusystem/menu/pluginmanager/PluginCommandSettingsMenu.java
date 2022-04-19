@@ -42,24 +42,24 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         ItemStack item = e.getCurrentItem();
         String path = "PluginManager.Settings.Commands.Settings.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Register", player))) {
+        if (item.equals(lgm.getItem(path + "Register", player, false))) {
             if (!currentCommand.isRegistered()) {
                 currentCommand.register(getCommandMap());
                 plugin.getDisabledCommands().remove(currentCommand.getName());
             }
-        } else if (item.equals(lgm.getItem(path + "Unregister", player))) {
+        } else if (item.equals(lgm.getItem(path + "Unregister", player, false))) {
             if (currentCommand.isRegistered()) {
                 currentCommand.unregister(getCommandMap());
                 plugin.getDisabledCommands().add(currentCommand.getName());
             }
-        } else if (item.equals(lgm.getItem(path + "Execute", player))) {
+        } else if (item.equals(lgm.getItem(path + "Execute", player, false))) {
             if (currentCommand.isRegistered()) {
                 currentCommand.execute(player, currentCommand.getLabel(), new String[]{});
             }
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             new PluginCommandsListMenu(playerMenuUtility, currentCommand.getPlugin()).open();
         }
     }
@@ -69,10 +69,10 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
         String path = "PluginManager.Settings.Commands.Settings.";
-        inventory.setItem(getSlot(path + "Register", 0), lgm.getItem(path + "Register", player));
-        inventory.setItem(getSlot(path + "Unregister", 1), lgm.getItem(path + "Unregister", player));
-        inventory.setItem(getSlot(path + "Execute", 2), lgm.getItem(path + "Execute", player));
-        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + "Register", 0), lgm.getItem(path + "Register", player, false));
+        inventory.setItem(getSlot(path + "Unregister", 1), lgm.getItem(path + "Unregister", player, false));
+        inventory.setItem(getSlot(path + "Execute", 2), lgm.getItem(path + "Execute", player, false));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false));
     }
 
     public CommandMap getCommandMap() {

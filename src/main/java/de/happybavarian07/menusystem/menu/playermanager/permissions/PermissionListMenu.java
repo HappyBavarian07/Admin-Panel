@@ -4,6 +4,7 @@ package de.happybavarian07.menusystem.menu.playermanager.permissions;/*
  */
 
 import de.happybavarian07.main.AdminPanelMain;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.utils.Utils;
@@ -74,10 +75,10 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
         String path = "PlayerManager.ActionsMenu.Permissions.ListMenu.";
         Player player = (Player) e.getWhoClicked();
         Player target = Bukkit.getPlayer(targetUUID);
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
         ItemStack item = e.getCurrentItem();
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "Sort", player))) {
+            if (item.equals(lgm.getItem(path + "Sort", player, false))) {
                 if(action == PermissionAction.LIST) {
                     player.setMetadata("PermissionsSortMetaData-List", new FixedMetadataValue(plugin, true));
                 } else if(action == PermissionAction.ADD) {
@@ -87,30 +88,30 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                 } else if(action == PermissionAction.INFO) {
                     player.setMetadata("PermissionsSortMetaData-Info", new FixedMetadataValue(plugin, true));
                 }
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.EnterSort", player));
+                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.EnterSort", player, true));
                 player.closeInventory();
-            } else if (item.equals(lgm.getItem(path + "Mode." + mode.getName(), player))) {
+            } else if (item.equals(lgm.getItem(path + "Mode." + mode.getName(), player, false))) {
                 this.mode = PermissionListMode.getNext(mode);
                 resetPermList();
                 new PermissionListMenu(playerMenuUtility, action, mode, sortQuery, targetUUID).open();
-            } else if (item.equals(lgm.getItem("General.Close", null))) {
+            } else if (item.equals(lgm.getItem("General.Close", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionActionSelectMenu(playerMenuUtility, targetUUID).open();
-            } else if (item.equals(lgm.getItem("General.Left", null))) {
+            } else if (item.equals(lgm.getItem("General.Left", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
                 } else {
                     page = page - 1;
                     new PermissionListMenu(playerMenuUtility, action, mode, sortQuery, targetUUID).open();
                 }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
+            } else if (item.equals(lgm.getItem("General.Right", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageright")) {
                     player.sendMessage(noPerms);
                     return;
@@ -119,15 +120,17 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                     page = page + 1;
                     new PermissionListMenu(playerMenuUtility, action, mode, sortQuery, targetUUID).open();
                 } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
                 }
-            } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+            } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.refresh")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PermissionListMenu(playerMenuUtility, action, mode, sortQuery, targetUUID).open();
             } else if (item.getType().equals(Material.WRITABLE_BOOK)) {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%permission%", item.getItemMeta().getDisplayName(), false);
                 if (action.equals(PermissionAction.ADD)) {
                     if (action2.equals(InventoryAction.PICKUP_ALL)) {
                         plugin.getPlayerPermissions().get(target.getUniqueId()).put(item.getItemMeta().getDisplayName(), true);
@@ -142,7 +145,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                     plugin.savePerms();
                     plugin.reloadPerms(target);
                     if (target.hasPermission(searchInPermList(item.getItemMeta().getDisplayName()))) {
-                        player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player));
+                        player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
                     }
                 } else if (action.equals(PermissionAction.REMOVE)) {
                     this.mode = PermissionListMode.getNext(mode);
@@ -151,7 +154,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                     plugin.savePerms();
                     plugin.reloadPerms(target);
                     if (!target.hasPermission(searchInPermList(item.getItemMeta().getDisplayName()))) {
-                        player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player));
+                        player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player, true));
                     }
                 } else if (action.equals(PermissionAction.INFO)) {
                     Permission current = searchInPermList(item.getItemMeta().getDisplayName());
@@ -172,9 +175,9 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
         addMenuBorder();
         String path = "PlayerManager.ActionsMenu.Permissions.ListMenu.";
         Player player = playerMenuUtility.getOwner();
-        inventory.setItem(47, lgm.getItem(path + "Sort", player));
+        inventory.setItem(47, lgm.getItem(path + "Sort", player, false));
         if (action == PermissionAction.INFO || action == PermissionAction.LIST) {
-            inventory.setItem(52, lgm.getItem(path + "Mode." + mode.getName(), player));
+            inventory.setItem(52, lgm.getItem(path + "Mode." + mode.getName(), player, false));
         }
 
         ///////////////////////////////////// Pagination loop template
@@ -232,28 +235,28 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
             this.sortQuery = ChatColor.stripColor(event.getMessage());
             sortInPermList(sortQuery);
             player.removeMetadata("PermissionsSortMetaData-List", plugin);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player));
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player, true));
             new PermissionListMenu(playerMenuUtility, PermissionAction.LIST, mode, sortQuery, targetUUID).open();
             event.setCancelled(true);
         } else if (player.hasMetadata("PermissionsSortMetaData-Add")) {
             this.sortQuery = ChatColor.stripColor(event.getMessage());
             sortInPermList(sortQuery);
             player.removeMetadata("PermissionsSortMetaData-Add", plugin);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player));
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player, true));
             new PermissionListMenu(playerMenuUtility, PermissionAction.ADD, mode, sortQuery, targetUUID).open();
             event.setCancelled(true);
         } else if (player.hasMetadata("PermissionsSortMetaData-Remove")) {
             this.sortQuery = ChatColor.stripColor(event.getMessage());
             sortInPermList(sortQuery);
             player.removeMetadata("PermissionsSortMetaData-Remove", plugin);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player));
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player, true));
             new PermissionListMenu(playerMenuUtility, PermissionAction.REMOVE, mode, sortQuery, targetUUID).open();
             event.setCancelled(true);
         } else if (player.hasMetadata("PermissionsSortMetaData-Info")) {
             this.sortQuery = ChatColor.stripColor(event.getMessage());
             sortInPermList(sortQuery);
             player.removeMetadata("PermissionsSortMetaData-Info", plugin);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player));
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.SortResult", player, true));
             new PermissionListMenu(playerMenuUtility, PermissionAction.INFO, mode, sortQuery, targetUUID).open();
             event.setCancelled(true);
         }

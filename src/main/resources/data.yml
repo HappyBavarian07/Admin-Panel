@@ -1,0 +1,9 @@
+# The Data File of the Admin-Panel
+# Pattern:
+# PluginsToUpdate:
+#   <PluginName>
+#     spigotID: <id>
+#     Here its possible to use %version% for the Plugin Version
+#     A Valid File Name is for Example: 'Admin-Panel-%version%.jar'
+#     fileName: '<fileName>'
+PluginsToUpdate: {}

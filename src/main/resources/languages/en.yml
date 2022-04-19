@@ -1,4 +1,20 @@
 # The Language File for English Language
+# Because of my Lang File Updater i sadly cannot write Comments into Lines (Please help me with this, i tried everything i can)
+# Here are a few Placeholders to use in some Messages:
+# All Placeholders API Placeholders (%player_name%, etc.)
+# %prefix% = The Prefix of the Plugin (works in every Message)
+# %target% = The Targeted Player (Only works if the Message has a Target (For Example Messages for the Money Menu)
+# %amount% = Only works in the Money Menu Messages
+# %language% = This works in Messages related to Language Files (ReloadedLanguageFile Message)
+# %fullname% = works in Messages and Items from the Temp Language Select Menu (Full Language Name)
+# %version% = works in Messages and Items from the Temp Language Select Menu (Language File Version)
+# %shortname% = works in Messages and Items from the Temp Language Select Menu (Language File Short Name (en, etc.))
+# %path% = works in Messages and Items from the Temp Language Select Menu (Path of Language File)
+# %filename% = works in Messages from Plugin Install Menu
+# %resourceid% = works in Messages from Plugin Install Menu
+# %reason% = works for Example in the Ban and Kick Menu
+# %message% = works in the Server Manager Broadcast Message Function
+# Maybe more Placeholders will come with time and maybe i get the Config Updater to run better
 LanguageFullName: 'English'
 LanguageVersion: '7.6.0'
 Messages:
@@ -59,8 +75,8 @@ Messages:
         SetMoney: '%prefix% &9> &cYou just set the Money of %player_name% to %amount%!'
         TakeMoney: '%prefix% &9> &cYou just took away %amount% from %player_name%!'
     ServerManager:
-      MaintenanceModeOff: '%prefix% &9> &cThe server is now in maintenance mode. All players who have no rights have been kicked!'
-      MaintenanceModeOn: '%prefix% &9> &aThe server is no longer in maintenance mode, all players can rejoin!'
+      MaintenanceModeOff: '%prefix% &9> &aThe server is no longer in maintenance mode, all players can rejoin!'
+      MaintenanceModeOn: '%prefix% &9> &cThe server is now in maintenance mode. All players who have no rights have been kicked!'
       AllPlayersKicked: '%prefix% &9> &aAll players were kicked from the server!'
       PleaseEnterAMessage: '%prefix% &9> &aPlease enter a message in the chat!'
       BroadcastHeader: '&a+---------------------------------------------------+'
@@ -101,6 +117,19 @@ Messages:
       ErrorInInstallProccess: '%prefix% &9> &cAn error occurred during the installation process!'
       LoadPluginError: '%prefix% &9> &cAn error occurred during the loading process!'
       FileToLoadDoesNotExist: '%prefix% &9> &cThe Plugin File %filename% does not exist!'
+      ResourceIsNotOnSpigot: '%prefix% &9> &cThis Plugin is not on Spigot! Or the Spigot ID is not correct!'
+      DownloadFileIsExternal: '%prefix% &9> &cThe File of this Plugin is external and cannot be downloaded!'
+      UpdatedPlugin: '%prefix% &9> &aThe Plugin %name% got udpated! Hint: If the Plugin is already in the newest Version it just downloads the File!'
+      AutoPluginUpdater:
+        AddedPlugin: '%prefix% &9> &aThe Plugin %name% was added!'
+        RemovedPlugin: '%prefix% &9> &aThe Plugin %name% was removed!'
+        SelectPlugin: '%prefix% &9> &aPlease enter a valid Plugin in Chat!'
+        SelectPluginToRemove: '%prefix% &9> &aPlease enter a valid Plugin in Chat!'
+        SelectFileName: '%prefix% &9> &aPlease enter a valid File Name with ''.jar'' at the End!'
+        FileNameSelected: '%prefix% &9> &aThe File Name %fileName% was selected!'
+        SelectSpigotID: '%prefix% &9> &aPlease enter a valid Spigot ID!'
+        SpigotIDSelected: '%prefix% &9> &aThe Spigot ID %spigotID% was selected!'
+        PluginSelected: '%prefix% &9> &aThe Plugin %name% was selected!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
   TomanyArguments: '&4Too many Arguments!'
@@ -215,26 +244,26 @@ Items:
           displayName: '&aKick for ...Connection Reset'
           lore:
             - '&aKicks a player with the message:!'
-            - '&7"&aInternal exception: java.net.SocketException: Connection reset.&7"'
+            - '&aInternal exception: java.net.SocketException: Connection reset.'
         ServerStoppedError:
           material: PISTON
           displayName: '&aKick for Error'
           lore:
             - '&aKicks a player with the message:!'
-            - '&7"&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection
-            refused: no further informations:&7"'
+            - '&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection
+            refused: no further informations:'
         Serverstop:
           material: PISTON
           displayName: '&aKick for Serverstop'
           lore:
             - '&aKicks a player with the message:!'
-            - '&7"&aServer closed!&7"'
+            - '&aServer closed!'
         Whitelist:
           material: PISTON
           displayName: '&aKick for Whitelist'
           lore:
             - '&aKicks a player with the message:!'
-            - '&7"&aYou are not whitelisted on this server!&7"'
+            - '&aYou are not whitelisted on this server!'
       FakeOp:
         material: PAPER
         displayName: '&cFake Op'
@@ -889,6 +918,31 @@ Items:
       lore:
         - '&2Load Plugins at Server Runtime!'
         - '&2The only thing you need is the File name!'
+    AutoUpdateMenu:
+      OpenMenuItem:
+        material: DIAMOND_BLOCK
+        displayName: '&aAuto Plugin Updater Menu'
+        lore:
+          - '&aThe Auto Plugin Updater Menu'
+      PluginItem:
+        material: PAPER
+        displayName: '&a%name%'
+        lore:
+          - '&aClick this Item to Update Plugin'
+          - '&aSpigot ID: &6%spigotID%'
+          - '&aFile Name: &6%fileName%'
+          - '&aOn Spigot: &6%onSpigot%'
+          - '&aExternal File: &6%externalFile%'
+      AddPlugin:
+        material: ENCHANTED_BOOK
+        displayName: '&aAdd a Plugin'
+        lore:
+          - '&aAdd Plugins to the Auto Updater'
+      RemovePlugin:
+        material: BOOK
+        displayName: '&aRemove a Plugin'
+        lore:
+          - '&aRemove Plugins to the Auto Updater'
     InstallMenu:
       ResourceID:
         material: BOOKSHELF
@@ -1018,6 +1072,7 @@ MenuTitles:
     Selector: '&aSelect a Plugin'
     Settings: '&3Settings'
     InstallMenu: '&6Install'
+    AutoUpdateMenu: '&6Auto Update Menu'
     Commands:
       Menu: '&6Commmands'
       Settings: '&3Settings'

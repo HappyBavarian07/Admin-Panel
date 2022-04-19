@@ -3,7 +3,7 @@ main: de.happybavarian07.main.AdminPanelMain
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07
-depend: [PlaceholderAPI]
+depend: [ PlaceholderAPI ]
 softdepend:
   - SuperVanish
   - Vault
@@ -12,7 +12,7 @@ commands:
   adminpanel:
     description: Opens the Adminpanel
     usage: /adminpanel [<Player>]
-    aliases: [apanel, adminp, ap]
+    aliases: [ apanel, adminp, ap ]
   update:
     description: The Update Command
     usage: /update <Check|Download|ForceDownload|Replace|ForceReplace|GetLatest>
@@ -61,6 +61,8 @@ permissions:
           AdminPanel.PluginManager.InstallPlugins:
             default: op
           AdminPanel.PluginManager.LoadPlugins:
+            default: op
+          AdminPanel.PluginManager.AutoUpdateMenu:
             default: op
           AdminPanel.PluginManager.PluginSettings.*:
             default: op

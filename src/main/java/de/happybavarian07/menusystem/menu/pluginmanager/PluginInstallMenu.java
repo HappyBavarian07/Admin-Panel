@@ -4,6 +4,7 @@ import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.plugins.PluginInstallEvent;
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         Player player = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         String path = "PluginManager.InstallMenu.";
-        ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player);
+        ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player, false);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
         for (String s : resourceIDMeta.getLore()) {
@@ -59,7 +60,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         resourceIDMeta.setLore(updatedResourceIDLore);
         resourceIDItem.setItemMeta(resourceIDMeta);
 
-        ItemStack nameItem = lgm.getItem(path + "Name", player);
+        ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
         for (String s : nameMeta.getLore()) {
@@ -67,24 +68,24 @@ public class PluginInstallMenu extends Menu implements Listener {
         }
         nameMeta.setLore(updatedNameLore);
         nameItem.setItemMeta(nameMeta);
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(resourceIDItem)) {
             player.setMetadata("typeResourceIDInChat", new FixedMetadataValue(plugin, true));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", player));
+            player.sendMessage(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", player, true));
             player.closeInventory();
         } else if (item.equals(nameItem)) {
             player.setMetadata("typeFileNameInChat", new FixedMetadataValue(plugin, true));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", player));
+            player.sendMessage(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.true", player))) {
+        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.true", player, false))) {
             enableAfterInstall = false;
             super.open();
-        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.false", player))) {
+        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.false", player, false))) {
             enableAfterInstall = true;
             super.open();
-        } else if (item.equals(lgm.getItem(path + "InstallButton", player))) {
+        } else if (item.equals(lgm.getItem(path + "InstallButton", player, false))) {
             PluginInstallEvent installEvent = new PluginInstallEvent(player, resourceID, fileName, enableAfterInstall);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(installEvent);
@@ -93,17 +94,17 @@ public class PluginInstallMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
-                        player.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", player));
+                        player.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", player, true));
                     } catch (IOException | InvalidPluginException | InvalidDescriptionException exception) {
                         exception.printStackTrace();
-                        player.sendMessage(lgm.getMessage("Player.PluginManager.ErrorInInstallProccess", player));
+                        player.sendMessage(lgm.getMessage("Player.PluginManager.ErrorInInstallProccess", player, true));
                     } catch (UnknownDependencyException unknownDependencyException) {
                         unknownDependencyException.printStackTrace();
-                        player.sendMessage(lgm.getMessage("Player.PluginManager.MissingDependencies", player));
+                        player.sendMessage(lgm.getMessage("Player.PluginManager.MissingDependencies", player, true));
                     }
-                    player.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", player)
-                            .replace("%resourceid%", String.valueOf(this.resourceID))
-                            .replace("%filename%", this.fileName));
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", resourceID, true);
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", fileName, false);
+                    player.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", player, true));
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
@@ -112,7 +113,7 @@ public class PluginInstallMenu extends Menu implements Listener {
             this.resourceID = 0;
             this.fileName = null;
             enableAfterInstall = false;
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -127,7 +128,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "PluginManager.InstallMenu.";
 
-        ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player);
+        ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player, false);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
         for (String s : resourceIDMeta.getLore()) {
@@ -137,7 +138,7 @@ public class PluginInstallMenu extends Menu implements Listener {
         resourceIDItem.setItemMeta(resourceIDMeta);
         inventory.setItem(0, resourceIDItem);
 
-        ItemStack nameItem = lgm.getItem(path + "Name", player);
+        ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
         for (String s : nameMeta.getLore()) {
@@ -148,12 +149,12 @@ public class PluginInstallMenu extends Menu implements Listener {
         inventory.setItem(1, nameItem);
 
         if (enableAfterInstall) {
-            inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.true", player));
+            inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.true", player, false));
         } else {
-            inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.false", player));
+            inventory.setItem(2, lgm.getItem(path + "EnableAfterInstall.false", player, false));
         }
-        inventory.setItem(7, lgm.getItem(path + "InstallButton", player));
-        inventory.setItem(8, lgm.getItem("General.Close", player));
+        inventory.setItem(7, lgm.getItem(path + "InstallButton", player, false));
+        inventory.setItem(8, lgm.getItem("General.Close", player, false));
     }
 
     @EventHandler
@@ -164,7 +165,8 @@ public class PluginInstallMenu extends Menu implements Listener {
             String message = event.getMessage().replace(" ", "-");
             this.fileName = message;
             player.removeMetadata("typeFileNameInChat", plugin);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.FileNameSelected", player).replace("%filename%", message));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message, true);
+            player.sendMessage(lgm.getMessage("Player.PluginManager.FileNameSelected", player, true));
             super.open();
         }
         if (player.hasMetadata("typeResourceIDInChat")) {
@@ -174,10 +176,11 @@ public class PluginInstallMenu extends Menu implements Listener {
                 this.resourceID = Integer.parseInt(message);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player));
+                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
             }
             player.removeMetadata("typeResourceIDInChat", plugin);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIDSelected", player).replace("%resourceid%", message));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", message, true);
+            player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIDSelected", player, true));
             super.open();
         }
     }

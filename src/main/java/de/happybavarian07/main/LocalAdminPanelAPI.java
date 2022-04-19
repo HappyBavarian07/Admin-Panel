@@ -156,6 +156,9 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
+    public void downloadPluginUpdateFromSpiget(int resourceID, String fileName, boolean replaceOldVersion) {}
+
+    @Override
     public void clearChat(int lines, boolean broadcastChatClear, Player player) {
         Utils.clearChat(lines, broadcastChatClear, player);
     }
@@ -196,23 +199,68 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public String getMessage(String path, Player player) {
-        return lgm.getMessage(path, player);
+    public String getMessage(String path, Player player, boolean resetAfter) {
+        return lgm.getMessage(path, player, resetAfter);
     }
 
     @Override
-    public String getMessage(String path, Player player, String langName) {
-        return lgm.getMessage(path, player, langName);
+    public String getMessage(String path, Player player, String langName, boolean resetAfter) {
+        return lgm.getMessage(path, player, langName, resetAfter);
     }
 
     @Override
-    public ItemStack getItem(String path, Player player) {
-        return lgm.getItem(path, player);
+    public void addPlaceholder(PlaceholderType type, String key, Object value, boolean resetBefore) {
+        lgm.addPlaceholder(type, key, value, resetBefore);
     }
 
     @Override
-    public ItemStack getItem(String path, Player player, String langName) {
-        return lgm.getItem(path, player, langName);
+    public void addPlaceholders(Map<PlaceholderType, Map<String, Object>> placeholders, boolean resetBefore) {
+        lgm.addPlaceholders(placeholders, resetBefore);
+    }
+
+    @Override
+    public void removePlaceholder(PlaceholderType type, String key) {
+        lgm.removePlaceholder(type, key);
+    }
+
+    @Override
+    public void removePlaceholders(PlaceholderType type, List<String> keys) {
+        lgm.removePlaceholders(type, keys);
+    }
+
+    @Override
+    public void resetPlaceholders(PlaceholderType type) {
+        lgm.resetPlaceholders(type);
+    }
+
+    @Override
+    public Map<PlaceholderType, Map<String, Object>> getPlaceholders() {
+        return lgm.getPlaceholders();
+    }
+
+    @Override
+    public String replacePlaceholders(PlaceholderType type, String message) {
+        return lgm.replacePlaceholders(type, message);
+    }
+
+    @Override
+    public String replacePlaceholders(String message, Map<String, Object> placeholders) {
+        return lgm.replacePlaceholders(message, placeholders);
+    }
+
+    @Override
+    public Map<String, Object> getNewPlaceholderMap() {
+        return lgm.getNewPlaceholderMap();
+    }
+
+    @Override
+    public ItemStack getItem(String path, Player player, boolean resetAfter) {
+        return lgm.getItem(path, player, resetAfter);
+    }
+
+    @Override
+    public ItemStack getItem(String path, Player player, String langName, boolean resetAfter) {
+        return lgm.getItem(path, player, langName, resetAfter);
     }
 
     @Override
@@ -228,7 +276,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     @Override
     public void reloadConfigurationFiles(Player messageReceiver) {
         plugin.reloadConfig();
-        messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver));
+        messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", messageReceiver, true));
         lgm.reloadLanguages(messageReceiver, true);
         plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", "API");
     }

@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +32,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
         this.updater = plugin.getUpdater();
         this.lgm = plugin.getLanguageManager();
         /*JSONArray versionList = plugin.getUpdater()
-                .getArrayFromWebsite("https://api.spiget.org/v2/resources/91800/versions?size=999&fields=id%2Cname%2CreleaseDate");
+                .getArrayFromWebsite("https://api.spiget.org/v2/resources/91800/versions?size=99999&fields=id%2Cname%2CreleaseDate");
         int index = 0;
         JSONObject jsonObj;
 
@@ -48,9 +49,9 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
         if (command.getName().equalsIgnoreCase("update")) {
             if (!sender.hasPermission("AdminPanel.update")) {
                 if (sender instanceof Player) {
-                    sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", (Player) sender));
+                    sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", (Player) sender, true));
                 } else {
-                    sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", null));
+                    sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", null, true));
                 }
                 return true;
             }

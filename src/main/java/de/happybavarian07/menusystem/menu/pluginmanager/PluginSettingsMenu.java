@@ -47,10 +47,10 @@ public class PluginSettingsMenu extends Menu {
         String path = "PluginManager.Settings.";
         boolean enabled = currentPlugin.isEnabled();
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Enable", player))) {
+        if (item.equals(lgm.getItem(path + "Enable", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Enable")) {
                 player.sendMessage(noPerms);
                 return;
@@ -65,7 +65,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Disable", player))) {
+        } else if (item.equals(lgm.getItem(path + "Disable", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Disable")) {
                 player.sendMessage(noPerms);
                 return;
@@ -80,7 +80,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Reload", player))) {
+        } else if (item.equals(lgm.getItem(path + "Reload", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Reload")) {
                 player.sendMessage(noPerms);
                 return;
@@ -95,7 +95,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Restart", player))) {
+        } else if (item.equals(lgm.getItem(path + "Restart", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
                 player.sendMessage(noPerms);
                 return;
@@ -112,7 +112,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Unload", player))) {
+        } else if (item.equals(lgm.getItem(path + "Unload", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Unload")) {
                 player.sendMessage(noPerms);
                 return;
@@ -127,7 +127,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Load", player))) {
+        } else if (item.equals(lgm.getItem(path + "Load", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Load")) {
                 player.sendMessage(noPerms);
                 return;
@@ -142,19 +142,19 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Commands.Item", player))) {
+        } else if (item.equals(lgm.getItem(path + "Commands.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Permissions")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginCommandsListMenu(playerMenuUtility, currentPlugin).open();
-        } else if (item.equals(lgm.getItem(path + "Permissions.Item", player))) {
+        } else if (item.equals(lgm.getItem(path + "Permissions.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Commands")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginPermissionsListMenu(playerMenuUtility, currentPlugin).open();
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -170,15 +170,15 @@ public class PluginSettingsMenu extends Menu {
         String path = "PluginManager.Settings.";
 
         // Items
-        inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player));
-        inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player));
-        inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player));
-        inventory.setItem(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player));
-        inventory.setItem(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player));
-        inventory.setItem(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player));
-        inventory.setItem(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player));
-        inventory.setItem(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player));
+        inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player, false));
+        inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player, false));
+        inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player, false));
+        inventory.setItem(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player, false));
+        inventory.setItem(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player, false));
+        inventory.setItem(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player, false));
+        inventory.setItem(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player, false));
+        inventory.setItem(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player, false));
 
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
     }
 }

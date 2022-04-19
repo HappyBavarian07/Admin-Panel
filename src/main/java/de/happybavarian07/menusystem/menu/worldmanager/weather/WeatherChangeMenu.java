@@ -39,11 +39,11 @@ public class WeatherChangeMenu extends Menu {
         ItemStack item = e.getCurrentItem();
         String itemPath = "WorldManager.Time.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, false);
 
         WeatherChangeEvent changeEvent;
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + Weather.CLEAR, player))) {
+        if (item.equals(lgm.getItem(itemPath + Weather.CLEAR, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.CLEAR);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -54,7 +54,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Weather.RAINING, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Weather.RAINING, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.RAINING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -65,7 +65,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Weather.THUNDERING, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Weather.THUNDERING, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.THUNDERING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -76,7 +76,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -91,9 +91,9 @@ public class WeatherChangeMenu extends Menu {
         Player player = playerMenuUtility.getOwner();
         String path = "WorldManager.Weather.";
 
-        inventory.setItem(getSlot(path + Weather.CLEAR, 0), lgm.getItem(path + Weather.CLEAR, player));
-        inventory.setItem(getSlot(path + Weather.RAINING, 1), lgm.getItem(path + Weather.RAINING, player));
-        inventory.setItem(getSlot(path + Weather.THUNDERING, 2), lgm.getItem(path + Weather.THUNDERING, player));
-        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + Weather.CLEAR, 0), lgm.getItem(path + Weather.CLEAR, player, false));
+        inventory.setItem(getSlot(path + Weather.RAINING, 1), lgm.getItem(path + Weather.RAINING, player, false));
+        inventory.setItem(getSlot(path + Weather.THUNDERING, 2), lgm.getItem(path + Weather.THUNDERING, player, false));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false));
     }
 }

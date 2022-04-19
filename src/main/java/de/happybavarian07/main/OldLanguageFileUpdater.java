@@ -34,23 +34,41 @@ public class OldLanguageFileUpdater {
             updates.put("LanguageVersion", newConfig.getString("LanguageVersion"));
 
         // Messages
-        for (String path : newConfig.getConfigurationSection("Messages").getKeys(true)) {
-            if (!oldConfig.contains("Messages." + path) && !newConfig.isConfigurationSection("Messages." + path)) {
-                updates.put("Messages." + path, newConfig.get("Messages." + path));
+        if(newConfig.getConfigurationSection("Messages") != null) {
+            for (String path : newConfig.getConfigurationSection("Messages").getKeys(true)) {
+                if(newConfig.isConfigurationSection("Messages." + path)) {
+                    updates.put("Messages." + path, null);
+                    continue;
+                }
+                if (!oldConfig.contains("Messages." + path)) {
+                    updates.put("Messages." + path, newConfig.get("Messages." + path));
+                }
             }
         }
 
         // Items
-        for (String path : newConfig.getConfigurationSection("Items").getKeys(true)) {
-            if (!oldConfig.contains("Items." + path) && !newConfig.isConfigurationSection("Items." + path)) {
-                updates.put("Items." + path, newConfig.get("Items." + path));
+        if(newConfig.getConfigurationSection("Items") != null) {
+            for (String path : newConfig.getConfigurationSection("Items").getKeys(true)) {
+                if(newConfig.isConfigurationSection("Items." + path)) {
+                    updates.put("Items." + path, null);
+                    continue;
+                }
+                if (!oldConfig.contains("Items." + path)) {
+                    updates.put("Items." + path, newConfig.get("Items." + path));
+                }
             }
         }
 
         // MenuTitles
-        for (String path : newConfig.getConfigurationSection("MenuTitles").getKeys(true)) {
-            if (!oldConfig.contains("MenuTitles." + path) && !newConfig.isConfigurationSection("MenuTitles." + path)) {
-                updates.put("MenuTitles." + path, newConfig.get("MenuTitles." + path));
+        if(newConfig.getConfigurationSection("MenuTitles") != null) {
+            for (String path : newConfig.getConfigurationSection("MenuTitles").getKeys(true)) {
+                if(newConfig.isConfigurationSection("MenuTitles." + path)) {
+                    updates.put("MenuTitles." + path, null);
+                    continue;
+                }
+                if (!oldConfig.contains("MenuTitles." + path)) {
+                    updates.put("MenuTitles." + path, newConfig.get("MenuTitles." + path));
+                }
             }
         }
         return updates;
@@ -61,14 +79,22 @@ public class OldLanguageFileUpdater {
         Map<String, Object> checkedUpdates = checkForUpdates(oldFile, newConfig, nonDefaultLang);
         //System.out.println("Language: " + langName);
         if (checkedUpdates.isEmpty()) return;
+        //System.out.println("Checked Updates:" + checkedUpdates);
         for (String path : checkedUpdates.keySet()) {
-            if ((!oldConfig.contains(path) || oldConfig.get(path) == null) && !oldConfig.isConfigurationSection(path)) {
+            //System.out.println("Check:" + (!oldConfig.contains(path) || oldConfig.get(path) == null));
+            if ((!oldConfig.contains(path) || oldConfig.get(path) == null)) {
                 //System.out.println("Path: " + path);
                 oldConfig.set(path, checkedUpdates.get(path));
                 // Save the File
                 //System.out.println("Value (now): " + oldConfig.get(path));
             }
+            if(newConfig.isConfigurationSection(path) && !oldConfig.isConfigurationSection(path)) {
+                oldConfig.createSection(path);
+            }
         }
+        oldConfig.options().header(newConfig.options().header());
+        //oldConfig.options().header("Test Header");
+        //System.out.println("Header: " + newConfig.options().header());
         // Save the File
         try {
             oldConfig.save(oldFile);

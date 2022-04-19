@@ -5,6 +5,7 @@ import de.happybavarian07.events.server.KickAllPlayersEvent;
 import de.happybavarian07.events.server.MaintenanceModeToggleEvent;
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
@@ -48,30 +49,30 @@ public class ServerManagerMenu extends Menu implements Listener {
         ItemStack item = e.getCurrentItem();
         String path = "ServerManager.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Broadcast", player))) {
+        if (item.equals(lgm.getItem(path + "Broadcast", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.Broadcast")) {
                 player.sendMessage(noPerms);
                 return;
             }
             player.closeInventory();
             player.setMetadata("serverManagerBroadcastMessage", new FixedMetadataValue(plugin, true));
-            player.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player));
-        } else if (item.equals(lgm.getItem(path + "ChatManagerItem", player))) {
+            player.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player, true));
+        } else if (item.equals(lgm.getItem(path + "ChatManagerItem", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "WhiteListMenuItem", player))) {
+        } else if (item.equals(lgm.getItem(path + "WhiteListMenuItem", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.Whitelist")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "KickAllPlayers", player))) {
+        } else if (item.equals(lgm.getItem(path + "KickAllPlayers", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.KickAllPlayers")) {
                 player.sendMessage(noPerms);
                 return;
@@ -89,26 +90,26 @@ public class ServerManagerMenu extends Menu implements Listener {
                 if (!kickAllPlayersEvent.isCancelled()) {
                     for (Player online : playersToKick) {
                         Utils.kick(player, online.getName(),
-                                lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online),
-                                lgm.getMessage("Player.ServerManager.KickAllPlayersSource", player));
+                                lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online, false),
+                                lgm.getMessage("Player.ServerManager.KickAllPlayersSource", player, false));
                     }
-                    player.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", player));
+                    player.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", player, true));
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.true", player))) {
+        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.true", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player, false);
+            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    if(plugin.isInMaintenanceMode() && kickAllPlayersEvent.isMaintenanceMode()) {
-                        plugin.setInMaintenanceMode(kickAllPlayersEvent.isMaintenanceMode());
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player));
+                    plugin.setInMaintenanceMode(false);
+                    if(!plugin.isInMaintenanceMode()) {
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player, true));
                         super.open();
                     }
                 }
@@ -116,30 +117,30 @@ public class ServerManagerMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
             super.open();
-        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.false", player))) {
+        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.false", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player, true);
+            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.setInMaintenanceMode(kickAllPlayersEvent.isMaintenanceMode());
-                    if(!plugin.isInMaintenanceMode() && !kickAllPlayersEvent.isMaintenanceMode()) {
+                    plugin.setInMaintenanceMode(true);
+                    if(plugin.isInMaintenanceMode()) {
                         for (Player online : Bukkit.getOnlinePlayers()) {
-                            if (!online.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) {
-                                online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online));
+                            if (!online.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) {
+                                online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
                             }
                         }
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player));
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
                     }
                     super.open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -155,16 +156,16 @@ public class ServerManagerMenu extends Menu implements Listener {
         String path = "ServerManager.";
 
         // Items
-        inventory.setItem(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player));
-        inventory.setItem(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player));
-        inventory.setItem(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player));
-        inventory.setItem(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player));
+        inventory.setItem(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player, false));
+        inventory.setItem(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false));
+        inventory.setItem(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player, false));
+        inventory.setItem(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player, false));
         if (plugin.isInMaintenanceMode()) {
-            inventory.setItem(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player));
+            inventory.setItem(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player, false));
         } else {
-            inventory.setItem(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player));
+            inventory.setItem(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player, false));
         }
-        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false));
     }
 
     @EventHandler
@@ -172,9 +173,10 @@ public class ServerManagerMenu extends Menu implements Listener {
         Player player = event.getPlayer();
         if (player.hasMetadata("serverManagerBroadcastMessage")) {
             String message = Utils.chat(event.getMessage());
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player));
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", player).replace("%message%", message));
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastFooter", player));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", message, true);
+            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player, false));
+            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", player, false));
+            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastFooter", player, true));
             player.removeMetadata("serverManagerBroadcastMessage", plugin);
             super.open();
             event.setCancelled(true);
@@ -186,7 +188,7 @@ public class ServerManagerMenu extends Menu implements Listener {
         Player player = event.getPlayer();
         if(player.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) return;
         if (plugin.isInMaintenanceMode()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player));
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player, true));
         } else {
             event.allow();
         }
@@ -195,7 +197,7 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerPing(ServerListPingEvent event) {
         if (plugin.isInMaintenanceMode()) {
-            event.setMotd(lgm.getMessage("Player.ServerManager.MaintenanceModeMOTD", null));
+            event.setMotd(lgm.getMessage("Player.ServerManager.MaintenanceModeMOTD", null, true));
             event.setMaxPlayers(lgm.getCurrentLang().getLangConfig().getConfig().getInt("Messages.Player.ServerManager.MaintenanceMaxPlayerCount"));
         } else {
             event.setMotd(Bukkit.getMotd());

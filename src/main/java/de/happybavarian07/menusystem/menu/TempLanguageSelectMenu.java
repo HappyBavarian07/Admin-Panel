@@ -7,6 +7,7 @@ import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.player.SelectPlayerEvent;
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageFile;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.playermanager.BannedPlayersMenu;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getServer;
@@ -48,27 +50,27 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
         languages.removeIf(lang -> lang.getPlugin() != plugin);
         languages.removeIf(lang -> lang == lgm.getCurrentLang());
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         assert item != null;
-        if (item.equals(lgm.getItem("General.Close", null))) {
+        if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
             }
             if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
             } else {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null))) {
+        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -77,9 +79,9 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                 page = page + 1;
                 super.open();
             } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
@@ -94,7 +96,7 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                     ///////////////////////////
 
                     LanguageFile current = languages.get(index);
-                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("StartMenu.SwitchLanguageMenu.LanguageItem", playerMenuUtility.getOwner());
+                    ItemStack head = lgm.getItem("StartMenu.SwitchLanguageMenu.LanguageItem", playerMenuUtility.getOwner(), false);
                     ItemMeta meta = head.getItemMeta();
                     meta.setDisplayName(format(meta.getDisplayName(), current));
                     List<String> updatedLore = new ArrayList<>();
@@ -104,10 +106,14 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                     meta.setLore(updatedLore);
                     head.setItemMeta(meta);
 
-                    assert item != null;
                     if(item.equals(head)) {
                         lgm.setCurrentLang(languages.get(index), true);
-                        player.sendMessage(format(lgm.getMessage("Player.General.SetCurrentLanguage", player), languages.get(index)));
+                        LanguageFile langFile = languages.get(index);
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN", false);
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN", false);
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%path%", langFile.getLangFile().getPath(), false);
+                        player.sendMessage(lgm.getMessage("Player.General.SetCurrentLanguage", player, true));
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
                     } else {
                         if(index >= languages.size()) {
@@ -139,7 +145,7 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                     ///////////////////////////
 
                     LanguageFile current = languages.get(index);
-                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("StartMenu.SwitchLanguageMenu.LanguageItem", playerMenuUtility.getOwner());
+                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("StartMenu.SwitchLanguageMenu.LanguageItem", playerMenuUtility.getOwner(), false);
                     ItemMeta meta = head.getItemMeta();
                     meta.setDisplayName(format(meta.getDisplayName(), current));
                     List<String> updatedLore = new ArrayList<>();
@@ -158,9 +164,11 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
     }
 
     public String format(String in, LanguageFile langFile) {
-        return in.replace("%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN")
-                .replace("%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN")
-                .replace("%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN")
-                .replace("%path%", langFile.getLangFile().getPath());
+        Map<String, Object> placeholders = lgm.getNewPlaceholderMap();
+        placeholders.put("%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN");
+        placeholders.put("%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN");
+        placeholders.put("%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN");
+        placeholders.put("%path%", langFile.getLangFile().getPath());
+        return lgm.replacePlaceholders(in, placeholders);
     }
 }

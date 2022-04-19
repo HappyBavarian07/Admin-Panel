@@ -43,7 +43,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
         String path = "PluginManager.Permissions.";
         List<Permission> permissions = currentPlugin.getDescription().getPermissions();
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(Material.WRITABLE_BOOK)) {
@@ -63,24 +63,24 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
             player.sendMessage(Utils.chat("&6Description: &a" + current.getDescription()));
             player.sendMessage(Utils.chat("&6Childrens: &a" + current.getChildren()));
             player.sendMessage(Utils.chat("&6Permissibles: &a" + current.getPermissibles()));
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginSettingsMenu(playerMenuUtility, currentPlugin).open();
-        } else if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
             }
             if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
             } else {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null))) {
+        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -89,9 +89,9 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                 page = page + 1;
                 super.open();
             } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", player))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

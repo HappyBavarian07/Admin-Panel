@@ -26,7 +26,7 @@ Plugin:
   # This is the prefix used by the plugin in the console when starting or stopping
   StartPrefix: '&r[&4Admin&d-&8Panel&r] '
   # This is the prefix used by the plugin for chat messages
-  # These messages can be edited in the messages.yml file
+  # These messages can be edited in the language files
   Prefix: '&r[&4Admin&d-&8Panel&r] '
 
   AddonSystem:
@@ -39,6 +39,7 @@ Plugin:
   # Example: /plugins/Admin-Panel/languages/<Language>.yml | language (in the config): Language
   language: en
 
+  # UNDER DEVELOPMENT
   # This is the language option for Updates you can, enter the name of the file (without .yml) here.
   # This Language will the Plugin use to update other Language Files
   # Note upper and lower case!
@@ -52,7 +53,6 @@ Plugin:
   # The Auto Admin-Panel Updater Section
   Updater:
     # If this option is activated, the updater will automatically check for updates
-    # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
     # The plugin uses https://spiget.org for this feature
     checkForUpdates: true
     # If this option is activated, the updater will automatically download the update (if available) from Spigot.
@@ -67,23 +67,26 @@ Plugin:
     # This Option will enable/disable if the Plugin should automatically update the Language Files
     AutomaticLanguageFileUpdating: true
 
-    # IN DEVELOPMENT
+    # UNDER DEVELOPMENT
     # The Auto Plugin Updater Section (the Updater to update other Plugins automatically)
-    #PluginUpdater:
-    # If this option is activated, the updater will automatically check for updates
-    # (Attention: The updater will not recognize whether you have an old or a new version! Only differences in the version-name)
-    # The plugin uses https://spiget.org for this feature
-    #checkForUpdates: false
-    # If this option is activated, the updater will automatically download the update (if available) from Spigot.
-    # The update can then be found in plugins/Admin-Panel/downladed-update/Admin-Panel-<UpdateVersion>.jar!
-    #downloadPluginUpdate: false
-    # If this option and the downloadPluginUpdate option is activated,
-    # then the updater will automatically replace the plugin with the new version!
-    #automaticReplace: false
-    # With this Option you can control how often the Updater should check!
-    # You can configure here the Time between Checks (in Minutes)
-    #UpdateCheckTime: 5
-    # IN DEVELOPMENT
+    PluginUpdater:
+      # If this option is activated, the updater will automatically check for updates
+      # If a Plugin has an Update it will download and replace it automatically, if enabled with the Options down below.
+      # The plugin uses https://spiget.org for this feature
+      enabled: false
+      # If this option is activated, the updater will automatically download the update (if available) from Spigot.
+      # The update can then be found in plugins/Admin-Panel/downladed-update/Admin-Panel-<UpdateVersion>.jar!
+      downloadPluginUpdate: false
+      # If this option and the downloadPluginUpdate option is activated,
+      # then the updater will automatically replace the plugin with the new version!
+      automaticReplace: false
+      # Downloads and installs Plugins that are not installed on the Server but in the List
+      downloadIfNotExists: false
+      # This the Time in which the Updater will check the Plugins specified in data.yml
+      # but only if checkForUpdatesFrequently is true
+      checkForUpdatesFrequently: false
+      UpdateCheckTime: 5
+    # UNDER DEVELOPMENT
 
 # These are the settings for the panel
 Panel:

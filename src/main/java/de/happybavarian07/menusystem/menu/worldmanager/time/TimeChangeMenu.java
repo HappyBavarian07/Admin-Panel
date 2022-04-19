@@ -38,11 +38,11 @@ public class TimeChangeMenu extends Menu {
         ItemStack item = e.getCurrentItem();
         String itemPath = "WorldManager.Time.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         TimeChangeEvent changeEvent;
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + Time.SUNRISE, player))) {
+        if (item.equals(lgm.getItem(itemPath + Time.SUNRISE, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNRISE);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -52,7 +52,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.DAY, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.DAY, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.DAY);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -62,7 +62,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.MORNING, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.MORNING, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MORNING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -72,7 +72,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.NOON, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.NOON, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NOON);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -82,7 +82,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.AFTERNOON, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.AFTERNOON, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.AFTERNOON);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -92,7 +92,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.SUNSET, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.SUNSET, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNSET);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -102,7 +102,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.NIGHT, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.NIGHT, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NIGHT);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -112,7 +112,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.MIDNIGHT, player))) {
+        } else if (item.equals(lgm.getItem(itemPath + Time.MIDNIGHT, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MIDNIGHT);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -122,7 +122,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -137,14 +137,14 @@ public class TimeChangeMenu extends Menu {
         Player player = playerMenuUtility.getOwner();
         String path = "WorldManager.Time.";
 
-        inventory.setItem(getSlot(path + Time.SUNRISE, 0), lgm.getItem(path + Time.SUNRISE, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 1), lgm.getItem(path + Time.DAY, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 2), lgm.getItem(path + Time.MORNING, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 3), lgm.getItem(path + Time.NOON, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 4), lgm.getItem(path + Time.AFTERNOON, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 5), lgm.getItem(path + Time.SUNSET, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 6), lgm.getItem(path + Time.NIGHT, player));
-        inventory.setItem(getSlot(path + Time.SUNRISE, 7), lgm.getItem(path + Time.MIDNIGHT, player));
-        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 0), lgm.getItem(path + Time.SUNRISE, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 1), lgm.getItem(path + Time.DAY, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 2), lgm.getItem(path + Time.MORNING, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 3), lgm.getItem(path + Time.NOON, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 4), lgm.getItem(path + Time.AFTERNOON, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 5), lgm.getItem(path + Time.SUNSET, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 6), lgm.getItem(path + Time.NIGHT, player, false));
+        inventory.setItem(getSlot(path + Time.SUNRISE, 7), lgm.getItem(path + Time.MIDNIGHT, player, false));
+        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false));
     }
 }

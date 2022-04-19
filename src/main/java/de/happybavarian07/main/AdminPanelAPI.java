@@ -172,6 +172,8 @@ public interface AdminPanelAPI {
      */
     Plugin downloadPluginFromSpiget(int resourceID, String fileName, Boolean enableAfterInstall) throws IOException, InvalidPluginException, InvalidDescriptionException, UnknownDependencyException;
 
+    void downloadPluginUpdateFromSpiget(int resourceID, String fileName, boolean replaceOldVersion);
+
     // Utils
 
     /**
@@ -250,9 +252,10 @@ public interface AdminPanelAPI {
      *
      * @param path   Der Pfad zu der Nachricht in der Config
      * @param player Der Spieler für die Placeholders
+     * @param resetAfter setzt die Placeholder zurück nach dem formattieren
      * @return Die Nachricht (wenn gefunden) mit Placeholders
      */
-    String getMessage(String path, Player player);
+    String getMessage(String path, Player player, boolean resetAfter);
 
     /**
      * Gibt dir eine Nachricht mit Placeholders zurück,
@@ -261,30 +264,102 @@ public interface AdminPanelAPI {
      * @param path     Der Pfad zu der Nachricht in der Config
      * @param player   Der Spieler für die Placeholders
      * @param langName Der Sprachen Name falls gewollt!
+     * @param resetAfter setzt die Placeholder zurück nach dem formattieren
      * @return Die Nachricht (wenn gefunden) mit Placeholders
      */
-    String getMessage(String path, Player player, String langName);
+    String getMessage(String path, Player player, String langName, boolean resetAfter);
+
+    /**
+     * Mit dieser Methode fügt man neue Placeholders einzeln temporär hinzu
+     * sobald eine Methode (getMessage) resetAfter auf true hat wird die gesamte
+     * Liste der Placeholder zurückgesetzt
+     * @param type der Typ des Placeholders
+     * @param key der Placeholder (z.B.: %target%)
+     * @param value der Wert des Placeholder
+     * @param resetBefore ob davor die anderen zurückgesetzt werden
+     */
+    void addPlaceholder(PlaceholderType type, String key, Object value, boolean resetBefore);
+
+    /**
+     * Mit dieser Methode fügt man neue Placeholders in einer Map temporär hinzu
+     * sobald eine Methode (getMessage) resetAfter auf true hat wird die gesamte
+     * Liste der Placeholder zurückgesetzt
+     * @param placeholders die Liste der Placeholders
+     * @param resetBefore ob davor die anderen zurückgesetzt werden
+     */
+    void addPlaceholders(Map<PlaceholderType, Map<String, Object>> placeholders, boolean resetBefore);
+
+    /**
+     * Diese Methode entfernt einen bestimmten Placeholder
+     * @param type der Typ des Placeholders
+     * @param key der Placeholder (z.B.: %target%)
+     */
+    void removePlaceholder(PlaceholderType type, String key);
+
+    /**
+     * Diese Methode entfernt eine liste bestimmter Placeholder
+     * @param type der Typ der Placeholders
+     * @param keys die Liste der Placeholder Keys
+     */
+    void removePlaceholders(PlaceholderType type, List<String> keys);
+
+    /**
+     * Diese Methode setzt die gesamte Liste der Placeholders
+     * zurück und löscht sie alle!
+     * @param type der Typ des Placeholders
+     */
+    void resetPlaceholders(PlaceholderType type);
+
+    /**
+     * Gibt die Liste der aktiven Placeholder zurück
+     * @return die Liste der aktiven Placeholder
+     */
+    Map<PlaceholderType, Map<String, Object>> getPlaceholders();
+
+    /**
+     * Ersetzt alle aktiven Placeholder, wenn vorhanden, in einer Nachricht
+     * @param type der Typ des Placeholders
+     * @param message die Nachricht
+     * @return die formattierte Nachricht
+     */
+    String replacePlaceholders(PlaceholderType type, String message);
+
+    /**
+     * Ersetzt alle Placeholder aus der angegebenen Liste, wenn vorhanden, in der Nachricht
+     * @param message die Nachricht
+     * @param placeholders die Placeholder Liste
+     * @return die formattierte Nachricht
+     */
+    String replacePlaceholders(String message, Map<String, Object> placeholders);
+
+    /**
+     * Gibt eine neue Liste im Placeholder Listen Format zurück
+     * @return die Placeholder Liste
+     */
+    Map<String, Object> getNewPlaceholderMap();
 
     /**
      * Gibt dir ein Item mit Placeholders im Namen und Lore zurück,
      * wenn gefunden aus der Sprache die gerade eingestellt ist!
      *
+     * @param resetAfter Ob die Item Placeholder nach der Methode gecleart werden sollen
      * @param path   Der Pfad zum Item in der Config
      * @param player Der Spieler für die Placeholders
      * @return Das Item (wenn gefunden) mit Placeholders im Namen und Lore
      */
-    ItemStack getItem(String path, Player player);
+    ItemStack getItem(String path, Player player, boolean resetAfter);
 
     /**
      * Gibt dir ein Item mit Placeholders im Namen und Lore zurück,
      * wenn gefunden aus der Sprache die angegeben ist (sie muss im System vorhanden sein, also erst {@code addLanguage()})!
      *
+     * @param resetAfter Ob die Item Placeholder nach der Methode gecleart werden sollen
      * @param path     Der Pfad zum Item in der Config
      * @param player   Der Spieler für die Placeholders
      * @param langName Der Sprachen Name falls gewollt!
      * @return Das Item (wenn gefunden) mit Placeholders im Namen und Lore
      */
-    ItemStack getItem(String path, Player player, String langName);
+    ItemStack getItem(String path, Player player, String langName, boolean resetAfter);
 
     /**
      * Gibt dir ein Item mit Placeholders im Namen und Lore zurück,

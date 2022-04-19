@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.NotDirectoryException;
@@ -86,12 +84,14 @@ public class PluginUtils {
     }
 
     public Plugin getPluginByName(String name) {
+        if(name == null) return null;
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
             if (name.equalsIgnoreCase(plugin.getName())) {
                 return plugin;
             }
         }
-        throw new NullPointerException("Plugin: " + name + " is null!");
+        return null;
+        //throw new NullPointerException("Plugin: " + name + " is null!");
     }
 
     public List<String> getPluginNames(boolean fullName) {
@@ -239,12 +239,13 @@ public class PluginUtils {
         return target;
     }
 
-    private final String USER_AGENT = "Admin-Panel-User-Agent";
+    private final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36";
 
     public File downloadFileFromURL(File destination, String urlString) throws IOException {
         URL website = new URL(urlString);
         HttpURLConnection httpcon = (HttpURLConnection) website.openConnection();
         httpcon.addRequestProperty("User-Agent", USER_AGENT);
+        httpcon.setReadTimeout(6000);
         httpcon.connect();
 
         ReadableByteChannel rbc = Channels.newChannel(httpcon.getInputStream());
@@ -256,11 +257,18 @@ public class PluginUtils {
     }
 
     public File downloadFileFromURL(File destination, URL url) throws IOException {
-        HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-        httpcon.addRequestProperty("User-Agent", USER_AGENT);
-        httpcon.connect();
+        HttpURLConnection httpconn = (HttpURLConnection) url.openConnection();
 
-        ReadableByteChannel rbc = Channels.newChannel(httpcon.getInputStream());
+        httpconn.addRequestProperty("User-Agent", USER_AGENT);
+        httpconn.addRequestProperty("Header", "Accept: text/html");
+        httpconn.addRequestProperty("cookie", "xpzezr54v5qnaoet5v2dx1ias5xx8m4faj7d5mfg4og");
+
+        httpconn.setConnectTimeout(2000);
+        httpconn.setInstanceFollowRedirects(false);
+        httpconn.setReadTimeout(6000);
+        httpconn.connect();
+
+        ReadableByteChannel rbc = Channels.newChannel(httpconn.getInputStream());
         FileOutputStream fos = new FileOutputStream(destination);
         fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         fos.close();

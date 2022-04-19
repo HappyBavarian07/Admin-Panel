@@ -50,7 +50,7 @@ public class GameRuleMenu extends PaginatedMenu {
                 gmName.equals("maxCommandChainLength") || gmName.equals("maxEntityCramming") ||
                 gmName.equals("spawnRadius") || gmName.equals("randomTickSpeed"));
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(Material.PLAYER_HEAD)) {
@@ -85,25 +85,25 @@ public class GameRuleMenu extends PaginatedMenu {
                 }
                 count++;
             }
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
-            if (item.equals(lgm.getItem("General.Left", null))) {
+            if (item.equals(lgm.getItem("General.Left", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
                 } else {
                     page = page - 1;
                     super.open();
                 }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
+            } else if (item.equals(lgm.getItem("General.Right", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageright")) {
                     player.sendMessage(noPerms);
                     return;
@@ -112,10 +112,10 @@ public class GameRuleMenu extends PaginatedMenu {
                     page = page + 1;
                     super.open();
                 } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
                 }
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
@@ -144,7 +144,7 @@ public class GameRuleMenu extends PaginatedMenu {
                     ///////////////////////////
 
                     List<String> lore = new ArrayList<>();
-                    ItemStack head = lgm.getItem("General.EmptySlot", playerMenuUtility.getOwner());
+                    ItemStack head = lgm.getItem("General.EmptySlot", playerMenuUtility.getOwner(), false);
                     if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
                         head = Head.BLANK_GREEN.getAsItem();
                         lore.add(Utils.chat("&6Value: &atrue"));

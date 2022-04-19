@@ -48,35 +48,35 @@ public class BannedPlayersMenu extends PaginatedMenu {
             }
         }
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null).getType())) {
+        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null, false).getType())) {
             if (!player.hasPermission("AdminPanel.PlayerManager.BannedPlayers")) {
                 player.sendMessage(noPerms);
                 return;
             }
             Utils.unban(player, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()));
             inventory.setItem(e.getSlot(), null);
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
-            if (item.equals(lgm.getItem("General.Left", null))) {
+            if (item.equals(lgm.getItem("General.Left", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
                 } else {
                     page = page - 1;
                     super.open();
                 }
-            } else if (item.equals(lgm.getItem("General.Right", null))) {
+            } else if (item.equals(lgm.getItem("General.Right", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.pageright")) {
                     player.sendMessage(noPerms);
                     return;
@@ -85,10 +85,10 @@ public class BannedPlayersMenu extends PaginatedMenu {
                     page = page + 1;
                     super.open();
                 } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
                 }
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

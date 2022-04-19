@@ -8,6 +8,7 @@ package de.happybavarian07.menusystem.menu.pluginmanager;
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.Head;
 import de.happybavarian07.main.LanguageManager;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.PaginatedMenu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
@@ -30,7 +31,9 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -59,7 +62,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         String path = "PluginManager.";
         List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(Material.PLAYER_HEAD)) {
@@ -68,38 +71,44 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 return;
             }
             new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName()))).open();
-        } else if (item.equals(lgm.getItem(path + "Install", player))) {
+        } else if (item.equals(lgm.getItem(path + "Install", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.InstallPlugins")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginInstallMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(path + "Load", player))) {
+        } else if (item.equals(lgm.getItem(path + "Load", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.LoadPlugins")) {
                 player.sendMessage(noPerms);
                 return;
             }
             player.setMetadata("TypePluginFileNameToLoadInChat", new FixedMetadataValue(plugin, true));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player));
+            player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false))) {
+            if (!player.hasPermission("AdminPanel.PluginManager.AutoUpdateMenu")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            new PluginAutoUpdaterMenu(playerMenuUtility).open();
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
             }
             if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
             } else {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null))) {
+        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -108,9 +117,9 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 page = page + 1;
                 super.open();
             } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", player))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
@@ -122,8 +131,9 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     @Override
     public void setMenuItems() {
         addMenuBorder();
-        inventory.setItem(getSlot("PluginManager.Load", 46), lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner()));
-        inventory.setItem(getSlot("PluginManager.Install", 47), lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner()));
+        inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.OpenMenuItem", 45), lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", playerMenuUtility.getOwner(), false));
+        inventory.setItem(getSlot("PluginManager.Load", 46), lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner(), false));
+        inventory.setItem(getSlot("PluginManager.Install", 47), lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner(), false));
         List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
 
         ///////////////////////////////////// Pagination loop template
@@ -174,18 +184,19 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");
             File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message + ".jar", true);
             if(!pluginFile.exists()) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player).replace("%filename%", message + ".jar"));
+                player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player, true));
                 return;
             }
             try {
                 pluginUtils.load(pluginFile);
             } catch (Exception e) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player).replace("%filename%", message + ".jar"));
+                player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player, true));
                 return;
             }
             player.removeMetadata("TypePluginFileNameToLoadInChat", plugin);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player).replace("%filename%", message + ".jar"));
+            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player, true));
             super.open();
         }
     }

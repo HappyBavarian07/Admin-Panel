@@ -40,7 +40,7 @@ public class PluginExpansion extends PlaceholderExpansion {
             return AdminPanelMain.getPrefix();
         }
         if (params.startsWith("message-")) {
-            return AdminPanelMain.getPlugin().getLanguageManager().getMessage(params.substring(8), player);
+            return AdminPanelMain.getPlugin().getLanguageManager().getMessage(params.substring(8), player, true);
         }
         return null;
     }

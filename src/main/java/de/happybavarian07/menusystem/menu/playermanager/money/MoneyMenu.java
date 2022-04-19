@@ -4,6 +4,7 @@ import de.happybavarian07.events.NotAPanelEventException;
 import de.happybavarian07.events.player.MoneySetEvent;
 import de.happybavarian07.events.player.MoneyTakeEvent;
 import de.happybavarian07.main.AdminPanelMain;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.Menu;
 import de.happybavarian07.menusystem.PlayerMenuUtility;
 import de.happybavarian07.menusystem.menu.playermanager.PlayerActionSelectMenu;
@@ -20,6 +21,8 @@ import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -49,34 +52,37 @@ public class MoneyMenu extends Menu implements Listener {
         Player target = Bukkit.getPlayer(targetUUID);
         ItemStack item = e.getCurrentItem();
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Give", target))) {
+        if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Give", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
                 player.sendMessage(noPerms);
                 return;
             }
             player.setMetadata("moneyGiveMenuMetaData", new FixedMetadataValue(plugin, targetUUID));
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", target));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Take", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Take", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
                 player.sendMessage(noPerms);
                 return;
             }
             player.setMetadata("moneyTakeMenuMetaData", new FixedMetadataValue(plugin, targetUUID));
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", target));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Set", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Set", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
                 player.sendMessage(noPerms);
                 return;
             }
             player.setMetadata("moneySetMenuMetaData", new FixedMetadataValue(plugin, targetUUID));
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", target));
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("General.Close", target))) {
+        } else if (item.equals(lgm.getItem("General.Close", target, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -91,10 +97,10 @@ public class MoneyMenu extends Menu implements Listener {
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, super.FILLER);
         }
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target));
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Set", 13), lgm.getItem("PlayerManager.MoneyMenu.Set", target));
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target));
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target));
+        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target, false));
+        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Set", 13), lgm.getItem("PlayerManager.MoneyMenu.Set", target, false));
+        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target, false));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false));
     }
 
     @EventHandler
@@ -113,19 +119,21 @@ public class MoneyMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(takeEvent);
                         if (!takeEvent.isCancelled()) {
                             EconomyResponse response = eco.depositPlayer(targetPlayer, amount);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
                             if (response.transactionSuccess()) {
                                 plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
                                         "gave " + amount + " to " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", "[Vault - Money]");
-                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.GiveMoney", targetPlayer).replace("%amount%", String.valueOf(amount)));
+                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.GiveMoney", player, true));
                             } else {
-                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player).replace("%amount%", String.valueOf(amount)));
+                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
                         notAPanelEventException.printStackTrace();
                     }
                 } catch (NumberFormatException ex) {
-                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", targetPlayer));
+                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
                 }
             }
             event.setCancelled(true);
@@ -145,20 +153,22 @@ public class MoneyMenu extends Menu implements Listener {
                         if (!takeEvent.isCancelled()) {
                             if (eco.has(Bukkit.getOfflinePlayer(targetUUIDEvent), amount)) {
                                 EconomyResponse response = eco.withdrawPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), amount);
+                                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
+                                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
                                 if (response.transactionSuccess()) {
-                                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TakeMoney", targetPlayer).replace("%amount%", String.valueOf(amount)));
+                                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TakeMoney", player, true));
                                 } else {
-                                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player).replace("%amount%", String.valueOf(amount)));
+                                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
                                 }
                             } else {
-                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotEnoughMoney", targetPlayer));
+                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotEnoughMoney", player, true));
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
                         notAPanelEventException.printStackTrace();
                     }
                 } catch (NumberFormatException ex) {
-                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player));
+                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
                 }
             }
             event.setCancelled(true);
@@ -179,17 +189,19 @@ public class MoneyMenu extends Menu implements Listener {
                         if (!setEvent.isCancelled()) {
                             eco.withdrawPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), eco.getBalance(Bukkit.getOfflinePlayer(targetUUIDEvent)));
                             EconomyResponse response = eco.depositPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), amount);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
                             if (response.transactionSuccess()) {
-                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.SetMoney", targetPlayer).replace("%amount%", String.valueOf(amount)));
+                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.SetMoney", player, true));
                             } else {
-                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player).replace("%amount%", String.valueOf(amount)));
+                                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
                         notAPanelEventException.printStackTrace();
                     }
                 } catch (NumberFormatException ex) {
-                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player));
+                    player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
                 }
             }
             event.setCancelled(true);

@@ -2,6 +2,7 @@ package de.happybavarian07.commands;
 
 import de.happybavarian07.main.AdminPanelMain;
 import de.happybavarian07.main.LanguageManager;
+import de.happybavarian07.main.PlaceholderType;
 import de.happybavarian07.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -31,14 +32,15 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
                     plugin.getFileLogger().writeToLog(Level.INFO, "Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")", "ActionsLogger - Player");
                 } else {
-                    sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null));
+                    sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
                 }
             } else if (args.length == 1) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
                     Player target = Bukkit.getPlayerExact(args[0]);
-                    String targetPlayerIsNull = lgm.getMessage("Player.General.TargetedPlayerIsNull", player);
-                    String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfOpenedForOther", target);
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], true);
+                    String targetPlayerIsNull = lgm.getMessage("Player.General.TargetedPlayerIsNull", player, false);
+                    String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true);
                     if (player.hasPermission("AdminPanel.open.other")) {
                         try {
                             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
@@ -48,14 +50,15 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                             player.sendMessage(targetPlayerIsNull);
                         }
                     } else {
-                        player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
+                        player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                     }
                 }
                 if (sender instanceof ConsoleCommandSender) {
                     ConsoleCommandSender console = (ConsoleCommandSender) sender;
                     Player target = Bukkit.getPlayerExact(args[0]);
-                    String targetplayerisnull = lgm.getMessage("Player.General.TargetedPlayerIsNull", null);
-                    String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfOpenedForOther", target);
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], true);
+                    String targetplayerisnull = lgm.getMessage("Player.General.TargetedPlayerIsNull", null, false);
+                    String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfForOther", target, true);
                     try {
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                         console.sendMessage(openingMessageSelfOpenedForOther);
@@ -65,7 +68,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     }
                 }
             } else {
-                sender.sendMessage(lgm.getMessage("Player.ToManyArguments", null));
+                sender.sendMessage(lgm.getMessage("Player.ToManyArguments", null, true));
             }
         }
         return true;

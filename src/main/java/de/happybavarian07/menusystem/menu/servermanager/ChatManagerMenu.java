@@ -45,10 +45,10 @@ public class ChatManagerMenu extends Menu implements Listener {
         ItemStack item = e.getCurrentItem();
         String path = "ChatManager.";
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "ClearChat", player))) {
+        if (item.equals(lgm.getItem(path + "ClearChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
                 player.sendMessage(noPerms);
                 return;
@@ -58,14 +58,14 @@ public class ChatManagerMenu extends Menu implements Listener {
                 AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
                 if (!clearChatEvent.isCancelled()) {
                     Utils.clearChat(clearChatEvent.getLines(), false, player);
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", player));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", player, true));
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "UnMuteChat", player))) {
+        } else if (item.equals(lgm.getItem(path + "UnMuteChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
@@ -76,14 +76,14 @@ public class ChatManagerMenu extends Menu implements Listener {
                 if (!muteChatEvent.isCancelled()) {
                     plugin.setChatMuted(false);
                     super.open();
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Header", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Message", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Footer", player));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Header", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Message", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Footer", player, true));
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "MuteChat", player))) {
+        } else if (item.equals(lgm.getItem(path + "MuteChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
@@ -94,14 +94,14 @@ public class ChatManagerMenu extends Menu implements Listener {
                 if (!muteChatEvent.isCancelled()) {
                     plugin.setChatMuted(true);
                     super.open();
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Header", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Message", player));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Footer", player));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Header", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Message", player, true));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Footer", player, true));
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player))) {
+        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -116,13 +116,13 @@ public class ChatManagerMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "ChatManager.";
 
-        inventory.setItem(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player));
+        inventory.setItem(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player, false));
         if (plugin.isChatMuted()) {
-            inventory.setItem(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player));
+            inventory.setItem(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player, false));
         } else {
-            inventory.setItem(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player));
+            inventory.setItem(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player, false));
         }
-        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player));
+        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false));
     }
 
     @EventHandler
@@ -130,7 +130,7 @@ public class ChatManagerMenu extends Menu implements Listener {
         Player player = event.getPlayer();
         if (plugin.isChatMuted()) {
             event.setCancelled(true);
-            player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player));
+            player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player, true));
         }
     }
 }

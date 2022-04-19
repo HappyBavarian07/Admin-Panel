@@ -32,6 +32,10 @@ package de.happybavarian07.utils;
  *  either expressed or implied, of anybody else.
  */
 
+import de.happybavarian07.main.AdminPanelMain;
+
+import java.util.logging.Level;
+
 public abstract class VersionComparator {
 
     public static final VersionComparator EQUALVERSIONS = new VersionComparator() {
@@ -49,14 +53,37 @@ public abstract class VersionComparator {
 
             boolean available;
             try {
+                //System.out.println("Versions: S:" + spigotVersionString + " | P:" + pluginVersionString);
+                if(pluginVersionString.length() != spigotVersionString.length()) {
+                    if (pluginVersionString.length() < spigotVersionString.length()) {
+                        StringBuilder pluginVersionStringBuilder = new StringBuilder(pluginVersionString);
+                        int index = pluginVersionStringBuilder.length();
+                        while(index < spigotVersionString.length()) {
+                            pluginVersionStringBuilder.append("0");
+                            index++;
+                        }
+                        pluginVersionString = pluginVersionStringBuilder.toString();
+                        //System.out.println("Versions Between: S:" + spigotVersionString + " | P:" + pluginVersionStringBuilder);
+                    } else {
+                        StringBuilder spigotVersionStringBuilder = new StringBuilder(spigotVersionString);
+                        int index = spigotVersionStringBuilder.length();
+                        while(index < pluginVersionString.length()) {
+                            spigotVersionStringBuilder.append("0");
+                            index++;
+                        }
+                        spigotVersionString = spigotVersionStringBuilder.toString();
+                        //System.out.println("Versions Between: S:" + spigotVersionStringBuilder + " | P:" + pluginVersionString);
+                    }
+                }
+                //System.out.println("Versions: S:" + spigotVersionString + " | P:" + pluginVersionString);
                 int pluginVersion = Integer.parseInt(pluginVersionString);
                 int spigotVersion = Integer.parseInt(spigotVersionString);
 
                 available = pluginVersion < spigotVersion;
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 available = false;
-                // TODO Error Handling
+                AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
             }
             return available;
         }

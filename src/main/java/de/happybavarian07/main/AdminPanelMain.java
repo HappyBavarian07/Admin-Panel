@@ -1,12 +1,12 @@
 package de.happybavarian07.main;
 
+import com.tchristofferson.configupdater.ConfigUpdater;
 import de.happybavarian07.addonloader.api.Addon;
 import de.happybavarian07.addonloader.api.Dependency;
 import de.happybavarian07.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.addonloader.utils.FileUtils;
 import de.happybavarian07.commands.AdminPanelOpenCommand;
 import de.happybavarian07.commands.UpdateCommand;
-import de.happybavarian07.configupdater.ConfigUpdater;
 import de.happybavarian07.listeners.MenuListener;
 import de.happybavarian07.placeholders.PanelExpansion;
 import de.happybavarian07.placeholders.PlayerExpansion;
@@ -16,6 +16,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,8 +33,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -64,6 +66,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private LanguageManager languageManager;
     private OldLanguageFileUpdater langFileUpdater;
     private List<Addon> loadedAddons = new ArrayList<>();
+    private AddonLoader loader;
+    private FileConfiguration dataYML;
+    private Map<String, NewUpdater> autoUpdaterPlugins = new HashMap<>();
 
     public static String getPrefix() {
         return prefix;
@@ -87,6 +92,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public boolean isInMaintenanceMode() {
         return inMaintenanceMode;
+    }
+
+    public Map<String, NewUpdater> getAutoUpdaterPlugins() {
+        return autoUpdaterPlugins;
     }
 
     public void setInMaintenanceMode(boolean inMaintenanceMode) {
@@ -124,8 +133,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public Map<UUID, Map<String, Boolean>> getPlayerPermissions() {
         return playerPermissions;
     }
-
-    private AddonLoader loader;
 
     @Override
     public void onEnable() {
@@ -248,65 +255,19 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         languageManager.addLang(deLang, deLang.getLangName());
         languageManager.addLang(enLang, enLang.getLangName());
         languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language")), true);
-        if (languageManager != null && languageManager.getMessage("Plugin.EnablingMessage", null) != null &&
-                !languageManager.getMessage("Plugin.EnablingMessage", null).equals("null config") &&
-                !languageManager.getMessage("Plugin.EnablingMessage", null).startsWith("null path: Messages.")) {
-            getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null));
+        if (languageManager != null && languageManager.getMessage("Plugin.EnablingMessage", null, false) != null &&
+                !languageManager.getMessage("Plugin.EnablingMessage", null, false).equals("null config") &&
+                !languageManager.getMessage("Plugin.EnablingMessage", null, false).startsWith("null path: Messages.")) {
+            getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null, true));
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
         try {
-            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), null);
+            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating")) {
-            for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
-                if (plugin.getResource("languages/" + langFiles.getLangName() + ".yml") == null) continue;
-                File oldFile = langFiles.getLangFile();
-                File newFile = new File(langFiles.getLangFile().getParentFile().getPath() + "/" + langFiles.getLangName() + "-new.yml");
-                YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
-                InputStream defaultStream = plugin.getResource("languages/" + langFiles.getLangName() + ".yml");
-                boolean nonDefaultLang = false;
-                //try {
-                //    defaultStream = plugin.getResource("languages/" + langFiles.getLangName() + ".yml");
-                //} catch (IllegalArgumentException e) {
-                //    String defaultLang = plugin.getConfig().getString("Plugin.languageForUpdates");
-                //    if (defaultLang == null || plugin.getResource(defaultLang) == null) defaultLang = "en";
-
-                //    defaultStream = plugin.getResource(defaultLang);
-                //    nonDefaultLang = true;
-                //}
-                if(defaultStream != null) {
-                    YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
-                    newConfig.setDefaults(defaultConfig);
-                }
-                newConfig.options().copyDefaults(true);
-                try {
-                    newConfig.save(newFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                langFileUpdater.updateFile(oldFile, newConfig, langFiles.getLangName(), nonDefaultLang);
-                newFile.delete();
-            }
-            /*for (LanguageFile langFiles : languageManager.getRegisteredLanguages().values()) {
-                File file = langFiles.getLangFile();
-                String resource = "languages/" + langFiles.getLangFile().getName();
-                try {
-                    List<String> ignoredSections = new ArrayList<>();
-                    int i = 1;
-                    while (i < 54) {
-                        ignoredSections.add("slot: " + i);
-                        i++;
-                    }
-                    ignoredSections.add("enchanted: true");
-                    ignoredSections.add("enchanted: false");
-                    ConfigUpdater.update(plugin, resource, file, ignoredSections);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }*/
             languageManager.reloadLanguages(null, false);
         }
 
@@ -328,23 +289,116 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             return String.valueOf(value);
         }));
 
-        updater = new NewUpdater(getPlugin(), 91800);
+        updater = new NewUpdater(getPlugin(), 91800, "Admin-Panel-%version%.jar", getPlugin());
         updater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
         if (getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
             updater.checkForUpdates(true);
             if (updater.updateAvailable()) {
-                updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
+                updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"), true);
             }
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     updater.checkForUpdates(false);
                     if (updater.updateAvailable()) {
-                        updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), false, true);
+                        updater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.automaticReplace"), getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"), true);
                     }
                 }
             }.runTaskTimer(plugin, (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
+        if (!new File(getDataFolder() + "/data.yml").exists()) {
+            saveResource("data.yml", false);
+        }
+        dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
+        if (getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
+            autoUpdaterPlugins.clear();
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.message("&1&lAuto Plugin Updater initiated&r");
+            for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
+                if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
+
+                ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
+                assert section != null;
+                if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
+                    continue;
+
+                int spigotID = section.getInt("spigotID");
+                String fileName = section.getString("fileName");
+
+                assert fileName != null;
+                if (!fileName.endsWith(".jar")) continue;
+
+                NewUpdater tempUpdater = new NewUpdater(getPlugin(), spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString));
+                autoUpdaterPlugins.put(sectionString, tempUpdater);
+                if (!tempUpdater.resourceIsOnSpigot()) continue;
+                if(tempUpdater.isExternalFile()) {
+                    logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                    tempUpdater.checkForUpdates(true);
+                    continue;
+                }
+                if ((tempUpdater.getPluginName() == null) && getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
+                    tempUpdater.downloadLatestUpdate(true, true, false);
+                    continue;
+                }
+
+                tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
+                tempUpdater.checkForUpdates(true);
+                if (tempUpdater.updateAvailable()) {
+                    tempUpdater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
+                            getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
+                }
+            }
+            if (getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        autoUpdaterPlugins.clear();
+                        for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
+                            if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
+
+                            ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
+                            assert section != null;
+                            if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
+                                continue;
+
+                            int spigotID = section.getInt("spigotID");
+                            String fileName = section.getString("fileName");
+
+                            assert fileName != null;
+                            if (!fileName.endsWith(".jar")) continue;
+
+                            NewUpdater tempUpdater = new NewUpdater(getPlugin(), spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString));
+                            autoUpdaterPlugins.put(sectionString, tempUpdater);
+                            if (!tempUpdater.resourceIsOnSpigot()) continue;
+                            if(tempUpdater.isExternalFile()) {
+                                logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                                tempUpdater.checkForUpdates(true);
+                                continue;
+                            }
+                            if ((tempUpdater.getPluginName() == null) && getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
+                                tempUpdater.downloadLatestUpdate(true, true, false);
+                                continue;
+                            }
+
+                            tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
+                            tempUpdater.checkForUpdates(true);
+                            if (tempUpdater.updateAvailable()) {
+                                tempUpdater.downloadLatestUpdate(getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
+                                        getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
+                            }
+                        }
+                    }
+                }.runTaskTimer(plugin, (getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
+            }
+            logger.coloredSpacer(ChatColor.BLUE);
+        }
+
+        /*new BukkitRunnable() {
+            @Override
+            public void run() {
+                languageManager.resetPlaceholders();
+            }
+        }.runTaskTimer(plugin, 0, 180);*/
 
         new BukkitRunnable() {
             @Override
@@ -374,7 +428,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
         //System.out.println("Init Addon Loader!!!!!!!!!!!!!!!!!!!!!!!!! 111111");
         //System.out.println("Config Option: " + plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled"));
-        if(plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled")) {
+        if (plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled")) {
             //System.out.println("Init Addon Loader!!!!!!!!!!!!!!!!!!!!!!!!! 222222");
             initAddonLoader();
         }
@@ -383,6 +437,32 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         LocalDateTime now = LocalDateTime.now();
 
         getFileLogger().writeToLog(Level.INFO, "Admin-Panel successfully started on '" + dtf.format(now) + "'", "DateLogger");
+    }
+
+    public FileConfiguration getDataYML() {
+        return dataYML;
+    }
+
+    public void removePluginFromUpdater(Plugin selectedPlugin) {
+        getDataYML().set("PluginsToUpdate." + selectedPlugin.getName(), null);
+
+        try {
+            getDataYML().save(new File(getDataFolder() + "/data.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addPluginToUpdater(Plugin plugin, int spigotID, String fileName) {
+        String path = "PluginsToUpdate." + plugin.getName() + ".";
+        getDataYML().set(path + "spigotID", spigotID);
+        getDataYML().set(path + "fileName", fileName);
+
+        try {
+            getDataYML().save(new File(getDataFolder() + "/data.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initAddonLoader() {
@@ -405,7 +485,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
         File[] temp = loader.getAddonFolder().listFiles(pathname -> pathname.getName().endsWith(".jar"));
 
-        if(!loader.getAddonFolder().exists() || temp == null || temp.length == 0) {
+        if (!loader.getAddonFolder().exists() || temp == null || temp.length == 0) {
             logger.coloredSpacer(ChatColor.RED);
             logger.message("&cThere are no Addons in that Folder! Stopping the Addon Loader!&r");
             logger.coloredSpacer(ChatColor.RED);
@@ -484,10 +564,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         loader = null;
-        if (languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null) != null &&
-                !languageManager.getMessage("Plugin.DisablingMessage", null).equals("null config") &&
-                !languageManager.getMessage("Plugin.DisablingMessage", null).startsWith("null path: Messages.")) {
-            getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null));
+        if (languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null, false) != null &&
+                !languageManager.getMessage("Plugin.DisablingMessage", null, false).equals("null config") &&
+                !languageManager.getMessage("Plugin.DisablingMessage", null, false).startsWith("null path: Messages.")) {
+            getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null, true));
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
         }

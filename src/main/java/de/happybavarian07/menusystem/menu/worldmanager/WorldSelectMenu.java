@@ -46,7 +46,7 @@ public class WorldSelectMenu extends PaginatedMenu {
         Player player = (Player) e.getWhoClicked();
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
 
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player);
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
         if (item.getType().equals(Material.PLAYER_HEAD)) {
             WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, Bukkit.getWorld(item.getItemMeta().getDisplayName()));
             try {
@@ -57,26 +57,26 @@ public class WorldSelectMenu extends PaginatedMenu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("WorldManager.Create", player))) {
+        } else if (item.equals(lgm.getItem("WorldManager.Create", player, false))) {
             new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null))) {
+        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
             }
             if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
             } else {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null))) {
+        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -85,9 +85,9 @@ public class WorldSelectMenu extends PaginatedMenu {
                 page = page + 1;
                 super.open();
             } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player));
+                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null))) {
+        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
@@ -110,7 +110,7 @@ public class WorldSelectMenu extends PaginatedMenu {
         Player player = playerMenuUtility.getOwner();
         addMenuBorder();
 
-        inventory.setItem(getSlot("WorldManager.Create", 47), lgm.getItem("WorldManager.Create", player));
+        inventory.setItem(getSlot("WorldManager.Create", 47), lgm.getItem("WorldManager.Create", player, false));
 
         //The thing you will be looping through to place items
         List<World> worlds = new ArrayList<>(getServer().getWorlds());

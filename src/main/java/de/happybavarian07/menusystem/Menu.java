@@ -33,7 +33,7 @@ public abstract class Menu implements InventoryHolder {
     protected PlayerMenuUtility playerMenuUtility;
     protected Inventory inventory;
     protected List<Inventory> inventorys = new ArrayList<>();
-    protected ItemStack FILLER = lgm.getItem("General.FillerItem", null);
+    protected ItemStack FILLER = lgm.getItem("General.FillerItem", null, false);
 
     //Constructor for Menu. Pass in a PlayerMenuUtility so that
     // we have information on who's menu this is and
@@ -69,7 +69,7 @@ public abstract class Menu implements InventoryHolder {
         // inventoryHolder in the MenuListener class when handling clicks
         if (!playerMenuUtility.getOwner().hasPermission(this.openingPermission)) {
             playerMenuUtility.getOwner().sendMessage(
-                    AdminPanelMain.getPlugin().getLanguageManager().getMessage("Player.General.NoPermissions", playerMenuUtility.getOwner()));
+                    AdminPanelMain.getPlugin().getLanguageManager().getMessage("Player.General.NoPermissions", playerMenuUtility.getOwner(), true));
             playerMenuUtility.getOwner().closeInventory();
             return;
         }
@@ -92,7 +92,7 @@ public abstract class Menu implements InventoryHolder {
                 playerMenuUtility.getOwner().openInventory(inventory);
                 if (this instanceof AdminPanelStartMenu) {
                     playerMenuUtility.getOwner().sendMessage(
-                            AdminPanelMain.getPlugin().getLanguageManager().getMessage("Player.General.OpeningMessageSelf", playerMenuUtility.getOwner()));
+                            AdminPanelMain.getPlugin().getLanguageManager().getMessage("Player.General.OpeningMessageSelf", playerMenuUtility.getOwner(), true));
                 }
             }
         } catch (NotAPanelEventException e) {

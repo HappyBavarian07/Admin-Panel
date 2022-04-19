@@ -1,4 +1,20 @@
 # Der Sprach Datei für Deutsche Sprache
+# Because of my Lang File Updater i sadly cannot write Comments into Lines (Please help me with this, i tried everything i can)
+# Here are a few Placeholders to use in some Messages:
+# All Placeholders API Placeholders (%player_name%, etc.)
+# %prefix% = The Prefix of the Plugin (works in every Message)
+# %target% = The Targeted Player (Only works if the Message has a Target (For Example Messages for the Money Menu)
+# %amount% = Only works in the Money Menu Messages
+# %language% = This works in Messages related to Language Files (ReloadedLanguageFile Message)
+# %fullname% = works in Messages and Items from the Temp Language Select Menu (Full Language Name)
+# %version% = works in Messages and Items from the Temp Language Select Menu (Language File Version)
+# %shortname% = works in Messages and Items from the Temp Language Select Menu (Language File Short Name (en, etc.))
+# %path% = works in Messages and Items from the Temp Language Select Menu (Path of Language File)
+# %filename% = works in Messages from Plugin Install Menu
+# %resourceid% = works in Messages from Plugin Install Menu
+# %reason% = works for Example in the Ban and Kick Menu
+# %message% = works in the Server Manager Broadcast Message Function
+# Maybe more Placeholders will come with time and maybe i get the Config Updater to run better
 LanguageFullName: 'Deutsch'
 LanguageVersion: '7.6.0'
 Messages:
@@ -14,7 +30,8 @@ Messages:
       AlreadyOnLastPage: '%prefix% &9> &cDu bist schon auf der letzten Seite!'
       NoPermissions: '%prefix% &9> &cDu hast keinen Zugriff auf diesen Command!'
       OpeningMessageSelf: '%prefix% &9> &cDu hast das Admin-Panel für dich geöffnet!'
-      OpeningMessageOther: '%prefix% &9> &c%player_name% hat das Admin-Panel für dich geöffnet!'
+      OpeningMessageOther: '%prefix% &9> &c%target% hat das Admin-Panel für dich geöffnet!'
+      OpeningMessageSelfForOther: '%prefix% &9> Du hast das Admin-Panel für &c%target% geöffnet!'
       TargetedPlayerIsNull: '%prefix% &9> &cDieser Spieler ist nicht online oder existiert nicht!'
       NotAValidUpdateVersion: '%prefix% &9> &cDies ist keine valide Plugin Version auf die man updaten kann!'
     WorldManager:
@@ -59,8 +76,8 @@ Messages:
         SetMoney: '%prefix% &9> &cDu hast gerade %player_name% auf %amount% gesetzt!'
         TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
     ServerManager:
-      MaintenanceModeOff: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
-      MaintenanceModeOn: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler können wieder beitreten!'
+      MaintenanceModeOff: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler können wieder beitreten!'
+      MaintenanceModeOn: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
       AllPlayersKicked: '%prefix% &9> &aAlle Spieler wurden vom Server gekickt!'
       PleaseEnterAMessage: '%prefix% &9> &aBitte gebe eine Nachricht in den Chat ein!'
       BroadcastHeader: '&a+---------------------------------------------------+'
@@ -101,6 +118,19 @@ Messages:
       ErrorInInstallProccess: '%prefix% &9> &cWährend des Installationsvorgangs ist ein Fehler aufgetreten!'
       LoadPluginError: '%prefix% &9> &cWährend des Ladevorgangs ist ein Fehler aufgetreten!'
       FileToLoadDoesNotExist: '%prefix% &9> &cDie Plugin Datei %filename% existiert nicht!'
+      ResourceIsNotOnSpigot: '%prefix% &9> &cDieses Plugin ist nicht auf Spigot vorhanden! Oder die Spigot ID stimmt nicht!'
+      DownloadFileIsExternal: '%prefix% &9> &cDie Datei des Plugins ist Extern und kann nicht gedownloaded werden!'
+      UpdatedPlugin: '%prefix% &9> &aDas Plugin %name% wurde geupdated! Tip: Wenn das Plugin schon auf der neuesten Version ist wird einfach die Datei gedownloaded!'
+      AutoPluginUpdater:
+        AddedPlugin: '%prefix% &9> &aDas Plugin %name% wurde hinzugefügt!'
+        RemovedPlugin: '%prefix% &9> &aDas Plugin %name% wurde entfernt!'
+        SelectPlugin: '%prefix% &9> &aBitte gib ein Plugin in den Chat ein!'
+        SelectPluginToRemove: '%prefix% &9> &aBitte gib ein Plugin in den Chat ein!'
+        SelectFileName: '%prefix% &9> &aBitte gib einen Datei Namen in den Chat ein mit ''.jar'' am Ende!'
+        FileNameSelected: '%prefix% &9> &aDer Datei Name %fileName% wurde ausgewählt!'
+        SelectSpigotID: '%prefix% &9> &aBitte gebe eine Spigot ID in den Chat ein!'
+        SpigotIDSelected: '%prefix% &9> &aDie Spigot ID %spigotID% wurde ausgewählt!'
+        PluginSelected: '%prefix% &9> &aDas Plugin %name% wurde ausgewählt!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
   ToManyArguments: '&4Zu viele Argumente!'
@@ -214,26 +244,25 @@ Items:
           displayName: '&aKick für ...Connection Reset'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
-            - '&7"&aInternal exception: java.net.SocketException: Connection reset.&7"'
+            - '&aInternal exception: java.net.SocketException: Connection reset.'
         ServerStoppedError:
           material: PISTON
           displayName: '&aKick für Error'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
-            - '&7"&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection
-            refused: no further informations:&7"'
+            - '&aio.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:'
         Serverstop:
           material: PISTON
           displayName: '&aKick für Serverstop'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
-            - '&7"&aServer closed!&7"'
+            - '&aServer closed!'
         Whitelist:
           material: PISTON
           displayName: '&aKick für Whitelist'
           lore:
             - '&aKickt einen Spieler mit der Nachricht: !'
-            - '&7"&aYou are not whitelisted on this server!&7"'
+            - '&aYou are not whitelisted on this server!'
       FakeOp:
         material: PAPER
         displayName: '&cFake Op'
@@ -888,6 +917,31 @@ Items:
       lore:
         - '&2Lade andere Plugins während der Server läuft!'
         - '&2Du brauchst nur den Datei Namen!'
+    AutoUpdateMenu:
+      OpenMenuItem:
+        material: DIAMOND_BLOCK
+        displayName: '&aAuto Plugin Updater Menü'
+        lore:
+          - '&aDas Auto Plugin Updater Menü'
+      PluginItem:
+        material: PAPER
+        displayName: '&a%name%'
+        lore:
+          - '&aKlicke dieses Item um das Plugin zu updaten'
+          - '&aSpigot ID: &6%spigotID%'
+          - '&aDateiname: &6%fileName%'
+          - '&aAuf Spigot: &6%onSpigot%'
+          - '&aExterne Datei: &6%externalFile%'
+      AddPlugin:
+        material: ENCHANTED_BOOK
+        displayName: '&aPlugin hinzufügen'
+        lore:
+          - '&aFüge Plugins zum Auto Updater hinzu'
+      RemovePlugin:
+        material: BOOK
+        displayName: '&aPlugin entfernen'
+        lore:
+          - '&aEntferne Plugins from Auto Updater'
     InstallMenu:
       ResourceID:
         material: BOOKSHELF
@@ -1017,6 +1071,7 @@ MenuTitles:
     Selector: '&aWähle ein Plugin'
     Settings: '&3Einstellungen'
     InstallMenu: '&6Installieren'
+    AutoUpdateMenu: '&6Auto Update Menü'
     Commands:
       Menu: '&6Commmands'
       Settings: '&3Einstellungen'

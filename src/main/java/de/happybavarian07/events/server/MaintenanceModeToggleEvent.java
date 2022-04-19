@@ -10,19 +10,13 @@ public class MaintenanceModeToggleEvent extends AdminPanelEvent implements Cance
     private boolean cancelled;
 
     private final Player player;
-    private final boolean maintenanceMode;
 
-    public MaintenanceModeToggleEvent(Player player, boolean maintenanceMode) {
+    public MaintenanceModeToggleEvent(Player player) {
         this.player = player;
-        this.maintenanceMode = maintenanceMode;
     }
 
     public Player getPlayer() {
         return player;
-    }
-
-    public boolean isMaintenanceMode() {
-        return maintenanceMode;
     }
 
     @Override

@@ -42,19 +42,19 @@ public class PlayerActionSelectMenu extends Menu {
         Player target = Bukkit.getPlayer(targetUUID);
         ItemStack item = e.getCurrentItem();
 
-        if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target))) {
+        if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target, false))) {
             new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target, false))) {
             new MoneyMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target, false))) {
             new PlayerBanMenu(playerMenuUtility, targetUUID).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target, false))) {
             new PlayerKickMenu(playerMenuUtility, targetUUID).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target))) {
+        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target, false))) {
             new PermissionActionSelectMenu(playerMenuUtility, targetUUID).open();
-        } else if (item.equals(lgm.getItem("General.Close", null))) {
+        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player));
+                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
             new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
@@ -68,13 +68,13 @@ public class PlayerActionSelectMenu extends Menu {
         }
         String path = "PlayerManager.ActionsMenu.";
         Player target = Bukkit.getPlayer(targetUUID);
-        inventory.setItem(getSlot(path + "ActionsItem", 10), lgm.getItem(path + "ActionsItem", target));
+        inventory.setItem(getSlot(path + "ActionsItem", 10), lgm.getItem(path + "ActionsItem", target, false));
         if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            inventory.setItem(getSlot(path + "MoneyItem", 12), lgm.getItem(path + "MoneyItem", target));
+            inventory.setItem(getSlot(path + "MoneyItem", 12), lgm.getItem(path + "MoneyItem", target, false));
         }
-        inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target));
-        inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target));
-        inventory.setItem(getSlot(path + "PermissionItem", 4), lgm.getItem(path + "PermissionItem", target));
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target));
+        inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target, false));
+        inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target, false));
+        inventory.setItem(getSlot(path + "PermissionItem", 4), lgm.getItem(path + "PermissionItem", target, false));
+        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false));
     }
 }
