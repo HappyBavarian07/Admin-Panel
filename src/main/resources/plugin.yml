@@ -1,5 +1,5 @@
 name: Admin-Panel
-main: de.happybavarian07.main.AdminPanelMain
+main: de.happybavarian07.adminpanel.main.AdminPanelMain
 version: ${project.version}
 api-version: 1.13
 author: HappyBavaraian07
@@ -16,12 +16,24 @@ commands:
   update:
     description: The Update Command
     usage: /update <Check|Download|ForceDownload|Replace|ForceReplace|GetLatest>
-
+  perplayerlang:
+    description: With this you can set your own Admin Panel Language
+    usage: /<command> <Language|default> [Player]
+    aliases:
+      - ppl
+      - pplang
+      - playerlang
+  reloadlang:
+    description: Reloads the Languages
+    usage: /reloadlang
 permissions:
   AdminPanel.*:
     default: op
     children:
+      AdminPanel.PerPlayerLang: true
+      AdminPanel.PerPlayerLangOther: true
       AdminPanel.SwitchLanguage: true
+      AdminPanel.ReloadLanguages: true
       AdminPanel.ReloadConfig: true
       AdminPanel.updatenotify: true
       AdminPanel.update: true

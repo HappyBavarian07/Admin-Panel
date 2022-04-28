@@ -7,3 +7,4 @@
 #     A Valid File Name is for Example: 'Admin-Panel-%version%.jar'
 #     fileName: '<fileName>'
 PluginsToUpdate: {}
+playerdata: {}

@@ -1,38 +1,53 @@
 # The Language File for English Language
-# Because of my Lang File Updater i sadly cannot write Comments into Lines (Please help me with this, i tried everything i can)
-# Here are a few Placeholders to use in some Messages:
-# All Placeholders API Placeholders (%player_name%, etc.)
 # %prefix% = The Prefix of the Plugin (works in every Message)
-# %target% = The Targeted Player (Only works if the Message has a Target (For Example Messages for the Money Menu)
-# %amount% = Only works in the Money Menu Messages
-# %language% = This works in Messages related to Language Files (ReloadedLanguageFile Message)
-# %fullname% = works in Messages and Items from the Temp Language Select Menu (Full Language Name)
-# %version% = works in Messages and Items from the Temp Language Select Menu (Language File Version)
-# %shortname% = works in Messages and Items from the Temp Language Select Menu (Language File Short Name (en, etc.))
-# %path% = works in Messages and Items from the Temp Language Select Menu (Path of Language File)
-# %filename% = works in Messages from Plugin Install Menu
-# %resourceid% = works in Messages from Plugin Install Menu
-# %reason% = works for Example in the Ban and Kick Menu
-# %message% = works in the Server Manager Broadcast Message Function
-# Maybe more Placeholders will come with time and maybe i get the Config Updater to run better
 LanguageFullName: 'English'
-LanguageVersion: '7.6.0'
+LanguageVersion: '8.1.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
     DisablingMessage: '[Admin-Panel] successfully disabled!'
   Player:
+    Commands:
+      TooFewArguments: '%prefix% &9> &cToo few Arguments!'
+      TooManyArguments: '%prefix% &9> &cToo many Arguments!'
+      InvalidSubCommand: '%prefix% &9> &cThat''s not a valid Command!'
+      ErrorPerformingSubCommand: '%prefix% &9> &cAn Error occurred!'
+      UsageMessage: '%prefix% &9> &c%usage%'
+      NotANumber: '%prefix% &9> &cThat''s not a Number!'
+      HelpPageDoesNotExist: '%prefix% &9> &cThis Help Page does not exist!'
+      HelpMessages:
+        # -------------------------------------------------
+        # Header and Footer Placeholders (Command Manager system):
+        # %page% = Current Page
+        # %max_page% = Max Page
+        # -------------------------------------------------
+        # Format Placeholders:
+        # %usage% = Sub Command Usage
+        # %description% = Sub Command Description
+        # %name% = Sub Command Name
+        # %aliases% = Sub Command Aliases
+        # %permission% = Sub Command Permission
+        Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+        Format: '  &b%usage% &7- &b%description%'
+        Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
     General:
       ReloadedConfig: '%prefix% &9> &aSuccessfully reloaded the Config!'
+      # %language% = The Language of the Plugin
       ReloadedLanguageFile: '%prefix% &9> &aSuccessfully reloaded Language: %language%!'
       SetCurrentLanguage: '%prefix% &9> &aSuccessfully set current Language to %fullname%!'
       AlreadyOnFirstPage: '%prefix% &9> &cYou''re already on the first page!'
       AlreadyOnLastPage: '%prefix% &9> &cYou''re already on the last page!'
       NoPermissions: '%prefix% &9> &cYou do not have access to this command!'
-      OpeningMessageSelf: '%prefix% &9> &cYou have opened the Admin-Panel for you!'
+      OpeningMessageSelf: '%prefix% &9> &cYou opened the Admin-Panel for you!'
       OpeningMessageOther: '%prefix% &9> &c%player_name% opened the Admin-Panel for you!'
+      # %target% = The Targeted Player
+      OpeningMessageSelfForOther: '%prefix% &9> You opened the Admin-Panel for &c%target%!'
       TargetedPlayerIsNull: '%prefix% &9> &cThis player is not online or does not exist!'
       NotAValidUpdateVersion: '%prefix% &9> &cThat''s not a valid Plugin Version to update to!'
+      NotAValidLanguage: '%prefix% &9> &c''%langName%'' is not a valid Language to select!'
+      PerPlayerLangSet: '%prefix% &9> &aSuccessfully selected ''%langName%'' as your Language!'
+      # %target% = The Targeted Player
+      PerPlayerLangSetOther: '%prefix% &9> &aSuccessfully selected ''%langName%'' as %target%''s Language!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aPlease enter a Name in the Chat!'
@@ -50,6 +65,7 @@ Messages:
           EnterSort: '%prefix% &9> &aPlease enter your Sorting in the Chat!'
           SortResult: '%prefix% &9> &aThe Sorting gets applied!'
       KickMenu:
+        # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
         NotKickable: '%prefix% &9> &cThis Player is not kickable!'
         SuccessfullyKicked: '%prefix% &9> &aYou kicked the Player successfully!'
@@ -57,6 +73,7 @@ Messages:
           EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
           NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
       BanMenu:
+        # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4You got banned from this Server! \r\n &4Time: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds% \r\n &4Reason: &4%reason%'
         SuccessfullyUnbanned: '%prefix% &9> &aYou unbanned the Player successfully!'
         SuccessfullyBanned: '%prefix% &9> &aYou banned the Player successfully!'
@@ -67,6 +84,7 @@ Messages:
           EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
           NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
       Money:
+        # %amount% = The Amount of Money
         PleaseEnterAmount: '%prefix% &9> &aPlease enter the amount you want to work with in the chat!'
         NotEnoughMoney: '%prefix% &9> &c%player_name% doesn''t have enough money for it! (%vault_eco_balance%)'
         TransactionError: '%prefix% &9> &c%player_name% There was an Error with the Transaction!'
@@ -79,6 +97,7 @@ Messages:
       MaintenanceModeOn: '%prefix% &9> &cThe server is now in maintenance mode. All players who have no rights have been kicked!'
       AllPlayersKicked: '%prefix% &9> &aAll players were kicked from the server!'
       PleaseEnterAMessage: '%prefix% &9> &aPlease enter a message in the chat!'
+      # %message% = The Message
       BroadcastHeader: '&a+---------------------------------------------------+'
       BroadcastMessage: '%prefix% &9> %message%'
       BroadcastFooter: '&a+---------------------------------------------------+'
@@ -105,6 +124,8 @@ Messages:
       Message: '       &4The chat was unmuted by%player_name%!'
       Footer: '&a+---------------------------------------------------+'
     PluginManager:
+      # %resourceid% = The Resource ID of the Plugin
+      # %filename% = The File Name of the Plugin
       FileNotFound: '%prefix% &9> &cThe Plugin has not been found!'
       MissingDependencies: '%prefix% &9> &cThe plugin was downloaded, but the dependencies are missing!'
       ResourceIDSelected: '%prefix% &9> &aThe ResourceID% resourceid% has been selected!'
@@ -427,6 +448,7 @@ Items:
         Reason:
           material: PAPER
           displayName: '&cSet the Reason of the Ban'
+          # %reason% = The Reason
           lore:
             - '&cSet the Reason of the Ban'
             - '&c%reason%'
@@ -475,6 +497,7 @@ Items:
         Ban:
           material: BEDROCK
           displayName: '&cBan the Player'
+          # %reason% = The Reason
           lore:
             - '&cBan the Player:'
             - '&cTime: &6%time%'
@@ -483,12 +506,14 @@ Items:
         Reason:
           material: PAPER
           displayName: '&cSet the Reason of the Ban'
+          # %reason% = The Reason
           lore:
             - '&cSet the Reason of the Ban'
             - '&c%reason%'
         Kick:
           material: BEDROCK
           displayName: '&cKick the Player'
+          # %reason% = The Reason
           lore:
             - '&cKick the Player:'
             - '&cReason: &6%reason%'
@@ -947,12 +972,14 @@ Items:
       ResourceID:
         material: BOOKSHELF
         displayName: '&2Resource ID'
+        # %resourceid% = The Resource ID of the Plugin
         lore:
           - '&2The Resource ID From Spigot!'
           - '&6%resourceid%'
       Name:
         material: OAK_SIGN
         displayName: '&2File Name'
+        # %filename% = The File Name of the Plugin
         lore:
           - '&2The Name of the Plugin jar File!'
           - '&6%filename%'
