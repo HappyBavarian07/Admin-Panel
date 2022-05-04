@@ -11,10 +11,10 @@ import de.happybavarian07.adminpanel.main.PlaceholderType;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@CommandData
 public abstract class SubCommand {
     protected AdminPanelMain plugin = AdminPanelMain.getPlugin();
     protected LanguageManager lgm = plugin.getLanguageManager();
@@ -24,6 +24,11 @@ public abstract class SubCommand {
 
     public SubCommand() {
 
+    }
+
+    public boolean isPlayerRequired(SubCommand sub) {
+        if(!sub.getClass().isAnnotationPresent(CommandData.class)) return false;
+        return sub.getClass().getAnnotation(CommandData.class).playerRequired();
     }
 
     public abstract boolean onPlayerCommand(Player player, String[] args);

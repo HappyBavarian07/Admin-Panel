@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AdminPanelEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
@@ -14,7 +15,7 @@ public abstract class AdminPanelEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

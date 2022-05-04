@@ -8,7 +8,6 @@ import de.happybavarian07.adminpanel.main.LanguageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class LanguageReloadCommand implements CommandExecutor {
@@ -20,8 +19,8 @@ public class LanguageReloadCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(command.getName().equalsIgnoreCase("reloadlang")) {
-            if(!sender.hasPermission("AdminPanel.ReloadLanguages")) {
+        if (command.getName().equalsIgnoreCase("reloadlang")) {
+            if (!sender.hasPermission("AdminPanel.ReloadLanguages")) {
                 sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", null, true));
                 return true;
             }

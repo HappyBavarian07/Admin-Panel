@@ -6,6 +6,7 @@ import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class PanelOpenEvent extends AdminPanelEvent implements Cancellable {
 
@@ -43,7 +44,7 @@ public class PanelOpenEvent extends AdminPanelEvent implements Cancellable {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 

@@ -42,6 +42,9 @@ public class PluginExpansion extends PlaceholderExpansion {
         if (params.startsWith("message-")) {
             return AdminPanelMain.getPlugin().getLanguageManager().getMessage(params.substring(8), player, true);
         }
+        if (params.startsWith("placeholders")) {
+            return AdminPanelMain.getPlugin().getLanguageManager().getPlaceholders().toString();
+        }
         return null;
     }
 }

@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.pan
  * @Date 27.04.2022 | 17:26
  */
 
+import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.PlaceholderType;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+@CommandData(playerRequired = false)
 public class PluginSelectMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {

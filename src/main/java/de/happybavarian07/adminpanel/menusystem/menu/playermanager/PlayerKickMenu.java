@@ -51,7 +51,6 @@ public class PlayerKickMenu extends Menu implements Listener {
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(lgm.getItem(path + "Reason", player, false).getType())) {
             player.setMetadata("KickPlayerSetNewReason", new FixedMetadataValue(plugin, true));
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.Reason.EnterNewReason", player, true));
             player.closeInventory();
         } else if (item.getType().equals(lgm.getItem(path + "Kick", player, false).getType())) {

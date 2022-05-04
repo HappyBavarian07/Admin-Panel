@@ -1,6 +1,5 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
-
-/**
+/*
  * @Author HappyBavarian07
  * @Date 02.09.2021
  */

@@ -443,7 +443,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         }
                     }
                 };
-                hurtingWaterRunnable.runTaskTimer(plugin, 20L, 100L);
+                hurtingWaterRunnable.runTaskTimer(plugin, 20, 100);
             }
         } else {
             if(hurtingWaterRunnable != null) {

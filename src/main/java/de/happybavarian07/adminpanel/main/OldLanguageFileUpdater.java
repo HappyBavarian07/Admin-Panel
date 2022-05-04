@@ -12,14 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OldLanguageFileUpdater {
-    private final AdminPanelMain plugin;
-    private final LanguageManager lgm;
-
-    public OldLanguageFileUpdater(AdminPanelMain plugin) {
-        this.plugin = plugin;
-        this.lgm = plugin.getLanguageManager();
-    }
-
     public Map<String, Object> checkForUpdates(File oldFile, FileConfiguration newConfig, boolean nonDefaultLang) {
         FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldFile);
         Map<String, Object> updates = new HashMap<>();

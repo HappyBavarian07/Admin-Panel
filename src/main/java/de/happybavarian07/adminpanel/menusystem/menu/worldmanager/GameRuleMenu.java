@@ -7,15 +7,16 @@ import de.happybavarian07.adminpanel.main.Head;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.Utils;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GameRuleMenu extends PaginatedMenu {
@@ -39,42 +40,58 @@ public class GameRuleMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
+    public void handleMenu(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        ItemStack item = event.getCurrentItem();
 
-        List<String> gamerules = new ArrayList<>(Arrays.asList(world.getGameRules()));
+        List<GameRule<?>> gamerules = new ArrayList<>();
+        for (String name : world.getGameRules()) {
+            if (GameRule.getByName(name) == null) continue;
 
-        gamerules.removeIf(gmName -> Integer.getInteger(world.getGameRuleValue(gmName)) != null ||
-                gmName.equals("maxCommandChainLength") || gmName.equals("maxEntityCramming") ||
-                gmName.equals("spawnRadius") || gmName.equals("randomTickSpeed"));
+            gamerules.add(GameRule.getByName(name));
+        }
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(Material.PLAYER_HEAD)) {
             int count = 0;
-            for (String gmName : gamerules) {
-                if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
+            for (GameRule<?> gameRule : gamerules) {
+                if (gameRule.getName().equals(item.getItemMeta().getDisplayName())) {
                     MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
-                            player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
+                            player, world, gameRule, world.getGameRuleValue(gamerules.get(count)));
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(gameruleChangeEvent);
                         if (!gameruleChangeEvent.isCancelled()) {
-                            world.setGameRuleValue(gmName, "false");
-                            super.open();
-                            return;
-                        }
-                    } catch (NotAPanelEventException notAPanelEventException) {
-                        notAPanelEventException.printStackTrace();
-                    }
-                } else if (!Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))) && gmName.equals(item.getItemMeta().getDisplayName())) {
-                    MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
-                            player, world, gmName, Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count))));
-                    try {
-                        AdminPanelMain.getAPI().callAdminPanelEvent(gameruleChangeEvent);
-                        if (!gameruleChangeEvent.isCancelled()) {
-                            world.setGameRuleValue(gmName, "true");
+                            if (world.getGameRuleValue(gamerules.get(count)) instanceof Boolean) {
+                                if (event.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                                    boolean value = Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(count).getName()));
+                                    world.setGameRule((GameRule<Boolean>) gameRule, !value);
+                                } else {
+                                    return;
+                                }
+                            } else if (world.getGameRuleValue(gamerules.get(count)) instanceof Integer) {
+                                int value = Integer.parseInt(world.getGameRuleValue(gamerules.get(count).getName()));
+                                System.out.println("Shift click: " + event.isShiftClick() + " | " + event.getClick().isShiftClick());
+                                System.out.println("Value 1: " + value);
+                                System.out.println("Inventory Action: " + event.getAction());
+                                if (event.isShiftClick()) {
+                                    if(!event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) return;
+                                    if (event.isLeftClick()) {
+                                        value = value + 10;
+                                    } else if (event.isRightClick()) {
+                                        value = value - 10;
+                                    }
+                                } else {
+                                    if (event.isLeftClick()) {
+                                        value = value + 1;
+                                    } else if (event.isRightClick()) {
+                                        value = value - 1;
+                                    }
+                                }
+                                System.out.println("Value 2: " + value);
+                                world.setGameRule((GameRule<Integer>) gameRule, value);
+                            }
                             super.open();
                             return;
                         }
@@ -128,14 +145,15 @@ public class GameRuleMenu extends PaginatedMenu {
         addMenuBorder();
 
         //The thing you will be looping through to place items
-        List<String> gamerules = new ArrayList<>(Arrays.asList(world.getGameRules()));
+        List<GameRule<?>> gamerules = new ArrayList<>();
+        for (String name : world.getGameRules()) {
+            if (GameRule.getByName(name) == null) continue;
 
-        gamerules.removeIf(gmName -> Integer.getInteger(world.getGameRuleValue(gmName)) != null ||
-                gmName.equals("maxCommandChainLength") || gmName.equals("maxEntityCramming") ||
-                gmName.equals("spawnRadius") || gmName.equals("randomTickSpeed"));
+            gamerules.add(GameRule.getByName(name));
+        }
 
         ///////////////////////////////////// Pagination loop template
-        if (gamerules != null && !gamerules.isEmpty()) {
+        if (!gamerules.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= gamerules.size()) break;
@@ -144,15 +162,26 @@ public class GameRuleMenu extends PaginatedMenu {
 
                     List<String> lore = new ArrayList<>();
                     ItemStack head = lgm.getItem("General.EmptySlot", playerMenuUtility.getOwner(), false);
-                    if (Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
-                        head = Head.BLANK_GREEN.getAsItem();
-                        lore.add(Utils.chat("&6Value: &atrue"));
-                    } else if (!Boolean.parseBoolean(world.getGameRuleValue(gamerules.get(index)))) {
-                        head = Head.BLANK_RED.getAsItem();
-                        lore.add(Utils.chat("&6Value: &cfalse"));
+                    Object value = world.getGameRuleValue(gamerules.get(index));
+                    if (value instanceof Boolean) {
+                        if ((Boolean) value) {
+                            head = Head.BLANK_GREEN.getAsItem();
+                            lore.add(Utils.chat("&6Value: &atrue"));
+                        } else {
+                            head = Head.BLANK_RED.getAsItem();
+                            lore.add(Utils.chat("&6Value: &cfalse"));
+                        }
+                    } else if (value instanceof Integer) {
+                        if ((Integer) value > 0) {
+                            head = Head.BLANK_GREEN.getAsItem();
+                            lore.add(Utils.chat("&6Value: &a" + value));
+                        } else {
+                            head = Head.BLANK_RED.getAsItem();
+                            lore.add(Utils.chat("&6Value: &c" + value));
+                        }
                     }
                     ItemMeta meta = head.getItemMeta();
-                    meta.setDisplayName(gamerules.get(index));
+                    meta.setDisplayName(gamerules.get(index).getName());
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                     inventory.addItem(head);

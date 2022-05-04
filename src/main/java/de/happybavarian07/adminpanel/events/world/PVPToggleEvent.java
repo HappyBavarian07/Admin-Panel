@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class PVPToggleEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -48,7 +49,7 @@ public class PVPToggleEvent extends AdminPanelEvent implements Cancellable {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

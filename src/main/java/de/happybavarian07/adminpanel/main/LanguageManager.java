@@ -4,7 +4,6 @@ import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -15,8 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -186,6 +183,8 @@ public class LanguageManager {
         if (resetBefore) resetPlaceholders(type, null);
         if (!placeholders.containsKey(key))
             placeholders.put(key, new Placeholder(key, value, type));
+        else
+            placeholders.replace(key, placeholders.get(key), new Placeholder(key, value, type));
     }
 
     public void addPlaceholders(Map<String, Placeholder> placeholders, boolean resetBefore) {

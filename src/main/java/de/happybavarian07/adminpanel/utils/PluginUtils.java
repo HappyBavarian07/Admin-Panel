@@ -149,12 +149,7 @@ public class PluginUtils {
 
         if (listeners != null && reloadlisteners) {
             for (SortedSet<RegisteredListener> set : listeners.values()) {
-                for (Iterator<RegisteredListener> it = set.iterator(); it.hasNext(); ) {
-                    RegisteredListener value = it.next();
-                    if (value.getPlugin() == plugin) {
-                        it.remove();
-                    }
-                }
+                set.removeIf(value -> value.getPlugin() == plugin);
             }
         }
 

@@ -159,10 +159,6 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void downloadPluginUpdateFromSpiget(int resourceID, String fileName, boolean replaceOldVersion) {
-    }
-
-    @Override
     public void clearChat(int lines, boolean broadcastChatClear, Player player) {
         Utils.clearChat(lines, broadcastChatClear, player);
     }
@@ -313,7 +309,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void registerCommandManager(CommandManager commandManager) {
-        plugin.getCommandManagerRegistry().register(commandManager);
+    public boolean registerCommandManager(CommandManager commandManager) {
+        return plugin.getCommandManagerRegistry().register(commandManager);
     }
 }

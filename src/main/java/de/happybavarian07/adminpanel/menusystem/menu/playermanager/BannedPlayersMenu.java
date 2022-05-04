@@ -18,7 +18,6 @@ import java.util.List;
 import static org.bukkit.Bukkit.getServer;
 
 public class BannedPlayersMenu extends PaginatedMenu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
     public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -110,7 +109,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
         }
 
         ///////////////////////////////////// Pagination loop template
-        if (updatedPlayers != null && !updatedPlayers.isEmpty()) {
+        if (!updatedPlayers.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= updatedPlayers.size()) break;

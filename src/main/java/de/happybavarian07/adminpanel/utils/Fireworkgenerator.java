@@ -88,13 +88,7 @@ public class Fireworkgenerator {
         this.firework.setFireworkMeta(this.fireworkmeta);
 
         if (this.LifeTime != 0) {
-            Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                @Override
-                public void run() {
-                    detonate();
-                }
-            }, this.LifeTime);
+            Bukkit.getScheduler().runTaskLater(this.plugin, this::detonate, this.LifeTime);
         }
     }
 

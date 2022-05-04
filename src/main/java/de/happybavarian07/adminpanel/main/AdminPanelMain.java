@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.main;
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManagerRegistry;
-import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
+import de.happybavarian07.adminpanel.configupdater.OldConfigUpdater;
 import de.happybavarian07.adminpanel.utils.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -135,6 +135,18 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return configFile;
     }
 
+    public boolean isAddonSystemEnabled() {
+        return getConfig().getBoolean("Plugin.AddonSystem.enabled");
+    }
+
+    public boolean isUpdaterEnabled() {
+        return getConfig().getBoolean("Plugin.Updater.checkForUpdates");
+    }
+
+    public boolean isPluginUpdaterEnabled() {
+        return getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled");
+    }
+
     @Override
     public void onEnable() {
 
@@ -151,7 +163,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setPlugin(this);
         languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
         commandManagerRegistry = new CommandManagerRegistry(this);
-        langFileUpdater = new OldLanguageFileUpdater(this);
+        langFileUpdater = new OldLanguageFileUpdater();
         API = new LocalAdminPanelAPI(this);
         InitMethods initMethods = new InitMethods(logger, Bukkit.getPluginManager(), plugin);
         new ChatUtil();
@@ -194,7 +206,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
         try {
-            ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
+            OldConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,13 +220,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // Init Updater
         updater = new NewUpdater(plugin, 91800, "Admin-Panel-%version%.jar", plugin);
         initMethods.initUpdater(updater, autoUpdaterPlugins, dataYML);
-
-        /*new BukkitRunnable() {
-            @Override
-            public void run() {
-                languageManager.resetPlaceholders();
-            }
-        }.runTaskTimer(plugin, 0, 180);*/
 
         // Init Permissions
         initMethods.initPermissions(playerPermissionsAttachments, playerPermissions);
@@ -249,8 +254,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     public String getVersion() {
-        if (Bukkit.getPluginManager().getPlugin(getName()) == null) return "N/A";
-        return Bukkit.getPluginManager().getPlugin(getName()).getDescription().getVersion();
+        if (getDescription().getVersion().equals("")) return "N/A";
+        return getDescription().getVersion();
     }
 
     public FileConfiguration getDataYML() {
@@ -294,6 +299,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if(loader != null) {
+            loader.crashAddons();
+        }
         loader = null;
         if (languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null, false) != null &&
                 !languageManager.getMessage("Plugin.DisablingMessage", null, false).equals("null config") &&
@@ -366,7 +374,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         } else {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
-                    online.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
+                    online.removeAttachment(playerPermissionsAttachments.get(online.getUniqueId()));
                 }
                 PermissionAttachment attachment = online.addAttachment(plugin);
                 if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {

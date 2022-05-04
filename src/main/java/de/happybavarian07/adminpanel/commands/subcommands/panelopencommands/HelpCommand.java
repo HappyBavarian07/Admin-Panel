@@ -4,6 +4,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panelopencommands;
  * @Date 05.10.2021 | 17:53
  */
 
+import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.PlaceholderType;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+@CommandData
 public class HelpCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
@@ -31,7 +33,7 @@ public class HelpCommand extends SubCommand {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
             player.sendMessage(lgm.getMessage("Player.Commands.HelpMessages.Header", player, false));
             for (SubCommand s : messages.getPage(page)) {
-                if(player.hasPermission(s.permission())) {
+                if (player.hasPermission(s.permission())) {
                     player.sendMessage(format(lgm.getMessage("Player.Commands.HelpMessages.Format", player, false), s));
                 }
             }
@@ -63,7 +65,7 @@ public class HelpCommand extends SubCommand {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
             sender.sendMessage(lgm.getMessage("Player.Commands.HelpMessages.Header", null, false));
             for (SubCommand s : messages.getPage(page)) {
-                if(sender.hasPermission(s.permission())) {
+                if (sender.hasPermission(s.permission()) && !isPlayerRequired(s)) {
                     sender.sendMessage(format(lgm.getMessage("Player.Commands.HelpMessages.Format", null, false), s));
                 }
             }

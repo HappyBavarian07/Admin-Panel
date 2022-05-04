@@ -175,7 +175,7 @@ public interface AdminPanelAPI {
      */
     Plugin downloadPluginFromSpiget(int resourceID, String fileName, Boolean enableAfterInstall) throws IOException, InvalidPluginException, InvalidDescriptionException, UnknownDependencyException;
 
-    void downloadPluginUpdateFromSpiget(int resourceID, String fileName, boolean replaceOldVersion);
+    //void downloadPluginUpdateFromSpiget(int resourceID, String fileName, boolean replaceOldVersion);
 
     // Utils
 
@@ -192,7 +192,7 @@ public interface AdminPanelAPI {
      * Restartet den Server
      *
      * @param time Zeit zwischen den Aktionen und Nachrichten
-     * @param time Zeit zwischen dem Restart und Player Kick
+     * @param time2 Zeit zwischen dem Restart und Player Kick
      * @throws InterruptedException Wenn der Restart unterbrochen wird
      */
     void restartServer(int time, int time2) throws InterruptedException;
@@ -446,5 +446,5 @@ public interface AdminPanelAPI {
      * Weitere Infos im Wiki unter Command Manager API
      * @param commandManager der Command Manager
      */
-    void registerCommandManager(CommandManager commandManager);
+    boolean registerCommandManager(CommandManager commandManager);
 }

@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.addonloader.api.Dependency;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.addonloader.utils.FileUtils;
 import de.happybavarian07.adminpanel.commands.AdminPanelOpenCommand;
+import de.happybavarian07.adminpanel.commands.LanguageReloadCommand;
 import de.happybavarian07.adminpanel.commands.PerPlayerLanguageCommand;
 import de.happybavarian07.adminpanel.commands.UpdateCommand;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
@@ -24,7 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
@@ -168,12 +168,12 @@ public class InitMethods {
                 e.printStackTrace();
             }
         }
-        permissionsConfig.getConfigurationSection("Permissions").getKeys(false).forEach(player -> {
+        Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions")).getKeys(false).forEach(player -> {
             String path = "Permissions." + player + ".Permissions";
             Map<String, Boolean> perms = new HashMap<>();
-            permissionsConfig.getConfigurationSection(path).getKeys(false).forEach(perm -> {
-                perms.put(perm.replace("(<->)", "."), permissionsConfig.getBoolean(path + "." + perm));
-            });
+            Objects.requireNonNull(permissionsConfig.getConfigurationSection(path)).getKeys(false)
+                    .forEach(perm ->
+                            perms.put(perm.replace("(<->)", "."), permissionsConfig.getBoolean(path + "." + perm)));
             playerPermissions.put(UUID.fromString(player), perms);
         });
     }
@@ -197,7 +197,8 @@ public class InitMethods {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0, 180);}
+        }.runTaskTimer(plugin, 0, 180);
+    }
 
     public void initCommands() {
         try {
@@ -207,7 +208,7 @@ public class InitMethods {
         }
         Objects.requireNonNull(plugin.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
         Objects.requireNonNull(plugin.getCommand("perplayerlang")).setExecutor(new PerPlayerLanguageCommand());
-        Objects.requireNonNull(plugin.getCommand("reloadlang")).setExecutor(new PerPlayerLanguageCommand());
+        Objects.requireNonNull(plugin.getCommand("reloadlang")).setExecutor(new LanguageReloadCommand());
     }
 
     public void initbStatsMetrics(Metrics metrics) {
@@ -228,6 +229,16 @@ public class InitMethods {
             }
             return String.valueOf(value);
         }));
+        /*metrics.addCustomChart(new Metrics.AdvancedBarChart("exampleBar", () -> {
+            Map<String, int[]> map = new HashMap<>();
+            map.put("Addon System", plugin.isAddonSystemEnabled() ? new int[]{0, 1} : new int[]{1, 0});
+            map.put("Updater", plugin.isUpdaterEnabled() ? new int[]{0, 1} : new int[]{1, 0});
+            map.put("Plugin Updater", plugin.isPluginUpdaterEnabled() ? new int[]{0, 1} : new int[]{1, 0});
+            return map;
+        }));*/
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_addonsystem", () -> String.valueOf(plugin.isAddonSystemEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_updater", () -> String.valueOf(plugin.isUpdaterEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_pluginupdater", () -> String.valueOf(plugin.isPluginUpdaterEnabled())));
     }
 
     public void initPluginCheck() {

@@ -15,12 +15,10 @@ import java.util.Map;
 
 public class LanguageFileUpdater {
     private static AdminPanelMain plugin;
-    private final LanguageManager lgm;
     private static final char SEPARATOR = '.';
 
     public LanguageFileUpdater(AdminPanelMain plugin) {
         LanguageFileUpdater.plugin = plugin;
-        this.lgm = plugin.getLanguageManager();
     }
 
     public static void update(String resourceName, File toUpdate) throws IOException {

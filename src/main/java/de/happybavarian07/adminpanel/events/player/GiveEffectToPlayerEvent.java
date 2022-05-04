@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 public class GiveEffectToPlayerEvent extends AdminPanelEvent implements Cancellable {
 
@@ -43,7 +44,7 @@ public class GiveEffectToPlayerEvent extends AdminPanelEvent implements Cancella
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

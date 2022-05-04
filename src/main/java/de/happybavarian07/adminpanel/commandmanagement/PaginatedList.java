@@ -3,10 +3,7 @@ package de.happybavarian07.adminpanel.commandmanagement;/*
  * @Date 06.11.2021 | 12:22
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PaginatedList<T> {
     private final Map<Integer, List<T>> resultMap;
@@ -16,6 +13,12 @@ public class PaginatedList<T> {
 
     public PaginatedList(List<T> listOfThings) {
         this.listOfThings = listOfThings;
+        this.resultMap = new HashMap<>();
+    }
+
+    public PaginatedList(Set<T> listOfThings) {
+        this.listOfThings = new ArrayList<>();
+        this.listOfThings.addAll(listOfThings);
         this.resultMap = new HashMap<>();
     }
 

@@ -16,6 +16,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,11 @@ public class PanelOpenManager extends CommandManager {
     @Override
     public String getCommandInfo() {
         return "Open specific Panels for you or other Players";
+    }
+
+    @Override
+    public JavaPlugin getJavaPlugin() {
+        return adminpanel;
     }
 
     @Override

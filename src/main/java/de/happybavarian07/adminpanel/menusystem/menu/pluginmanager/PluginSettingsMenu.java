@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
-/**
+/*
  * @Author HappyBavarian07
  * @Date 02.09.2021
  */
@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class PluginSettingsMenu extends Menu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginUtils pluginUtils;
     private final Plugin currentPlugin;
 

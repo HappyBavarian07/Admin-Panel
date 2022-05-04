@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
-/**
+/*
  * @Author HappyBavarian07
  * @Date 02.09.2021
  */

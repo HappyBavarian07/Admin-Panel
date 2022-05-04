@@ -223,8 +223,8 @@ public class WorldSettingsMenu extends Menu {
         inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
     }
 
-    public boolean deleteWorldFolder(File path) {
-        if (path.exists()) {
+    public void deleteWorldFolder(File path) {
+        if (path.exists() && path.isDirectory()) {
             File[] files = path.listFiles();
             for (File file : files) {
                 if (file.isDirectory()) {
@@ -234,6 +234,6 @@ public class WorldSettingsMenu extends Menu {
                 }
             }
         }
-        return (path.delete());
+        path.delete();
     }
 }

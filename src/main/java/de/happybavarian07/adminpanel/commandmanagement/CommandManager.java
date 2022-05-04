@@ -12,13 +12,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public abstract class CommandManager {
     protected final ArrayList<SubCommand> commands = new ArrayList<>();
-    protected final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    protected final LanguageManager lgm = plugin.getLanguageManager();
+    protected final AdminPanelMain adminpanel = AdminPanelMain.getPlugin();
+    protected final LanguageManager lgm = adminpanel.getLanguageManager();
     protected List<String> commandArgs = new ArrayList<>();
     protected List<String> commandSubArgs = new ArrayList<>();
 
@@ -27,6 +28,8 @@ public abstract class CommandManager {
     public abstract String getCommandUsage();
 
     public abstract String getCommandInfo();
+
+    public abstract JavaPlugin getJavaPlugin();
 
     public abstract List<String> getCommandAliases();
 
@@ -65,6 +68,12 @@ public abstract class CommandManager {
         return true;
     }
 
+    public boolean isPlayerRequired(SubCommand sub) {
+        if (!sub.getClass().isAnnotationPresent(CommandData.class)) return false;
+        CommandData data = sub.getClass().getAnnotation(CommandData.class);
+        return data.playerRequired();
+    }
+
     public boolean onCommand(ConsoleCommandSender sender, String[] args) {
         SubCommand target = this.getSub(args[0]);
 
@@ -78,6 +87,10 @@ public abstract class CommandManager {
             return true;
         }
 
+        if(isPlayerRequired(target)) {
+            sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
+            return true;
+        }
         ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(args));
         arrayList.remove(0);
         String[] updatedArgs = new String[arrayList.size()];
@@ -92,6 +105,7 @@ public abstract class CommandManager {
                 sender.sendMessage(format(lgm.getMessage("Player.Commands.UsageMessage", null, true), target));
             }
         } catch (Exception e) {
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%exception%", e.getMessage(), false);
             sender.sendMessage(format(lgm.getMessage("Player.Commands.ErrorPerformingSubCommand", null, true), target));
             e.printStackTrace();
         }

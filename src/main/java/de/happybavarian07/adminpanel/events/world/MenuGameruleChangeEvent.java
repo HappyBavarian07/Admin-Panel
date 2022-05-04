@@ -1,10 +1,12 @@
 package de.happybavarian07.adminpanel.events.world;
 
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -12,10 +14,10 @@ public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancella
 
     private final Player player;
     private final World world;
-    private final String gameRule;
-    private final boolean value;
+    private final GameRule<?> gameRule;
+    private final Object value;
 
-    public MenuGameruleChangeEvent(Player player, World world, String gameRule, boolean value) {
+    public MenuGameruleChangeEvent(Player player, World world, GameRule<?> gameRule, Object value) {
         this.player = player;
         this.world = world;
         this.gameRule = gameRule;
@@ -26,7 +28,7 @@ public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancella
         return world;
     }
 
-    public boolean value() {
+    public Object value() {
         return value;
     }
 
@@ -34,7 +36,7 @@ public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancella
         return player;
     }
 
-    public String getGameRule() {
+    public GameRule<?> getGameRule() {
         return gameRule;
     }
 
@@ -54,7 +56,7 @@ public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancella
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

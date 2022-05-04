@@ -1,7 +1,8 @@
 package de.happybavarian07.adminpanel.listeners;
 
-import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.Menu;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -30,7 +31,7 @@ public class MenuListener implements Listener {
                 @Override
                 public void run() {
                     for (Player player : Bukkit.getOnlinePlayers())
-                        if(Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
+                        if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
                             if (player.hasMetadata("AdminPanelOpen")) {
                                 if (br.isCancelled()) return;
 
@@ -42,7 +43,7 @@ public class MenuListener implements Listener {
                                 }
                             }
                         } else {
-                            if(!VanishAPI.isInvisible(player)) {
+                            if (!VanishAPI.isInvisible(player)) {
                                 if (player.hasMetadata("AdminPanelOpen")) {
                                     if (br.isCancelled()) return;
 
@@ -89,7 +90,7 @@ public class MenuListener implements Listener {
             if (event.getPlayer().hasMetadata("AdminPanelOpen")) {
                 Menu holder = (Menu) event.getInventory().getHolder();
                 event.getPlayer().removeMetadata("AdminPanelOpen", AdminPanelMain.getPlugin());
-                if(holder.getClass().isAssignableFrom(Listener.class)) HandlerList.unregisterAll((Listener) holder);
+                if (holder.getClass().isAssignableFrom(Listener.class)) HandlerList.unregisterAll((Listener) holder);
             }
         }
     }
@@ -101,17 +102,18 @@ public class MenuListener implements Listener {
             if (!player.hasMetadata("AdminPanelOpen")) {
                 player.setMetadata("AdminPanelOpen", new FixedMetadataValue(AdminPanelMain.getPlugin(), true));
             }
-            FileConfiguration cfg = AdminPanelMain.getPlugin().getConfig();
-            if (cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {
-                if (cfg.getString("Panel.SoundWhenOpened") != null) {
-                    String sound = cfg.getString("Panel.SoundWhenOpened");
-                    player.playSound(player.getLocation(), Sound.valueOf(sound),
-                            (float) cfg.getDouble("Panel.SoundVolume"),
-                            (float) cfg.getDouble("Panel.SoundPitch"));
+            if (event.getInventory().getHolder() instanceof AdminPanelStartMenu) {
+                FileConfiguration cfg = AdminPanelMain.getPlugin().getConfig();
+                if (cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {
+                    if (cfg.getString("Panel.SoundWhenOpened") != null) {
+                        String sound = cfg.getString("Panel.SoundWhenOpened");
+                        player.playSound(player.getLocation(), Sound.valueOf(sound),
+                                (float) cfg.getDouble("Panel.SoundVolume"),
+                                (float) cfg.getDouble("Panel.SoundPitch"));
+                    }
                 }
             }
         }
     }
-
 }
 

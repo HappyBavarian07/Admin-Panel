@@ -62,7 +62,7 @@ public class AddonLoader {
             JarEntry entry;
             while ((entry = stream.getNextJarEntry()) != null) {
                 final String name = entry.getName();
-                if (name.isEmpty() || !name.endsWith(".class")) {
+                if (!name.endsWith(".class")) {
                     continue;
                 }
 
@@ -181,7 +181,7 @@ public class AddonLoader {
     public Object executeMethod(String name, Class<?> clazz, Object... args) {
         try {
             Method m = clazz.getMethod(name);
-            return m.invoke(clazz.newInstance(), args);
+            return m.invoke(clazz.getDeclaredConstructor().newInstance(), args);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
         }
@@ -194,6 +194,13 @@ public class AddonLoader {
      * I warned you!
      */
     public void crashAddons() {
+        for(File addonFile : getLoadedJarFiles().keySet()) {
+            try {
+                getMainClassOfAddon(addonFile).newInstance().onDisable();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         getLoadedJarFiles().clear();
         try {
             getUrlClassLoader().close();

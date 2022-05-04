@@ -15,7 +15,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
             Player target = Bukkit.getPlayer(args[1]);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%langname%", langName, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[1], false);
-            if(target == null) {
+            if (target == null) {
                 player.sendMessage(lgm.getMessage("Player.General.TargetedPlayerIsNull", player, true));
                 return true;
             }

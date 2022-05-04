@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,14 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateCommand implements CommandExecutor, TabCompleter {
-    private final AdminPanelMain plugin;
     private final NewUpdater updater;
     private final LanguageManager lgm;
     private final List<String> completerArgs = new ArrayList<>();
     //private final Map<String, Integer> versionArgs = new HashMap<>();
 
     public UpdateCommand() throws JSONException {
-        this.plugin = AdminPanelMain.getPlugin();
+        AdminPanelMain plugin = AdminPanelMain.getPlugin();
         this.updater = plugin.getUpdater();
         this.lgm = plugin.getLanguageManager();
         /*JSONArray versionList = plugin.getUpdater()
@@ -41,7 +41,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args) {
         if (command.getName().equalsIgnoreCase("update")) {
             if (!sender.hasPermission("AdminPanel.update")) {
                 if (sender instanceof Player) {
@@ -153,7 +153,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args) {
         if (command.getName().equalsIgnoreCase("update")) {
             if (!sender.hasPermission("AdminPanel.update")) return null;
             if (completerArgs.isEmpty()) {

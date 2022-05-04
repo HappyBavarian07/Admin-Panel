@@ -117,7 +117,7 @@ public class MoneyMenu extends Menu implements Listener {
                         if (!takeEvent.isCancelled()) {
                             EconomyResponse response = eco.depositPlayer(targetPlayer, amount);
                             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
-                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                             if (response.transactionSuccess()) {
                                 plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
                                         "gave " + amount + " to " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", "[Vault - Money]");
@@ -151,8 +151,10 @@ public class MoneyMenu extends Menu implements Listener {
                             if (eco.has(Bukkit.getOfflinePlayer(targetUUIDEvent), amount)) {
                                 EconomyResponse response = eco.withdrawPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), amount);
                                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
-                                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
+                                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                                 if (response.transactionSuccess()) {
+                                    plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
+                                            "took " + amount + " from " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", "[Vault - Money]");
                                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TakeMoney", player, true));
                                 } else {
                                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
@@ -187,8 +189,10 @@ public class MoneyMenu extends Menu implements Listener {
                             eco.withdrawPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), eco.getBalance(Bukkit.getOfflinePlayer(targetUUIDEvent)));
                             EconomyResponse response = eco.depositPlayer(Bukkit.getOfflinePlayer(targetUUIDEvent), amount);
                             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%amount%", amount, true);
-                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), true);
+                            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                             if (response.transactionSuccess()) {
+                                plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
+                                        "set the Money to " + amount + " from the Player " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", "[Vault - Money]");
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.SetMoney", player, true));
                             } else {
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
