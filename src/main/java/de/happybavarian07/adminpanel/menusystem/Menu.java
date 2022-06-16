@@ -60,6 +60,16 @@ public abstract class Menu implements InventoryHolder {
         this.openingPermission = permission;
     }
 
+    protected boolean legacyServer() {
+        String serverVersion = Bukkit.getServer().getVersion();
+        return serverVersion.contains("1.12") ||
+                serverVersion.contains("1.11") ||
+                serverVersion.contains("1.10") ||
+                serverVersion.contains("1.9") ||
+                serverVersion.contains("1.8") ||
+                serverVersion.contains("1.7");
+    }
+
     //When called, an inventory is created and opened for the player
     public void open() {
         //The owner of the inventory created is the Menu itself,

@@ -46,7 +46,7 @@ public class WorldSelectMenu extends PaginatedMenu {
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-        if (item.getType().equals(Material.PLAYER_HEAD)) {
+        if (item.getType().equals(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD)) {
             WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, Bukkit.getWorld(item.getItemMeta().getDisplayName()));
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);

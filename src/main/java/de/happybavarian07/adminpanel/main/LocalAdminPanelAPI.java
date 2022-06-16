@@ -70,7 +70,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     public ItemStack createSkull(String headTexture, String name) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short) 3);
+        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1, (short) 3);
         if (headTexture.isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -92,7 +92,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     public ItemStack createSkull(Head headTexture, String name) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short) 3);
+        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1, (short) 3);
         if (headTexture.getFullTexture().isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -111,6 +111,16 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
         head.setItemMeta(meta);
         return head;
+    }
+
+    private boolean legacyServer() {
+        String serverVersion = Bukkit.getServer().getVersion();
+        return serverVersion.contains("1.12") ||
+                serverVersion.contains("1.11") ||
+                serverVersion.contains("1.10") ||
+                serverVersion.contains("1.9") ||
+                serverVersion.contains("1.8") ||
+                serverVersion.contains("1.7");
     }
 
     @Override

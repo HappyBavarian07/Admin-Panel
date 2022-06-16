@@ -60,7 +60,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(Material.PLAYER_HEAD)) {
+        if (item.getType().equals(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD)) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Open")) {
                 player.sendMessage(noPerms);
                 return;

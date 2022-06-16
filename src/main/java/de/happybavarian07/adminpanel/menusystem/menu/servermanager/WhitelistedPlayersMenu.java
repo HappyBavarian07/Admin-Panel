@@ -92,7 +92,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
 
                     OfflinePlayer current = players.get(index);
                     if (!current.isWhitelisted()) continue;
-                    ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+                    ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setDisplayName(current.getName());
                     meta.setOwningPlayer(current);

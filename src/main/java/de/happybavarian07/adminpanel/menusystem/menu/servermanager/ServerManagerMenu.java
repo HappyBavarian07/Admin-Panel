@@ -108,7 +108,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 if (!kickAllPlayersEvent.isCancelled()) {
                     plugin.setInMaintenanceMode(false);
                     if(!plugin.isInMaintenanceMode()) {
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player, true));
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
                         super.open();
                     }
                 }
@@ -132,7 +132,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                                 online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
                             }
                         }
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
+                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player, true));
                     }
                     super.open();
                 }

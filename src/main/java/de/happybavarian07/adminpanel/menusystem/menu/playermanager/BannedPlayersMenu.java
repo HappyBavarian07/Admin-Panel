@@ -116,7 +116,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
                 if (updatedPlayers.get(index) != null) {
                     ///////////////////////////
 
-                    ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+                    ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
                     SkullMeta meta = (SkullMeta) head.getItemMeta();
                     meta.setOwningPlayer(updatedPlayers.get(index));
                     meta.setDisplayName(updatedPlayers.get(index).getName());
