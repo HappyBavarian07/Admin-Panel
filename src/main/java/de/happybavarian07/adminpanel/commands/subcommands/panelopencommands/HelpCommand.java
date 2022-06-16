@@ -16,6 +16,10 @@ import java.util.Map;
 
 @CommandData
 public class HelpCommand extends SubCommand {
+    public HelpCommand(String mainCommandName) {
+        super(mainCommandName);
+    }
+
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length != 1) {
@@ -23,7 +27,7 @@ public class HelpCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands("openpanel"));
+            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
             messages.maxItemsPerPage(10).sort();
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -55,7 +59,7 @@ public class HelpCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands("openpanel"));
+            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
             messages.maxItemsPerPage(10).sort();
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -65,7 +69,7 @@ public class HelpCommand extends SubCommand {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
             sender.sendMessage(lgm.getMessage("Player.Commands.HelpMessages.Header", null, false));
             for (SubCommand s : messages.getPage(page)) {
-                if (sender.hasPermission(s.permission()) && !isPlayerRequired(s)) {
+                if (sender.hasPermission(s.permission()) && !isPlayerRequired()) {
                     sender.sendMessage(format(lgm.getMessage("Player.Commands.HelpMessages.Format", null, false), s));
                 }
             }

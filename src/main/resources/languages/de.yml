@@ -8,6 +8,24 @@ Messages:
     DisablingMessage: '[Admin-Panel] erfolgreich deaktiviert!'
   Player:
     Commands:
+#      VanillaItems:
+#        Enable: '%prefix% &9> &c'
+#        Disable: '%prefix% &9> &c'
+#        List:
+          # -------------------------------------------------
+          # Header and Footer Placeholders (Command Manager system):
+          # %page% = Current Page
+          # %max_page% = Max Page
+          # -------------------------------------------------
+#          Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+          # Format Placeholders:
+          # %usage% = Sub Command Usage
+          # %description% = Sub Command Description
+          # %name% = Sub Command Name
+          # %aliases% = Sub Command Aliases
+          # %permission% = Sub Command Permission
+#          Format: '  &b%usage% &7- &b%description%'
+#          Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
       TooFewArguments: '%prefix% &9> &cZu wenig Argumente!'
       TooManyArguments: '%prefix% &9> &cZu viele Argumente!'
       InvalidSubCommand: '%prefix% &9> &cDas ist kein gültiger Befehl!'
@@ -152,6 +170,14 @@ Messages:
         SelectSpigotID: '%prefix% &9> &aBitte gebe eine Spigot ID in den Chat ein!'
         SpigotIDSelected: '%prefix% &9> &aDie Spigot ID %spigotID% wurde ausgewählt!'
         PluginSelected: '%prefix% &9> &aDas Plugin %name% wurde ausgewählt!'
+  PotionMenu:
+    NotANumber: '%prefix% &9> &cDas ist keine Nummer!'
+    EnterDuration: '%prefix% &9> &aBitte gib eine Dauer ein!'
+    DurationSet: '%prefix% &9> &aDie neue Dauer wurde gesetzt!'
+    EnterAmplifier: '%prefix% &9> &aBitte gib einen Amplifier an!'
+    AmplifierSet: '%prefix% &9> &aDer neue Amplifier wurde gesetzt!'
+    EffectAdded: '%prefix% &9> &aDer Effekt &7%type%&r (&aDauer: %duration%&r, &aAmplifier: &7%amplifier%&r)&a wurde dem Spieler %7%target%&a hinzugefügt!'
+    EffectRemoved: '%prefix% &9> &cDer Effekt &7%type%&c wurde dem Spieler %7%target%&c weggenommen!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
   ToManyArguments: '&4Zu viele Argumente!'
@@ -375,6 +401,16 @@ Items:
         displayName: '&4Lösche alle Effekte'
         lore:
           - '&aLöscht alle Effekte des Spielers!'
+      SetDuration:
+        material: PAPER
+        displayName: '&4Setze eine Dauer'
+        lore:
+          - '&aAusgewählte Dauer: %duration%!'
+      SetAmplifier:
+        material: PAPER
+        displayName: '&4Setze einen Amplifier'
+        lore:
+          - '&aAusgewählter Amplifier: %amplifier%!'
       Spawning:
         material: SPAWNER
         displayName: '&aSpawner'

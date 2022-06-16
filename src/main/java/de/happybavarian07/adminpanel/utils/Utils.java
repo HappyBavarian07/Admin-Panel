@@ -10,12 +10,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -285,5 +289,70 @@ public class Utils {
 
     public Chat getChat() {
         return plugin.chat;
+    }
+
+    public static boolean isVanillaItemDisabled(ItemStack stack) {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if(stack == null) return false;
+        return dataConfig.getStringList("DisabledItems").contains(stack.getType().toString());
+    }
+
+    public static List<Material> getDisabledItems() {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        List<String> materialNames = dataConfig.getStringList("DisabledItems");
+        List<Material> material = new ArrayList<>();
+        for(String materialString : materialNames) {
+            Material value = Material.matchMaterial(materialString);
+            if(value == null) continue;
+            material.add(value);
+        }
+        return material;
+    }
+
+    public static boolean disableVanillaItem(ItemStack stack) {
+        boolean success = false;
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if(!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) { createDisabledItemsSection(); return false; }
+
+        if(!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) return false;
+
+        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
+        disabledItems.add(stack.getType().toString());
+        dataConfig.set("DisabledItems", disabledItems);
+        saveDataConfig();
+
+        if(!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
+
+        return success;
+    }
+
+    public static boolean enableVanillaItem(ItemStack stack) {
+        boolean success = false;
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if(!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) { createDisabledItemsSection(); return false; }
+
+        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
+        disabledItems.remove(stack.getType().toString());
+        dataConfig.set("DisabledItems", disabledItems);
+        saveDataConfig();
+
+        if(dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
+
+        return success;
+    }
+
+    private static boolean createDisabledItemsSection() {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if(!dataConfig.contains("DisabledItems")) dataConfig.set("DisabledItems", new ArrayList<>());
+        saveDataConfig();
+        return !dataConfig.contains("DisabledItems");
+    }
+
+    private static void saveDataConfig() {
+        try {
+            plugin.getDataYML().save(new File(plugin.getDataFolder() + "/data.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

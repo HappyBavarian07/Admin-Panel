@@ -43,7 +43,7 @@ public abstract class CommandManager {
             return true;
         }
 
-        if (!player.hasPermission(target.permission())) {
+        if (!player.hasPermission(target.permission()) || (target.isOpRequired() && !player.isOp())) {
             player.sendMessage(format(lgm.getMessage("Player.General.NoPermissions", player, true), target));
             return true;
         }
@@ -68,12 +68,6 @@ public abstract class CommandManager {
         return true;
     }
 
-    public boolean isPlayerRequired(SubCommand sub) {
-        if (!sub.getClass().isAnnotationPresent(CommandData.class)) return false;
-        CommandData data = sub.getClass().getAnnotation(CommandData.class);
-        return data.playerRequired();
-    }
-
     public boolean onCommand(ConsoleCommandSender sender, String[] args) {
         SubCommand target = this.getSub(args[0]);
 
@@ -82,12 +76,12 @@ public abstract class CommandManager {
             return true;
         }
 
-        if (!sender.hasPermission(target.permission())) {
+        if (!sender.hasPermission(target.permission()) || (target.isOpRequired() && !sender.isOp())) {
             sender.sendMessage(format(lgm.getMessage("Player.General.NoPermissions", null, true), target));
             return true;
         }
 
-        if(isPlayerRequired(target)) {
+        if (target.isPlayerRequired()) {
             sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
             return true;
         }
@@ -105,7 +99,6 @@ public abstract class CommandManager {
                 sender.sendMessage(format(lgm.getMessage("Player.Commands.UsageMessage", null, true), target));
             }
         } catch (Exception e) {
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%exception%", e.getMessage(), false);
             sender.sendMessage(format(lgm.getMessage("Player.Commands.ErrorPerformingSubCommand", null, true), target));
             e.printStackTrace();
         }
@@ -119,7 +112,7 @@ public abstract class CommandManager {
         for (SubCommand sub : this.getSubCommands()) {
             String[] aliases;
             int length = (aliases = sub.aliases()).length;
-            if (sender.hasPermission(sub.permission())) {
+            if (sender.hasPermission(sub.permission()) || (sub.isOpRequired() && sender.isOp())) {
                 commandArgs.add(sub.name());
                 commandArgs.addAll(Arrays.asList(aliases).subList(0, length));
             }
@@ -163,8 +156,8 @@ public abstract class CommandManager {
                 if (!sub.name().equals(args[0])) {
                     for (String s : sub.aliases()) {
                         if (s.equals(args[0])) {
-                            if (sender.hasPermission(sub.permission())) {
-                                if (sender.hasPermission(sub.permission())) {
+                            if (sender.hasPermission(sub.permission()) || (sub.isOpRequired() && sender.isOp())) {
+                                if (sender.hasPermission(sub.permission()) || (sub.isOpRequired() && sender.isOp())) {
                                     commandSubArgs.addAll(Arrays.asList(subArgs).subList(0, length));
                                 }
                                 //System.out.println("Test SubArgs 2 (args)");
@@ -181,8 +174,8 @@ public abstract class CommandManager {
                         }
                     }
                 } else {
-                    if (sender.hasPermission(sub.permission())) {
-                        if (sender.hasPermission(sub.permission())) {
+                    if (sender.hasPermission(sub.permission()) || (sub.isOpRequired() && sender.isOp())) {
+                        if (sender.hasPermission(sub.permission()) || (sub.isOpRequired() && sender.isOp())) {
                             commandSubArgs.addAll(Arrays.asList(subArgs).subList(0, length));
                         }
                         //System.out.println("Test SubArgs 2 (name)");

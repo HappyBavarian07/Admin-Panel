@@ -72,22 +72,22 @@ public class PanelOpenManager extends CommandManager {
 
     @Override
     public void setup() {
-        commands.add(new HelpCommand());
+        commands.add(new HelpCommand(getCommandName()));
 
         // Panels without Args
-        commands.add(new BannedPlayersMenuCommand());
-        commands.add(new PlayerSelectMenuCommand());
-        commands.add(new PluginAutoUpdaterMenuCommand());
-        commands.add(new PluginInstallMenuCommand());
-        commands.add(new PluginSelectMenuCommand());
-        commands.add(new ChatManagerMenuCommand());
-        commands.add(new ServerManagerMenuCommand());
-        commands.add(new WhitelistedPlayersMenuCommand());
-        commands.add(new WhitelistManagerMenuCommand());
-        commands.add(new WorldCreateMenuCommand());
-        commands.add(new WorldSelectMenuCommand());
-        commands.add(new AdminPanelStartMenuCommand());
-        commands.add(new TempLanguageSelectMenuCommand());
+        commands.add(new BannedPlayersMenuCommand(getCommandName()));
+        commands.add(new PlayerSelectMenuCommand(getCommandName()));
+        commands.add(new PluginAutoUpdaterMenuCommand(getCommandName()));
+        commands.add(new PluginInstallMenuCommand(getCommandName()));
+        commands.add(new PluginSelectMenuCommand(getCommandName()));
+        commands.add(new ChatManagerMenuCommand(getCommandName()));
+        commands.add(new ServerManagerMenuCommand(getCommandName()));
+        commands.add(new WhitelistedPlayersMenuCommand(getCommandName()));
+        commands.add(new WhitelistManagerMenuCommand(getCommandName()));
+        commands.add(new WorldCreateMenuCommand(getCommandName()));
+        commands.add(new WorldSelectMenuCommand(getCommandName()));
+        commands.add(new AdminPanelStartMenuCommand(getCommandName()));
+        commands.add(new TempLanguageSelectMenuCommand(getCommandName()));
 
         // Panels with Args
         // etc

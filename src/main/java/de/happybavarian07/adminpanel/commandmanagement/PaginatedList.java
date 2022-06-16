@@ -19,7 +19,7 @@ public class PaginatedList<T> {
     public PaginatedList(Set<T> listOfThings) {
         this.listOfThings = new ArrayList<>();
         this.listOfThings.addAll(listOfThings);
-        this.resultMap = new HashMap<>();
+        resultMap = new HashMap<>();
     }
 
     public Map<Integer, List<T>> getResultMap() throws ListNotSortedException {

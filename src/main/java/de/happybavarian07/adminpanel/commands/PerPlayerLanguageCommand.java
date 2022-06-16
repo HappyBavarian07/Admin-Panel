@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.main.LanguageManager;
 import de.happybavarian07.adminpanel.main.PlaceholderType;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -60,7 +61,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             String langName = args[0];
-            Player target = Bukkit.getPlayer(args[1]);
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%langname%", langName, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[1], false);
             if (target == null) {
@@ -90,10 +91,9 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (command.getName().equalsIgnoreCase("perplayerlang")) {
             if (!sender.hasPermission("AdminPanel.PerPlayerLang")) return new ArrayList<>();
-            if (completerArgs.isEmpty()) {
-                completerArgs.add("default");
-                completerArgs.addAll(lgm.getRegisteredLanguages().keySet());
-            }
+            completerArgs.clear();
+            completerArgs.add("default");
+            completerArgs.addAll(lgm.getRegisteredLanguages().keySet());
 
             List<String> result = new ArrayList<>();
             if (args.length == 1) {

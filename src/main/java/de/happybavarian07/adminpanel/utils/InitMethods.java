@@ -35,10 +35,7 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class InitMethods {
@@ -75,86 +72,90 @@ public class InitMethods {
             plugin.saveResource("data.yml", false);
         }
         if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
-            autoUpdaterPlugins.clear();
-            logger.coloredSpacer(ChatColor.BLUE);
-            logger.message("&1&lAuto Plugin Updater initiated&r");
-            for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
-                if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
+            new Thread(() -> {
+                autoUpdaterPlugins.clear();
+                logger.coloredSpacer(ChatColor.BLUE);
+                logger.message("&1&lAuto Plugin Updater initiated&r");
+                for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
+                    if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
 
-                ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                assert section != null;
-                if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
-                    continue;
+                    ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
+                    assert section != null;
+                    if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
+                        continue;
 
-                int spigotID = section.getInt("spigotID");
-                String fileName = section.getString("fileName");
+                    int spigotID = section.getInt("spigotID");
+                    String fileName = section.getString("fileName");
+                    boolean bypassExternalURL = section.getBoolean("bypassExternalDownload");
 
-                assert fileName != null;
-                if (!fileName.endsWith(".jar")) continue;
+                    assert fileName != null;
+                    if (!fileName.endsWith(".jar")) continue;
 
-                NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString));
-                autoUpdaterPlugins.put(sectionString, tempUpdater);
-                if (!tempUpdater.resourceIsOnSpigot()) continue;
-                if (tempUpdater.isExternalFile()) {
-                    logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                    NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
+                    autoUpdaterPlugins.put(sectionString, tempUpdater);
+                    if (!tempUpdater.resourceIsOnSpigot()) continue;
+                    if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
+                        logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                        tempUpdater.checkForUpdates(true);
+                        continue;
+                    }
+                    if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
+                        tempUpdater.downloadLatestUpdate(true, true, false);
+                        continue;
+                    }
+
+                    tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
                     tempUpdater.checkForUpdates(true);
-                    continue;
+                    if (tempUpdater.updateAvailable()) {
+                        tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
+                                plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
+                    }
                 }
-                if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
-                    tempUpdater.downloadLatestUpdate(true, true, false);
-                    continue;
-                }
+                if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            autoUpdaterPlugins.clear();
+                            for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
+                                if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
 
-                tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
-                tempUpdater.checkForUpdates(true);
-                if (tempUpdater.updateAvailable()) {
-                    tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
-                            plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
-                }
-            }
-            if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        autoUpdaterPlugins.clear();
-                        for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
-                            if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
+                                ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
+                                assert section != null;
+                                if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
+                                    continue;
 
-                            ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                            assert section != null;
-                            if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
-                                continue;
+                                int spigotID = section.getInt("spigotID");
+                                String fileName = section.getString("fileName");
+                                boolean bypassExternalURL = section.getBoolean("bypassExternalDownload");
 
-                            int spigotID = section.getInt("spigotID");
-                            String fileName = section.getString("fileName");
+                                assert fileName != null;
+                                if (!fileName.endsWith(".jar")) continue;
 
-                            assert fileName != null;
-                            if (!fileName.endsWith(".jar")) continue;
+                                NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
+                                autoUpdaterPlugins.put(sectionString, tempUpdater);
+                                if (!tempUpdater.resourceIsOnSpigot()) continue;
+                                if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("")) {
+                                    logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                                    tempUpdater.checkForUpdates(true);
+                                    continue;
 
-                            NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString));
-                            autoUpdaterPlugins.put(sectionString, tempUpdater);
-                            if (!tempUpdater.resourceIsOnSpigot()) continue;
-                            if (tempUpdater.isExternalFile()) {
-                                logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
+                                }
+                                if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
+                                    tempUpdater.downloadLatestUpdate(true, true, false);
+                                    continue;
+                                }
+
+                                tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
                                 tempUpdater.checkForUpdates(true);
-                                continue;
-
-                            }
-                            if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
-                                tempUpdater.downloadLatestUpdate(true, true, false);
-                                continue;
-                            }
-
-                            tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
-                            tempUpdater.checkForUpdates(true);
-                            if (tempUpdater.updateAvailable()) {
-                                tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
-                                        plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
+                                if (tempUpdater.updateAvailable()) {
+                                    tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
+                                            plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
+                                }
                             }
                         }
-                    }
-                }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
-            }
+                    }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
+                }
+            }).start();
             logger.coloredSpacer(ChatColor.BLUE);
         }
     }
@@ -207,7 +208,9 @@ public class InitMethods {
             e.printStackTrace();
         }
         Objects.requireNonNull(plugin.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
-        Objects.requireNonNull(plugin.getCommand("perplayerlang")).setExecutor(new PerPlayerLanguageCommand());
+        PerPlayerLanguageCommand perPLanguageCommand = new PerPlayerLanguageCommand();
+        Objects.requireNonNull(plugin.getCommand("perplayerlang")).setExecutor(perPLanguageCommand);
+        Objects.requireNonNull(plugin.getCommand("perplayerlang")).setTabCompleter(perPLanguageCommand);
         Objects.requireNonNull(plugin.getCommand("reloadlang")).setExecutor(new LanguageReloadCommand());
     }
 
@@ -239,6 +242,31 @@ public class InitMethods {
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_addonsystem", () -> String.valueOf(plugin.isAddonSystemEnabled())));
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_updater", () -> String.valueOf(plugin.isUpdaterEnabled())));
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_pluginupdater", () -> String.valueOf(plugin.isPluginUpdaterEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_plugin_replace_enabled", () -> String.valueOf(plugin.isUpdateReplacerEnabled())));
+        if (!plugin.getLanguageManager().getPlhandler().getPlayerLanguages().isEmpty()) {
+            metrics.addCustomChart(new Metrics.SimplePie("most_used_player_lang", () -> {
+                Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPlhandler().getPlayerLanguages();
+                Map<LanguageFile, Integer> popularityMap = new HashMap<>();
+                for (LanguageFile i : playerLangs.values()) {
+                    Integer count = popularityMap.get(i);
+                    popularityMap.put(i, count != null ? count + 1 : 1);
+                }
+                LanguageFile popular = Collections.max(popularityMap.entrySet(),
+                        Map.Entry.comparingByValue()).getKey();
+                return popular.getLangName();
+            }));
+        }
+    }
+
+    public LanguageFile getMostUsedPlayerLang() {
+        Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPlhandler().getPlayerLanguages();
+        Map<LanguageFile, Integer> popularityMap = new HashMap<>();
+        for (LanguageFile i : playerLangs.values()) {
+            Integer count = popularityMap.get(i);
+            popularityMap.put(i, count != null ? count + 1 : 1);
+        }
+        return Collections.max(popularityMap.entrySet(),
+                Map.Entry.comparingByValue()).getKey();
     }
 
     public void initPluginCheck() {
@@ -300,74 +328,75 @@ public class InitMethods {
     }
 
     public void initAddonLoader(AddonLoader loader) {
+        new Thread(() -> {
+            logger.coloredMessage(ChatColor.GREEN, "Done with Phase 1/3! (Adding)");
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.emptySpacer();
 
-        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 1/3! (Adding)");
-        logger.coloredSpacer(ChatColor.BLUE);
-        logger.emptySpacer();
+            File[] temp = loader.getAddonFolder().listFiles(pathname -> pathname.getName().endsWith(".jar"));
 
-        File[] temp = loader.getAddonFolder().listFiles(pathname -> pathname.getName().endsWith(".jar"));
-
-        if (!loader.getAddonFolder().exists() || temp == null || temp.length == 0) {
-            logger.coloredSpacer(ChatColor.RED);
-            logger.message("&cThere are no Addons in that Folder! Stopping the Addon Loader!&r");
-            logger.coloredSpacer(ChatColor.RED);
-            loader.crashAddons();
-            return;
-        }
-
-        logger.coloredSpacer(ChatColor.BLUE);
-        logger.coloredMessage(ChatColor.GREEN, "Loading Addons!");
-
-        for (File jarFile : loader.getLoadedJarFiles().keySet()) {
-            plugin.getLogger().log(Level.INFO, "Loading Addon Jar File: " + jarFile.getName());
-            try {
-                loader.loadAddon(jarFile);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+            if (!loader.getAddonFolder().exists() || temp == null || temp.length == 0) {
+                logger.coloredSpacer(ChatColor.RED);
+                logger.message("&cThere are no Addons in that Folder! Stopping the Addon Loader!&r");
+                logger.coloredSpacer(ChatColor.RED);
+                loader.crashAddons();
+                return;
             }
-        }
 
-        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 2/3! (Loading)");
-        logger.coloredSpacer(ChatColor.BLUE);
-        logger.emptySpacer();
-        logger.coloredSpacer(ChatColor.BLUE);
-        logger.coloredMessage(ChatColor.GREEN, "Enabling Addons!");
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.coloredMessage(ChatColor.GREEN, "Loading Addons!");
 
-        for (File addonFile : loader.getLoadedJarFiles().keySet()) {
-            try {
-                //System.out.println("File: " + addonFile);
-                final Class<? extends Addon> addonClass = FileUtils.findClass(addonFile, Addon.class);
-
-                if (addonClass == null) {
-                    //System.out.println("Addon Class is null!");
-                    continue;
+            for (File jarFile : loader.getLoadedJarFiles().keySet()) {
+                plugin.getLogger().log(Level.INFO, "Loading Addon Jar File: " + jarFile.getName());
+                try {
+                    loader.loadAddon(jarFile);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
+            }
 
-                Addon addon = addonClass.getConstructor().newInstance();
-                //System.out.println("Resource:" + addon);
+            logger.coloredMessage(ChatColor.GREEN, "Done with Phase 2/3! (Loading)");
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.emptySpacer();
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.coloredMessage(ChatColor.GREEN, "Enabling Addons!");
 
-                boolean allowedToStart = true;
-                if (!addon.getDependencies().isEmpty()) {
-                    for (Dependency dependency : addon.getDependencies()) {
-                        if (!Bukkit.getPluginManager().isPluginEnabled(dependency.getName())) {
-                            allowedToStart = false;
-                            logger.coloredMessage(ChatColor.DARK_RED, "Dependency Error enabling Addon: " + addon.getName());
-                            logger.coloredMessage(ChatColor.DARK_RED, "Please install the following Dependency '" + dependency.getName() + "' (Link: " + dependency.getLink() + ")!");
+            for (File addonFile : loader.getLoadedJarFiles().keySet()) {
+                try {
+                    //System.out.println("File: " + addonFile);
+                    final Class<? extends Addon> addonClass = FileUtils.findClass(addonFile, Addon.class);
+
+                    if (addonClass == null) {
+                        //System.out.println("Addon Class is null!");
+                        continue;
+                    }
+
+                    Addon addon = addonClass.getConstructor().newInstance();
+                    //System.out.println("Resource:" + addon);
+
+                    boolean allowedToStart = true;
+                    if (!addon.getDependencies().isEmpty()) {
+                        for (Dependency dependency : addon.getDependencies()) {
+                            if (!Bukkit.getPluginManager().isPluginEnabled(dependency.getName())) {
+                                allowedToStart = false;
+                                logger.coloredMessage(ChatColor.DARK_RED, "Dependency Error enabling Addon: " + addon.getName());
+                                logger.coloredMessage(ChatColor.DARK_RED, "Please install the following Dependency '" + dependency.getName() + "' (Link: " + dependency.getLink() + ")!");
+                            }
                         }
                     }
-                }
-                if (allowedToStart) {
-                    plugin.getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
-                    addon.onEnable();
-                }
+                    if (allowedToStart) {
+                        plugin.getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
+                        addon.onEnable();
+                    }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        logger.coloredMessage(ChatColor.GREEN, "Done with Phase 3/3! (Enabling)");
-        logger.coloredSpacer(ChatColor.BLUE);
+            logger.coloredMessage(ChatColor.GREEN, "Done with Phase 3/3! (Enabling)");
+            logger.coloredSpacer(ChatColor.BLUE);
+        }).start();
     }
 
     private boolean setupEconomy() {

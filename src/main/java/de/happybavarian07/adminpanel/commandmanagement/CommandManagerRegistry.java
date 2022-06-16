@@ -3,7 +3,6 @@ package de.happybavarian07.adminpanel.commandmanagement;/*
  * @Date 09.11.2021 | 14:52
  */
 
-import de.happybavarian07.adminpanel.commands.DCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.LanguageManager;
 import de.happybavarian07.adminpanel.utils.Utils;
@@ -15,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -29,61 +27,6 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
     public CommandManagerRegistry(AdminPanelMain plugin) {
         this.lgm = plugin.getLanguageManager();
         this.commandManagers = new HashMap<>();
-    }
-
-    public boolean register(CommandManager cm) {
-        if (commandManagers.containsKey(cm)) return false;
-
-        // Checking if the Command Manager has CommandData
-
-        CommandData data = cm.getClass().getAnnotation(CommandData.class);
-
-        JavaPlugin javaPlugin = cm.getJavaPlugin();
-        if(javaPlugin == null) javaPlugin = AdminPanelMain.getPlugin();
-        // Registering the Command on the Server
-        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
-            Objects.requireNonNull(javaPlugin.getCommand(cm.getCommandName())).setExecutor(this);
-            Objects.requireNonNull(javaPlugin.getCommand(cm.getCommandName())).setTabCompleter(this);
-        } else {
-            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
-            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
-            pluginCommand.setProperty("aliases", cm.getCommandAliases());
-            pluginCommand.setProperty("usage", cm.getCommandUsage());
-            pluginCommand.setProperty("description", cm.getCommandInfo());
-            pluginCommand.setProperty("permission", cm.getCommandPermission());
-            pluginCommand.setExecutor(this);
-            pluginCommand.setTabCompleter(this);
-            pluginCommand.register();
-        }
-        // Calling setup() for Adding Sub Commands
-        cm.setup();
-        commandManagers.put(cm, data);
-        return true;
-    }
-
-    public void unregister(CommandManager cm) {
-        if (!commandManagers.containsKey(cm)) return;
-
-        JavaPlugin javaPlugin = cm.getJavaPlugin();
-        if(javaPlugin == null) javaPlugin = AdminPanelMain.getPlugin();
-
-        // Unregistering the Command on the Server
-        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
-            unregisterCommand(javaPlugin.getCommand(cm.getCommandName()), javaPlugin);
-        } else {
-            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
-            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
-            pluginCommand.setProperty("aliases", cm.getCommandAliases());
-            pluginCommand.setProperty("usage", cm.getCommandUsage());
-            pluginCommand.setProperty("description", cm.getCommandInfo());
-            pluginCommand.setProperty("permission", cm.getCommandPermission());
-            pluginCommand.setExecutor(this);
-            pluginCommand.setTabCompleter(this);
-            unregisterCommand(pluginCommand, javaPlugin);
-        }
-        // Calling setup() for Adding Sub Commands
-        cm.getSubCommands().clear();
-        commandManagers.remove(cm);
     }
 
     private static Object getPrivateField(Object object, String field) {
@@ -110,8 +53,8 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             assert knownCommands != null;
             knownCommands.remove(cmd.getName());
-            for (String alias : cmd.getAliases()){
-                if(knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())){
+            for (String alias : cmd.getAliases()) {
+                if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())) {
                     knownCommands.remove(alias);
                 }
             }
@@ -130,14 +73,67 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             assert knownCommands != null;
             knownCommands.remove(cmd.getName());
-            for (String alias : cmd.getAliases()){
-                if(knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())){
+            for (String alias : cmd.getAliases()) {
+                if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())) {
                     knownCommands.remove(alias);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean register(CommandManager cm) {
+        if (commandManagers.containsKey(cm)) return false;
+
+        // Checking if the Command Manager has CommandData
+
+        CommandData data = cm.getClass().getAnnotation(CommandData.class);
+
+        JavaPlugin javaPlugin = cm.getJavaPlugin();
+        // Registering the Command on the Server
+        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
+            Objects.requireNonNull(javaPlugin.getCommand(cm.getCommandName())).setExecutor(this);
+            Objects.requireNonNull(javaPlugin.getCommand(cm.getCommandName())).setTabCompleter(this);
+        } else {
+            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
+            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
+            pluginCommand.setProperty("aliases", cm.getCommandAliases());
+            pluginCommand.setProperty("usage", cm.getCommandUsage());
+            pluginCommand.setProperty("description", cm.getCommandInfo());
+            pluginCommand.setProperty("permission", cm.getCommandPermission());
+            pluginCommand.setExecutor(this);
+            pluginCommand.setTabCompleter(this);
+            pluginCommand.register();
+        }
+        // Calling setup() for Adding Sub Commands
+        cm.setup();
+        commandManagers.put(cm, data);
+        return true;
+    }
+
+    public void unregister(CommandManager cm) {
+        if (!commandManagers.containsKey(cm)) return;
+
+        JavaPlugin javaPlugin = cm.getJavaPlugin();
+
+        // Unregistering the Command on the Server
+        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
+            unregisterCommand(javaPlugin.getCommand(cm.getCommandName()), javaPlugin);
+        } else {
+            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
+            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
+            pluginCommand.setProperty("aliases", cm.getCommandAliases());
+            pluginCommand.setProperty("usage", cm.getCommandUsage());
+            pluginCommand.setProperty("description", cm.getCommandInfo());
+            pluginCommand.setProperty("permission", cm.getCommandPermission());
+            pluginCommand.setExecutor(this);
+            pluginCommand.setTabCompleter(this);
+            unregisterCommand(pluginCommand, javaPlugin);
+        }
+        // Calling setup() for Adding Sub Commands
+        cm.getSubCommands().clear();
+        commandManagers.remove(cm);
     }
 
     public void unregisterAll() {

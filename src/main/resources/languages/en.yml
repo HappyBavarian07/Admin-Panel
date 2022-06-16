@@ -151,6 +151,14 @@ Messages:
         SelectSpigotID: '%prefix% &9> &aPlease enter a valid Spigot ID!'
         SpigotIDSelected: '%prefix% &9> &aThe Spigot ID %spigotID% was selected!'
         PluginSelected: '%prefix% &9> &aThe Plugin %name% was selected!'
+  PotionMenu:
+    NotANumber: '%prefix% &9> &cThat''s not a Number!'
+    EnterDuration: '%prefix% &9> &aPlease enter an Duration!'
+    DurationSet: '%prefix% &9> &aThe new Duration has been set!'
+    EnterAmplifier: '%prefix% &9> &aPlease enter an Amplifier!'
+    AmplifierSet: '%prefix% &9> &aThe new Amplifier has been set!'
+    EffectAdded: '%prefix% &9> &aThe Effect &7%type%&r (&aDuration: &7%duration%&r, &aAmplifier: &7%amplifier%&r)&a got added to &7%target%&a!'
+    EffectRemoved: '%prefix% &9> &cThe Effect &7%type%&c got removed from &7%target%&c!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
   TomanyArguments: '&4Too many Arguments!'
@@ -376,6 +384,16 @@ Items:
         displayName: '&4Clear Effects'
         lore:
           - '&aClears all Effects of the Player!'
+      SetDuration:
+        material: PAPER
+        displayName: '&4Set a Duration'
+        lore:
+          - '&aSelected Duration: %duration%!'
+      SetAmplifier:
+        material: PAPER
+        displayName: '&4Set an Amplifier'
+        lore:
+          - '&aSelected Amplifier: %amplifier%!'
       Spawning:
         material: SPAWNER
         displayName: '&aSpawner'

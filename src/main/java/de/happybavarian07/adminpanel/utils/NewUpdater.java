@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class NewUpdater implements Listener {
@@ -34,15 +35,19 @@ public class NewUpdater implements Listener {
     private final String fileName;
     private final JavaPlugin pluginToUpdate;
     private VersionComparator versionComparator;
+    private final String linkToFile;
+    boolean bypassExternalURL;
 
-    public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, @Nullable JavaPlugin pluginToUpdate) {
+    public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, @Nullable JavaPlugin pluginToUpdate, String linkToFile, boolean bypassExternalURL) {
         this.plugin = plugin;
         this.pluginUtils = new PluginUtils();
         this.resourceID = resourceID;
         this.versionComparator = VersionComparator.EQUALVERSIONS;
         this.fileName = fileName;
         this.pluginToUpdate = pluginToUpdate;
+        this.linkToFile = linkToFile == null ? "" : linkToFile;
         messages = new Messages();
+        this.bypassExternalURL = bypassExternalURL;
     }
 
     public boolean resourceIsOnSpigot() {
@@ -293,6 +298,9 @@ public class NewUpdater implements Listener {
         }
         URL downloadURL;
         try {
+            if(isExternalFile() && !getLinkToFile().equals("") && !bypassExternalURL()) {
+                downloadURL = new URL(linkToFile);
+            }
             downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
         } catch (MalformedURLException e) {
             plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
@@ -397,6 +405,14 @@ public class NewUpdater implements Listener {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getLinkToFile() {
+        return linkToFile;
+    }
+
+    public boolean bypassExternalURL() {
+        return bypassExternalURL;
     }
 
     public enum UpdateResponse {

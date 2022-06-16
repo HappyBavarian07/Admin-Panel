@@ -6,5 +6,9 @@
 #     Here its possible to use %version% for the Plugin Version
 #     A Valid File Name is for Example: 'Admin-Panel-%version%.jar'
 #     fileName: '<fileName>'
+#     For If the Plugin has an external download
+#     link: '<LinkToFile>'
+#     Use this at your own risk, if the Download URL from the Download Button is a direct URL to a specific Version of the Plugin
+#     bypassExternalDownload: false
 PluginsToUpdate: {}
 playerdata: {}

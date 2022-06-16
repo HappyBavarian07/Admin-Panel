@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -63,7 +64,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onMenuClick(InventoryClickEvent e) {
 
         InventoryHolder holder = e.getInventory().getHolder();
@@ -84,7 +85,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder() instanceof Menu) {
             if (event.getPlayer().hasMetadata("AdminPanelOpen")) {
@@ -95,7 +96,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
         if (event.getInventory().getHolder() instanceof Menu) {

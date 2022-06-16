@@ -18,17 +18,23 @@ import java.util.Map;
 public abstract class SubCommand {
     protected AdminPanelMain plugin = AdminPanelMain.getPlugin();
     protected LanguageManager lgm = plugin.getLanguageManager();
+    protected String mainCommandName = "";
     /*
     /<command> <subcommand> args[0] args[1]
      */
 
-    public SubCommand() {
-
+    public SubCommand(String mainCommandName) {
+        this.mainCommandName = mainCommandName;
     }
 
-    public boolean isPlayerRequired(SubCommand sub) {
-        if(!sub.getClass().isAnnotationPresent(CommandData.class)) return false;
-        return sub.getClass().getAnnotation(CommandData.class).playerRequired();
+    public boolean isPlayerRequired() {
+        if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
+        return this.getClass().getAnnotation(CommandData.class).playerRequired();
+    }
+
+    public boolean isOpRequired() {
+        if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
+        return this.getClass().getAnnotation(CommandData.class).opRequired();
     }
 
     public abstract boolean onPlayerCommand(Player player, String[] args);

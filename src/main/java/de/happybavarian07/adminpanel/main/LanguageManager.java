@@ -277,6 +277,38 @@ public class LanguageManager {
         return message;
     }
 
+    public ItemStack replacePlaceholders(Player player, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        List<String> lore = meta.getLore();
+        List<String> loreWithPlaceholders = new ArrayList<>();
+        assert lore != null;
+        for (String s : lore) {
+            String temp = replacePlaceholders(PlaceholderType.ITEM, s);
+            loreWithPlaceholders.add(Utils.format(player, temp, prefix));
+        }
+        meta.setLore(loreWithPlaceholders);
+        meta.setDisplayName(replacePlaceholders(PlaceholderType.ITEM, Utils.format(player, meta.getDisplayName(), prefix)));
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public ItemStack replacePlaceholders(Player player, ItemStack item, Map<String, Placeholder> placeholders) {
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        List<String> lore = meta.getLore();
+        List<String> loreWithPlaceholders = new ArrayList<>();
+        assert lore != null;
+        for (String s : lore) {
+            String temp = replacePlaceholders(s, placeholders);
+            loreWithPlaceholders.add(Utils.format(player, temp, prefix));
+        }
+        meta.setLore(loreWithPlaceholders);
+        meta.setDisplayName(replacePlaceholders(Utils.format(player, meta.getDisplayName(), prefix), placeholders));
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public String replacePlaceholders(String message, Map<String, Placeholder> placeholders) {
         for (String key : placeholders.keySet()) {
             message = placeholders.get(key).replace(message);

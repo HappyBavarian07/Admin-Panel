@@ -7,6 +7,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class PerPlayerLanguageHandler {
@@ -26,6 +28,16 @@ public class PerPlayerLanguageHandler {
 
     public LanguageFile getPlayerLanguage(UUID uuid) {
         return lgm.getLang(dataConfig.getString("playerdata." + uuid.toString() + ".language", lgm.getCurrentLangName()), true);
+    }
+
+    public Map<UUID, LanguageFile> getPlayerLanguages() {
+        Map<UUID, LanguageFile> playerLangs = new HashMap<>();
+        for(String configSec : dataConfig.getConfigurationSection("playerdata").getKeys(false)) {
+            playerLangs.put(UUID.fromString(configSec),
+                    lgm.getLang(dataConfig.getString("playerdata." + UUID.fromString(configSec).toString() + ".language",
+                            lgm.getCurrentLangName()), true));
+        }
+        return playerLangs;
     }
 
     public void setPlayerLanguage(UUID uuid, String language) {

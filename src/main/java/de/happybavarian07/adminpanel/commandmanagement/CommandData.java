@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface CommandData {
     boolean playerRequired() default false;
+    boolean opRequired() default false;
 }

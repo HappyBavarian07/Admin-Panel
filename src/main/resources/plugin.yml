@@ -18,7 +18,7 @@ commands:
     usage: /update <Check|Download|ForceDownload|Replace|ForceReplace|GetLatest>
   perplayerlang:
     description: With this you can set your own Admin Panel Language
-    usage: /<command> <Language|default> [Player]
+    usage: /perplayerlang <Language|default> [Player]
     aliases:
       - ppl
       - pplang
@@ -37,6 +37,15 @@ permissions:
       AdminPanel.ReloadConfig: true
       AdminPanel.updatenotify: true
       AdminPanel.update: true
+      AdminPanel.DisabledItems.*:
+        default: op
+        children:
+          AdminPanel.DisabledItems.Enable:
+            default: op
+          AdminPanel.DisabledItems.Disable:
+            default: op
+          AdminPanel.DisabledItems.List:
+            default: op
       AdminPanel.Bypass.*:
         default: op
         children:
@@ -49,6 +58,8 @@ permissions:
           AdminPanel.Bypass.KickAll:
             default: op
           AdminPanel.Bypass.ban:
+            default: op
+          AdminPanel.Bypass.ItemDisable:
             default: op
       AdminPanel.Button.*:
         default: op

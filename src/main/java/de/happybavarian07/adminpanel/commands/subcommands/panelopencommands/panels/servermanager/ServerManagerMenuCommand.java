@@ -17,6 +17,10 @@ import java.util.Map;
 
 @CommandData(playerRequired = false)
 public class ServerManagerMenuCommand extends SubCommand {
+    public ServerManagerMenuCommand(String mainCommandName) {
+        super(mainCommandName);
+    }
+
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {

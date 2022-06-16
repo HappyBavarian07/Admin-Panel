@@ -17,6 +17,10 @@ import java.util.Map;
 
 @CommandData(playerRequired = false)
 public class WhitelistedPlayersMenuCommand extends SubCommand {
+    public WhitelistedPlayersMenuCommand(String mainCommandName) {
+        super(mainCommandName);
+    }
+
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {

@@ -147,6 +147,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled");
     }
 
+    public boolean isUpdateReplacerEnabled() {
+        return getConfig().getBoolean("Plugin.Updater.automaticReplace");
+    }
+
     @Override
     public void onEnable() {
 
@@ -205,6 +209,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
+
+        if (!languageManager.getPlhandler().getPlayerLanguages().isEmpty())
+            System.out.println("Most Used Player Lang: " + initMethods.getMostUsedPlayerLang().getLangName());
+
         try {
             OldConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
@@ -218,7 +226,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         initMethods.initbStatsMetrics(metrics);
 
         // Init Updater
-        updater = new NewUpdater(plugin, 91800, "Admin-Panel-%version%.jar", plugin);
+        updater = new NewUpdater(plugin, 91800, "Admin-Panel-%version%.jar", plugin, "", true);
         initMethods.initUpdater(updater, autoUpdaterPlugins, dataYML);
 
         // Init Permissions
@@ -276,6 +284,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         String path = "PluginsToUpdate." + plugin.getName() + ".";
         getDataYML().set(path + "spigotID", spigotID);
         getDataYML().set(path + "fileName", fileName);
+        getDataYML().set(path + "link", "");
+        getDataYML().set(path + "bypassExternalDownload", false);
 
         try {
             getDataYML().save(new File(getDataFolder() + "/data.yml"));
@@ -299,7 +309,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        if(loader != null) {
+        if (loader != null) {
             loader.crashAddons();
         }
         loader = null;
