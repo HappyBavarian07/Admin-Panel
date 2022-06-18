@@ -84,7 +84,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
     }
 
     public boolean register(CommandManager cm) {
-        if (commandManagers.containsKey(cm)) return false;
+        if (commandManagers.containsKey(cm) || cm == null) return false;
 
         // Checking if the Command Manager has CommandData
 
@@ -113,7 +113,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
     }
 
     public void unregister(CommandManager cm) {
-        if (!commandManagers.containsKey(cm)) return;
+        if (!commandManagers.containsKey(cm) || cm == null) return;
 
         JavaPlugin javaPlugin = cm.getJavaPlugin();
 
@@ -159,7 +159,14 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
 
     public Boolean isPlayerRequired(CommandManager commandManager) {
         CommandData data = commandManagers.get(commandManager);
+        if(data == null) return false;
         return data.playerRequired();
+    }
+
+    public Boolean isOpRequired(CommandManager commandManager) {
+        CommandData data = commandManagers.get(commandManager);
+        if(data == null) return false;
+        return data.opRequired();
     }
 
     public List<SubCommand> getSubCommands(String commandName) {

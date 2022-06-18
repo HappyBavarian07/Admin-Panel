@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
+@CommandData
 public abstract class CommandManager {
     protected final ArrayList<SubCommand> commands = new ArrayList<>();
     protected final AdminPanelMain adminpanel = AdminPanelMain.getPlugin();

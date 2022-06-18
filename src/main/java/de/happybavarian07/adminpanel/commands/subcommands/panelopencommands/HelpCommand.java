@@ -106,7 +106,7 @@ public class HelpCommand extends SubCommand {
 
     @Override
     public String syntax() {
-        return "/openpanel help <Page>";
+        return "/" + mainCommandName + " help <Page>";
     }
 
     @Override

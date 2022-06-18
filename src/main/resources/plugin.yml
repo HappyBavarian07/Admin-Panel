@@ -72,6 +72,17 @@ permissions:
             default: op
           AdminPanel.Button.refresh:
             default: op
+      Adminpanel.AdminPanelAdmin:
+        default: op
+      AdminPanel.AdminPanelAdminCommands:
+        default: op
+        children:
+          AdminPanel.AdminPanelAdminCommands.ReloadConfig: true
+          AdminPanel.AdminPanelAdminCommands.ReloadData: true
+          AdminPanel.AdminPanelAdminCommands.ReloadLang: true
+          AdminPanel.AdminPanelAdminCommands.ReloadPlugin: true
+          AdminPanel.AdminPanelAdminCommands.UpdateConfig: true
+          AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
       AdminPanel.open:
         default: op
       AdminPanel.open.other:

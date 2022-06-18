@@ -152,6 +152,25 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+    }
+
+    public void updateConfig() {
+        try {
+            OldConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        reloadConfig();
+    }
+
+    public void reloadData() {
+        saveResource("data.yml", false);
+        dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
+    }
+
+    @Override
     public void onEnable() {
 
         // bStats
@@ -210,14 +229,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
         }
 
-        if (!languageManager.getPlhandler().getPlayerLanguages().isEmpty())
-            System.out.println("Most Used Player Lang: " + initMethods.getMostUsedPlayerLang().getLangName());
+        /*if (!languageManager.getPlhandler().getPlayerLanguages().isEmpty())
+            System.out.println("Most Used Player Lang: " + initMethods.getMostUsedPlayerLang().getLangName());*/
 
-        try {
-            OldConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        updateConfig();
         if (getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating")) {
             languageManager.reloadLanguages(null, false);
         }

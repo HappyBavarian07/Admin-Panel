@@ -23,8 +23,6 @@
 ##########################################################
 
 Plugin:
-  # This is the prefix used by the plugin in the console when starting or stopping
-  StartPrefix: '&r[&4Admin&d-&8Panel&r] '
   # This is the prefix used by the plugin for chat messages
   # These messages can be edited in the language files
   Prefix: '&r[&4Admin&d-&8Panel&r] '
@@ -36,7 +34,7 @@ Plugin:
 
   # This is the language option you can add language files to the "languages" folder,
   # and then enter the name of the file (without .yml) here. Note upper and lower case!
-  # Example: /plugins/Admin-Panel/languages/<Language>.yml | language (in the config): Language
+  # Example: /plugins/Admin-Panel/languages/<Language>.yml | language (in the config): <Language>
   language: en
 
   # UNDER DEVELOPMENT
@@ -52,6 +50,9 @@ Plugin:
 
   # The Auto Admin-Panel Updater Section
   Updater:
+    # If this is false the Plugin will no longer log if there is no update available.
+    # This Option is for the normal Updater and for the Auto Plugin Updater.
+    logNoUpdate: true
     # If this option is activated, the updater will automatically check for updates
     # The plugin uses https://spiget.org for this feature
     checkForUpdates: true

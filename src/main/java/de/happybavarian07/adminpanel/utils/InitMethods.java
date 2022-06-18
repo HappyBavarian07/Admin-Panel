@@ -11,6 +11,7 @@ import de.happybavarian07.adminpanel.commands.AdminPanelOpenCommand;
 import de.happybavarian07.adminpanel.commands.LanguageReloadCommand;
 import de.happybavarian07.adminpanel.commands.PerPlayerLanguageCommand;
 import de.happybavarian07.adminpanel.commands.UpdateCommand;
+import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -68,9 +69,6 @@ public class InitMethods {
                 }
             }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
-        if (!new File(plugin.getDataFolder() + "/data.yml").exists()) {
-            plugin.saveResource("data.yml", false);
-        }
         if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
             new Thread(() -> {
                 autoUpdaterPlugins.clear();
@@ -95,6 +93,7 @@ public class InitMethods {
                     autoUpdaterPlugins.put(sectionString, tempUpdater);
                     if (!tempUpdater.resourceIsOnSpigot()) continue;
                     if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
+                        if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
                         logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
                         tempUpdater.checkForUpdates(true);
                         continue;
@@ -134,7 +133,8 @@ public class InitMethods {
                                 NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
                                 autoUpdaterPlugins.put(sectionString, tempUpdater);
                                 if (!tempUpdater.resourceIsOnSpigot()) continue;
-                                if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("")) {
+                                if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
+                                    if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
                                     logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
                                     tempUpdater.checkForUpdates(true);
                                     continue;
@@ -311,6 +311,11 @@ public class InitMethods {
         if (!plugin.getConfigFile().exists()) {
             logger.message("&e&lDone!&r");
         }
+        if (!new File(plugin.getDataFolder() + "/data.yml").exists()) {
+            logger.spacer().message("&c&lCreating data.yml file!&r");
+            plugin.saveResource("data.yml", false);
+            logger.message("&e&lDone!&r");
+        }
         if (!fileLogger.getLogFile().exists()) {
             logger.spacer().message("&c&lCreating plugin.log file!&r");
             fileLogger.createLogFile();
@@ -420,5 +425,6 @@ public class InitMethods {
 
     public void initCommandManagers() {
         plugin.getCommandManagerRegistry().register(new PanelOpenManager());
+        plugin.getCommandManagerRegistry().register(new AdminPanelAdminManager());
     }
 }

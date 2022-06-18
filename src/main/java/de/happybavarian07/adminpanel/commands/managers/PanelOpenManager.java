@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Collections;
 import java.util.List;
 
-@CommandData(playerRequired = false)
+@CommandData
 public class PanelOpenManager extends CommandManager {
     @Override
     public String getCommandName() {

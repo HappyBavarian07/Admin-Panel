@@ -159,7 +159,7 @@ public class NewUpdater implements Listener {
     public void checkForUpdates(boolean logInConsole) {
         boolean updateAvailable = updateAvailable();
         if (!updateAvailable) {
-            if (logInConsole) {
+            if (logInConsole && plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Update available for Plugin: " + getPluginName()));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "Checked Plugin: " + getPluginName() + " for Updates -> There is no Update Available", "Updater");

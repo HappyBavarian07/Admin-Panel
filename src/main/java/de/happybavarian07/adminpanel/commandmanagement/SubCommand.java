@@ -18,6 +18,7 @@ import java.util.Map;
 public abstract class SubCommand {
     protected AdminPanelMain plugin = AdminPanelMain.getPlugin();
     protected LanguageManager lgm = plugin.getLanguageManager();
+    protected CommandManagerRegistry registry = plugin.getCommandManagerRegistry();
     protected String mainCommandName = "";
     /*
     /<command> <subcommand> args[0] args[1]
@@ -29,11 +30,13 @@ public abstract class SubCommand {
 
     public boolean isPlayerRequired() {
         if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
+        if(registry.isPlayerRequired(registry.getCommandManager(mainCommandName))) return true;
         return this.getClass().getAnnotation(CommandData.class).playerRequired();
     }
 
     public boolean isOpRequired() {
         if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
+        if(registry.isOpRequired(registry.getCommandManager(mainCommandName))) return true;
         return this.getClass().getAnnotation(CommandData.class).opRequired();
     }
 
