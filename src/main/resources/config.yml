@@ -27,6 +27,30 @@ Plugin:
   # These messages can be edited in the language files
   Prefix: '&r[&4Admin&d-&8Panel&r] '
 
+  # This is the System to sync Data across all to the Bungee Cord system connected Servers
+  # Obivously it needs the Admin Panel Bungee Plugin to work
+  # UNDER DEVELOPMENT
+  # BungeeCord Part is not available online so this whole System will NOT work!
+  BungeeSyncSystem:
+    # here you can enable it
+    enabled: false
+    # Here you can change the Plugin Message Channel Names
+    ChannelNames:
+      In: "adminpanel:bungeein"
+      Out: "adminpanel:bungeeout"
+    # This Section is an Addition to the Bungee Cord system that has to be enabled in the Config of the Bungee Plugin aswell
+    # This System uses Java Methods to establish a better connection between the Bungee Cord Server Admin Panel Plugin and the
+    # Bukkit/Spigot/etc. Admin Panel Plugins.
+    # The Setup is easy and you can find it here: <LinkToFAQ>
+    JavaSockets:
+      enabled: false
+      # The public IP of the Bungee Server (localhost/0.0.0.0)
+      hostName: 0.0.0.0
+      # The Port in the Config of the Bungee Plugin
+      port: 12345
+      # The Name for the Server to register
+      ClientName: "ExampleClientName"
+
   AddonSystem:
     # This Option disables/enables the Addon System for the Admin-Panel
     # A restart or reload of the Admin-Panel is required to start it!

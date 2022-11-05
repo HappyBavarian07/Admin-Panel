@@ -2,6 +2,10 @@ package de.happybavarian07.adminpanel.main;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
+import de.happybavarian07.adminpanel.bungee.BungeeTestCommand;
+import de.happybavarian07.adminpanel.bungee.BungeeUtils;
+import de.happybavarian07.adminpanel.bungee.DataClientUtils;
+import de.happybavarian07.adminpanel.bungee.NewDataClient;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManagerRegistry;
 import de.happybavarian07.adminpanel.configupdater.OldConfigUpdater;
 import de.happybavarian07.adminpanel.utils.*;
@@ -9,6 +13,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -58,6 +63,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private AddonLoader loader;
     private FileConfiguration dataYML;
     private CommandManagerRegistry commandManagerRegistry;
+    private BungeeUtils bungeeUtils;
+    //private DataClient dataClient;
+    private DataClientUtils dataClientUtils;
+    private NewDataClient dataClient;
+    private boolean languageManagerEnabled;
+
+    public FileConfiguration getPermissionsConfig() {
+        return permissionsConfig;
+    }
 
     public static String getPrefix() {
         return prefix;
@@ -77,6 +91,36 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setPlugin(AdminPanelMain plugin) {
         AdminPanelMain.plugin = plugin;
+    }
+
+    public boolean isLanguageManagerEnabled() {
+        return languageManagerEnabled;
+    }
+
+    private void setLanguageManagerEnabled(boolean languageManagerEnabled) {
+        this.languageManagerEnabled = languageManagerEnabled;
+    }
+
+    public NewDataClient getDataClient() {
+        try {
+            return dataClient;
+        } catch (CommandException e) {
+            System.out.println("Data Client is not connected to Data Server from BungeeCord!");
+        }
+        return null;
+    }
+
+    public DataClientUtils getDataClientUtils() {
+        try {
+            return dataClientUtils;
+        } catch (CommandException e) {
+            System.out.println("Data Client is not connected to Data Server from BungeeCord!");
+        }
+        return null;
+    }
+
+    public BungeeUtils getBungeeUtils() {
+        return bungeeUtils;
     }
 
     public boolean isInMaintenanceMode() {
@@ -170,9 +214,20 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
     }
 
+    private boolean checkIfBungee() {
+        if (getServer().spigot().getConfig().getConfigurationSection("settings").getBoolean("bungeecord", false) &&
+                getConfig().getBoolean("Plugin.BungeeSyncSystem.enabled")) {
+            return true;
+        } else {
+            getLogger().severe("This Server is not BungeeCord.");
+            getLogger().severe("If the Server is already hooked to BungeeCord, please enable it into your spigot.yml aswell.");
+            getLogger().severe("Plugin - BungeeCord Connection Feature disabled!");
+            return false;
+        }
+    }
+
     @Override
     public void onEnable() {
-
         // bStats
         int bStatsID = 11778;
         Metrics metrics = new Metrics(this, bStatsID);
@@ -184,6 +239,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 );
         logger.coloredSpacer(ChatColor.DARK_RED).message("&4&lInitialize Plugin Main Variable to this!&r");
         setPlugin(this);
+
+
         languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
         commandManagerRegistry = new CommandManagerRegistry(this);
         langFileUpdater = new OldLanguageFileUpdater();
@@ -193,6 +250,28 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         new Utils();
         new File(this.getDataFolder() + "/languages").mkdir();
         logger.message("&e&lVariable Done!&r");
+        logger.message("&e&lStarting Bungee Registration");
+        if (checkIfBungee()) {
+            String path = "Plugin.BungeeSyncSystem.ChannelNames.";
+            bungeeUtils = new BungeeUtils(getConfig().getString(path + "In", ""), getConfig().getString(path + "Out", ""));
+            bungeeUtils.openBungeeChannel();
+            this.getCommand("bungeetest").setExecutor(new BungeeTestCommand());
+            path = "Plugin.BungeeSyncSystem.JavaSockets.";
+            if (getConfig().getBoolean(path + "enabled")) {
+                /*dataClient = new DataClient(getConfig().getString(path + "hostName"),
+                        getConfig().getInt(path + "port"), getConfig().getString(path + "ClientName"));
+                dataClient.connect();*/
+                try {
+                    dataClient = new NewDataClient(getConfig().getString(path + "hostName"),
+                            getConfig().getInt(path + "port"),
+                            getConfig().getString(path + "ClientName"));
+                    dataClientUtils = new DataClientUtils(dataClient);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        logger.message("&a&lDone");
         // Plugin Checks
         initMethods.initPluginCheck();
         logger.messages("&c&lFinished Vault initialization!&r");
@@ -202,6 +281,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // Permission Init
         permissionsConfig = YamlConfiguration.loadConfiguration(permissionFile);
         initMethods.initPermissionFiles(permissionsConfig, permissionFile, playerPermissions);
+        //permissionsConfig.set("Permissions.0c069d0e-5778-4d51-8929-6b2f69b475c0.Permissions.test.test.test1", true);
+        //permissionsConfig.set("Permissions.0c069d0e-5778-4d51-8929-6b2f69b475c0.Permissions.test.test.test2", true);
+        try {
+            permissionsConfig.save(permissionFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // ...
         logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
         setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
@@ -221,12 +307,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         languageManager.addLang(deLang, deLang.getLangName());
         languageManager.addLang(enLang, enLang.getLangName());
         languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language"), true), true);
-        if (languageManager != null && languageManager.getMessage("Plugin.EnablingMessage", null, false) != null &&
-                !languageManager.getMessage("Plugin.EnablingMessage", null, false).equals("null config") &&
-                !languageManager.getMessage("Plugin.EnablingMessage", null, false).startsWith("null path: Messages.")) {
+        setLanguageManagerEnabled(languageManager != null && languageManager.getCurrentLang() != null);
+        if (isLanguageManagerEnabled()) {
             getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null, true));
         } else {
-            getServer().getConsoleSender().sendMessage("[Admin-Panel] enabled!");
+            getServer().getConsoleSender().sendMessage(Utils.chat("&f[&aAdmin-&ePanel&f] &cLanguage Manager is not enabled, " +
+                    "which means all the Items and Messages won't work! " +
+                    "The Plugin will automatically unload! " +
+                    "Look for Errors from the Admin-Panel in the Console!"));
+            Bukkit.getPluginManager().disablePlugin(this);
         }
 
         /*if (!languageManager.getPlhandler().getPlayerLanguages().isEmpty())
@@ -242,7 +331,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
         // Init Updater
         updater = new NewUpdater(plugin, 91800, "Admin-Panel-%version%.jar", plugin, "", true);
-        initMethods.initUpdater(updater, autoUpdaterPlugins, dataYML);
+        initMethods.initUpdater(updater, dataYML);
 
         // Init Permissions
         initMethods.initPermissions(playerPermissionsAttachments, playerPermissions);
@@ -265,6 +354,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             logger.emptySpacer();
             logger.coloredSpacer(ChatColor.BLUE);
             logger.coloredMessage(ChatColor.GREEN, "Adding Addons to the List!");
+
 
             loader = new AddonLoader(new File(this.getDataFolder() + "/addons"));
             initMethods.initAddonLoader(loader);
@@ -328,14 +418,19 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             loader.crashAddons();
         }
         loader = null;
-        if (languageManager != null && languageManager.getMessage("Plugin.DisablingMessage", null, false) != null &&
-                !languageManager.getMessage("Plugin.DisablingMessage", null, false).equals("null config") &&
-                !languageManager.getMessage("Plugin.DisablingMessage", null, false).startsWith("null path: Messages.")) {
+        if (isLanguageManagerEnabled()) {
             getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null, true));
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
         }
         savePerms();
+        if (checkIfBungee()) {
+            bungeeUtils.closeBungeeChannel();
+            String path = "Plugin.BungeeSyncSystem.JavaSockets.";
+            if (getConfig().getBoolean(path + "enabled")) {
+                dataClient.disconnect(true, true);
+            }
+        }
     }
 
     @EventHandler
@@ -369,7 +464,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             Map<String, Boolean> perms = playerPermissions.get(uuid);
             permissionsConfig.set("Permissions." + uuid + ".Permissions", null);
             for (String permissions : perms.keySet()) {
-                permissionsConfig.set(path + permissions.replace(".", "(<->)"), perms.get(permissions));
+                permissionsConfig.set(path + permissions/*.replace(".", "(<->)")*/, perms.get(permissions));
             }
         }
         try {

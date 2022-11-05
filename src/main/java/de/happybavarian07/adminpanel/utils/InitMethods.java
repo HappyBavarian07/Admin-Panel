@@ -52,7 +52,7 @@ public class InitMethods {
         this.languageManager = plugin.getLanguageManager();
     }
 
-    public void initUpdater(NewUpdater updater, Map<String, NewUpdater> autoUpdaterPlugins, FileConfiguration dataYML) {
+    public void initUpdater(NewUpdater updater, FileConfiguration dataYML) {
         updater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
         if (plugin.getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
             updater.checkForUpdates(true);
@@ -71,7 +71,7 @@ public class InitMethods {
         }
         if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
             new Thread(() -> {
-                autoUpdaterPlugins.clear();
+                plugin.getAutoUpdaterPlugins().clear();
                 logger.coloredSpacer(ChatColor.BLUE);
                 logger.message("&1&lAuto Plugin Updater initiated&r");
                 for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
@@ -90,7 +90,7 @@ public class InitMethods {
                     if (!fileName.endsWith(".jar")) continue;
 
                     NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
-                    autoUpdaterPlugins.put(sectionString, tempUpdater);
+                    plugin.getAutoUpdaterPlugins().put(sectionString, tempUpdater);
                     if (!tempUpdater.resourceIsOnSpigot()) continue;
                     if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
                         if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
@@ -114,7 +114,7 @@ public class InitMethods {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            autoUpdaterPlugins.clear();
+                            plugin.getAutoUpdaterPlugins().clear();
                             for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
                                 if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
 
@@ -131,7 +131,7 @@ public class InitMethods {
                                 if (!fileName.endsWith(".jar")) continue;
 
                                 NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
-                                autoUpdaterPlugins.put(sectionString, tempUpdater);
+                                plugin.getAutoUpdaterPlugins().put(sectionString, tempUpdater);
                                 if (!tempUpdater.resourceIsOnSpigot()) continue;
                                 if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
                                     if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
@@ -174,12 +174,27 @@ public class InitMethods {
             Map<String, Boolean> perms = new HashMap<>();
             Objects.requireNonNull(permissionsConfig.getConfigurationSection(path)).getKeys(false)
                     .forEach(perm ->
-                            perms.put(perm.replace("(<->)", "."), permissionsConfig.getBoolean(path + "." + perm)));
+                            perms.put(perm, permissionsConfig.getBoolean(path + "." + perm)));
             playerPermissions.put(UUID.fromString(player), perms);
         });
     }
 
     public void initPermissions(Map<UUID, PermissionAttachment> playerPermissionsAttachments, Map<UUID, Map<String, Boolean>> playerPermissions) {
+        for(String configSection : plugin.getPermissionsConfig().getConfigurationSection("Permissions").getKeys(false)) {
+            UUID tempUUID = UUID.fromString(configSection);
+            if(!playerPermissionsAttachments.containsKey(tempUUID)) {
+                if (!playerPermissions.containsKey(tempUUID)) {
+                    playerPermissions.put(tempUUID, new HashMap<>());
+                }
+                Map<String, Boolean> permissions = new HashMap<>();
+                for(String permissionName : plugin.getPermissionsConfig().getConfigurationSection("Permissions." + configSection + ".Permissions").getKeys(true)) {
+                    if(plugin.getPermissionsConfig().isConfigurationSection("Permissions." + configSection + ".Permissions." + permissionName)) continue;
+
+                    permissions.put(permissionName, plugin.getPermissionsConfig().getBoolean("Permissions." + configSection + ".Permissions." + permissionName));
+                }
+                playerPermissions.put(tempUUID, permissions);
+            }
+        }
         new BukkitRunnable() {
             @Override
             public void run() {

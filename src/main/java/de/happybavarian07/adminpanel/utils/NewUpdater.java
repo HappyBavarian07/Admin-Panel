@@ -35,7 +35,7 @@ public class NewUpdater implements Listener {
     private final String fileName;
     private final JavaPlugin pluginToUpdate;
     private VersionComparator versionComparator;
-    private final String linkToFile;
+    private String linkToFile;
     boolean bypassExternalURL;
 
     public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, @Nullable JavaPlugin pluginToUpdate, String linkToFile, boolean bypassExternalURL) {
@@ -45,7 +45,7 @@ public class NewUpdater implements Listener {
         this.versionComparator = VersionComparator.EQUALVERSIONS;
         this.fileName = fileName;
         this.pluginToUpdate = pluginToUpdate;
-        this.linkToFile = linkToFile == null ? "" : linkToFile;
+        this.linkToFile = linkToFile == null ? "" : linkToFile.replace("%version%", getLatestVersionName());
         messages = new Messages();
         this.bypassExternalURL = bypassExternalURL;
     }
@@ -300,8 +300,9 @@ public class NewUpdater implements Listener {
         try {
             if(isExternalFile() && !getLinkToFile().equals("") && !bypassExternalURL()) {
                 downloadURL = new URL(linkToFile);
+            } else {
+                downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
             }
-            downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
         } catch (MalformedURLException e) {
             plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
             return UpdateResponse.SPIGET_ERROR;
@@ -409,6 +410,10 @@ public class NewUpdater implements Listener {
 
     public String getLinkToFile() {
         return linkToFile;
+    }
+
+    public void setLinkToFile(String linkToFile) {
+        this.linkToFile = linkToFile;
     }
 
     public boolean bypassExternalURL() {

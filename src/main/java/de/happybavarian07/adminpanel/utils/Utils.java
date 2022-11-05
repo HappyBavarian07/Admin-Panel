@@ -19,7 +19,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,6 +54,17 @@ public class Utils {
 
         inv.setItem(invSlot - 1, item);
         return item;
+    }
+
+    public static String arrayToString(String[] array) {
+        StringBuilder sbOut = new StringBuilder("");
+        if (array.length <= 0) return sbOut.toString();
+
+        for (String s : array) {
+            if (!s.equals(""))
+                sbOut.append(Utils.format(null, s, AdminPanelMain.getPrefix())).append(" ");
+        }
+        return sbOut.toString();
     }
 
     @SuppressWarnings("deprecation")
@@ -173,35 +183,35 @@ public class Utils {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l5", AdminPanelMain.getPrefix()));
-        }, 2L *time);
+        }, 2L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l4", AdminPanelMain.getPrefix()));
-        }, 3L *time);
+        }, 3L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l3", AdminPanelMain.getPrefix()));
-        }, 4L *time);
+        }, 4L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l2", AdminPanelMain.getPrefix()));
-        }, 5L *time);
+        }, 5L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l1", AdminPanelMain.getPrefix()));
-        }, 6L *time);
+        }, 6L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             clearChat(100, false, null);
             Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
             Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Restart initiated!", AdminPanelMain.getPrefix()));
             Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        }, 7L *time);
+        }, 7L * time);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
                 p2.kickPlayer(Utils.format(null, "&4&lThe server is now restarting!", AdminPanelMain.getPrefix()));
             }
             Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "restart");
-        }, 7L *time+time2);
+        }, 7L * time + time2);
     }
 
     public static String format(Player player, String message, String prefix) {
@@ -231,6 +241,10 @@ public class Utils {
         return instance;
     }
 
+    private void setInstance(Utils instance) {
+        Utils.instance = instance;
+    }
+
     public static List<String> emptyList() {
         List<String> list = new ArrayList<>();
         list.add("");
@@ -238,8 +252,75 @@ public class Utils {
         return list;
     }
 
-    private void setInstance(Utils instance) {
-        Utils.instance = instance;
+    public static boolean isVanillaItemDisabled(ItemStack stack) {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if (stack == null) return false;
+        return dataConfig.getStringList("DisabledItems").contains(stack.getType().toString());
+    }
+
+    public static List<Material> getDisabledItems() {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        List<String> materialNames = dataConfig.getStringList("DisabledItems");
+        List<Material> material = new ArrayList<>();
+        for (String materialString : materialNames) {
+            Material value = Material.matchMaterial(materialString);
+            if (value == null) continue;
+            material.add(value);
+        }
+        return material;
+    }
+
+    public static boolean disableVanillaItem(ItemStack stack) {
+        boolean success = false;
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if (!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) {
+            createDisabledItemsSection();
+            return false;
+        }
+
+        if (!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) return false;
+
+        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
+        disabledItems.add(stack.getType().toString());
+        dataConfig.set("DisabledItems", disabledItems);
+        saveDataConfig();
+
+        if (!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
+
+        return success;
+    }
+
+    public static boolean enableVanillaItem(ItemStack stack) {
+        boolean success = false;
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if (!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) {
+            createDisabledItemsSection();
+            return false;
+        }
+
+        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
+        disabledItems.remove(stack.getType().toString());
+        dataConfig.set("DisabledItems", disabledItems);
+        saveDataConfig();
+
+        if (dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
+
+        return success;
+    }
+
+    private static boolean createDisabledItemsSection() {
+        FileConfiguration dataConfig = plugin.getDataYML();
+        if (!dataConfig.contains("DisabledItems")) dataConfig.set("DisabledItems", new ArrayList<>());
+        saveDataConfig();
+        return !dataConfig.contains("DisabledItems");
+    }
+
+    private static void saveDataConfig() {
+        try {
+            plugin.getDataYML().save(new File(plugin.getDataFolder() + "/data.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void ban(final Player p, final OfflinePlayer target, final String reason, final String sourcename) {
@@ -289,70 +370,5 @@ public class Utils {
 
     public Chat getChat() {
         return plugin.chat;
-    }
-
-    public static boolean isVanillaItemDisabled(ItemStack stack) {
-        FileConfiguration dataConfig = plugin.getDataYML();
-        if(stack == null) return false;
-        return dataConfig.getStringList("DisabledItems").contains(stack.getType().toString());
-    }
-
-    public static List<Material> getDisabledItems() {
-        FileConfiguration dataConfig = plugin.getDataYML();
-        List<String> materialNames = dataConfig.getStringList("DisabledItems");
-        List<Material> material = new ArrayList<>();
-        for(String materialString : materialNames) {
-            Material value = Material.matchMaterial(materialString);
-            if(value == null) continue;
-            material.add(value);
-        }
-        return material;
-    }
-
-    public static boolean disableVanillaItem(ItemStack stack) {
-        boolean success = false;
-        FileConfiguration dataConfig = plugin.getDataYML();
-        if(!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) { createDisabledItemsSection(); return false; }
-
-        if(!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) return false;
-
-        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
-        disabledItems.add(stack.getType().toString());
-        dataConfig.set("DisabledItems", disabledItems);
-        saveDataConfig();
-
-        if(!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
-
-        return success;
-    }
-
-    public static boolean enableVanillaItem(ItemStack stack) {
-        boolean success = false;
-        FileConfiguration dataConfig = plugin.getDataYML();
-        if(!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) { createDisabledItemsSection(); return false; }
-
-        List<String> disabledItems = dataConfig.getStringList("DisabledItems");
-        disabledItems.remove(stack.getType().toString());
-        dataConfig.set("DisabledItems", disabledItems);
-        saveDataConfig();
-
-        if(dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
-
-        return success;
-    }
-
-    private static boolean createDisabledItemsSection() {
-        FileConfiguration dataConfig = plugin.getDataYML();
-        if(!dataConfig.contains("DisabledItems")) dataConfig.set("DisabledItems", new ArrayList<>());
-        saveDataConfig();
-        return !dataConfig.contains("DisabledItems");
-    }
-
-    private static void saveDataConfig() {
-        try {
-            plugin.getDataYML().save(new File(plugin.getDataFolder() + "/data.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

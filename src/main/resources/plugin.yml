@@ -26,6 +26,7 @@ commands:
   reloadlang:
     description: Reloads the Languages
     usage: /reloadlang
+  bungeetest:
 permissions:
   AdminPanel.*:
     default: op

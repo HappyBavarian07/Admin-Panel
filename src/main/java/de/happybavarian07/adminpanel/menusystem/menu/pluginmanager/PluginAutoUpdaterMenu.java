@@ -133,6 +133,8 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
         inventory.setItem(getSlot(path + "RemovePlugin", 47), lgm.getItem(path + "RemovePlugin", playerMenuUtility.getOwner(), false));
 
         Map<String, NewUpdater> pluginsToUpdate = plugin.getAutoUpdaterPlugins();
+        System.out.println("Plugins to Update: " + pluginsToUpdate);
+        System.out.println("Plugins to Update: " + plugin.getAutoUpdaterPlugins());
         ///////////////////////////////////// Pagination loop template
         if (pluginsToUpdate != null && !pluginsToUpdate.isEmpty()) {
             int i = 0;
@@ -153,6 +155,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
                     itemMeta.setDisplayName(Utils.format(playerMenuUtility.getOwner(), "&a" + currentUpdater.getPluginToUpdate().getName(), ""));
                     pluginItem.setItemMeta(itemMeta);
                     inventory.addItem(pluginItem);
+
 
                     ////////////////////////
                 }

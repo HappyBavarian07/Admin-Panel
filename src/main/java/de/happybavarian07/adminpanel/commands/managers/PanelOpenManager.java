@@ -32,7 +32,7 @@ public class PanelOpenManager extends CommandManager {
     public String getCommandUsage() {
         /*
          */
-        return "/openpanel <SubCommand> (openpanel help <Page>)";
+        return "/openpanel <SubCommand> (/openpanel help <Page>)";
     }
 
     @Override

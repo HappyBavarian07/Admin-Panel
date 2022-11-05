@@ -38,6 +38,14 @@ public class StartUpLogger {
         return this;
     }
 
+    public StartUpLogger dataClientMessage(ChatColor color, String message) {
+        coloredSpacer(color);
+        coloredMessage(color, "Java Socket Bungeecord Data Sync System (short: JSBDSS)");
+        coloredMessage(color, message);
+        coloredSpacer(color);
+        return this;
+    }
+
     public StartUpLogger rawMessage(String message) {
         sender.sendMessage(message);
         return this;
