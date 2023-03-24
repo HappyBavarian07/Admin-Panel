@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.LanguageManager;
 import de.happybavarian07.adminpanel.main.Placeholder;
 import de.happybavarian07.adminpanel.main.PlaceholderType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -29,20 +30,42 @@ public abstract class SubCommand {
     }
 
     public boolean isPlayerRequired() {
-        if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
-        if(registry.isPlayerRequired(registry.getCommandManager(mainCommandName))) return true;
+        if (!this.getClass().isAnnotationPresent(CommandData.class)) {
+            return registry.isPlayerRequired(registry.getCommandManager(mainCommandName));
+        }
         return this.getClass().getAnnotation(CommandData.class).playerRequired();
     }
 
     public boolean isOpRequired() {
-        if (!this.getClass().isAnnotationPresent(CommandData.class)) return false;
-        if(registry.isOpRequired(registry.getCommandManager(mainCommandName))) return true;
+        if (!this.getClass().isAnnotationPresent(CommandData.class)) {
+            return registry.isOpRequired(registry.getCommandManager(mainCommandName));
+        }
         return this.getClass().getAnnotation(CommandData.class).opRequired();
     }
 
-    public abstract boolean onPlayerCommand(Player player, String[] args);
+    /**
+     * Checks if the Sub Command can only be executed if the Player gives the Args given in the {subArgs()} Method
+     *
+     * @return boolean
+     */
+    public boolean allowOnlySubCommandArgsThatFitToSubArgs() {
+        if (!this.getClass().isAnnotationPresent(CommandData.class)) {
+            return registry.allowOnlySubCommandArgsThatFitToSubArgs(registry.getCommandManager(mainCommandName));
+        }
+        return this.getClass().getAnnotation(CommandData.class).allowOnlySubCommandArgsThatFitToSubArgs();
+    }
 
-    public abstract boolean onConsoleCommand(ConsoleCommandSender sender, String[] args);
+    public boolean onPlayerCommand(Player player, String[] args) {
+        return handleCommand(player, player, args);
+    }
+
+    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
+        return handleCommand(sender, null, args);
+    }
+
+    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
+        return false;
+    }
 
     public abstract String name();
 
@@ -63,6 +86,7 @@ public abstract class SubCommand {
         placeholders.put("%name%", new Placeholder("%name%", cmd.name(), PlaceholderType.ALL));
         placeholders.put("%permission%", new Placeholder("%permission%", cmd.permission(), PlaceholderType.ALL));
         placeholders.put("%aliases%", new Placeholder("%aliases%", cmd.aliases(), PlaceholderType.ALL));
+        placeholders.put("%subArgs%", new Placeholder("%subArgs%", cmd.subArgs().toString(), PlaceholderType.ALL));
 
         return lgm.replacePlaceholders(in, placeholders);
     }

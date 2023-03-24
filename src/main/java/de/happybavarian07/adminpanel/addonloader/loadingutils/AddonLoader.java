@@ -27,6 +27,7 @@ import java.util.logging.Level;
 public class AddonLoader {
     private static AdminPanelMain plugin;
     private final Map<File, List<Class<?>>> loadedJarFiles;
+    private final Map<File, Addon> loadedAddonMainClasses;
     private final File addonFolder;
     private final URLClassLoader urlClassLoader;
 
@@ -34,6 +35,7 @@ public class AddonLoader {
         plugin = AdminPanelMain.getPlugin();
         this.addonFolder = addonFolder;
         this.loadedJarFiles = new HashMap<>();
+        this.loadedAddonMainClasses = new HashMap<>();
         this.urlClassLoader = new URLClassLoader(new URL[]{}, ClassLoader.getSystemClassLoader());
 
         if (!addonFolder.isDirectory()) {
@@ -137,10 +139,21 @@ public class AddonLoader {
         return classes;
     }
 
-    public Class<? extends Addon> getMainClassOfAddon(File addon) {
+    public Addon getMainClassOfAddon(File addon) {
         try {
-            return FileUtils.findClass(addon, Addon.class);
-        } catch (IOException | ClassNotFoundException e) {
+            if(loadedAddonMainClasses.containsKey(addon)) {
+                return loadedAddonMainClasses.get(addon);
+            } else {
+                Addon temp;
+                try {
+                    temp = FileUtils.findClass(addon, Addon.class).newInstance();
+                } catch (NullPointerException e){
+                    temp = null;
+                }
+                loadedAddonMainClasses.put(addon, temp);
+                return temp;
+            }
+        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -195,11 +208,7 @@ public class AddonLoader {
      */
     public void crashAddons() {
         for(File addonFile : getLoadedJarFiles().keySet()) {
-            try {
-                getMainClassOfAddon(addonFile).newInstance().onDisable();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            getMainClassOfAddon(addonFile).onDisable();
         }
         getLoadedJarFiles().clear();
         try {

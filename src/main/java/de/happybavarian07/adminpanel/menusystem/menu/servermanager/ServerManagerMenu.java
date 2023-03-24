@@ -38,6 +38,11 @@ public class ServerManagerMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "ServerManagerMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

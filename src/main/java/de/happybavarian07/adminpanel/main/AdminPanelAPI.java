@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface AdminPanelAPI {
     // Basic
@@ -205,6 +206,32 @@ public interface AdminPanelAPI {
      * @throws InterruptedException Wenn es unterbrochen wird
      */
     void stopServer(int time, int time2) throws InterruptedException;
+
+    /**
+     * Sends A formatted Report Message to my Discord via a Webhook
+     * @param playerUUID The Player that reported
+     * @param reportMessage The Report Message with no format
+     * @return If successful
+     */
+    int reportBugToDiscord(UUID playerUUID, String reportMessage);
+
+    /**
+     * Sends a formatted Report message with the normal reportBugToDiscord Method
+     * but first turns the Array into a String
+     * @param playerUUID The Player that reported
+     * @param reportMessageArray The Report Message Array with no format
+     * @return If successful
+     */
+    int reportBugToDiscord(UUID playerUUID, String[] reportMessageArray);
+
+    /**
+     * Sends a formatted Report message with the normal reportBugToDiscord Method
+     * but first turns the ArrayList into a String
+     * @param playerUUID The Player that reported
+     * @param reportMessageArrayList The Report Message Array List with no format
+     * @return If successful
+     */
+    int reportBugToDiscord(UUID playerUUID, List<String> reportMessageArrayList);
 
     // Language System
 
@@ -447,4 +474,11 @@ public interface AdminPanelAPI {
      * @param commandManager der Command Manager
      */
     boolean registerCommandManager(CommandManager commandManager);
+
+
+    /**
+     * Returns the Cooldown Time Map
+     * @return The Cooldown Time Map
+     */
+    public Map<UUID, Long> getCooldownTimeMap();
 }

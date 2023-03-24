@@ -31,6 +31,11 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PluginPermissionsListMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

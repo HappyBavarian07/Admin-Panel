@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 /*
@@ -42,6 +43,8 @@ public abstract class Menu implements InventoryHolder {
 
     //let each menu decide their name
     public abstract String getMenuName();
+
+    public abstract String getConfigMenuAddonFeatureName();
 
     //let each menu decide their slot amount
     public abstract int getSlots();
@@ -89,8 +92,14 @@ public abstract class Menu implements InventoryHolder {
                 inventory = Bukkit.createInventory(this, getSlots(), getMenuName());
                 inventorys.add(inventory);
 
+                Map<String, MenuAddon> addonList = plugin.getMenuAddons(this.getConfigMenuAddonFeatureName());
+
                 //grab all the items specified to be used for this menu and add to inventory
                 this.setMenuItems();
+                for(String menuAddonName : addonList.keySet()) {
+                    MenuAddon addon = addonList.get(menuAddonName);
+                    addon.setMenuAddonItems();
+                }
 
                 if (Listener.class.isAssignableFrom(this.getClass())) {
                     Bukkit.getPluginManager().registerEvents((Listener) this, AdminPanelMain.getPlugin());
@@ -98,6 +107,12 @@ public abstract class Menu implements InventoryHolder {
 
                 //open the inventory for the player
                 playerMenuUtility.getOwner().openInventory(inventory);
+
+                // Try executing Menu Addons onOpenEvent
+                for(String menuAddonName : addonList.keySet()) {
+                    MenuAddon addon = addonList.get(menuAddonName);
+                    addon.onOpenEvent();
+                }
                 if (this instanceof AdminPanelStartMenu) {
                     playerMenuUtility.getOwner().sendMessage(
                             AdminPanelMain.getPlugin().getLanguageManager().getMessage("Player.General.OpeningMessageSelf", playerMenuUtility.getOwner(), true));

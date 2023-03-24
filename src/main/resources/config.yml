@@ -27,6 +27,14 @@ Plugin:
   # These messages can be edited in the language files
   Prefix: '&r[&4Admin&d-&8Panel&r] '
 
+  StartUpLogger:
+    # Will disable the whole Start Up Messages and other Debug Messages, that might be useful or important.
+    enabled: true
+    # The Message_Format will be formatted to fit the Message that is being formatted.
+    # It will fill the '-' with the Message.
+    Message_Format: '|------------------------------------------------------------------|'
+    # The Spacer Format: Is the Spacer and just prints this message
+    Spacer_Format:  '+-------------------------------------------------------------+'
   # This is the System to sync Data across all to the Bungee Cord system connected Servers
   # Obivously it needs the Admin Panel Bungee Plugin to work
   # UNDER DEVELOPMENT
@@ -41,7 +49,8 @@ Plugin:
     # This Section is an Addition to the Bungee Cord system that has to be enabled in the Config of the Bungee Plugin aswell
     # This System uses Java Methods to establish a better connection between the Bungee Cord Server Admin Panel Plugin and the
     # Bukkit/Spigot/etc. Admin Panel Plugins.
-    # The Setup is easy and you can find it here: <LinkToFAQ>
+    # The Setup is easy and you can find the Instructions here: <LinkToFAQ>
+    # Moved To DataClientSettings.yml
     JavaSockets:
       enabled: false
       # The public IP of the Bungee Server (localhost/0.0.0.0)
@@ -50,6 +59,7 @@ Plugin:
       port: 12345
       # The Name for the Server to register
       ClientName: "ExampleClientName"
+      # Socket Settings in the DataClientSettings.yml File
 
   AddonSystem:
     # This Option disables/enables the Addon System for the Admin-Panel
@@ -167,7 +177,8 @@ Pman:
     # Here you can configure players who cannot be banned
     ExemptPlayers:
       - 'ExamplePlayer'
-
+    # Enables the Warning System in the Actions Menu
+    WarningSystem: false
   Money:
     # This is the currency used for the money part in the Pman
     currency: $

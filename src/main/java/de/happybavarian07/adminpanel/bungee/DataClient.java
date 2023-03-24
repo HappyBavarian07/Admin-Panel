@@ -4,9 +4,11 @@ package de.happybavarian07.adminpanel.bungee;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import sun.jvm.hotspot.utilities.ObjectReader;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.*;
@@ -16,11 +18,11 @@ public class DataClient {
     private final String hostName;
     private final int port;
     private final String clientName;
+    private final Map<String, Boolean> ready = new HashMap<>();
     private Socket serverSocket;
     private boolean connected = false;
     private PrintWriter serverOutputStream;
     private BufferedReader serverInputStream;
-    private final Map<String, Boolean> ready = new HashMap<>();
     private DataClientUtils dataClientUtils;
 
     public DataClient(String hostName, int port, String clientName) {
@@ -30,7 +32,7 @@ public class DataClient {
     }
 
     public void connect() {
-        // TODO if(dataClientUtils == null) dataClientUtils = AdminPanelMain.getPlugin().getDataClientUtils();
+        // if(dataClientUtils == null) dataClientUtils = AdminPanelMain.getPlugin().getDataClientUtils();
         if (connected) return;
         try {
             serverSocket = new Socket(hostName, port);
@@ -72,7 +74,7 @@ public class DataClient {
                             while (!Objects.equals(currentData, "FinishedWithDataTransfer")) {
                                 try {
                                     currentData = serverInputStream.readLine();
-                                    if(currentData.equals("FinishedWithDataTransfer")) break;
+                                    if (currentData.equals("FinishedWithDataTransfer")) break;
                                     data.add(currentData);
                                 } catch (SocketException e) {
                                     break;
@@ -83,7 +85,7 @@ public class DataClient {
                                 }
                             }
                             System.out.println("Data: " + data);
-                            if(data.get(0).equals("PlayerPermissionsSend")) {
+                            if (data.get(0).equals("PlayerPermissionsSend")) {
 
                             }
                             serverOutputStream.println("ReceivedData");
@@ -143,8 +145,8 @@ public class DataClient {
         new Thread(() -> {
             serverOutputStream.println("GetReadyForData");
             ready.put("readyfordata", false);
-            while(!ready.get("readyfordata")) {
-                if(ready.get("readyfordata")) {
+            while (!ready.get("readyfordata")) {
+                if (ready.get("readyfordata")) {
                     ready.remove("readyfordata");
                     break;
                 }
@@ -152,8 +154,8 @@ public class DataClient {
 
             serverOutputStream.println("Destination:" + destination);
             ready.put("destinationreceived", false);
-            while(!ready.get("destinationreceived")) {
-                if(ready.get("destinationreceived")) {
+            while (!ready.get("destinationreceived")) {
+                if (ready.get("destinationreceived")) {
                     ready.remove("destinationreceived");
                     break;
                 }
@@ -164,8 +166,8 @@ public class DataClient {
             }
             serverOutputStream.println("FinishedWithDataTransfer");
             ready.put("receiveddata", false);
-            while(!ready.get("receiveddata")) {
-                if(ready.get("receiveddata")) {
+            while (!ready.get("receiveddata")) {
+                if (ready.get("receiveddata")) {
                     ready.remove("receiveddata");
                     break;
                 }
@@ -178,7 +180,7 @@ public class DataClient {
     }
 
     public void sendDataToAllClients(String... data) {
-            sendDataToServer("EveryClient", data);
+        sendDataToServer("EveryClient", data);
     }
 
     public void reconnect() {
@@ -187,7 +189,7 @@ public class DataClient {
             String outputServer = "";
             while (!Objects.equals(outputServer, "ClientCanDisconnect")) {
                 try {
-                    outputServer = serverInputStream.readLine(); // TODO ERROR HERE
+                    outputServer = serverInputStream.readLine();
                 } catch (SocketException e) {
                     break;
                 } catch (IOException e) {

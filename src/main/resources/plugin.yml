@@ -31,6 +31,18 @@ permissions:
   AdminPanel.*:
     default: op
     children:
+      AdminPanel.DataClient:
+        default: op
+        children:
+          AdminPanel.DataClient.executeCommands: true
+          AdminPanel.DataClient.SubCommands:
+            default: op
+            children:
+              AdminPanel.DataClient.SubCommands.Menu: true
+              AdminPanel.DataClient.SubCommands.SyncPermissions: true
+              AdminPanel.DataClient.SubCommands.SyncTrolls: true
+              AdminPanel.DataClient.SubCommands.ListClients: true
+              AdminPanel.DataClient.SubCommands.UpdateClients: true
       AdminPanel.PerPlayerLang: true
       AdminPanel.PerPlayerLangOther: true
       AdminPanel.SwitchLanguage: true
@@ -84,6 +96,7 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.ReloadPlugin: true
           AdminPanel.AdminPanelAdminCommands.UpdateConfig: true
           AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
+          AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
       AdminPanel.open:
         default: op
       AdminPanel.open.other:
@@ -183,6 +196,8 @@ permissions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Kick:
                 default: op
+              AdminPanel.PlayerManager.PlayerSettings.Warn:
+                default: op
               AdminPanel.PlayerManager.PlayerSettings.Permissions:
                 default: op
                 children:
@@ -198,6 +213,8 @@ permissions:
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Money:
+                default: op
+              AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Warnings:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview:
                 default: op

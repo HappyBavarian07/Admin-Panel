@@ -11,9 +11,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class JavaSocketConnectedEvent extends AdminPanelEvent /*implements Cancellable*/ {
+public class JavaSocketConnectedEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    //private boolean cancelled;
+    private boolean cancelled;
     private final String ipAddress;
     private final int port;
     private final String clientName;
@@ -66,7 +66,7 @@ public class JavaSocketConnectedEvent extends AdminPanelEvent /*implements Cance
         return handlers;
     }
 
-    /*@Override
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }
@@ -74,5 +74,5 @@ public class JavaSocketConnectedEvent extends AdminPanelEvent /*implements Cance
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
-    }*/
+    }
 }

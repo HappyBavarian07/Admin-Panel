@@ -30,6 +30,11 @@ public class BannedPlayersMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "BannedPlayersMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

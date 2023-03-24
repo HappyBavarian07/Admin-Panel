@@ -27,6 +27,11 @@ public class TimeChangeMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "TimeChangeMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 9;
     }

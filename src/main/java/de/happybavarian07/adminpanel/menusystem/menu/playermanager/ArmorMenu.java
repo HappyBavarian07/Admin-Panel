@@ -26,6 +26,11 @@ public class ArmorMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "ArmorMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 9;
     }

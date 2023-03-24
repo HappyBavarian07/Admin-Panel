@@ -38,6 +38,11 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PluginAutoUpdaterMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

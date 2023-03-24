@@ -12,6 +12,7 @@ import de.happybavarian07.adminpanel.commands.LanguageReloadCommand;
 import de.happybavarian07.adminpanel.commands.PerPlayerLanguageCommand;
 import de.happybavarian07.adminpanel.commands.UpdateCommand;
 import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
+import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -189,7 +190,7 @@ public class InitMethods {
                 Map<String, Boolean> permissions = new HashMap<>();
                 for(String permissionName : plugin.getPermissionsConfig().getConfigurationSection("Permissions." + configSection + ".Permissions").getKeys(true)) {
                     if(plugin.getPermissionsConfig().isConfigurationSection("Permissions." + configSection + ".Permissions." + permissionName)) continue;
-
+                    if(permissionName.contains("(<->)")) permissionName.replace("(<->)", ".");
                     permissions.put(permissionName, plugin.getPermissionsConfig().getBoolean("Permissions." + configSection + ".Permissions." + permissionName));
                 }
                 playerPermissions.put(tempUUID, permissions);
@@ -384,15 +385,14 @@ public class InitMethods {
             for (File addonFile : loader.getLoadedJarFiles().keySet()) {
                 try {
                     //System.out.println("File: " + addonFile);
-                    final Class<? extends Addon> addonClass = FileUtils.findClass(addonFile, Addon.class);
+                    Addon addon = loader.getMainClassOfAddon(addonFile);
+                    //System.out.println("Resource:" + addon);
 
-                    if (addonClass == null) {
+                    if (addon == null) {
                         //System.out.println("Addon Class is null!");
                         continue;
                     }
 
-                    Addon addon = addonClass.getConstructor().newInstance();
-                    //System.out.println("Resource:" + addon);
 
                     boolean allowedToStart = true;
                     if (!addon.getDependencies().isEmpty()) {
@@ -441,5 +441,6 @@ public class InitMethods {
     public void initCommandManagers() {
         plugin.getCommandManagerRegistry().register(new PanelOpenManager());
         plugin.getCommandManagerRegistry().register(new AdminPanelAdminManager());
+        plugin.getCommandManagerRegistry().register(new DataClientCommandManager());
     }
 }

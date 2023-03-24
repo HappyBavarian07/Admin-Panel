@@ -6,12 +6,8 @@ package de.happybavarian07.adminpanel.commands.managers;/*
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.HelpCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.adminpaneladmin.*;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.DisableCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.EnableCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.ListCommand;
-import de.myzelyam.supervanish.commands.subcommands.Reload;
+import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -80,8 +76,12 @@ public class AdminPanelAdminManager extends CommandManager {
         commands.add(new ReloadDataCommand(getCommandName()));
         commands.add(new ReloadLangCommand(getCommandName()));
         commands.add(new ReloadPluginCommand(getCommandName()));
+        commands.add(new ReloadCommandManagersCommand(getCommandName()));
         commands.add(new UpdateConfigCommand(getCommandName()));
         commands.add(new UpdateLangFilesCommand(getCommandName()));
+        commands.add(new StartUpLoggerControlCommand(getCommandName()));
+        commands.add(new BugReportCommand(getCommandName()));
+        commands.add(new BackupManagerCommand(getCommandName()));
     }
 
     @Override

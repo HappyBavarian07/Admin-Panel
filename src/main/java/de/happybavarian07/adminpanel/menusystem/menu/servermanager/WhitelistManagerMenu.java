@@ -28,6 +28,11 @@ public class WhitelistManagerMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WhitelistManagerMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

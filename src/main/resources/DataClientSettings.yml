@@ -1,0 +1,24 @@
+# Socket Settings
+Settings:
+  # General Settings Section
+  General:
+    # Enables Debug Messages
+    # Default: false
+    # These Messages will appear Blue in the Console
+    Debug: false
+    # Automatically syncs all Trolls with other Servers
+    AutoSyncTrolls: false
+    # Automatically check if a connection still is possible to the Server
+    CheckConnection: false
+    # Check Connection Timing in Seconds
+    CheckConnectionTiming: 300
+    # File Logging
+    FileLogging: false
+    # File Logger Prefix
+    FileLoggerPrefix: 'JSBDSS'
+  # Permission Sync Settings Section
+  Permissions:
+    # If true, just overwrites the Players Permission when send the Command from the Server to receive the Permissions from another Server
+    # If false, just adds them to the existing Permissions of the Player
+    # Default: false
+    OverwritePerms: false

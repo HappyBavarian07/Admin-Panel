@@ -15,12 +15,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class Utils {
 
@@ -323,6 +333,100 @@ public class Utils {
         }
     }
 
+    public static boolean sendMessageToWebhook(String message) {
+        //System.out.println("Message: " + message);
+        if (message == null || message.isEmpty()) return false;
+        try {
+            URL url = new URL("https://discord.com/api/webhooks/1068586078627450920/XADdYRfzsgFse7yQe_2zozz0ajFl3ez_NNanjYuC0mfnw1aqZXPWs6TTFjRsgKAVlOUZ");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.addRequestProperty("Content-Type", "application/json");
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            JSONObject json = new JSONObject();
+
+            json.put("content", message);
+            json.put("username", "Admin-Panel-Report-System");
+            connection.getOutputStream().write(json.toString().getBytes());
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 204) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                throw new IOException("Failed to send message to Discord webhook: " + response);
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static void zipFiles(File[] files, String zipFile) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            for (File file : files) {
+                if (!file.exists()) {
+                    continue;
+                }
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    ZipEntry zipEntry = new ZipEntry(
+                            (!file.getParentFile().getName().equals("Admin-Panel") &&
+                                    !file.getParentFile().getName().equals("plugins") ? file.getParentFile().getName() + File.separator : "")
+                                    + file.getName());
+                    zos.putNextEntry(zipEntry);
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while ((length = fis.read(bytes)) >= 0) {
+                        zos.write(bytes, 0, length);
+                    }
+                    zos.closeEntry();
+                }
+            }
+        }
+    }
+
+    public static void unzipFiles(String zipFilePath, String destDir) {
+        File dir = new File(destDir);
+        // create output directory if it doesn't exist
+        if (!dir.exists()) dir.mkdirs();
+        FileInputStream fis;
+        //buffer for read and write data to file
+        byte[] buffer = new byte[1024];
+        try {
+            fis = new FileInputStream(zipFilePath);
+            ZipInputStream zis = new ZipInputStream(fis);
+            ZipEntry ze = zis.getNextEntry();
+            while (ze != null) {
+                String fileName = ze.getName();
+                File newFile = new File(destDir + File.separator + fileName);
+                //System.out.println("Unzipping to "+newFile.getAbsolutePath());
+                //create directories for sub directories in zip
+                new File(newFile.getParent()).mkdirs();
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                //close this ZipEntry
+                zis.closeEntry();
+                ze = zis.getNextEntry();
+            }
+            //close last ZipEntry
+            zis.closeEntry();
+            zis.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void ban(final Player p, final OfflinePlayer target, final String reason, final String sourcename) {
         try {
             if (target.isBanned()) {
@@ -357,6 +461,25 @@ public class Utils {
             }
         } catch (NullPointerException e) {
             p.sendMessage(Utils.format(null, "&cThe Player is not online or doesn't exists!", AdminPanelMain.getPrefix()));
+        }
+    }
+
+    public void loadLibraryFolder(String pathToFolder) throws MalformedURLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        File folder = new File(pathToFolder);
+        if (!folder.isDirectory() || !folder.exists()) return;
+        File[] listOfFiles = folder.listFiles();
+        if (listOfFiles == null || listOfFiles.length == 0) return;
+
+        for (File file : listOfFiles) {
+            if (file.isFile() && file.getName().endsWith(".jar")) {
+                URL url = file.toURI().toURL();
+                URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+                Class<URLClassLoader> urlClass = URLClassLoader.class;
+                Method method;
+                method = urlClass.getDeclaredMethod("addURL", URL.class);
+                method.setAccessible(true);
+                method.invoke(urlClassLoader, url);
+            }
         }
     }
 

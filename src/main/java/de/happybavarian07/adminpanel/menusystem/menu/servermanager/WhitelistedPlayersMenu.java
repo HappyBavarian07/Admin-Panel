@@ -31,6 +31,11 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WhitelistedPlayersMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

@@ -10,9 +10,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class JavaSocketDisconnectedEvent extends AdminPanelEvent /*implements Cancellable*/ {
+public class JavaSocketDisconnectedEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    //private boolean cancelled;
+    private boolean cancelled;
     private final boolean serverNotified;
 
     public JavaSocketDisconnectedEvent(boolean serverNotified) {
@@ -45,7 +45,7 @@ public class JavaSocketDisconnectedEvent extends AdminPanelEvent /*implements Ca
         return handlers;
     }
 
-    /*@Override
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }
@@ -53,5 +53,5 @@ public class JavaSocketDisconnectedEvent extends AdminPanelEvent /*implements Ca
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
-    }*/
+    }
 }

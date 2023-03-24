@@ -7,7 +7,6 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.LanguageManager;
 import de.happybavarian07.adminpanel.main.Placeholder;
 import de.happybavarian07.adminpanel.main.PlaceholderType;
-import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -44,18 +43,26 @@ public abstract class CommandManager {
             return true;
         }
 
-        if (!player.hasPermission(target.permission()) || (target.isOpRequired() && !player.isOp())) {
+        if (!hasPermission(player, target)) {
+            //if (!player.hasPermission(target.permission()) || (target.isOpRequired() && !player.isOp())) {
             player.sendMessage(format(lgm.getMessage("Player.General.NoPermissions", player, true), target));
             return true;
         }
-
-        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(args));
-        arrayList.remove(0);
-        String[] updatedArgs = new String[arrayList.size()];
-        int count = 0;
-        for (String s : arrayList) {
-            updatedArgs[count] = s;
-            count++;
+        String[] updatedArgs = removeFirstArgument(args);
+        if (!target.subArgs().isEmpty() && target.allowOnlySubCommandArgsThatFitToSubArgs()) {
+            int count2 = 1;
+            Map<Integer, String> invalidArgs = new HashMap<>();
+            for (String arg : updatedArgs) {
+                if (!Arrays.asList(target.subArgs().get(count2)).contains(arg)) {
+                    invalidArgs.put(count2, arg);
+                }
+                count2++;
+            }
+            if (!invalidArgs.isEmpty()) {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%invalidArgs%", invalidArgs.toString(), false);
+                player.sendMessage(format(lgm.getMessage("Player.Commands.CommandContainsInvalidArgs", player, true), target));
+                return false;
+            }
         }
         try {
             boolean callResult = target.onPlayerCommand(player, updatedArgs);
@@ -63,6 +70,7 @@ public abstract class CommandManager {
                 player.sendMessage(format(lgm.getMessage("Player.Commands.UsageMessage", player, true), target));
             }
         } catch (Exception e) {
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%error%", e + ": " + e.getMessage(), false);
             player.sendMessage(format(lgm.getMessage("Player.Commands.ErrorPerformingSubCommand", player, true), target));
             e.printStackTrace();
         }
@@ -77,7 +85,8 @@ public abstract class CommandManager {
             return true;
         }
 
-        if (!sender.hasPermission(target.permission()) || (target.isOpRequired() && !sender.isOp())) {
+        if (!hasPermission(sender, target)) {
+            //if (!sender.hasPermission(target.permission()) || (target.isOpRequired() && !sender.isOp())) {
             sender.sendMessage(format(lgm.getMessage("Player.General.NoPermissions", null, true), target));
             return true;
         }
@@ -86,6 +95,36 @@ public abstract class CommandManager {
             sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
             return true;
         }
+        String[] updatedArgs = removeFirstArgument(args);
+        if (!target.subArgs().isEmpty() && target.allowOnlySubCommandArgsThatFitToSubArgs()) {
+            int count2 = 1;
+            Map<Integer, String> invalidArgs = new HashMap<>();
+            for (String arg : updatedArgs) {
+                if (!Arrays.asList(target.subArgs().get(count2)).contains(arg)) {
+                    invalidArgs.put(count2, arg);
+                }
+                count2++;
+            }
+            if (!invalidArgs.isEmpty()) {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%invalidArgs%", invalidArgs.toString(), false);
+                sender.sendMessage(format(lgm.getMessage("Player.Commands.CommandContainsInvalidArgs", null, true), target));
+                return false;
+            }
+        }
+        try {
+            boolean callResult = target.onConsoleCommand(sender, updatedArgs);
+            if (!callResult) {
+                sender.sendMessage(format(lgm.getMessage("Player.Commands.UsageMessage", null, true), target));
+            }
+        } catch (Exception e) {
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%error%", e + ": " + e.getMessage(), false);
+            sender.sendMessage(format(lgm.getMessage("Player.Commands.ErrorPerformingSubCommand", null, true), target));
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public String[] removeFirstArgument(String[] args) {
         ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(args));
         arrayList.remove(0);
         String[] updatedArgs = new String[arrayList.size()];
@@ -94,21 +133,23 @@ public abstract class CommandManager {
             updatedArgs[count] = s;
             count++;
         }
-        try {
-            boolean callResult = target.onConsoleCommand(sender, updatedArgs);
-            if (!callResult) {
-                sender.sendMessage(format(lgm.getMessage("Player.Commands.UsageMessage", null, true), target));
-            }
-        } catch (Exception e) {
-            sender.sendMessage(format(lgm.getMessage("Player.Commands.ErrorPerformingSubCommand", null, true), target));
-            e.printStackTrace();
+        return updatedArgs;
+    }
+
+    public boolean hasPermission(CommandSender sender, SubCommand target) {
+        return sender.hasPermission(target.permission()) || (target.isOpRequired() && sender.isOp());
+    }
+
+    public boolean handleSubCommand(CommandSender sender, SubCommand target, String[] args) {
+        if (sender instanceof Player) {
+            return target.onPlayerCommand((Player) sender, args);
         }
-        return true;
+        return target.onConsoleCommand((ConsoleCommandSender) sender, args);
     }
 
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         //System.out.println("Test 2");
-        commandArgs.clear();
+        /*commandArgs.clear();
         commandSubArgs.clear();
         for (SubCommand sub : this.getSubCommands()) {
             String[] aliases;
@@ -192,7 +233,44 @@ public abstract class CommandManager {
             }
             return Utils.emptyList();
         }
-        return Utils.emptyList();
+        return Utils.emptyList();*/
+        List<String> result = new ArrayList<>();
+        List<String> subCommandOptions = new ArrayList<>();
+        List<String> subCommandArgOptions = new ArrayList<>();
+
+        for (SubCommand sub : this.getSubCommands()) {
+            if (!sender.hasPermission(sub.permission()) && !(sub.isOpRequired() && sender.isOp())) {
+                continue;
+            }
+
+            subCommandOptions.add(sub.name());
+            subCommandOptions.addAll(Arrays.asList(sub.aliases()));
+
+            if (args.length == 1) {
+                for (String option : subCommandOptions) {
+                    if (option.toLowerCase().startsWith(args[0].toLowerCase())) {
+                        result.add(option);
+                    }
+                }
+            } else if (args.length > 1) {
+                if (sub.name().equals(args[0]) || Arrays.asList(sub.aliases()).contains(args[0])) {
+                    Map<Integer, String[]> subArgs = sub.subArgs();
+                    if (subArgs != null && subArgs.containsKey(args.length - 1)) {
+                        subCommandArgOptions.addAll(Arrays.asList(subArgs.get(args.length - 1)));
+                    }
+
+                    for (String option : subCommandArgOptions) {
+                        if (option.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
+                            result.add(option);
+                        }
+                    }
+
+                    return result;
+                }
+            }
+        }
+
+        return result;
     }
 
     public abstract void setup();
@@ -227,6 +305,7 @@ public abstract class CommandManager {
         placeholders.put("%name%", new Placeholder("%name%", cmd.name(), PlaceholderType.ALL));
         placeholders.put("%permission%", new Placeholder("%permission%", cmd.permission(), PlaceholderType.ALL));
         placeholders.put("%aliases%", new Placeholder("%aliases%", cmd.aliases(), PlaceholderType.ALL));
+        placeholders.put("%subArgs%", new Placeholder("%subArgs%", cmd.subArgs().toString(), PlaceholderType.ALL));
 
         return lgm.replacePlaceholders(in, placeholders);
     }

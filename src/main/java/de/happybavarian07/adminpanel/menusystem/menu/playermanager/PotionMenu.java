@@ -43,6 +43,11 @@ public class PotionMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PotionMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

@@ -46,6 +46,11 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PluginSelectMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

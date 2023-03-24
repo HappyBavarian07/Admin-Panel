@@ -41,6 +41,11 @@ public class PluginInstallMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PluginInstallMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 9;
     }

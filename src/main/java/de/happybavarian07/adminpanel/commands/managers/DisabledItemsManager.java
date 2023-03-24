@@ -5,10 +5,10 @@ package de.happybavarian07.adminpanel.commands.managers;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.HelpCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.DisableCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.EnableCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panelopencommands.disableditems.ListCommand;
+import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.disableditems.DisableCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.disableditems.EnableCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.disableditems.ListCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

@@ -35,6 +35,11 @@ public class WorldSelectMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WorldSelectMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

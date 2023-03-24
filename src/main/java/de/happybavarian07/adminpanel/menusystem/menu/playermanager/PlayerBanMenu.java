@@ -45,6 +45,11 @@ public class PlayerBanMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PlayerBanMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

@@ -11,9 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BungeeTestCommand implements CommandExecutor {
 
@@ -32,11 +32,15 @@ public class BungeeTestCommand implements CommandExecutor {
                 case "hello":
                     if (sender instanceof Player) return false;
                     sender.sendMessage("Requesting Server Ping!");
-                    //AdminPanelMain.getPlugin().getDataClient().sayHello();
+                    sender.sendMessage("Response from Server: " + AdminPanelMain.getPlugin().getDataClient().pingServer(AdminPanelMain.getPlugin().getDataClient().getCheckConnectionThread()));
                     break;
                 case "reconnect":
                     sender.sendMessage("Reconnecting to AdminPanel Bungee Server!");
-                    AdminPanelMain.getPlugin().getDataClient().reconnect();
+                    try {
+                        AdminPanelMain.getPlugin().getDataClient().reconnect(true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "test":
                     //AdminPanelMain.getPlugin().getDataClient().sendDataToAllClients("The Data Transfer Test to Server", Serialization.serialize(new DataClient.TestClass("TheWHAAT2223", 2323213)));
@@ -48,6 +52,21 @@ public class BungeeTestCommand implements CommandExecutor {
                     perms.put("second.permission.in.list", false);
                     perms.put("and.the.third.one", false);
                     AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), perms, "null");
+                case "testreportFeature":
+                    //AdminPanelMain.getAPI().reportBugToDiscord(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), "This is a test");
+                    //System.out.println("Args:" + Arrays.toString(args));
+                    List<String> message = new ArrayList<>(Arrays.asList(args));
+                    message.remove(0);
+                    //System.out.println("Args formatted: " + message);
+                    //System.out.println("Args joined: " + String.join(" ", message));
+                    int response = AdminPanelMain.getAPI().reportBugToDiscord(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), String.join(" ", message));
+                    if(response == -2) System.out.println("Cooldown!");
+                    else if (response == -1) System.out.println("Geht nicht!");
+                    else if (response == 0) System.out.println("Erfolgreich!");
+                case "backuptest":
+                    AdminPanelMain.getPlugin().getBackupManager().startBackup("ConfigBackup");
+                case "loadbackup":
+                    AdminPanelMain.getPlugin().getBackupManager().loadBackup(args[1], Integer.parseInt(args[2]));
                 /*case "testnewsystem":
                     NewDataClient dataClient = AdminPanelMain.getPlugin().getDataClient();
                     dataClient.send(new Message(dataClient.getClientName(), "TheNewSystem", Action.SENDTOSERVER, "Data23232", "LÖTKJSE").toStringArray());*/

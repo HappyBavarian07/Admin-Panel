@@ -30,6 +30,11 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "TempLanguageSelectMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

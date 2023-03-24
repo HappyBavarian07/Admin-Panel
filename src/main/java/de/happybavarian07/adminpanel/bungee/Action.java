@@ -11,6 +11,10 @@ public enum Action {
     SENDPLAYERDATA,
     PINGSERVER,
     PINGCLIENT,
+    PINGSERVERANSWERED,
+    PINGCLIENTANSWERED,
+    CONNECTEDCLIENTS,
+    SENDCUSTOMMAP,
     NOACTION;
 
     public static Action fromString(String s) {

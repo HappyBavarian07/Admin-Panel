@@ -18,10 +18,6 @@ public class BungeeUtils {
     private String outgoingChannelName;
     private final IncomingChannelListener channelListener;
 
-    // TODO Versuchen mit java Sockets eine Config Option hinzuzufügen, dass man Daten syncen kann ohne Spieler online
-    // TODO Auf dem Bungee Cord einen Server machen und jeder Spigot/Paper Server ist dann ein Client der mit dem Server verbunden ist
-    // https://docs.oracle.com/javase/tutorial/networking/sockets/clientServer.html
-    // https://docs.oracle.com/javase/tutorial/networking/sockets/readingWriting.html
     public BungeeUtils(String incomingChannelName, String outgoingChannelName) {
         this.incomingChannelName = incomingChannelName;
         this.outgoingChannelName = outgoingChannelName;

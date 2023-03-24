@@ -37,6 +37,11 @@ public class WorldSettingsMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WorldSettingsMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

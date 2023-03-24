@@ -30,6 +30,11 @@ public class PermissionActionSelectMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PermissionActionSelectMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

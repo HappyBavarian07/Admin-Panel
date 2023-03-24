@@ -35,6 +35,11 @@ public class PlayerKickMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PlayerKickMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 9;
     }

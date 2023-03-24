@@ -32,6 +32,11 @@ public class PlayerSelectMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PlayerSelectMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

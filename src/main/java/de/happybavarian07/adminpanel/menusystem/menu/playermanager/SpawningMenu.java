@@ -34,6 +34,11 @@ public class SpawningMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "SpawningMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

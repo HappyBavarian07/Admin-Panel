@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 class LocalAdminPanelAPI implements AdminPanelAPI {
@@ -37,6 +38,8 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     private final AdminPanelMain plugin;
     private final LanguageManager lgm;
     private final PluginUtils pluginUtils;
+    // PlayerUUID, Cooldown Time in Millis
+    private final Map<UUID, Long> cooldownTimeMap = new HashMap<>();
 
     public LocalAdminPanelAPI(AdminPanelMain plugin) {
         this.plugin = plugin;
@@ -184,6 +187,35 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
+    public int reportBugToDiscord(UUID playerUUID, String reportMessage) {
+        long playerTime = cooldownTimeMap.getOrDefault(playerUUID, -1L);
+        if (cooldownTimeMap.containsKey(playerUUID) && playerTime > System.currentTimeMillis()) return -2;
+        if (cooldownTimeMap.containsKey(playerUUID) && playerTime <= System.currentTimeMillis()) {
+            cooldownTimeMap.remove(playerUUID);
+        }
+        Player player = Bukkit.getPlayer(playerUUID);
+        boolean response = Utils.sendMessageToWebhook(
+                "**Admin-Panel-Report** from Player '" + (player != null ? "**" + player.getName() + "**" : "**Not found**") + " (UUID: **" + playerUUID + "**)':\n" +
+                reportMessage
+        );
+        if (response) {
+            cooldownTimeMap.put(playerUUID, System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5));
+            return 0;
+        }
+        return -1;
+    }
+
+    @Override
+    public int reportBugToDiscord(UUID playerUUID, List<String> reportMessageArrayList) {
+        return reportBugToDiscord(playerUUID, String.join(" ", reportMessageArrayList));
+    }
+
+    @Override
+    public int reportBugToDiscord(UUID playerUUID, String[] reportMessageArray) {
+        return reportBugToDiscord(playerUUID, String.join(" ", reportMessageArray));
+    }
+
+    @Override
     public void addLanguage(LanguageFile languageFile, String languageName) {
         lgm.addLang(languageFile, languageName);
     }
@@ -321,5 +353,10 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     @Override
     public boolean registerCommandManager(CommandManager commandManager) {
         return plugin.getCommandManagerRegistry().register(commandManager);
+    }
+
+    @Override
+    public Map<UUID, Long> getCooldownTimeMap() {
+        return cooldownTimeMap;
     }
 }

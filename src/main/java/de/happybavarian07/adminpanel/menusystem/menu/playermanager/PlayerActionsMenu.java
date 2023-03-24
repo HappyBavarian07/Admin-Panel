@@ -34,6 +34,11 @@ public class PlayerActionsMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PlayerActionsMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

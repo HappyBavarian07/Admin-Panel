@@ -34,6 +34,11 @@ public class PluginSettingsMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PluginSettingsMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

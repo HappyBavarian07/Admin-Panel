@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.bungee.DataClientUtils;
 import de.happybavarian07.adminpanel.bungee.NewDataClient;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManagerRegistry;
 import de.happybavarian07.adminpanel.configupdater.OldConfigUpdater;
+import de.happybavarian07.adminpanel.menusystem.MenuAddon;
 import de.happybavarian07.adminpanel.utils.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -38,12 +39,12 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private static AdminPanelAPI API;
     private static AdminPanelMain plugin;
     private static PluginFileLogger fileLogger;
-    public final Map<Player, Boolean> hurtingwater = new HashMap<>();
-    public final Map<Player, Boolean> chatmute = new HashMap<>();
-    public final Map<Player, Boolean> villagerSounds = new HashMap<>();
-    public final Map<Player, Boolean> blockBreakPrevent = new HashMap<>();
-    public final Map<Player, Boolean> dupeMobsOnKill = new HashMap<>();
-    final StartUpLogger logger = StartUpLogger.create();
+    public final Map<UUID, Boolean> hurtingwater = new HashMap<>();
+    public final Map<UUID, Boolean> chatmute = new HashMap<>();
+    public final Map<UUID, Boolean> villagerSounds = new HashMap<>();
+    public final Map<UUID, Boolean> blockBreakPrevent = new HashMap<>();
+    public final Map<UUID, Boolean> dupeMobsOnKill = new HashMap<>();
+    public final Map<UUID, Boolean> freezeplayers = new HashMap<>();
     private final List<String> disabledCommands = new ArrayList<>();
     private final File configFile = new File(this.getDataFolder(), "config.yml");
     private final File permissionFile = new File(this.getDataFolder(), "permissions.yml");
@@ -51,11 +52,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private final Map<UUID, Map<String, Boolean>> playerPermissions = new HashMap<>();
     private final List<Addon> loadedAddons = new ArrayList<>();
     private final Map<String, NewUpdater> autoUpdaterPlugins = new HashMap<>();
+    private final Map<String, Map<String, MenuAddon>> menuAddonList = new HashMap<>();
     public Economy eco = null;
     public net.milkbowl.vault.permission.Permission perms = null;
     public Chat chat = null;
     public boolean inMaintenanceMode = false;
     public boolean chatMuted = false;
+    private StartUpLogger logger;
     private FileConfiguration permissionsConfig;
     private NewUpdater updater;
     private LanguageManager languageManager;
@@ -68,10 +71,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private DataClientUtils dataClientUtils;
     private NewDataClient dataClient;
     private boolean languageManagerEnabled;
-
-    public FileConfiguration getPermissionsConfig() {
-        return permissionsConfig;
-    }
+    private WarningManager warningManager;
+    private InitMethods initMethods;
+    private BackupManager backupManager;
 
     public static String getPrefix() {
         return prefix;
@@ -91,6 +93,44 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setPlugin(AdminPanelMain plugin) {
         AdminPanelMain.plugin = plugin;
+    }
+
+    public BackupManager getBackupManager() {
+        return backupManager;
+    }
+
+    public Map<String, Map<String, MenuAddon>> getMenuAddonList() {
+        return menuAddonList;
+    }
+
+    public void addMenuAddon(MenuAddon addon) {
+        if (!menuAddonList.containsKey(addon.getMenu().getConfigMenuAddonFeatureName()))
+            menuAddonList.put(addon.getMenu().getConfigMenuAddonFeatureName(), new HashMap<>());
+        menuAddonList.get(addon.getMenu().getConfigMenuAddonFeatureName()).put(addon.getName(), addon);
+    }
+
+    public boolean removeMenuAddon(String menuName, String name) {
+        if (menuAddonList.isEmpty() || menuAddonList.get(menuName) == null || menuAddonList.get(menuName).isEmpty()) return false;
+        if (!menuAddonList.get(menuName).containsKey(name)) return false;
+
+        menuAddonList.get(menuName).remove(name);
+        return true;
+    }
+
+    public Map<String, MenuAddon> getMenuAddons(String menuName) {
+        if (menuAddonList.isEmpty() || menuAddonList.get(menuName) == null || menuAddonList.get(menuName).isEmpty()) return new HashMap<>();
+
+        return menuAddonList.get(menuName);
+    }
+
+    public boolean hasMenuAddon(String menuName, String addonName) {
+        if (menuAddonList.isEmpty() || menuAddonList.get(menuName) == null || menuAddonList.get(menuName).isEmpty()) return false;
+
+        return menuAddonList.get(menuName).containsKey(addonName);
+    }
+
+    public FileConfiguration getPermissionsConfig() {
+        return permissionsConfig;
     }
 
     public boolean isLanguageManagerEnabled() {
@@ -209,6 +249,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         reloadConfig();
     }
 
+    public InitMethods getInitMethods() {
+        return initMethods;
+    }
+
     public void reloadData() {
         saveResource("data.yml", false);
         dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
@@ -228,6 +272,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        setPlugin(this);
+        logger = StartUpLogger.create();
         // bStats
         int bStatsID = 11778;
         Metrics metrics = new Metrics(this, bStatsID);
@@ -238,24 +284,44 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                         "&e&lStarting Admin Panel Plugin:&r"
                 );
         logger.coloredSpacer(ChatColor.DARK_RED).message("&4&lInitialize Plugin Main Variable to this!&r");
-        setPlugin(this);
 
 
         languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
         commandManagerRegistry = new CommandManagerRegistry(this);
         langFileUpdater = new OldLanguageFileUpdater();
         API = new LocalAdminPanelAPI(this);
-        InitMethods initMethods = new InitMethods(logger, Bukkit.getPluginManager(), plugin);
+        initMethods = new InitMethods(logger, Bukkit.getPluginManager(), plugin);
         new ChatUtil();
         new Utils();
         new File(this.getDataFolder() + "/languages").mkdir();
+        backupManager = new BackupManager(plugin, 5, "config_backups/");
+        if (!new File(this.getDataFolder() + "/config_backups").exists()) {
+                new File(this.getDataFolder() + "/config_backups").mkdirs();
+        }
+        // Backup Manager Backup Adding
+        File[] filesToBackup = new File[]{
+                new File(this.getDataFolder() + "/languages/de.yml"),
+                new File(this.getDataFolder() + "/languages/en.yml"),
+                new File(this.getDataFolder() + "/config.yml"),
+                new File(this.getDataFolder() + "/data.yml"),
+                new File(this.getDataFolder() + "/DataClientSettings.yml"),
+                new File(this.getDataFolder() + "/permissions.yml")
+        };
+        backupManager.addFileBackup(new FileBackup(
+                "ConfigBackup",
+                filesToBackup,
+                backupManager.getBackupFolder() + "ConfigBackup"
+        ));
+        // Backup on Start/End of the onEnable Method (maybe with a String Config Option)
+
         logger.message("&e&lVariable Done!&r");
+        fileLogger = new PluginFileLogger();
         logger.message("&e&lStarting Bungee Registration");
         if (checkIfBungee()) {
             String path = "Plugin.BungeeSyncSystem.ChannelNames.";
             bungeeUtils = new BungeeUtils(getConfig().getString(path + "In", ""), getConfig().getString(path + "Out", ""));
             bungeeUtils.openBungeeChannel();
-            this.getCommand("bungeetest").setExecutor(new BungeeTestCommand());
+            //this.getCommand("bungeetest").setExecutor(new BungeeTestCommand());
             path = "Plugin.BungeeSyncSystem.JavaSockets.";
             if (getConfig().getBoolean(path + "enabled")) {
                 /*dataClient = new DataClient(getConfig().getString(path + "hostName"),
@@ -275,9 +341,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         // Plugin Checks
         initMethods.initPluginCheck();
         logger.messages("&c&lFinished Vault initialization!&r");
-        fileLogger = new PluginFileLogger();
         // Config Files
         initMethods.initConfigFiles(fileLogger, permissionFile);
+        // Init Warnings Manager
+        if (getConfig().getBoolean("Pman.Actions.WarningSystem")) {
+            warningManager = new WarningManager(
+                    plugin,
+                    new File(this.getDataFolder() + "/warnings.yml"));
+            warningManager.loadWarnings();
+        }
         // Permission Init
         permissionsConfig = YamlConfiguration.loadConfiguration(permissionFile);
         initMethods.initPermissionFiles(permissionsConfig, permissionFile, playerPermissions);
@@ -360,6 +432,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             initMethods.initAddonLoader(loader);
         }
 
+        // Backup Manager Execute
+        // if Clause fertig
+        // Backup on Start/End of the onEnable Method (maybe with a String Config Option)
+        backupManager.startBackup("ConfigBackup");
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
@@ -424,6 +501,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
         }
         savePerms();
+        if (warningManager != null) {
+            warningManager.saveWarnings();
+        }
         if (checkIfBungee()) {
             bungeeUtils.closeBungeeChannel();
             String path = "Plugin.BungeeSyncSystem.JavaSockets.";
@@ -464,6 +544,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             Map<String, Boolean> perms = playerPermissions.get(uuid);
             permissionsConfig.set("Permissions." + uuid + ".Permissions", null);
             for (String permissions : perms.keySet()) {
+                if(permissions.contains("(<->)")) permissions.replace("(<->)", ".");
                 permissionsConfig.set(path + permissions/*.replace(".", "(<->)")*/, perms.get(permissions));
             }
         }
@@ -511,5 +592,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
             }
         }
+    }
+
+    public WarningManager getWarningManager() {
+        return warningManager;
     }
 }

@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.listeners;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
+import de.happybavarian07.adminpanel.menusystem.MenuAddon;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
@@ -82,6 +83,11 @@ public class MenuListener implements Listener {
             Menu menu = (Menu) holder;
             // Call the handleMenu object which takes the event and processes it
             menu.handleMenu(e);
+
+            for(String menuAddonName : AdminPanelMain.getPlugin().getMenuAddons(menu.getConfigMenuAddonFeatureName()).keySet()) {
+                MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddons(menu.getConfigMenuAddonFeatureName()).get(menuAddonName);
+                addon.handleMenu(e);
+            }
         }
     }
 
@@ -90,6 +96,11 @@ public class MenuListener implements Listener {
         if (event.getInventory().getHolder() instanceof Menu) {
             if (event.getPlayer().hasMetadata("AdminPanelOpen")) {
                 Menu holder = (Menu) event.getInventory().getHolder();
+
+                for(String menuAddonName : AdminPanelMain.getPlugin().getMenuAddons(holder.getConfigMenuAddonFeatureName()).keySet()) {
+                    MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddons(holder.getConfigMenuAddonFeatureName()).get(menuAddonName);
+                    addon.onCloseEvent();
+                }
                 event.getPlayer().removeMetadata("AdminPanelOpen", AdminPanelMain.getPlugin());
                 if (holder.getClass().isAssignableFrom(Listener.class)) HandlerList.unregisterAll((Listener) holder);
             }

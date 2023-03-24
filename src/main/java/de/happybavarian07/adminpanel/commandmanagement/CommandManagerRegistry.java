@@ -169,6 +169,12 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
         return data.opRequired();
     }
 
+    public Boolean allowOnlySubCommandArgsThatFitToSubArgs(CommandManager commandManager) {
+        CommandData data = commandManagers.get(commandManager);
+        if(data == null) return false;
+        return data.allowOnlySubCommandArgsThatFitToSubArgs();
+    }
+
     public List<SubCommand> getSubCommands(String commandName) {
         return getCommandManager(commandName).getSubCommands();
     }

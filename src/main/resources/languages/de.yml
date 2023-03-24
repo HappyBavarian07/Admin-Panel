@@ -6,32 +6,124 @@ Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
     DisablingMessage: '[Admin-Panel] erfolgreich deaktiviert!'
+  DataClient:
+    RequestedUpdateMessage: '%prefix% &9> &aErfolgreich Client List Anfrage an den Server gesendet.'
+    ClientListMessages:
+      PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+      # -------------------------------------------------
+      # Header and Footer Placeholders (Command Manager system):
+      # %page% = Current Page
+      # %max_page% = Max Page
+      # -------------------------------------------------
+      Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      # Format Placeholders:
+      # %dataClientName% = Data Client Name
+      # %count% = The Id of that Client
+      Format: '  &bClient-%count% &7- &b%dataClientName%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+    PermissionsSync:
+      PermissionsSendForAllPlayers: '%prefix% &9> &aDie Permissions von allen Spielern wurden an den Server geschickt.'
+      # Placeholders:
+      # %target_player% = Target Player
+      PermissionsSendForOnePlayer: '%prefix% &9> &aDie Permissions von ''%target_player%'' wurden an den Server geschickt.'
+    TrollsSync:
+      TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
+  BackupSystem:
+    SubCommands:
+      # Placeholders:
+      # %backupName% = equals the Backup Config Name specified
+      Start: '%prefix% &9> &aDer Backup Erstellungs Prozess für ''%backupName%'' ist fertig. &r%success%'
+      Load: '%prefix% &9> &aDer Backup Lade Prozess für ''%backupName%'' ist fertig. Du kannst die alten Configs in diesem Zip Archive finden: ''old_configs.yml''. &r%success%'
+        # GetNewestBackup Placeholders:
+        # %fileName% = File Name
+        # %normalPath% = The Relative Path
+        # %absolutePath% = The Absolute Path
+        # %parentFile% = The Parent Directory / File
+      # %exists% = If the File exists
+      GetNewestBackupFile: '%prefix% &9> &aDie neueste Backup Datei von ''%backupName%'' ist %fileName%!'
+      # DeleteBackup Placeholders:
+      # %backupFileNumberOrName% = The Specified Name or Number for the Backup File to delete
+      DeleteBackup: '%prefix% &9> &aLösche das Backup ''%backupFileNumberOrName%'' von ''%backupName%''!'
+      ListBackups:
+        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        # -------------------------------------------------
+        # Header and Footer Placeholders (Command Manager system):
+        # %page% = Current Page
+        # %max_page% = Max Page
+        # -------------------------------------------------
+        Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+        # Format Placeholders:
+        # %filesToBackup% = Files To Backup
+        # %filesToBackupSize% = Files To Backup Size
+        # %backupsDone% = The Backups Done
+        # %backupsDoneSize% = The Backups Done Size
+        # %identifier% = The Identifier of the Backup
+        # %backupDest% = The Destination to backup too
+        # %newestBackupFile% = The Newest Backup File
+        Format: '  &b%identifier% &7- &bFiles To Backup: %filesToBackupSize%, Backups Done: %backupsDoneSize%, Backup Destination: %backupDest%'
+        Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      ListFilesToBackup:
+        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        # -------------------------------------------------
+        # Header and Footer Placeholders (Command Manager system):
+        # %page% = Current Page
+        # %max_page% = Max Page
+        # -------------------------------------------------
+        Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+        # Format Placeholders:
+        # %fileName% = File Name
+        # %normalPath% = The Relative Path
+        # %absolutePath% = The Absolute Path
+        # %parentFile% = The Parent Directory / File
+        # %exists% = If the File exists
+        Format: '  &b%fileName% (%exists%) &7- &b%normalPath%'
+        Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      ListBackupsDone:
+        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        # -------------------------------------------------
+        # Header and Footer Placeholders (Command Manager system):
+        # %page% = Current Page
+        # %max_page% = Max Page
+        # -------------------------------------------------
+        Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+        # Format Placeholders:
+        # %fileName% = File Name
+        # %normalPath% = The Relative Path
+        # %absolutePath% = The Absolute Path
+        # %parentFile% = The Parent Directory / File
+        # %exists% = If the File exists
+        # %backupsDoneNumber% = The Number of the Backup in the List
+        Format: '  &b%backupsDoneNumber%. %fileName% (%exists%) &7- &b%normalPath%'
+        Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
   Player:
     Commands:
-#      VanillaItems:
-#        Enable: '%prefix% &9> &c'
-#        Disable: '%prefix% &9> &c'
-#        List:
-          # -------------------------------------------------
-          # Header and Footer Placeholders (Command Manager system):
-          # %page% = Current Page
-          # %max_page% = Max Page
-          # -------------------------------------------------
-#          Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
-          # Format Placeholders:
-          # %usage% = Sub Command Usage
-          # %description% = Sub Command Description
-          # %name% = Sub Command Name
-          # %aliases% = Sub Command Aliases
-          # %permission% = Sub Command Permission
-#          Format: '  &b%usage% &7- &b%description%'
-#          Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      #VanillaItems:
+      #Enable: '%prefix% &9> &c'
+      #Disable: '%prefix% &9> &c'
+      #List:
+      # -------------------------------------------------
+      # Header and Footer Placeholders (Command Manager system):
+      # %page% = Current Page
+      # %max_page% = Max Page
+      # -------------------------------------------------
+      #Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      # Format Placeholders:
+      # %usage% = Sub Command Usage
+      # %description% = Sub Command Description
+      # %name% = Sub Command Name
+      # %aliases% = Sub Command Aliases
+      # %permission% = Sub Command Permission
+      #Format: '  &b%usage% &7- &b%description%'
+      #Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
       TooFewArguments: '%prefix% &9> &cZu wenig Argumente!'
       TooManyArguments: '%prefix% &9> &cZu viele Argumente!'
       InvalidSubCommand: '%prefix% &9> &cDas ist kein gültiger Befehl!'
+      # Placeholders:
+      # %error% = The Error that happened
       ErrorPerformingSubCommand: '%prefix% &9> &cEin Fehler ist aufgetreten!'
       UsageMessage: '%prefix% &9> &c%usage%'
       NotANumber: '%prefix% &9> &cDas ist keine Nummer!'
+      CommandContainsInvalidArgs: '%prefix% &9>Der Command enthält ungültige Argumente! (%invalidArgs%)'
       HelpPageDoesNotExist: '%prefix% &9> &cDiese Hilfe Seite existiert nicht!'
       HelpMessages:
         # -------------------------------------------------
@@ -274,6 +366,17 @@ Items:
           displayName: '&cChat stumm schalten'
           lore:
             - '&6Schalte den Spieler im Chat stumm!'
+      FreezePlayer:
+        true:
+          material: BARRIER
+          displayName: '&aSpieler auf der Stelle fest frieren'
+          lore:
+            - '&6Der Spieler kann sich nicht mehr bewegen!'
+        false:
+          material: BARRIER
+          displayName: '&cSpieler auf der Stelle fest frieren'
+          lore:
+            - '&6Der Spieler kann sich nicht mehr bewegen!'
       DupeMobsOnKill:
         true:
           material: BLAZE_SPAWN_EGG
@@ -620,6 +723,28 @@ Items:
         displayName: '&cTake Money'
         lore:
           - '&cNehme dem Spieler Geld Weg!'
+    WarningMenuItem:
+      material: PAPER
+      displayName: '&aVerwarnungs Menü'
+      lore:
+        - '&cÖffnet das Menü in dem alle Verwarnungen'
+        - '&cdes Spielers angezeigt werden.'
+    WarningMenu:
+      AddWarning:
+        material: PAPER
+        displayName: '&aGebe dem Spieler eine Verwarnung'
+        lore:
+          - '&5Gebe dem Spieler eine Verwarnung!'
+      WarningItem:
+        material: PAPER
+        displayName: '&aVerwarnung &6#%count%'
+        lore:
+          - '&5- &6Left-Click: Info'
+          - '&5- &6Right-Click: Remove'
+          - '&5- &6Grund: &7%reason%'
+          - '&5- &6Erstellungsdatum: &7%creationDate%'
+          - '&5- &6Ablaufdatum: &7%expirationDate%'
+          - '&5- &6Warnungs Nummer: &7%count%'
   WorldManager:
     Settings:
       PVP:

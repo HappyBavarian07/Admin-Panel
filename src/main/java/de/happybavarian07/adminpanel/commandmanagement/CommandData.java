@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 public @interface CommandData {
     boolean playerRequired() default false;
     boolean opRequired() default false;
+    boolean allowOnlySubCommandArgsThatFitToSubArgs() default false;
 }

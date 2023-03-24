@@ -39,6 +39,11 @@ public class WorldCreateMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WorldCreateMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

@@ -33,6 +33,11 @@ public class ChatManagerMenu extends Menu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "ChatManagerMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }

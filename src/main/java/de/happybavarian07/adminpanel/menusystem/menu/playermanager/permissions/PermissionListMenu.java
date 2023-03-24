@@ -65,6 +65,11 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PermissionListMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

@@ -35,6 +35,11 @@ public class GameRuleMenu extends PaginatedMenu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "GameRuleMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 54;
     }

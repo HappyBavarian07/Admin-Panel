@@ -25,6 +25,11 @@ public class AdminPanelStartMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "AdminpanelStartMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 27;
     }
@@ -59,13 +64,13 @@ public class AdminPanelStartMenu extends Menu {
                     interruptedException.printStackTrace();
                 }
             } else if (item.equals(lgm.getItem(path + "WorldManager", player, false))) {
-                if (!player.hasPermission("AdminPanel.ServerStop")) {
+                if (!player.hasPermission("AdminPanel.WorldManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
             } else if (item.equals(lgm.getItem(path + "PlayerManager", player, false))) {
-                if (!player.hasPermission("AdminPanel.ServerStop")) {
+                if (!player.hasPermission("AdminPanel.PlayerManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }

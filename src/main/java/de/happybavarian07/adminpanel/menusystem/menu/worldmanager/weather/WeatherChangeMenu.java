@@ -27,6 +27,11 @@ public class WeatherChangeMenu extends Menu {
     }
 
     @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "WeatherChangeMenu";
+    }
+
+    @Override
     public int getSlots() {
         return 9;
     }

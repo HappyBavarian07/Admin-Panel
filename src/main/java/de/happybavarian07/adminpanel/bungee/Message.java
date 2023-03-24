@@ -3,6 +3,8 @@ package de.happybavarian07.adminpanel.bungee;/*
  * @Date 10.10.2022 | 16:30
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +22,7 @@ public class Message {
         this.action = action;
         this.data = data;
     }
-    public Message(String senderName, String destination, Action action, String... data) {
+    public Message(String senderName, String destination, Action action, @NotNull String... data) {
         this.senderName = senderName;
         this.destination = destination;
         this.action = action;
@@ -54,7 +56,7 @@ public class Message {
     }
 
     public static Message fromStringArray(String[] stringArray) {
-        if(stringArray.length <= 4) return null;
+        if(stringArray.length < 4) return null;
 
         List<String> data = new ArrayList<>(Arrays.asList(stringArray).subList(3, stringArray.length));
         data.removeIf(Objects::isNull);
