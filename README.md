@@ -3,7 +3,7 @@ Source Code of the Admin Panel Plugin on Spigotmc.org
 
 
 Man kann den Source Code kopieren (ist halt nicht so schön).
-Aber ich bitte darum das nicht zu tun weil für dieses Plugin mindestens 4 Tage durchgearbeitet habe!
+Es steckt sehr viel Arbeit in diesem Plugin.
 
 
 Ich habe dieses Plugin einem anderen Plugin nachempfunden mit einigen extra Features und mehr Optionen wie Gamerules und Wetter und Zeit (da habe ich halt mehr Optionen hinzugefügt), falls ihr das Plugin sehen wollt hier: https://www.spigotmc.org/resources/admin-gui.71157/
