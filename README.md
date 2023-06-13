@@ -19,3 +19,25 @@ Das Admin-Panel
 
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.happybavarian07/Admin-Panel.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.happybavarian07%22%20AND%20a:%22Admin-Panel%22)
+
+# Admin-Panel
+Source Code of the Admin Panel Plugin on Spigotmc.org
+
+
+You can copy the source code.
+A lot of work has been put into this plugin.
+
+
+I have modeled this plugin after another plugin, with some extra features and more options such as gamerules, weather, and time (I have added more options in these areas). If you want to see the plugin, here's the link: https://www.spigotmc.org/resources/admin-gui.71157/
+But if anyone thinks I simply copied the code from the other plugin, no, I did not!
+
+
+I actually started from scratch with a different plugin and only took inspiration from it!
+
+
+With this plugin, my goal is to unite many plugins like Plugin Manager, Server Manager, World Manager, ... into one big plugin.
+
+The Admin-Panel
+
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.happybavarian07/Admin-Panel.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.happybavarian07%22%20AND%20a:%22Admin-Panel%22)
