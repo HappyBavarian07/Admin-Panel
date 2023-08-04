@@ -24,7 +24,7 @@ Das Admin-Panel
 Source Code of the Admin Panel Plugin on Spigotmc.org
 
 
-You can copy the source code.
+You can copy the source code. (But it wouldnt be very nice without asking)
 A lot of work has been put into this plugin.
 
 
