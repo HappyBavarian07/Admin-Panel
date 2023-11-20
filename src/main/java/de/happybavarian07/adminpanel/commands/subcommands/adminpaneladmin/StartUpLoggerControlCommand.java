@@ -75,7 +75,12 @@ public class StartUpLoggerControlCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

@@ -7,6 +7,8 @@ import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
@@ -105,12 +107,22 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
 
         List<Permission> permissions = currentPlugin.getDescription().getPermissions();
         ///////////////////////////////////// Pagination loop template
-        if (permissions != null && !permissions.isEmpty()) {
+        if (!permissions.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= permissions.size()) break;

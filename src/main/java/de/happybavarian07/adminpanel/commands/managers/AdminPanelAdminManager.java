@@ -49,8 +49,13 @@ public class AdminPanelAdminManager extends CommandManager {
     }
 
     @Override
-    public String getCommandPermission() {
+    public String getCommandPermissionAsString() {
         return "Adminpanel.AdminPanelAdmin";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 
     @Override
@@ -82,6 +87,8 @@ public class AdminPanelAdminManager extends CommandManager {
         commands.add(new StartUpLoggerControlCommand(getCommandName()));
         commands.add(new BugReportCommand(getCommandName()));
         commands.add(new BackupManagerCommand(getCommandName()));
+        commands.add(new PermissionMenuHelpCommand(getCommandName()));
+        commands.add(new StaffChatCommand(getCommandName()));
     }
 
     @Override

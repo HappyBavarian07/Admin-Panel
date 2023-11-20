@@ -4,13 +4,14 @@ package de.happybavarian07.adminpanel.commandmanagement;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
-import de.happybavarian07.adminpanel.main.Placeholder;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.language.Placeholder;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -33,7 +34,13 @@ public abstract class CommandManager {
 
     public abstract List<String> getCommandAliases();
 
-    public abstract String getCommandPermission();
+    public Permission getCommandPermissionAsPermission() {
+        return new Permission(getCommandPermissionAsString());
+    }
+
+    public abstract String getCommandPermissionAsString();
+
+    public abstract boolean autoRegisterPermission();
 
     public boolean onCommand(Player player, String[] args) {
         SubCommand target = this.getSub(args[0]);
@@ -137,7 +144,7 @@ public abstract class CommandManager {
     }
 
     public boolean hasPermission(CommandSender sender, SubCommand target) {
-        return sender.hasPermission(target.permission()) || (target.isOpRequired() && sender.isOp());
+        return sender.hasPermission(target.permissionAsPermission()) || (target.isOpRequired() && sender.isOp());
     }
 
     public boolean handleSubCommand(CommandSender sender, SubCommand target, String[] args) {
@@ -239,7 +246,7 @@ public abstract class CommandManager {
         List<String> subCommandArgOptions = new ArrayList<>();
 
         for (SubCommand sub : this.getSubCommands()) {
-            if (!sender.hasPermission(sub.permission()) && !(sub.isOpRequired() && sender.isOp())) {
+            if (!sender.hasPermission(sub.permissionAsPermission()) && !(sub.isOpRequired() && sender.isOp())) {
                 continue;
             }
 
@@ -303,7 +310,7 @@ public abstract class CommandManager {
         placeholders.put("%usage%", new Placeholder("%usage%", cmd.syntax(), PlaceholderType.ALL));
         placeholders.put("%description%", new Placeholder("%description%", cmd.info(), PlaceholderType.ALL));
         placeholders.put("%name%", new Placeholder("%name%", cmd.name(), PlaceholderType.ALL));
-        placeholders.put("%permission%", new Placeholder("%permission%", cmd.permission(), PlaceholderType.ALL));
+        placeholders.put("%permission%", new Placeholder("%permission%", cmd.permissionAsString(), PlaceholderType.ALL));
         placeholders.put("%aliases%", new Placeholder("%aliases%", cmd.aliases(), PlaceholderType.ALL));
         placeholders.put("%subArgs%", new Placeholder("%subArgs%", cmd.subArgs().toString(), PlaceholderType.ALL));
 

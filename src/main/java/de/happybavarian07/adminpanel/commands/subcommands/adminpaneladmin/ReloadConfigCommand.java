@@ -69,7 +69,12 @@ public class ReloadConfigCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.ReloadConfig";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

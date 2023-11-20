@@ -7,7 +7,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
@@ -20,10 +20,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -82,7 +83,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            player.setMetadata("TypePluginFileNameToLoadInChat", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player, true));
             player.closeInventory();
         } else if (item.equals(lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false))) {
@@ -129,6 +130,16 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
         inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.OpenMenuItem", 45), lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", playerMenuUtility.getOwner(), false));
@@ -137,7 +148,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
 
         ///////////////////////////////////// Pagination loop template
-        if (plugins != null && !plugins.isEmpty()) {
+        if (!plugins.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= plugins.size()) break;
@@ -180,12 +191,12 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("TypePluginFileNameToLoadInChat")) {
+        if (playerMenuUtility.hasData("TypePluginFileNameToLoadInChat")) {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");
             File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message + ".jar", true);
-            if(!pluginFile.exists()) {
+            if (!pluginFile.exists()) {
                 player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player, true));
                 return;
             }
@@ -195,7 +206,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player, true));
                 return;
             }
-            player.removeMetadata("TypePluginFileNameToLoadInChat", plugin);
+            playerMenuUtility.removeData("TypePluginFileNameToLoadInChat");
             player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player, true));
             super.open();
         }

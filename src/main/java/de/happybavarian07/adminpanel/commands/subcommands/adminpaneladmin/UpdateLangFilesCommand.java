@@ -71,7 +71,12 @@ public class UpdateLangFilesCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.UpdateLangFiles";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

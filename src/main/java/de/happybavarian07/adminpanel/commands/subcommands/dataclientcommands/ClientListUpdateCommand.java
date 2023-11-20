@@ -19,14 +19,14 @@ public class ClientListUpdateCommand extends SubCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
-        plugin.getDataClient().requestClientListUpdate();
+        plugin.getDataClient().getPacketHandler().requestClientListUpdate();
         player.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", player, false));
         return true;
     }
 
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        plugin.getDataClient().requestClientListUpdate();
+        plugin.getDataClient().getPacketHandler().requestClientListUpdate();
         sender.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", null, false));
         return true;
     }
@@ -57,7 +57,12 @@ public class ClientListUpdateCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.DataClient.SubCommands.UpdateClients";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

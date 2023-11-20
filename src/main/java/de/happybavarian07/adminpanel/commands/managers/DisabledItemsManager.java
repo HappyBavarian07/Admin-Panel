@@ -47,8 +47,13 @@ public class DisabledItemsManager extends CommandManager {
     }
 
     @Override
-    public String getCommandPermission() {
+    public String getCommandPermissionAsString() {
         return "";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 
     @Override

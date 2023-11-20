@@ -69,7 +69,12 @@ public class UpdateConfigCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.UpdateConfig";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

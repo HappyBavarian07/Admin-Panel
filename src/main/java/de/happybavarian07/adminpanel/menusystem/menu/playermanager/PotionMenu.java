@@ -2,36 +2,37 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.GiveEffectToPlayerEvent;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class PotionMenu extends PaginatedMenu implements Listener {
-    private final UUID targetUUID;
     private int amplifier;
     private int duration;
 
-    public PotionMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PotionMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.targetUUID = targetUUID;
         amplifier = 1; // in Int
         duration = 60; // in Ticks
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions");
@@ -39,7 +40,7 @@ public class PotionMenu extends PaginatedMenu implements Listener {
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("PlayerManager.PotionMenu", Bukkit.getPlayer(targetUUID));
+        return lgm.getMenuTitle("PlayerManager.PotionMenu", playerMenuUtility.getTarget());
     }
 
     @Override
@@ -69,7 +70,8 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                     player.sendMessage(lgm.getMessage("PotionMenu.EffectRemoved", player, true));
                 }
             } else if (event.isLeftClick()) {
-                if(player.hasPotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase())))) return;
+                if (player.hasPotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()))))
+                    return;
                 if (duration < 0 || amplifier < 1 || duration > 1000000 || amplifier > 255) return;
                 PotionEffect effect = new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase())),
                         duration, amplifier - 1, false, false, false);
@@ -78,7 +80,7 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                     AdminPanelMain.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
                     if (!giveEffectToPlayerEvent.isCancelled()) {
                         try {
-                            Bukkit.getPlayer(targetUUID).addPotionEffect(effect);
+                            playerMenuUtility.getTarget().addPotionEffect(effect);
                             player.sendMessage(lgm.getMessage("PotionMenu.EffectAdded", player, true));
                         } catch (NullPointerException | IllegalArgumentException ignored) {
                         }
@@ -92,17 +94,17 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
-            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false))) {
-            for (PotionEffect effect : Bukkit.getPlayer(targetUUID).getActivePotionEffects()) {
-                Bukkit.getPlayer(targetUUID).removePotionEffect(effect.getType());
+            for (PotionEffect effect : playerMenuUtility.getTarget().getActivePotionEffects()) {
+                playerMenuUtility.getTarget().removePotionEffect(effect.getType());
             }
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.SetDuration", null, false))) {
-            player.setMetadata("SetDurationPotionMenu", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("SetDurationPotionMenu", true);
             player.sendMessage(lgm.getMessage("PotionMenu.EnterDuration", player, false));
             player.closeInventory();
         } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", null, false))) {
-            player.setMetadata("SetAmplifierPotionMenu", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("SetAmplifierPotionMenu", true);
             player.sendMessage(lgm.getMessage("PotionMenu.EnterAmplifier", player, false));
             player.closeInventory();
         } else if (item.equals(lgm.getItem("General.Left", null, false)) ||
@@ -125,12 +127,22 @@ public class PotionMenu extends PaginatedMenu implements Listener {
         }
     }
 
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("SetDurationPotionMenu")) {
+        if (playerMenuUtility.hasData("SetDurationPotionMenu")) {
             try {
-                player.removeMetadata("SetDurationPotionMenu", plugin);
+                playerMenuUtility.removeData("SetDurationPotionMenu");
                 duration = Integer.parseInt(event.getMessage());
                 player.sendMessage(lgm.getMessage("PotionMenu.DurationSet", player, false));
             } catch (NumberFormatException e) {
@@ -139,9 +151,9 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                 this.open();
                 event.setCancelled(true);
             }
-        } else if (player.hasMetadata("SetAmplifierPotionMenu")) {
+        } else if (playerMenuUtility.hasData("SetAmplifierPotionMenu")) {
             try {
-                player.removeMetadata("SetAmplifierPotionMenu", plugin);
+                playerMenuUtility.removeData("SetAmplifierPotionMenu");
                 amplifier = Integer.parseInt(event.getMessage());
                 player.sendMessage(lgm.getMessage("PotionMenu.AmplifierSet", player, false));
             } catch (NumberFormatException e) {

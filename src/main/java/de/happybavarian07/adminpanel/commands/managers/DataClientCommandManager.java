@@ -6,10 +6,7 @@ package de.happybavarian07.adminpanel.commands.managers;/*
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.ClientListListCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.ClientListUpdateCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.PermissonsSyncCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.TrollsSyncCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -48,8 +45,13 @@ public class DataClientCommandManager extends CommandManager {
     }
 
     @Override
-    public String getCommandPermission() {
+    public String getCommandPermissionAsString() {
         return "AdminPanel.DataClient.executeCommands";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 
     @Override
@@ -73,6 +75,7 @@ public class DataClientCommandManager extends CommandManager {
 
         commands.add(new PermissonsSyncCommand(getCommandName()));
         commands.add(new TrollsSyncCommand(getCommandName()));
+        commands.add(new MenuCommand(getCommandName()));
         commands.add(new ClientListListCommand(getCommandName()));
         commands.add(new ClientListUpdateCommand(getCommandName()));
     }

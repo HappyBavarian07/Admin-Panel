@@ -10,6 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -20,17 +22,15 @@ import java.util.UUID;
 
 public class SpawningMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final UUID targetUUID;
 
-    public SpawningMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public SpawningMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.targetUUID = targetUUID;
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner");
     }
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("PlayerManager.SpawningMenu", Bukkit.getPlayer(targetUUID));
+        return lgm.getMenuTitle("PlayerManager.SpawningMenu", playerMenuUtility.getTarget());
     }
 
     @Override
@@ -58,8 +58,8 @@ public class SpawningMenu extends PaginatedMenu {
                 entity.equals(EntityType.UNKNOWN));
         if (item.getType().equals(Material.GHAST_SPAWN_EGG)) {
             try {
-                Location loc = Bukkit.getPlayer(targetUUID).getLocation().add(0, 2, 0);
-                Bukkit.getPlayer(targetUUID).getWorld().spawnEntity(loc,
+                Location loc = playerMenuUtility.getTarget().getLocation().add(0, 2, 0);
+                playerMenuUtility.getTarget().getWorld().spawnEntity(loc,
                         EntityType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()));
             } catch (NullPointerException | IllegalArgumentException ignored) {
             }
@@ -68,7 +68,7 @@ public class SpawningMenu extends PaginatedMenu {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
-            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (page == 0) {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
@@ -87,6 +87,16 @@ public class SpawningMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
 
@@ -100,7 +110,7 @@ public class SpawningMenu extends PaginatedMenu {
                 entity.equals(EntityType.ENDER_SIGNAL) ||
                 entity.equals(EntityType.UNKNOWN));
 
-        if (entityList != null && !entityList.isEmpty()) {
+        if (!entityList.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= entityList.size()) break;

@@ -6,7 +6,6 @@ package de.happybavarian07.adminpanel.utils;/*
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.api.Dependency;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.addonloader.utils.FileUtils;
 import de.happybavarian07.adminpanel.commands.AdminPanelOpenCommand;
 import de.happybavarian07.adminpanel.commands.LanguageReloadCommand;
 import de.happybavarian07.adminpanel.commands.PerPlayerLanguageCommand;
@@ -15,10 +14,12 @@ import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
+import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageFile;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageFile;
+import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.main.Metrics;
+import de.happybavarian07.adminpanel.placeholders.DataClientExpansion;
 import de.happybavarian07.adminpanel.placeholders.PanelExpansion;
 import de.happybavarian07.adminpanel.placeholders.PlayerExpansion;
 import de.happybavarian07.adminpanel.placeholders.PluginExpansion;
@@ -206,8 +207,8 @@ public class InitMethods {
                         }
                         PermissionAttachment attachment = online.addAttachment(plugin);
                         Map<String, Boolean> permissions = playerPermissions.get(online.getUniqueId());
-                        for (String perms : permissions.keySet()) {
-                            attachment.setPermission(perms, permissions.get(perms));
+                        for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
+                            attachment.setPermission(perms.getKey(), perms.getValue());
                         }
                         playerPermissionsAttachments.put(online.getUniqueId(), attachment);
                         online.recalculatePermissions();
@@ -290,6 +291,7 @@ public class InitMethods {
             new PlayerExpansion().register();
             new PluginExpansion().register();
             new PanelExpansion().register();
+            new DataClientExpansion().register();
             logger.message("&a&lInitialized PlaceHolderAPI with Placeholders!&r");
         } else {
             logger.spacer()

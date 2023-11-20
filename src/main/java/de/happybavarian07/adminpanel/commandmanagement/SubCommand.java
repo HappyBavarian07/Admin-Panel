@@ -5,12 +5,13 @@ package de.happybavarian07.adminpanel.commandmanagement;
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
-import de.happybavarian07.adminpanel.main.Placeholder;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.language.Placeholder;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,14 +78,18 @@ public abstract class SubCommand {
 
     public abstract String syntax();
 
-    public abstract String permission();
+    public Permission permissionAsPermission() {
+        return new Permission(permissionAsString(), permissionAsString());
+    }
+    public abstract String permissionAsString();
+    public abstract boolean autoRegisterPermission();
 
     protected String format(String in, SubCommand cmd) {
         Map<String, Placeholder> placeholders = new HashMap<>();
         placeholders.put("%usage%", new Placeholder("%usage%", cmd.syntax(), PlaceholderType.ALL));
         placeholders.put("%description%", new Placeholder("%description%", cmd.info(), PlaceholderType.ALL));
         placeholders.put("%name%", new Placeholder("%name%", cmd.name(), PlaceholderType.ALL));
-        placeholders.put("%permission%", new Placeholder("%permission%", cmd.permission(), PlaceholderType.ALL));
+        placeholders.put("%permission%", new Placeholder("%permission%", cmd.permissionAsString(), PlaceholderType.ALL));
         placeholders.put("%aliases%", new Placeholder("%aliases%", cmd.aliases(), PlaceholderType.ALL));
         placeholders.put("%subArgs%", new Placeholder("%subArgs%", cmd.subArgs().toString(), PlaceholderType.ALL));
 

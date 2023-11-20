@@ -4,8 +4,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.disableditems;/*
  */
 
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
-import org.bukkit.Bukkit;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -71,7 +70,12 @@ public class EnableCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.DisabledItems.Enable";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

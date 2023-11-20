@@ -5,8 +5,13 @@ import com.mojang.authlib.properties.Property;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
+import de.happybavarian07.adminpanel.language.LanguageFile;
+import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.language.Placeholder;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
@@ -20,11 +25,14 @@ import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
+import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +42,7 @@ import java.util.logging.Level;
 
 class LocalAdminPanelAPI implements AdminPanelAPI {
 
-    private static final Map<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
+    private static final Map<UUID, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
     private final AdminPanelMain plugin;
     private final LanguageManager lgm;
     private final PluginUtils pluginUtils;
@@ -48,7 +56,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public Map<Player, PlayerMenuUtility> getPlayerMenuUtilityMap() {
+    public Map<UUID, PlayerMenuUtility> getPlayerMenuUtilityMap() {
         return playerMenuUtilityMap;
     }
 
@@ -60,57 +68,51 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     @Override
     public PlayerMenuUtility getPlayerMenuUtility(Player player) {
         PlayerMenuUtility playerMenuUtility;
-        if (!(playerMenuUtilityMap.containsKey(player))) { //See if the player has a playermenuutility "saved" for them
+        if (!(playerMenuUtilityMap.containsKey(player.getUniqueId()))) { //See if the player has a playermenuutility "saved" for them
 
             //This player doesn't. Make one for them add add it to the hashmap
-            playerMenuUtility = new PlayerMenuUtility(player);
-            playerMenuUtilityMap.put(player, playerMenuUtility);
+            playerMenuUtility = new PlayerMenuUtility(player.getUniqueId());
+            playerMenuUtilityMap.put(player.getUniqueId(), playerMenuUtility);
 
             return playerMenuUtility;
         } else {
-            return playerMenuUtilityMap.get(player); //Return the object by using the provided player
+            return playerMenuUtilityMap.get(player.getUniqueId()); //Return the object by using the provided player
         }
     }
 
     public ItemStack createSkull(String headTexture, String name) {
-        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1, (short) 3);
+        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
         if (headTexture.isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         meta.setDisplayName(Utils.chat(name));
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-        profile.getProperties().put("textures", new Property("textures", headTexture));
+        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
-            Field field = meta.getClass().getDeclaredField("profile");
-            field.setAccessible(true);
-            field.set(meta, profile);
-        } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
+        meta.setOwnerProfile(profile);
 
         head.setItemMeta(meta);
         return head;
     }
 
     public ItemStack createSkull(Head headTexture, String name) {
-        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1, (short) 3);
-        if (headTexture.getFullTexture().isEmpty()) return head;
+        ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
+        if (headTexture.getTexture().isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         meta.setDisplayName(Utils.chat(name));
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-        profile.getProperties().put("textures", new Property("textures", headTexture.getFullTexture()));
+        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
-            Field field = meta.getClass().getDeclaredField("profile");
-            field.setAccessible(true);
-            field.set(meta, profile);
-        } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture.getTexture()));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
+        meta.setOwnerProfile(profile);
 
         head.setItemMeta(meta);
         return head;
@@ -177,13 +179,13 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void restartServer(int time, int time2) throws InterruptedException {
-        Utils.serverRestart(time, time2);
+    public void restartServer(int timeBeforeRestart) {
+        Utils.serverRestart(timeBeforeRestart);
     }
 
     @Override
-    public void stopServer(int time, int time2) throws InterruptedException {
-        Utils.serverStop(time, time2);
+    public void stopServer(int timeBeforeStop) {
+        Utils.serverStop(timeBeforeStop);
     }
 
     @Override
@@ -335,7 +337,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", null, true));
         lgm.reloadLanguages(messageReceiver, true);
-        plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", "API");
+        plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", LogPrefix.API);
     }
 
     // Events
@@ -343,7 +345,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     public AdminPanelEvent callAdminPanelEvent(Event event) throws NotAPanelEventException {
         if (event instanceof AdminPanelEvent) {
             Bukkit.getPluginManager().callEvent(event);
-            plugin.getFileLogger().writeToLog(Level.CONFIG, "Called the Admin-Panel Event " + event, "API");
+            plugin.getFileLogger().writeToLog(Level.CONFIG, "Called the Admin-Panel Event " + event, LogPrefix.API);
             return (AdminPanelEvent) event;
         } else {
             throw new NotAPanelEventException("The Event: " + event + " is not an Admin-Panel Event!\nThis Error usually happens if a Plugin tryes to call a Normal Bukkit Event with the callAdminPanelEvent Method in the API!\nPlease contact the Developer of this Plugin!");

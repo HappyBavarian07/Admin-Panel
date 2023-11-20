@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -11,22 +11,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.*;
 
 public class PlayerKickMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-
-    private final UUID targetUUID;
     private String reason = "";
 
-    public PlayerKickMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PlayerKickMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick");
-        this.targetUUID = targetUUID;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class PlayerKickMenu extends Menu implements Listener {
         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
         if (item == null || !item.hasItemMeta()) return;
         if (item.getType().equals(lgm.getItem(path + "Reason", player, false).getType())) {
-            player.setMetadata("KickPlayerSetNewReason", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("KickPlayerSetNewReason", true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.Reason.EnterNewReason", player, true));
             player.closeInventory();
         } else if (item.getType().equals(lgm.getItem(path + "Kick", player, false).getType())) {
@@ -65,7 +61,7 @@ public class PlayerKickMenu extends Menu implements Listener {
             }
 
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-            OfflinePlayer target = Bukkit.getOfflinePlayer(targetUUID);
+            OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
             if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.NotKickable", player, true));
                 return;
@@ -80,16 +76,26 @@ public class PlayerKickMenu extends Menu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("KickPlayerSetNewReason")) {
+        if (playerMenuUtility.hasData("KickPlayerSetNewReason")) {
             this.reason = format(player, event.getMessage());
-            player.removeMetadata("KickPlayerSetNewReason", plugin);
+            playerMenuUtility.removeData("KickPlayerSetNewReason");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.Reason.NewReasonSet", player, true));
             super.open();

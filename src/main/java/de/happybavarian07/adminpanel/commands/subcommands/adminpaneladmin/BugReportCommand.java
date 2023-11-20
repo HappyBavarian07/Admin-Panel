@@ -67,7 +67,12 @@ public class BugReportCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.ReportBug";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

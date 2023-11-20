@@ -1,20 +1,22 @@
 package de.happybavarian07.adminpanel.utils;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.Menu;
+import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.menusystem.menu.misc.ConfirmationMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.*;
 import org.bukkit.BanList.Type;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,11 +28,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import static org.bukkit.Bukkit.getServer;
 
 public class Utils {
 
@@ -140,7 +145,7 @@ public class Utils {
         }
     }
 
-    public static void serverStop(int time, int time2) throws InterruptedException {
+    public static void serverStop(int timeBeforeStop) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
         }
@@ -148,80 +153,70 @@ public class Utils {
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server will now shut down and all players will be kicked!", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerstop in: &c&l6", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&aServerstop in: &c&l5", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverstop in: &c&l4", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&6Serverstop in: &c&l3", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverstop in: &c&l2", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&4Serverstop in: &c&l1", AdminPanelMain.getPrefix()));
-        Thread.sleep(time);
-        clearChat(100, false, null);
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Stop initiated!", AdminPanelMain.getPrefix()));
-        Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        Thread.sleep(time2);
-        for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
-            p2.kickPlayer(Utils.format(null, "&4&lThe server is now shuting down!", AdminPanelMain.getPrefix()));
+
+        for (int i = 6; i > 0; i--) {
+            final int secondsLeft = i;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                clearChat(100, false, null);
+                if (secondsLeft <= 2) {
+                    Bukkit.broadcastMessage(Utils.format(null, "&4Serverstop in: &c&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                } else if (secondsLeft <= 4) {
+                    Bukkit.broadcastMessage(Utils.format(null, "&6Serverstop in: &b&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                } else {
+                    Bukkit.broadcastMessage(Utils.format(null, "&aServerstop in: &a&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                }
+            }, (long) (6 - i) * 20);
         }
-        Bukkit.shutdown();
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            clearChat(100, false, null);
+            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+            Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Stop initiated!", AdminPanelMain.getPrefix()));
+            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+        }, 6 * 20);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
+                p2.kickPlayer(Utils.format(null, "&4&lThe server is now shutting down!", AdminPanelMain.getPrefix()));
+            }
+            Bukkit.shutdown();
+        }, (6 * 20) + timeBeforeStop);
     }
 
-    public static void serverRestart(int time, int time2) throws InterruptedException {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.closeInventory();
-        }
+    public static void serverRestart(int timeBeforeRestart) {
+        Bukkit.getOnlinePlayers().forEach(Player::closeInventory);
         clearChat(100, false, null);
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lThe server is about to restart!", AdminPanelMain.getPrefix()));
         Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l6", AdminPanelMain.getPrefix()));
-        }, time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &c&l5", AdminPanelMain.getPrefix()));
-        }, 2L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l4", AdminPanelMain.getPrefix()));
-        }, 3L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &c&l3", AdminPanelMain.getPrefix()));
-        }, 4L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l2", AdminPanelMain.getPrefix()));
-        }, 5L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l1", AdminPanelMain.getPrefix()));
-        }, 6L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            clearChat(100, false, null);
-            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-            Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Restart initiated!", AdminPanelMain.getPrefix()));
-            Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
-        }, 7L * time);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player p2 : Bukkit.getServer().getOnlinePlayers()) {
-                p2.kickPlayer(Utils.format(null, "&4&lThe server is now restarting!", AdminPanelMain.getPrefix()));
+            for (int i = 6; i > 0; i--) {
+                final int secondsLeft = i;
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    clearChat(100, false, null);
+                    if (secondsLeft <= 2) {
+                        Bukkit.broadcastMessage(Utils.format(null, "&4Serverrestart in: &c&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                    } else if (secondsLeft <= 4) {
+                        Bukkit.broadcastMessage(Utils.format(null, "&6Serverrestart in: &b&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                    } else {
+                        Bukkit.broadcastMessage(Utils.format(null, "&aServerrestart in: &a&l" + secondsLeft, AdminPanelMain.getPrefix()));
+                    }
+                }, (long) (7 - secondsLeft) * 20);
             }
-            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "restart");
-        }, 7L * time + time2);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                clearChat(100, false, null);
+                Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+                Bukkit.broadcastMessage(Utils.format(null, "&r[&4&lWARNING&r] " + "&c&lServer Restart initiated!", AdminPanelMain.getPrefix()));
+                Bukkit.broadcastMessage(Utils.format(null, "&a+---------------------------------------------------+", AdminPanelMain.getPrefix()));
+            }, 6L * 20);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Bukkit.getOnlinePlayers().forEach(p2 -> p2.kickPlayer(Utils.format(null, "&4&lThe server is now restarting!", AdminPanelMain.getPrefix())));
+                Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "restart");
+            }, 6L * 20 + timeBeforeRestart);
+        }, 20);
     }
 
     public static String format(Player player, String message, String prefix) {
@@ -249,6 +244,16 @@ public class Utils {
 
     public static Utils getInstance() {
         return instance;
+    }
+
+    public static List<String> stringToList(String input) {
+        List<String> result = new ArrayList<>();
+        if (input != null && input.startsWith("[") && input.endsWith("]")) {
+            input = input.substring(1, input.length() - 1);
+            String[] items = input.split(", ");
+            result.addAll(Arrays.asList(items));
+        }
+        return result;
     }
 
     private void setInstance(Utils instance) {
@@ -337,7 +342,7 @@ public class Utils {
         //System.out.println("Message: " + message);
         if (message == null || message.isEmpty()) return false;
         try {
-            URL url = new URL("https://discord.com/api/webhooks/1068586078627450920/XADdYRfzsgFse7yQe_2zozz0ajFl3ez_NNanjYuC0mfnw1aqZXPWs6TTFjRsgKAVlOUZ");
+            URL url = new URL("https://discord.com/api/webhooks/1158431051492892763/ZOtRZf0BMDECMw9WQ8vijRhRHXAEYYGD39plafrgxT903gPWOysWfvTbOrQA23vGkhX6");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.addRequestProperty("Content-Type", "application/json");
             connection.setRequestMethod("POST");
@@ -374,6 +379,11 @@ public class Utils {
                 if (!file.exists()) {
                     continue;
                 }
+                if (file.isDirectory()) {
+                    // Add if in a dir
+                    zipDirIntoZipFile(zos, file);
+                    continue;
+                }
                 try (FileInputStream fis = new FileInputStream(file)) {
                     ZipEntry zipEntry = new ZipEntry(
                             (!file.getParentFile().getName().equals("Admin-Panel") &&
@@ -389,6 +399,30 @@ public class Utils {
                 }
             }
         }
+    }
+
+    private static ZipOutputStream zipDirIntoZipFile(ZipOutputStream zos, File directory) throws IOException {
+        if(!directory.isDirectory()) return zos;
+        File[] filesInDir = directory.listFiles();
+        assert filesInDir != null;
+        if (filesInDir.length > 0) {
+            for (File fileInDir : filesInDir) {
+                try (FileInputStream fis = new FileInputStream(fileInDir)) {
+                    ZipEntry zipEntry = new ZipEntry(
+                            (!fileInDir.getParentFile().getName().equals("Admin-Panel") &&
+                                    !fileInDir.getParentFile().getName().equals("plugins") ? fileInDir.getParentFile().getName() + File.separator : "")
+                                    + fileInDir.getName());
+                    zos.putNextEntry(zipEntry);
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while ((length = fis.read(bytes)) >= 0) {
+                        zos.write(bytes, 0, length);
+                    }
+                    zos.closeEntry();
+                }
+            }
+        }
+        return zos;
     }
 
     public static void unzipFiles(String zipFilePath, String destDir) {
@@ -427,7 +461,7 @@ public class Utils {
         }
     }
 
-    private void ban(final Player p, final OfflinePlayer target, final String reason, final String sourcename) {
+    /*private void ban(final Player p, final OfflinePlayer target, final String reason, final String sourcename) {
         try {
             if (target.isBanned()) {
                 p.sendMessage(Utils.format(null, "&cThe Player &a" + target.getName() + "&c is already banned!", AdminPanelMain.getPrefix()));
@@ -462,7 +496,7 @@ public class Utils {
         } catch (NullPointerException e) {
             p.sendMessage(Utils.format(null, "&cThe Player is not online or doesn't exists!", AdminPanelMain.getPrefix()));
         }
-    }
+    }*/
 
     public void loadLibraryFolder(String pathToFolder) throws MalformedURLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         File folder = new File(pathToFolder);
@@ -481,6 +515,80 @@ public class Utils {
                 method.invoke(urlClassLoader, url);
             }
         }
+    }
+
+    public static Menu getMenuByClassName(String className, Player player) {
+        String menuPackage = "de.happybavarian07.adminpanel.menusystem.menu";
+        String fullClassName = menuPackage + "." + className;
+
+        try {
+            Class<?> clazz = Class.forName(fullClassName);
+            if (Menu.class.isAssignableFrom(clazz)) {
+                return (Menu) clazz.getDeclaredConstructor(PlayerMenuUtility.class).newInstance(AdminPanelMain.getAPI().getPlayerMenuUtility(player));
+            } else {
+                System.err.println("The class does not extend Menu: " + fullClassName);
+                return null; // Or handle it as needed
+            }
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class not found: " + fullClassName);
+            e.printStackTrace();
+            return null; // You can modify the return value based on your needs
+        } catch (IllegalAccessException | InstantiationException e) {
+            System.err.println("Error creating an instance: " + fullClassName);
+            e.printStackTrace();
+            return null; // You can modify the return value based on your needs
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Error invoking constructor: " + fullClassName, e);
+        }
+    }
+
+    public static void openConfirmationMenu(String reason,
+                                            String menuToOpenAfter,
+                                            Method methodToExecuteAfter,
+                                            Object objectToInvokeOn,
+                                            List<Object> methodArgs,
+                                            List<Class<? extends Exception>> exceptionsToCatch,
+                                            Player player) {
+        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
+        ConfirmationMenu confirmationMenu = new ConfirmationMenu(playerMenuUtility);
+        playerMenuUtility.setData("ConfirmationMenu_MenuToOpenAfter", menuToOpenAfter, true);
+        playerMenuUtility.setData("ConfirmationMenu_Reason", reason, true);
+        playerMenuUtility.setData("ConfirmationMenu_MethodToExecuteAfter", methodToExecuteAfter, true);
+        playerMenuUtility.setData("ConfirmationMenu_ObjectToInvokeMethodOn", objectToInvokeOn, true);
+        for(int i = 0; i < methodArgs.size(); i++) {
+            playerMenuUtility.setData("ConfirmationMenu_MethodArgs_" + i, methodArgs.get(i), true);
+        }
+        playerMenuUtility.setData("ConfirmationMenu_ExceptionsToCatch", exceptionsToCatch, true);
+        confirmationMenu.open();
+    }
+
+    public static void deleteMinecraftWorld(World world) {
+
+        for (Player playerInWorld : world.getPlayers()) {
+            playerInWorld.kickPlayer(Utils.chat("The World just got deleted!"));
+        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.unloadWorld(world, false);
+                getServer().getWorlds().remove(world);
+                deleteWorldFolder(world.getWorldFolder().getAbsoluteFile());
+            }
+        }.runTaskLater(plugin, 5);
+    }
+
+    public static void deleteWorldFolder(File path) {
+        if (path.exists() && path.isDirectory()) {
+            File[] files = path.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteWorldFolder(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        path.delete();
     }
 
     public Economy getEconomy() {

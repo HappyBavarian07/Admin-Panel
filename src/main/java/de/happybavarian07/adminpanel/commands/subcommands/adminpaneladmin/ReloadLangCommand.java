@@ -69,7 +69,12 @@ public class ReloadLangCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.ReloadLang";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

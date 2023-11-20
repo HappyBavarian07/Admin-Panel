@@ -36,7 +36,7 @@ public class StartUpLogger {
                     e.printStackTrace();
                 }
             }
-        }, "StartUpLogger Messag Queue Thread");
+        }, "StartUpLogger Message Queue Thread");
         messageQueueThread.setDaemon(true);
         messageQueueThread.start();
     }
@@ -172,7 +172,7 @@ public class StartUpLogger {
         String MESSAGE_FORMAT = AdminPanelMain.getPlugin().getConfig().getString("Plugin.StartUpLogger.Message_Format",
                 "|------------------------------------------------------------------|");
         final int messageSpacerLength = MESSAGE_FORMAT.length();
-        final int messageLength = message.replaceAll("ง([a-fA-F0-9]|r|l|m|n|o|k)", "").length();
+        final int messageLength = message.replaceAll("ยง([a-fA-F0-9]|r|l|m|n|o|k)", "").length();
 
         // Return the default message if it is too long for the actual spacer
         if (messageLength > messageSpacerLength - 2) return message;
@@ -186,11 +186,19 @@ public class StartUpLogger {
     }
 
     public void addMessageToQueue(String... message) {
-        messageQueue.add(message);
+        if (enabled) {
+            messageQueue.add(message);
+            /*for(String m : message) {
+                sender.sendMessage(m);
+            }*/
+        }
     }
 
     public void addMessageToQueue(String message) {
-        messageQueue.add(new String[]{message});
+        if (enabled) {
+            //messageQueue.add(new String[]{message});
+            sender.sendMessage(message);
+        }
     }
 
     public void enableMessageSystem() {

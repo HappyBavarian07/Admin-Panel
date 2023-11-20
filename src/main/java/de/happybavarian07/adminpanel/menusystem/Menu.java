@@ -3,12 +3,15 @@ package de.happybavarian07.adminpanel.menusystem;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.general.PanelOpenEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -52,6 +55,12 @@ public abstract class Menu implements InventoryHolder {
     //let each menu decide how the items in the menu will be handled when clicked
     public abstract void handleMenu(InventoryClickEvent e);
 
+    // Inventory Open Event
+    public abstract void handleOpenMenu(InventoryOpenEvent e);
+
+    // Inventory Close Event
+    public abstract void handleCloseMenu(InventoryCloseEvent e);
+
     //let each menu decide what items are to be placed in the inventory menu
     public abstract void setMenuItems();
 
@@ -75,6 +84,7 @@ public abstract class Menu implements InventoryHolder {
 
     //When called, an inventory is created and opened for the player
     public void open() {
+        if(playerMenuUtility.getOwner() == null) return;
         //The owner of the inventory created is the Menu itself,
         // so we are able to reverse engineer the Menu object from the
         // inventoryHolder in the MenuListener class when handling clicks
@@ -92,12 +102,12 @@ public abstract class Menu implements InventoryHolder {
                 inventory = Bukkit.createInventory(this, getSlots(), getMenuName());
                 inventorys.add(inventory);
 
-                Map<String, MenuAddon> addonList = plugin.getMenuAddons(this.getConfigMenuAddonFeatureName());
+                Map<String, MenuAddon> addonList = plugin.getMenuAddonManager().getMenuAddons(this.getConfigMenuAddonFeatureName());
 
                 //grab all the items specified to be used for this menu and add to inventory
                 this.setMenuItems();
-                for(String menuAddonName : addonList.keySet()) {
-                    MenuAddon addon = addonList.get(menuAddonName);
+                for(Map.Entry<String, MenuAddon> menuAddonName : addonList.entrySet()) {
+                    MenuAddon addon = menuAddonName.getValue();
                     addon.setMenuAddonItems();
                 }
 
@@ -109,8 +119,8 @@ public abstract class Menu implements InventoryHolder {
                 playerMenuUtility.getOwner().openInventory(inventory);
 
                 // Try executing Menu Addons onOpenEvent
-                for(String menuAddonName : addonList.keySet()) {
-                    MenuAddon addon = addonList.get(menuAddonName);
+                for(Map.Entry<String, MenuAddon> menuAddonName : addonList.entrySet()) {
+                    MenuAddon addon = menuAddonName.getValue();
                     addon.onOpenEvent();
                 }
                 if (this instanceof AdminPanelStartMenu) {
@@ -121,7 +131,7 @@ public abstract class Menu implements InventoryHolder {
         } catch (NotAPanelEventException e) {
             e.printStackTrace();
         }
-        plugin.getFileLogger().writeToLog(Level.INFO, playerMenuUtility.getOwner().getName() + "(UUID: " + playerMenuUtility.getOwner().getUniqueId() + ") opened the Panel: " + this.getClass().getName(), "ActionsLogger - Panel");
+        plugin.getFileLogger().writeToLog(Level.INFO, playerMenuUtility.getOwner().getName() + "(UUID: " + playerMenuUtility.getOwner().getUniqueId() + ") opened the Panel: " + this.getClass().getName(), LogPrefix.ACTIONSLOGGER_PANEL);
     }
 
     //Overridden method from the InventoryHolder interface

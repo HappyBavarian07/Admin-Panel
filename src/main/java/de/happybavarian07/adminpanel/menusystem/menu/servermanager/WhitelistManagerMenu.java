@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
@@ -10,9 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class WhitelistManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -47,11 +48,11 @@ public class WhitelistManagerMenu extends Menu implements Listener {
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(lgm.getItem(path + "AddPlayer", player, false))) {
-            player.setMetadata("WhitelistManagerAddPlayer", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("WhitelistManagerAddPlayer", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
             player.closeInventory();
         } else if (item.equals(lgm.getItem(path + "RemovePlayer", player, false))) {
-            player.setMetadata("WhitelistManagerRemovePlayer", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("WhitelistManagerRemovePlayer", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
             player.closeInventory();
         } else if (item.equals(lgm.getItem(path + "ListPlayers", player, false))) {
@@ -65,6 +66,16 @@ public class WhitelistManagerMenu extends Menu implements Listener {
         } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             new ServerManagerMenu(playerMenuUtility).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override
@@ -86,7 +97,7 @@ public class WhitelistManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("WhitelistManagerAddPlayer")) {
+        if (playerMenuUtility.hasData("WhitelistManagerAddPlayer")) {
             event.setCancelled(true);
             String message = event.getMessage();
             OfflinePlayer playerToAdd = Bukkit.getOfflinePlayer(message);
@@ -94,11 +105,11 @@ public class WhitelistManagerMenu extends Menu implements Listener {
                 playerToAdd.setWhitelisted(true);
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", playerToAdd.getName(), true);
                 player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.AddedPlayer", player, true));
-                player.removeMetadata("WhitelistManagerAddPlayer", plugin);
+                playerMenuUtility.removeData("WhitelistManagerAddPlayer");
                 super.open();
             }
         }
-        if (player.hasMetadata("WhitelistManagerRemovePlayer")) {
+        if (playerMenuUtility.hasData("WhitelistManagerRemovePlayer")) {
             event.setCancelled(true);
             String message = event.getMessage();
             OfflinePlayer playerToRemove = Bukkit.getOfflinePlayer(message);
@@ -106,7 +117,7 @@ public class WhitelistManagerMenu extends Menu implements Listener {
                 playerToRemove.setWhitelisted(false);
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", playerToRemove.getName(), true);
                 player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.RemovedPlayer", player, true));
-                player.removeMetadata("WhitelistManagerRemovePlayer", plugin);
+                playerMenuUtility.removeData("WhitelistManagerRemovePlayer");
                 super.open();
             }
         }

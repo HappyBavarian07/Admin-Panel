@@ -4,7 +4,7 @@ package de.happybavarian07.adminpanel.listeners;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

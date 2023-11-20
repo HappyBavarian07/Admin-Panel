@@ -6,6 +6,7 @@ package de.happybavarian07.adminpanel.addonloader.loadingutils;/*
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.utils.FileUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 
+/**
+ * The AddonLoader Class
+ */
 public class AddonLoader {
     private static AdminPanelMain plugin;
     private final Map<File, List<Class<?>>> loadedJarFiles;
@@ -31,6 +35,10 @@ public class AddonLoader {
     private final File addonFolder;
     private final URLClassLoader urlClassLoader;
 
+    /**
+     * The Constructor of the AddonLoader
+     * @param addonFolder The Folder where the Addons are located
+     */
     public AddonLoader(File addonFolder) {
         plugin = AdminPanelMain.getPlugin();
         this.addonFolder = addonFolder;
@@ -49,6 +57,15 @@ public class AddonLoader {
         }
     }
 
+    /**
+     * Finds a Class in a Jar File
+     * @param file The Jar File
+     * @param clazz The Class
+     * @return The Class
+     * @param <T> The Class
+     * @throws IOException If the File doesn't exist
+     * @throws ClassNotFoundException If the Class doesn't exist
+     */
     public static <T> Class<? extends T> findClass(@NotNull final File file,
                                                    @NotNull final Class<T> clazz) throws IOException, ClassNotFoundException {
         if (!file.exists()) {
@@ -88,6 +105,11 @@ public class AddonLoader {
         return classes.get(0);
     }
 
+    /**
+     * Finds all Jar Files in a Folder
+     * @param folder The Folder
+     * @return The Jar Files
+     */
     public List<File> findJarFiles(File folder) {
         List<File> jarFiles = new ArrayList<>();
         File[] files = folder.listFiles();
@@ -100,6 +122,13 @@ public class AddonLoader {
         return jarFiles;
     }
 
+    /**
+     * Loads an Addon
+     * @param addon The Addon
+     * @return The Classes of the Addon
+     * @throws IOException If the File doesn't exist
+     * @throws ClassNotFoundException If the Class doesn't exist
+     */
     public List<Class<?>> loadAddon(File addon) throws IOException, ClassNotFoundException {
         if (!addon.exists()) {
             return null;
@@ -139,6 +168,11 @@ public class AddonLoader {
         return classes;
     }
 
+    /**
+     * Returns the Main Class of an Addon
+     * @param addon The Addon
+     * @return The Main Class
+     */
     public Addon getMainClassOfAddon(File addon) {
         try {
             if(loadedAddonMainClasses.containsKey(addon)) {
@@ -179,10 +213,18 @@ public class AddonLoader {
         }
     }
 
+    /**
+     * Returns the URLClassLoader
+     * @return The URLClassLoader
+     */
     public URLClassLoader getUrlClassLoader() {
         return urlClassLoader;
     }
 
+    /**
+     * Returns the Addon Folder
+     * @return The Addon Folder
+     */
     public File getAddonFolder() {
         return addonFolder;
     }
@@ -191,6 +233,13 @@ public class AddonLoader {
         return loadedJarFiles;
     }
 
+    /**
+     * Executes a Method from a Class
+     * @param name The Name of the Method
+     * @param clazz The Class
+     * @param args The Arguments
+     * @return The Result of the Method
+     */
     public Object executeMethod(String name, Class<?> clazz, Object... args) {
         try {
             Method m = clazz.getMethod(name);
@@ -214,7 +263,7 @@ public class AddonLoader {
         try {
             getUrlClassLoader().close();
         } catch (IOException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Addon-Loader");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.ADDONLOADER);
             e.printStackTrace();
         }
     }

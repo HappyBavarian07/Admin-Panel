@@ -32,7 +32,7 @@ public class BungeeTestCommand implements CommandExecutor {
                 case "hello":
                     if (sender instanceof Player) return false;
                     sender.sendMessage("Requesting Server Ping!");
-                    sender.sendMessage("Response from Server: " + AdminPanelMain.getPlugin().getDataClient().pingServer(AdminPanelMain.getPlugin().getDataClient().getCheckConnectionThread()));
+                    sender.sendMessage("Response from Server: " + AdminPanelMain.getPlugin().getDataClient().getPacketHandler().pingServer());
                     break;
                 case "reconnect":
                     sender.sendMessage("Reconnecting to AdminPanel Bungee Server!");

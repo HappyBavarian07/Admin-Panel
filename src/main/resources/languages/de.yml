@@ -1,7 +1,7 @@
 # Der Sprach Datei für Deutsche Sprache
 # %prefix% = The Prefix of the Plugin (works in every Message)
 LanguageFullName: 'Deutsch'
-LanguageVersion: '8.1.0'
+LanguageVersion: '8.6.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
@@ -96,6 +96,16 @@ Messages:
         Format: '  &b%backupsDoneNumber%. %fileName% (%exists%) &7- &b%normalPath%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
   Player:
+    StaffChat:
+      ToggleOn: '%prefix% &9> &aDer Staff Chat wurde für Spieler ''%player_name%'' angeschaltet!'
+      ToggleOff: '%prefix% &9> &aDer Staff Chat wurde für Spieler ''%player_name%'' ausgeschaltet!'
+      Disabled: '%prefix% &9> &cDer Staff Chat ist deaktiviert!'
+      Enabled: '%prefix% &9> &aDer Staff Chat ist aktiviert!'
+      # Placeholders for the Message Format:
+      # %sc_prefix% = The Prefix of the Staff Chat
+      # %player_name% = The Name of the Player
+      # %message% = The Message
+      MessageFormat: '%sc_prefix% | &7%player_name%&8: &f%message%'
     Commands:
       #VanillaItems:
       #Enable: '%prefix% &9> &c'
@@ -141,6 +151,7 @@ Messages:
         Format: '  &b%usage% &7- &b%description%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
     General:
+      Error: '%prefix% &9> &cEin Fehler ist aufgetreten! (%error%)'
       ReloadedConfig: '%prefix% &9> &aErfolgreich die Config reloaded!'
       # %language% = The Language of the Plugin
       ReloadedLanguageFile: '%prefix% &9> &aErfolgreich die Sprache %language% reloaded!'
@@ -276,6 +287,23 @@ Messages:
   TooFewArguments: '&4Zu wenig Argumente!'
 Items:
   General:
+    ConfirmationMenu:
+      Confirm:
+        material: LIME_STAINED_GLASS_PANE
+        displayName: '&aBestätigen'
+        lore:
+          - '&aBestätige deine Auswahl!'
+      Cancel:
+        material: RED_STAINED_GLASS_PANE
+        displayName: '&cAbbrechen'
+        lore:
+            - '&cBreche deine Auswahl ab!'
+      ReasonItem:
+        material: PAPER
+        displayName: '&aWillst du diese Aktion ausführen?'
+        lore:
+          - '&aAktion: %reason%'
+          - '&aGrün &f= &6Ja &f| &cRot &f= &6Nein'
     FillerItem:
       material: BLACK_STAINED_GLASS_PANE
       displayName: ' '
@@ -1266,3 +1294,7 @@ MenuTitles:
     Permissions:
       Menu: '&6Permissions'
       Settings: '&3Einstellungen'
+  DataClientMainMenu: '&aData Client'
+  DataClientSettingsMenu: '&aData Client Einstellungen'
+  Misc:
+    ConfirmationMenu: '&aBestätigungs Menu'

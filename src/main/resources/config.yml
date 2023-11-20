@@ -4,17 +4,19 @@
 #+------------------------------------------------------+#
 ##########################################################
 
-# Gültige Colorcodes sind:
+# GÃ¼ltige Colorcodes sind:
 # &1, &2, &3, &4, &5, &6, &7, &8, &9
 # &a, &b, &c, &d, &e, &f
-# Gültige Format Codes sind:
+# GÃ¼ltige Format Codes sind:
 # &n, &m, &l, &k
 
 # Plugin By HappyBavarian07
 
-# The permissions.yml file is only important for the plugin!!! so please don't change anything in there, otherwise part of the plugin might break.
+# The permissions.yml file is only important for the plugin!!!
+# So please don't change anything in there, otherwise part of the plugin might break.
 # As soon as you delete a file, it will reset itself to the default with the next reload and will create itself again
-# All Files are self updating, only the Language File Updater can be turned off. If you delete an Option or rename it, it will delete the other one (if exists) and take the Default Value
+# All Files are self updating, only the Language File Updater can be turned off.
+# If you delete an Option or rename it, it will delete the other one (if exists) and take the Default Value
 
 ##########################################################
 #+------------------------------------------------------+#
@@ -26,7 +28,14 @@ Plugin:
   # This is the prefix used by the plugin for chat messages
   # These messages can be edited in the language files
   Prefix: '&r[&4Admin&d-&8Panel&r] '
-
+  # This are the Staff Chat Settings
+  StaffChat:
+    # This is the Prefix for the Staff Chat
+    Prefix: '&r[&4Staff&d-&8Chat&r]'
+    # This is the Chat Prefix to send a Message in the Staff Chat
+    # If your message starts with that and you have the Permission,
+    # then the Plugin will send your message in Staff Chat
+    ChatPrefix: '#SC '
   StartUpLogger:
     # Will disable the whole Start Up Messages and other Debug Messages, that might be useful or important.
     enabled: true
@@ -35,8 +44,9 @@ Plugin:
     Message_Format: '|------------------------------------------------------------------|'
     # The Spacer Format: Is the Spacer and just prints this message
     Spacer_Format:  '+-------------------------------------------------------------+'
+
   # This is the System to sync Data across all to the Bungee Cord system connected Servers
-  # Obivously it needs the Admin Panel Bungee Plugin to work
+  # Obivously it needs the Admin Panel Bungee Plugin to work.
   # UNDER DEVELOPMENT
   # BungeeCord Part is not available online so this whole System will NOT work!
   BungeeSyncSystem:
@@ -78,9 +88,40 @@ Plugin:
   # Example: /plugins/Admin-Panel/languages/<Language>.yml | languageForUpdates (in the config): Language
   languageForUpdates: en
 
-  # This Option makes it that all Actions (Plugin Update, Admin Panel Open, ...) get logged
-  # in the plugin.log File If You don't want this please disable this Option!
-  LogActions: true
+  # This Section is for the Actions that get logged in the plugin.log File
+  LogActions:
+    # This Option makes it that all Actions (Plugin Update, Admin Panel Open, ...) get logged
+    # in the plugin.log File If You don't want this please disable this Option!
+    enabled: true
+    # This Option adds the possibility of disabling single Actions from being logged
+    IndividualActions:
+      ACTIONSLOGGER_PLAYER: true
+      ACTIONSLOGGER_SERVER: true
+      ACTIONSLOGGER_PANEL: true
+      ACTIONSLOGGER_PLUGIN: true
+      ADDONLOADER: true
+      ADMINPANEL: true
+      ADMINPANEL_MAIN: true
+      ADMINPANEL_COMMANDS: true
+      ADMINPANEL_GUI: true
+      ADMINPANEL_LISTENER: true
+      ADMINPANEL_UTILS: true
+      DATELOGGER: true
+      API: true
+      COMMANDS: true
+      CONFIG: true
+      DATABASE: true
+      DEBUG: true
+      ERROR: true
+      FILE: true
+      INFO: true
+      INITIALIZER: true
+      VAULT_MONEY: true
+      VAULT_PERMISSION: true
+      VAULT_CHAT: true
+      VAULT_ECONOMY: true
+      VAULT_PLUGIN: true
+      UPDATER: true
 
   # The Auto Admin-Panel Updater Section
   Updater:

@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -66,6 +68,16 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         } else if (item.equals(lgm.getItem("General.Close", player, false))) {
             new PluginCommandsListMenu(playerMenuUtility, currentCommand.getPlugin()).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

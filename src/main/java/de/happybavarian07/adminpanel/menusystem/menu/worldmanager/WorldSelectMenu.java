@@ -13,6 +13,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -100,6 +102,16 @@ public class WorldSelectMenu extends PaginatedMenu {
         }
     }
 
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
     public World getWorld(String name) {
         for (World world : getServer().getWorlds()) {
             if (world.getName().equals(name)) {
@@ -120,7 +132,7 @@ public class WorldSelectMenu extends PaginatedMenu {
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
 
         ///////////////////////////////////// Pagination loop template
-        if (worlds != null && !worlds.isEmpty()) {
+        if (!worlds.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= worlds.size()) break;

@@ -101,8 +101,8 @@ public class JSONObject {
          * so the clone method returns itself.
          * @return     NULL.
          */
-        protected final Object clone() {
-            return this;
+        protected final Object clone() throws CloneNotSupportedException {
+            return super.clone();
         }
 
         /**
@@ -1197,7 +1197,7 @@ public class JSONObject {
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
                                (c >= '\u2000' && c < '\u2100')) {
                     hhhh = "000" + Integer.toHexString(c);
-                    sb.append("\\u" + hhhh.substring(hhhh.length() - 4));
+                    sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
                 } else {
                     sb.append(c);
                 }
@@ -1449,16 +1449,16 @@ public class JSONObject {
             return "null";
         }
         if (value instanceof JSONString) {
-            Object object;
+            String object;
             try {
                 object = ((JSONString)value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            if (object instanceof String) {
-                return (String)object;
+            if (object != null) {
+                return object;
             }
-            throw new JSONException("Bad value from toJSONString: " + object);
+            throw new JSONException("Bad value from toJSONString: " + null);
         }
         if (value instanceof Number) {
             return numberToString((Number) value);

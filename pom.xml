@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.happybavarian07</groupId>
     <artifactId>Admin-Panel</artifactId>
-    <version>8.5.0</version>
+    <version>8.6.0</version>
 
     <name>Admin-Panel</name>
     <description>An Minecraft Plugin to control your Server!</description>
@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>default-deploy</id>
@@ -96,7 +96,7 @@
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
 
@@ -127,8 +127,8 @@
     </scm>
 
     <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <packaging>jar</packaging>
 
@@ -151,7 +151,7 @@
         </repository>
         <repository>
             <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
             <id>maven-central</id>
@@ -163,7 +163,20 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>9.8.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>9.8.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -184,12 +197,6 @@
             <version>2.10.9</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.14.3</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- SuperVanish -->
         <dependency>
             <groupId>com.github.LeonMangler</groupId>
@@ -197,11 +204,23 @@
             <version>6.2.7</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.30</version>
+            <groupId>com.tchristofferson</groupId>
+            <artifactId>ConfigUpdater</artifactId>
+            <version>2.1-SNAPSHOT</version>
+        </dependency>
+        <!-- Use ezlib -->
+        <dependency>
+            <groupId>com.saicone.ezlib</groupId>
+            <artifactId>ezlib</artifactId>
+            <version>1.2.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Use ezlib loader -->
+        <dependency>
+            <groupId>com.saicone.ezlib</groupId>
+            <artifactId>loader</artifactId>
+            <version>1.2.3</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -6,23 +6,22 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
 public class ArmorMenu extends Menu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final UUID targetUUID;
 
-    public ArmorMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public ArmorMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.targetUUID = targetUUID;
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview");
     }
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("PlayerManager.ArmorView", Bukkit.getPlayer(targetUUID));
+        return lgm.getMenuTitle("PlayerManager.ArmorView", playerMenuUtility.getTarget());
     }
 
     @Override
@@ -38,7 +37,7 @@ public class ArmorMenu extends Menu {
     @Override
     public void handleMenu(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        Player target = Bukkit.getPlayer(targetUUID);
+        Player target = playerMenuUtility.getTarget();
         ItemStack item = e.getCurrentItem();
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
@@ -55,8 +54,18 @@ public class ArmorMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionsMenu(playerMenuUtility, targetUUID).open();
+            new PlayerActionsMenu(playerMenuUtility).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override
@@ -64,7 +73,7 @@ public class ArmorMenu extends Menu {
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, super.FILLER);
         }
-        Player target = Bukkit.getPlayer(targetUUID);
+        Player target = playerMenuUtility.getTarget();
         if (target.getInventory().getArmorContents()[0] != null) {
             inventory.setItem(0, target.getInventory().getArmorContents()[0]);
         } else {

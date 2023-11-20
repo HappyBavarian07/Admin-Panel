@@ -1,13 +1,13 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 
-import de.happybavarian07.adminpanel.main.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.server.KickAllPlayersEvent;
 import de.happybavarian07.adminpanel.events.server.MaintenanceModeToggleEvent;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.Menu;
+import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,11 +15,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 return;
             }
             player.closeInventory();
-            player.setMetadata("serverManagerBroadcastMessage", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("serverManagerBroadcastMessage", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player, true));
         } else if (item.equals(lgm.getItem(path + "ChatManagerItem", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
@@ -112,7 +113,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
                     plugin.setInMaintenanceMode(false);
-                    if(!plugin.isInMaintenanceMode()) {
+                    if (!plugin.isInMaintenanceMode()) {
                         Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
                         super.open();
                     }
@@ -131,7 +132,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
                     plugin.setInMaintenanceMode(true);
-                    if(plugin.isInMaintenanceMode()) {
+                    if (plugin.isInMaintenanceMode()) {
                         for (Player online : Bukkit.getOnlinePlayers()) {
                             if (!online.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) {
                                 online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
@@ -151,6 +152,16 @@ public class ServerManagerMenu extends Menu implements Listener {
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override
@@ -175,13 +186,13 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("serverManagerBroadcastMessage")) {
+        if (playerMenuUtility.hasData("serverManagerBroadcastMessage")) {
             String message = Utils.chat(event.getMessage());
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", message, true);
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player, false));
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", player, false));
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastFooter", player, true));
-            player.removeMetadata("serverManagerBroadcastMessage", plugin);
+            playerMenuUtility.removeData("serverManagerBroadcastMessage");
             super.open();
             event.setCancelled(true);
         }
@@ -190,7 +201,7 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if(player.hasPermission("AdminPanel.Bypass.KickInMainTenanceMode")) return;
+        if (player.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) return;
         if (plugin.isInMaintenanceMode()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player, true));
         } else {

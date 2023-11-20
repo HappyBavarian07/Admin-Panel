@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -96,12 +98,22 @@ public class PluginCommandsListMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
 
         Map<String, Map<String, Object>> commands = currentPlugin.getDescription().getCommands();
         ///////////////////////////////////// Pagination loop template
-        if (commands != null && !commands.isEmpty()) {
+        if (!commands.isEmpty()) {
             int i = 0;
             for (String cmdName : commands.keySet()) {
                 index = super.maxItemsPerPage * page + i;

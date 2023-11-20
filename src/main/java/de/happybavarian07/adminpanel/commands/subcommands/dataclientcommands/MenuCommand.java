@@ -5,7 +5,11 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.dataclient.DataClientMainMenu;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -19,13 +23,25 @@ public class MenuCommand extends SubCommand {
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return false;
-    }
+    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
+        if(playerOrNull == null) {
+            sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
+            return false;
+        }
+        if(args.length == 0) {
+            new DataClientMainMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerOrNull)).open();
+            return true;
+        }
 
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        return false;
+        Player target = Bukkit.getPlayer(args[0]);
+        if(target == null) {
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], false);
+            sender.sendMessage(lgm.getMessage("General.TargetedPlayerIsNull", playerOrNull, true));
+            return false;
+        }
+
+        new DataClientMainMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        return true;
     }
 
     @Override
@@ -62,7 +78,12 @@ public class MenuCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
-        return "";
+    public String permissionAsString() {
+        return "AdminPanel.DataClient.Menu.Open";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

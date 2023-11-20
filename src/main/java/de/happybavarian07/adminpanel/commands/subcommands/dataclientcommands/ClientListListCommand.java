@@ -6,7 +6,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -26,7 +26,7 @@ public class ClientListListCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getNamesOfAllClients());
+            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
             messages.maxItemsPerPage(10).sort();
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -58,7 +58,8 @@ public class ClientListListCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getNamesOfAllClients());
+            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
+            System.out.println("Other Connected Clients: " + plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
             messages.maxItemsPerPage(10).sort();
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -109,7 +110,12 @@ public class ClientListListCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.DataClient.SubCommands.ListClients";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

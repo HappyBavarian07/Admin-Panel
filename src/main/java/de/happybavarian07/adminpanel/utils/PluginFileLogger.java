@@ -9,6 +9,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
@@ -24,12 +26,32 @@ public class PluginFileLogger {
         logFile = new File(plugin.getDataFolder(), "plugin.log");
     }
 
-    public PluginFileLogger writeToLog(Level record, String stringToLog, String logPrefix) {
-        if (!plugin.getConfig().getBoolean("Plugin.LogActions")) return instance;
+    public PluginFileLogger writeToLog(Level record, String stringToLog, LogPrefix logPrefix) {
+        if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled") || !logPrefix.isEnabled()) return instance;
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
-            Date d = Calendar.getInstance().getTime();
-            String prefix = "[" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " " + record + "]: [" + logPrefix + "] ";
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+
+            String prefix = "[" + dtf.format(now) + " " + record + "]: [" + logPrefix.getLogPrefix() + "] ";
+            bw.write(prefix + stringToLog);
+            bw.newLine();
+            bw.close();
+            return instance;
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+            return instance;
+        }
+    }
+
+    public PluginFileLogger writeToLog(Level record, String stringToLog, String logPrefix) {
+        if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled")) return instance;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+
+            String prefix = "[" + dtf.format(now) + " " + record + "]: [" + logPrefix + "] ";
             bw.write(prefix + stringToLog);
             bw.newLine();
             bw.close();

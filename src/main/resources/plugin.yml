@@ -43,6 +43,28 @@ permissions:
               AdminPanel.DataClient.SubCommands.SyncTrolls: true
               AdminPanel.DataClient.SubCommands.ListClients: true
               AdminPanel.DataClient.SubCommands.UpdateClients: true
+          AdminPanel.DataClient.Menu:
+            default: op
+            children:
+              AdminPanel.DataClient.Menu.Settings:
+                default: op
+                children:
+                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnection: true
+                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming: true
+                  AdminPanel.DataClient.Menu.Settings.Debug: true
+                  AdminPanel.DataClient.Menu.Settings.OverwritePermissions: true
+                  AdminPanel.DataClient.Menu.Settings.FileLogging: true
+                  AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix: true
+
+              AdminPanel.DataClient.Menu.Button:
+                default: op
+                children:
+                  AdminPanel.DataClient.Menu.Button.Disconnect: true
+                  AdminPanel.DataClient.Menu.Button.Connect: true
+                  AdminPanel.DataClient.Menu.Button.Reconnect: true
+                  AdminPanel.DataClient.Menu.Button.PacketHandling: true
+                  AdminPanel.DataClient.Menu.Button.DataClientName: true
+                  AdminPanel.DataClient.Menu.Button.DataClientSettings: true
       AdminPanel.PerPlayerLang: true
       AdminPanel.PerPlayerLangOther: true
       AdminPanel.SwitchLanguage: true
@@ -206,6 +228,7 @@ permissions:
                   AdminPanel.PlayerManager.PlayerSettings.Permissions.List: true
                   AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove: true
                   AdminPanel.PlayerManager.PlayerSettings.Permissions.Open: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.MenuHelp: true
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick:

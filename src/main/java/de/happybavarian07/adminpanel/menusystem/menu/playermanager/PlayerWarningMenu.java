@@ -4,7 +4,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.Warning;
@@ -12,6 +12,8 @@ import de.happybavarian07.adminpanel.utils.WarningManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
@@ -22,9 +24,9 @@ public class PlayerWarningMenu extends PaginatedMenu {
     private final WarningManager warningManager;
     private final Map<ItemStack, Warning> itemsToWarnings = new HashMap<>();
 
-    public PlayerWarningMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PlayerWarningMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.targetUUID = targetUUID;
+        this.targetUUID = playerMenuUtility.getTargetUUID();
         this.warningManager = AdminPanelMain.getPlugin().getWarningManager();
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Warnings");
     }
@@ -99,7 +101,7 @@ public class PlayerWarningMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
@@ -132,13 +134,23 @@ public class PlayerWarningMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
         //The thing you will be looping through to place items
         List<Warning> warnings = new ArrayList<>(warningManager.getWarnings(targetUUID));
 
         ///////////////////////////////////// Pagination loop template
-        if (warnings != null && !warnings.isEmpty()) {
+        if (!warnings.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= warnings.size()) break;

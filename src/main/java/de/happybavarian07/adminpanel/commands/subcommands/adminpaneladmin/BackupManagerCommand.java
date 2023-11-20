@@ -6,8 +6,8 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.main.Placeholder;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.Placeholder;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.utils.BackupManager;
 import de.happybavarian07.adminpanel.utils.FileBackup;
 import org.bukkit.command.CommandSender;
@@ -180,8 +180,13 @@ public class BackupManagerCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.BackupManager";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 
     private String formatStringWithFile(String in, File f) {

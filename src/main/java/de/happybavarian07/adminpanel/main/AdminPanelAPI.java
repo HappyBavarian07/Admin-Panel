@@ -3,6 +3,9 @@ package de.happybavarian07.adminpanel.main;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
+import de.happybavarian07.adminpanel.language.LanguageFile;
+import de.happybavarian07.adminpanel.language.Placeholder;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import org.bukkit.command.CommandSender;
@@ -39,7 +42,7 @@ public interface AdminPanelAPI {
      *
      * @return Die Map
      */
-    Map<Player, PlayerMenuUtility> getPlayerMenuUtilityMap();
+    Map<UUID, PlayerMenuUtility> getPlayerMenuUtilityMap();
 
     /**
      * Diese Methode sucht nach der PlayerMenuUtility von dem Spieler
@@ -192,20 +195,18 @@ public interface AdminPanelAPI {
     /**
      * Restartet den Server
      *
-     * @param time Zeit zwischen den Aktionen und Nachrichten
-     * @param time2 Zeit zwischen dem Restart und Player Kick
+     * @param timeBeforeRestart Zeit zwischen dem Restart und Player Kick
      * @throws InterruptedException Wenn der Restart unterbrochen wird
      */
-    void restartServer(int time, int time2) throws InterruptedException;
+    void restartServer(int timeBeforeRestart) throws InterruptedException;
 
     /**
      * Stoppt den Server
      *
-     * @param time  Zeit zwischen den Aktionen und Nachrichten
-     * @param time2 Zeit bevor Spieler gekickt werden und der Server gestoppt wird
+     * @param timeBeforeStop Zeit bevor Spieler gekickt werden und der Server gestoppt wird
      * @throws InterruptedException Wenn es unterbrochen wird
      */
-    void stopServer(int time, int time2) throws InterruptedException;
+    void stopServer(int timeBeforeStop) throws InterruptedException;
 
     /**
      * Sends A formatted Report Message to my Discord via a Webhook
@@ -429,6 +430,8 @@ public interface AdminPanelAPI {
      * @param path   Der Pfad zum Objekt in der Config
      * @param defaultValue Der Default Wert
      * @param player Der Spieler für die Placeholders
+     * @param <T> Der Typ des Objekts welches aus der Config gesucht wird
+     * @param resetAfter Ob die Placeholder zurückgesetzt werden sollen nach dem ersetzen
      * @return Das Objekt, falls es ein String ist mit Placeholders
      */
     <T> T getCustomObject(String path, Player player, T defaultValue, boolean resetAfter);
@@ -442,6 +445,7 @@ public interface AdminPanelAPI {
      * @param defaultValue Der Default Wert
      * @param langName Der Sprachen Name falls gewollt
      * @param resetAfter Ob die Custom Placeholder nachher resettet werden sollen
+     * @param <T> Der Typ des Objekts welches aus der Config gesucht wird
      * @return Das Objekt, falls es ein String ist mit Placeholders
      */
     <T> T getCustomObject(String path, Player player, String langName, T defaultValue, boolean resetAfter);
@@ -472,6 +476,7 @@ public interface AdminPanelAPI {
      * Registriert einen neuen Command Manager
      * Weitere Infos im Wiki unter Command Manager API
      * @param commandManager der Command Manager
+     * @return Gibt zurück ob der Command Manager registriert wurde
      */
     boolean registerCommandManager(CommandManager commandManager);
 

@@ -5,7 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -68,7 +68,12 @@ public class TrollsSyncCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.DataClient.SubCommands.SyncTrolls";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

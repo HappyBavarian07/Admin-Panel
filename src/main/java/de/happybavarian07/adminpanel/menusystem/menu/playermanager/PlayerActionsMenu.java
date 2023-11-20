@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
@@ -13,6 +13,8 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -20,17 +22,15 @@ import java.util.UUID;
 
 public class PlayerActionsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final UUID targetUUID;
 
-    public PlayerActionsMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PlayerActionsMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.targetUUID = targetUUID;
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Actions");
     }
 
     @Override
     public String getMenuName() {
-        return lgm.getMenuTitle("PlayerManager.PlayerActions", Bukkit.getPlayer(targetUUID));
+        return lgm.getMenuTitle("PlayerManager.PlayerActions", playerMenuUtility.getTarget());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PlayerActionsMenu extends Menu {
     @Override
     public void handleMenu(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        Player target = Bukkit.getPlayer(targetUUID);
+        Player target = playerMenuUtility.getTarget();
         ItemStack item = e.getCurrentItem();
         String path = "PlayerManager.ActionsMenu.";
 
@@ -105,7 +105,7 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "Vanish.false", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish")) {
                 player.sendMessage(noPerms);
@@ -125,13 +125,13 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PotionMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PotionMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "Spawning", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new SpawningMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new SpawningMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "PlayerSpawnLocation", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation")) {
                 player.sendMessage(noPerms);
@@ -209,14 +209,24 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new ArmorMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new ArmorMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem("General.Close", target, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override
@@ -225,7 +235,7 @@ public class PlayerActionsMenu extends Menu {
             inventory.setItem(i, super.FILLER);
         }
         String path = "PlayerManager.ActionsMenu.";
-        Player target = Bukkit.getPlayer(targetUUID);
+        Player target = playerMenuUtility.getTarget();
         inventory.setItem(getSlot("PlayerManager.PlayerHead", 4), lgm.getItem("PlayerManager.PlayerHead", target, false));
         SkullMeta meta = (SkullMeta) inventory.getItem(4).getItemMeta();
         meta.setOwningPlayer(target);

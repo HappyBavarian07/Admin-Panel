@@ -14,6 +14,8 @@ import de.happybavarian07.adminpanel.utils.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -164,6 +166,16 @@ public class PluginSettingsMenu extends Menu {
             }
             new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -80,6 +82,16 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
         Player player = playerMenuUtility.getOwner();
@@ -88,7 +100,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
         Collections.addAll(players, getServer().getOfflinePlayers());
 
         ///////////////////////////////////// Pagination loop template
-        if (players != null && !players.isEmpty()) {
+        if (!players.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= players.size()) break;

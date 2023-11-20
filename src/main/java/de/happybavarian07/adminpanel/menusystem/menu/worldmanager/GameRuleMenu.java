@@ -13,6 +13,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -77,9 +79,6 @@ public class GameRuleMenu extends PaginatedMenu {
                                 }
                             } else if (world.getGameRuleValue(gamerules.get(count)) instanceof Integer) {
                                 int value = Integer.parseInt(world.getGameRuleValue(gamerules.get(count).getName()));
-                                System.out.println("Shift click: " + event.isShiftClick() + " | " + event.getClick().isShiftClick());
-                                System.out.println("Value 1: " + value);
-                                System.out.println("Inventory Action: " + event.getAction());
                                 if (event.isShiftClick()) {
                                     if(!event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) return;
                                     if (event.isLeftClick()) {
@@ -143,6 +142,16 @@ public class GameRuleMenu extends PaginatedMenu {
             }
             super.open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

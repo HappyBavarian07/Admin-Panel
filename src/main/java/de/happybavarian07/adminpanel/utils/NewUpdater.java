@@ -17,14 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Optional;
 import java.util.logging.Level;
 
 public class NewUpdater implements Listener {
@@ -64,7 +62,9 @@ public class NewUpdater implements Listener {
     }
 
     public String html2text(String html) {
-        return Jsoup.parse(html).text();
+        String text = html.replaceAll("<.*?>", "");
+        text = text.replaceAll("\\s+", " ").trim();
+        return text;
     }
 
     public String getLatestVersionID() {
@@ -76,7 +76,7 @@ public class NewUpdater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
-        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version ID for Plugin: " + getPluginName() + " -> " + version, "Updater");
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version ID for Plugin: " + getPluginName() + " -> " + version, LogPrefix.UPDATER);
         return version;
     }
 
@@ -89,7 +89,7 @@ public class NewUpdater implements Listener {
             e.printStackTrace();
             version = "NoVersionFound";
         }
-        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version Name for Plugin: " + getPluginName() + " -> " + version, "Updater");
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version Name for Plugin: " + getPluginName() + " -> " + version, LogPrefix.UPDATER);
         return version;
     }
 
@@ -148,10 +148,10 @@ public class NewUpdater implements Listener {
         boolean available = versionComparator.updateAvailable(pluginVersion, spigotVersion);
 
         if (available) {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked for Plugin: " + getPluginName() + " if an Update is available -> true", "Updater");
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked for Plugin: " + getPluginName() + " if an Update is available -> true", LogPrefix.UPDATER);
             return true;
         } else {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked for Plugin: " + getPluginName() + " if an Update is available -> false", "Updater");
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Checked for Plugin: " + getPluginName() + " if an Update is available -> false", LogPrefix.UPDATER);
             return false;
         }
     }
@@ -162,7 +162,7 @@ public class NewUpdater implements Listener {
             if (logInConsole && plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Update available for Plugin: " + getPluginName()));
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "Checked Plugin: " + getPluginName() + " for Updates -> There is no Update Available", "Updater");
+            plugin.getFileLogger().writeToLog(Level.INFO, "Checked Plugin: " + getPluginName() + " for Updates -> There is no Update Available", LogPrefix.UPDATER);
         } else {
             JSONObject jsonObject = getObjectFromWebsite("https://api.spiget.org/v2/resources/" + resourceID + "/updates/latest");
             Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -180,7 +180,7 @@ public class NewUpdater implements Listener {
                                 "&bNew Version ID: &c" + getLatestVersionID() + "&r\n" +
                                 "&bNew Version Title: &c" + jsonObject.getString("title") + "&r\n" +
                                 "&bNew Version Description: &c" + descriptionDecoded));*/
-                plugin.getFileLogger().writeToLog(Level.WARNING, "Checked Plugin: " + getPluginName() + " for Updates -> There is an Update Available! (Version Change: " + getPluginVersion() + " -> " + getLatestVersionName() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.WARNING, "Checked Plugin: " + getPluginName() + " for Updates -> There is an Update Available! (Version Change: " + getPluginVersion() + " -> " + getLatestVersionName() + ")", LogPrefix.UPDATER);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -210,7 +210,7 @@ public class NewUpdater implements Listener {
             try {
                 downloadPath.createNewFile();
             } catch (IOException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.ERROR;
             }
         }
@@ -218,7 +218,7 @@ public class NewUpdater implements Listener {
         try {
             downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/versions/" + versionID + "/download");
         } catch (MalformedURLException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
             return UpdateResponse.SPIGET_ERROR;
         }
         try {
@@ -226,7 +226,7 @@ public class NewUpdater implements Listener {
             FileUtils.copyURLToFile(downloadURL, downloadPath);
         } catch (IOException /*| InterruptedException*/ e) {
             e.printStackTrace();
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
             return UpdateResponse.DOWNLOAD_FAIL;
         }
         downloadPath.renameTo(new File(plugin.getDataFolder() + "/downloaded-update/Admin-Panel-" + spigotVersion + ".jar"));
@@ -237,7 +237,7 @@ public class NewUpdater implements Listener {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefix.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
         } else if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && replace) {
 
@@ -251,13 +251,13 @@ public class NewUpdater implements Listener {
                 }
                 FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
             } catch (IOException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.ERROR;
             }
             try {
                 pluginUtils.load(newPluginFile);
             } catch (InvalidPluginException | InvalidDescriptionException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.LOADING_ERROR;
             }
             Bukkit.getPluginManager().enablePlugin(pluginUtils.getPluginByName("Admin-Panel"));
@@ -266,7 +266,7 @@ public class NewUpdater implements Listener {
                         "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
                                 "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", "Updater");
+            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefix.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
         } else
             return UpdateResponse.ERROR;
@@ -292,7 +292,7 @@ public class NewUpdater implements Listener {
             try {
                 downloadPath.createNewFile();
             } catch (IOException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.ERROR;
             }
         }
@@ -304,14 +304,14 @@ public class NewUpdater implements Listener {
                 downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
             }
         } catch (MalformedURLException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
             return UpdateResponse.SPIGET_ERROR;
         }
         try {
             //pluginUtils.downloadFileFromURL(downloadPath, downloadURL);
             FileUtils.copyURLToFile(downloadURL, downloadPath);
         } catch (IOException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
             return UpdateResponse.DOWNLOAD_FAIL;
         }
         downloadPath.renameTo(new File(plugin.getDataFolder() + "/downloaded-update/" + fileName.replace("%version%", getLatestVersionName())));
@@ -322,7 +322,7 @@ public class NewUpdater implements Listener {
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
                 plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + downloadPath));
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", "Updater");
+            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + getLatestVersionName() + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefix.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
         } else if (force) {
             try {
@@ -336,14 +336,14 @@ public class NewUpdater implements Listener {
                 }
                 FileUtils.moveFileToDirectory(downloadPath, plugin.getDataFolder().getParentFile(), false);
             } catch (IOException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.ERROR;
             }
             Plugin loadedPlugin;
             try {
                 loadedPlugin = pluginUtils.load(newPluginFile);
             } catch (InvalidPluginException | InvalidDescriptionException e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", "Updater");
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
                 return UpdateResponse.LOADING_ERROR;
             }
             Bukkit.getPluginManager().enablePlugin(loadedPlugin);
@@ -352,7 +352,7 @@ public class NewUpdater implements Listener {
                         "&aThe new Version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
                                 "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + getLatestVersionName() + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", "Updater");
+            plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + getLatestVersionName() + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefix.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
         } else
             return UpdateResponse.ERROR;
@@ -360,7 +360,7 @@ public class NewUpdater implements Listener {
 
     public String getPluginVersion() {
         if(getPluginName() == null) return getLatestVersionName();
-        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Plugin: " + getPluginName() + " Version -> " + pluginUtils.getPluginByName(getPluginName()).getDescription().getVersion(), "Updater");
+        plugin.getFileLogger().writeToLog(Level.INFO, "Requested Plugin: " + getPluginName() + " Version -> " + pluginUtils.getPluginByName(getPluginName()).getDescription().getVersion(), LogPrefix.UPDATER);
         return pluginUtils.getPluginByName(getPluginName()).getDescription().getVersion();
     }
 

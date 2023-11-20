@@ -1,9 +1,10 @@
 package de.happybavarian07.adminpanel.commands;
 
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,7 +31,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
                     new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-                    plugin.getFileLogger().writeToLog(Level.INFO, "Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")", "ActionsLogger - Player");
+                    plugin.getFileLogger().writeToLog(Level.INFO, "Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLAYER);
                 } else {
                     sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
                 }
@@ -45,7 +46,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                         try {
                             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                             player.sendMessage(openingMessageSelfOpenedForOther);
-                            plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", "ActionsLogger - Player");
+                            plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLAYER);
                         } catch (NullPointerException e) {
                             player.sendMessage(targetPlayerIsNull);
                         }
@@ -62,7 +63,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     try {
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                         console.sendMessage(openingMessageSelfOpenedForOther);
-                        plugin.getFileLogger().writeToLog(Level.INFO, "Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", "ActionsLogger - Player");
+                        plugin.getFileLogger().writeToLog(Level.INFO, "Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLAYER);
                     } catch (NullPointerException e) {
                         console.sendMessage(targetplayerisnull);
                     }

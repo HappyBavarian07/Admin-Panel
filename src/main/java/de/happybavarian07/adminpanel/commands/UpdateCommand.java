@@ -2,7 +2,7 @@ package de.happybavarian07.adminpanel.commands;
 
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

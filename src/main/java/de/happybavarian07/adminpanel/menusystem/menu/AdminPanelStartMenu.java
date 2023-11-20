@@ -10,6 +10,8 @@ import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMen
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class AdminPanelStartMenu extends Menu {
@@ -48,21 +50,13 @@ public class AdminPanelStartMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                try {
-                    Utils.serverRestart(20, 60);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
+                Utils.serverRestart(60);
             } else if (item.equals(lgm.getItem(path + "ServerStop", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                try {
-                    Utils.serverStop(1000, 2000);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
+                Utils.serverStop(60);
             } else if (item.equals(lgm.getItem(path + "WorldManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.WorldManager.open")) {
                     player.sendMessage(noPerms);
@@ -102,6 +96,16 @@ public class AdminPanelStartMenu extends Menu {
                 new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
             }
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

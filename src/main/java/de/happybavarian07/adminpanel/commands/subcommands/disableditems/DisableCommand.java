@@ -61,7 +61,12 @@ public class DisableCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.DisabledItems.Disable";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

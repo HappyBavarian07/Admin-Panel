@@ -9,18 +9,18 @@ import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionS
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
 public class PermissionActionSelectMenu extends Menu {
     private final PlayerMenuUtility playerMenuUtility;
-    private final UUID targetUUID;
 
-    public PermissionActionSelectMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PermissionActionSelectMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         this.playerMenuUtility = playerMenuUtility;
-        this.targetUUID = targetUUID;
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Open");
     }
 
@@ -52,33 +52,55 @@ public class PermissionActionSelectMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PermissionListMenu(playerMenuUtility, PermissionAction.ADD, PermissionListMode.ALL, "", targetUUID).open();
+                playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                playerMenuUtility.addData("PermissionAction", PermissionAction.ADD);
+                playerMenuUtility.addData("SortQuery", "");
+                new PermissionListMenu(playerMenuUtility).open();
             } else if (item.equals(lgm.getItem(path + "Remove", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PermissionListMenu(playerMenuUtility, PermissionAction.REMOVE, PermissionListMode.ALL, "", targetUUID).open();
+                playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                playerMenuUtility.addData("PermissionAction", PermissionAction.REMOVE);
+                playerMenuUtility.addData("SortQuery", "");
+                new PermissionListMenu(playerMenuUtility).open();
             } else if (item.equals(lgm.getItem(path + "Info", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Info")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PermissionListMenu(playerMenuUtility, PermissionAction.INFO, PermissionListMode.ALL, "", targetUUID).open();
+                playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                playerMenuUtility.addData("PermissionAction", PermissionAction.INFO);
+                playerMenuUtility.addData("SortQuery", "");
+                new PermissionListMenu(playerMenuUtility).open();
             } else if (item.equals(lgm.getItem(path + "List", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.List")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PermissionListMenu(playerMenuUtility, PermissionAction.LIST, PermissionListMode.ALL, "", targetUUID).open();
+                playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                playerMenuUtility.addData("PermissionAction", PermissionAction.LIST);
+                playerMenuUtility.addData("SortQuery", "");
+                new PermissionListMenu(playerMenuUtility).open();
             } else if (item.equals(lgm.getItem("General.Close", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PlayerActionSelectMenu(playerMenuUtility, targetUUID).open();
+                new PlayerActionSelectMenu(playerMenuUtility).open();
             }
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

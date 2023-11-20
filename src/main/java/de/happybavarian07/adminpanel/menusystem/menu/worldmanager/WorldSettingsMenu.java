@@ -13,11 +13,15 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -168,7 +172,15 @@ public class WorldSettingsMenu extends Menu {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(deleteEvent);
                 if (!deleteEvent.isCancelled()) {
-                    for (Player playerInWorld : world.getPlayers()) {
+                    Utils.openConfirmationMenu(
+                            "World Deletion of World: " + world.getName(),
+                            "worldmanager.WorldSelectMenu",
+                            Utils.class.getMethod("deleteMinecraftWorld", World.class),
+                            Utils.getInstance(),
+                            List.of(world),
+                            Collections.emptyList(),
+                            player);
+                    /*for (Player playerInWorld : world.getPlayers()) {
                         playerInWorld.kickPlayer(Utils.chat("The World just got deleted!"));
                     }
                     new BukkitRunnable() {
@@ -179,10 +191,12 @@ public class WorldSettingsMenu extends Menu {
                             deleteWorldFolder(world.getWorldFolder().getAbsoluteFile());
                             new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
                         }
-                    }.runTaskLater(plugin, 5);
+                    }.runTaskLater(plugin, 5);*/
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                throw new RuntimeException(ex);
             }
         } else if (item.equals(lgm.getItem(itemPath + "GameRule", player, false))) {
             new GameRuleMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
@@ -199,6 +213,16 @@ public class WorldSettingsMenu extends Menu {
             }
             new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.LanguageManager;
+import de.happybavarian07.adminpanel.language.LanguageManager;
 
 public abstract class PaginatedMenu extends Menu {
 

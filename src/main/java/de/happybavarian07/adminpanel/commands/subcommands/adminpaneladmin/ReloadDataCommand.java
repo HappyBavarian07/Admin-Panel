@@ -69,7 +69,12 @@ public class ReloadDataCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.ReloadData";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

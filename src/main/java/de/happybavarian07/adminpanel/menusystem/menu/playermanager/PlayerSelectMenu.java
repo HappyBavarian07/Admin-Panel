@@ -9,6 +9,8 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -55,12 +57,13 @@ public class PlayerSelectMenu extends PaginatedMenu {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
                 if (!selectPlayerEvent.isCancelled()) {
-                    if (player.equals(Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName())) &&
+                    if (player.getName().equals(item.getItemMeta().getDisplayName()) &&
                     !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
                         player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player, true));
                         return;
                     }
-                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), target).open();
+                    playerMenuUtility.setTargetUUID(target);
+                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
@@ -105,6 +108,16 @@ public class PlayerSelectMenu extends PaginatedMenu {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         addMenuBorder();
         inventory.setItem(getSlot("PlayerManager.ActionsMenu.BannedPlayers", 47), lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false));
@@ -113,7 +126,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
 
         ///////////////////////////////////// Pagination loop template
-        if (players != null && !players.isEmpty()) {
+        if (!players.isEmpty()) {
             for (int i = 0; i < super.maxItemsPerPage; i++) {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= players.size()) break;

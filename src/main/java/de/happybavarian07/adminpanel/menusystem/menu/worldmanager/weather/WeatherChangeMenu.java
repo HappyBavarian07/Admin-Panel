@@ -9,10 +9,11 @@ import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSettingsM
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class WeatherChangeMenu extends Menu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final World world;
 
     public WeatherChangeMenu(PlayerMenuUtility playerMenuUtility, World world) {
@@ -40,7 +41,7 @@ public class WeatherChangeMenu extends Menu {
     public void handleMenu(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
-        String itemPath = "WorldManager.Time.";
+        String itemPath = "WorldManager.Weather.";
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, false);
 
@@ -63,7 +64,6 @@ public class WeatherChangeMenu extends Menu {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
                 if (!changeEvent.isCancelled()) {
                     world.setStorm(true);
-                    world.setThundering(false);
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
@@ -86,6 +86,16 @@ public class WeatherChangeMenu extends Menu {
             }
             new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @Override

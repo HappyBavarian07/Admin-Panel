@@ -1,7 +1,7 @@
 # The Language File for English Language
 # %prefix% = The Prefix of the Plugin (works in every Message)
 LanguageFullName: 'English'
-LanguageVersion: '8.1.0'
+LanguageVersion: '8.6.0'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
@@ -27,15 +27,20 @@ Messages:
       PermissionsSendForOnePlayer: '%prefix% &9> &aDie Permissions von ''%target_player%'' wurden an den Server geschickt.'
     TrollsSync:
       TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
+    Menu:
+      AutoCheckConnectionTimingChat: '%prefix% &9> &aEnter the Auto Check Connection Timing in the Chat! (Current: %apdataclient_auto_check_connection_timing%)'
+      AutoCheckConnectingTimingChatSuccess: '%prefix% &9> &aThe Auto Check Connection Timing has been set to %apdataclient_auto_check_connection_timing%!'
+      FileLoggingPrefixChat: '%prefix% &9> &aEnter the File Logging Prefix in the Chat! (Current: %apdataclient_file_logging_prefix%)'
+      FileLoggingPrefixChatSuccess: '%prefix% &9> &aThe File Logging Prefix has been set to %apdataclient_file_logging_prefix%!'
   BackupSystem:
     SubCommands:
       # Placeholders:
       # %backupName% = equals the Backup Config Name
       Start: '%prefix% &9> &aThe Backup Making Process for ''%backupName%'' finished. &r%success%'
       Load: '%prefix% &9> &aThe Backup Loading Process for ''%backupName%'' finished. You can find the old Configs in a Zip File named: ''old_configs.yml''. &r%success%'
-        # GetNewestBackup Placeholders:
-        # %fileName% = File Name
-        # %normalPath% = The Relative Path
+      # GetNewestBackup Placeholders:
+      # %fileName% = File Name
+      # %normalPath% = The Relative Path
       # %absolutePath% = The Absolute Path
       # %parentFile% = The Parent Directory / File
       # %exists% = If the File exists
@@ -139,6 +144,7 @@ Messages:
         Format: '  &b%usage% &7- &b%description%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
     General:
+      Error: '%prefix% &9> &cAn unexpected Error happened! (%error%)'
       ReloadedConfig: '%prefix% &9> &aSuccessfully reloaded the Config!'
       # %language% = The Language of the Plugin
       ReloadedLanguageFile: '%prefix% &9> &aSuccessfully reloaded Language: %language%!'
@@ -273,6 +279,23 @@ Messages:
   TooFewArguments: '&4Too few Arguments!'
 Items:
   General:
+    ConfirmationMenu:
+      Confirm:
+        material: LIME_STAINED_GLASS_PANE
+        displayName: '&aConfirm'
+        lore:
+          - '&aConfirm this Action!'
+      Cancel:
+        material: RED_STAINED_GLASS_PANE
+        displayName: '&cCancel'
+        lore:
+          - '&cCancel this Action!'
+      ReasonItem:
+        material: PAPER
+        displayName: '&aDo you really want to do this?'
+        lore:
+          - '&aAction: %reason%'
+          - '&aGreen &f= &6Yes &f| &cRed &f= &6No'
     FillerItem:
       material: BLACK_STAINED_GLASS_PANE
       displayName: ' '
@@ -1223,6 +1246,125 @@ Items:
           displayName: '&2Permissions'
           lore:
             - '&2List of all Permissions!'
+  DataClientMenu:
+    MainMenu:
+      Controls:
+        Connect:
+          material: GREEN_WOOL
+          displayName: '&aConnect'
+          lore:
+            - '&aConnect to the Server!'
+        Reconnect:
+          material: ORANGE_WOOL
+          displayName: '&aReconnect'
+          lore:
+            - '&aReconnect to the Server!'
+        Disconnect:
+          material: RED_WOOL
+          displayName: '&cDisconnect'
+          lore:
+            - '&cDisconnect from the Server!'
+        PacketHandling:
+          true:
+            material: GREEN_WOOL
+            displayName: '&aPacket Handling'
+            lore:
+              - '&aTurn off Packet Handling!'
+          false:
+            material: RED_WOOL
+            displayName: '&cPacket Handling'
+            lore:
+              - '&cTurn on Packet Handling!'
+      DataClientName:
+        material: PAPER
+        displayName: '&aData Client: &6Name'
+        lore:
+          - '&aCurrent Data Client Name:'
+          - '&6%name%'
+          - '&aClick to change the Name!'
+      DataClientConnectedClients:
+        material: PAPER
+        displayName: '&aData Client: &6Connected Clients'
+        lore:
+          - '&aCurrent Connected Data Clients:'
+          - '&6%apdataclient_connected_clients%'
+          - '&aClick to change the Connected Clients!'
+      DataClientStats:
+        material: PAPER
+        displayName: '&aData Client: &6Stats'
+        lore:
+          - '&aCurrent Data Client Stats:'
+          - '&f- &aTotal Packets Send: &6%apdataclient_stats_total_packets_send%'
+          - '&f- &aTotal Packets Send (This Session): &6%apdataclient_stats_total_packets_send_this_session%'
+          - '&f- &aTotal Packets Received: &6%apdataclient_stats_total_packets_received%'
+          - '&f- &aTotal Packets Received (This Session): &6%apdataclient_stats_total_packets_received_this_session%'
+          - '&f- &aTotal Errors: &6%apdataclient_stats_total_errors%'
+          - '&f- &aTotal Errors (This Session): &6%apdataclient_stats_total_errors_this_session%'
+          - '&aClick to change the Stats!'
+      DataClientSettings:
+        material: LEVER
+        displayName: '&aData Client: &6Settings'
+        lore:
+          - '&aClick to change the Settings!'
+      Settings:
+        Debug:
+          true:
+            material: GREEN_WOOL
+            displayName: '&aDebug'
+            lore:
+              - '&aTurn off Debug!'
+          false:
+            material: RED_WOOL
+            displayName: '&cDebug'
+            lore:
+              - '&cTurn on Debug!'
+        OverwritePermissions:
+          true:
+            material: GREEN_WOOL
+            displayName: '&aOverwrite Permissions'
+            lore:
+              - '&aTurn off Overwrite Permissions!'
+          false:
+            material: RED_WOOL
+            displayName: '&cOverwrite Permissions'
+            lore:
+              - '&cTurn on Overwrite Permissions!'
+        AutoCheckConnection:
+          true:
+            material: GREEN_WOOL
+            displayName: '&aAuto Check Connection'
+            lore:
+              - '&aTurn off Auto Check Connection!'
+          false:
+            material: RED_WOOL
+            displayName: '&cAuto Check Connection'
+            lore:
+              - '&cTurn on Auto Check Connection!'
+        AutoCheckConnectionTiming:
+          material: CLOCK
+          displayName: '&aAuto Check Connection Timing'
+          lore:
+            - '&aCurrent Auto Check Connection Timing:'
+            - '&6%apdataclient_auto_check_connection_timing%'
+            - '&aClick to change the Auto Check Connection Timing!'
+        FileLogging:
+          true:
+            material: GREEN_WOOL
+            displayName: '&aFile Logging'
+            lore:
+              - '&aTurn off File Logging!'
+          false:
+            material: RED_WOOL
+            displayName: '&cFile Logging'
+            lore:
+              - '&cTurn on File Logging!'
+        FileLoggingPrefix:
+            material: PAPER
+            displayName: '&aFile Logging Prefix'
+            lore:
+                - '&aCurrent File Logging Prefix:'
+                - '&6%apdataclient_file_logging_prefix%'
+                - '&aClick to change the File Logging Prefix!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   SwitchLanguageMenu: '&aLanguages'
@@ -1265,3 +1407,7 @@ MenuTitles:
     Permissions:
       Menu: '&6Permissions'
       Settings: '&3Settings'
+  DataClientMainMenu: '&aData Client'
+  DataClientSettingsMenu: '&aData Client Settings'
+  Misc:
+    ConfirmationMenu: '&aConfirmation Menu'

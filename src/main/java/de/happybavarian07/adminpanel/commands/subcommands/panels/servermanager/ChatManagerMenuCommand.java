@@ -6,7 +6,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager;
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ChatManagerMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -95,7 +95,12 @@ public class ChatManagerMenuCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return new ChatManagerMenu(null).getOpeningPermission();
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

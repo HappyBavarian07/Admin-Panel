@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -13,18 +13,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerBanMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-
-    private final UUID targetUUID;
     private String reason = "";
     private int seconds = 0;
     private int minutes = 0;
@@ -33,10 +32,9 @@ public class PlayerBanMenu extends Menu implements Listener {
     private int months = 0;
     private int years = 0;
 
-    public PlayerBanMenu(PlayerMenuUtility playerMenuUtility, UUID targetUUID) {
+    public PlayerBanMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban");
-        this.targetUUID = targetUUID;
     }
 
     @Override
@@ -125,7 +123,7 @@ public class PlayerBanMenu extends Menu implements Listener {
             super.open();
         } else if (item.getType().equals(lgm.getItem(path + "Reason", player, false).getType()) &&
                 item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Reason", player, false).getItemMeta().getDisplayName()))) {
-            player.setMetadata("BanPlayerSetNewReason", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("BanPlayerSetNewReason", true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reason, false);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.EnterNewReason", player, true));
@@ -146,7 +144,7 @@ public class PlayerBanMenu extends Menu implements Listener {
             long monthsMillis = months * 2628000000L;
             long yearsMillis = years * 31556952000L;
             banEnd.setTime(System.currentTimeMillis() + secondsMillis + minutesMillis + hoursMillis + daysMillis + monthsMillis + yearsMillis);
-            OfflinePlayer target = Bukkit.getOfflinePlayer(targetUUID);
+            OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
             if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.NotBannable", player, true));
                 return;
@@ -158,7 +156,7 @@ public class PlayerBanMenu extends Menu implements Listener {
             if (target.isOnline()) {
                 target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.BanMenu.TargetKickMessage", target.getPlayer(), true)));
             }
-            Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(Bukkit.getOfflinePlayer(targetUUID).getName()), reason, banEnd, player.getName());
+            Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID()).getName()), reason, banEnd, player.getName());
             years = 0;
             months = 0;
             days = 0;
@@ -172,16 +170,26 @@ public class PlayerBanMenu extends Menu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), targetUUID).open();
+            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
     }
 
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("BanPlayerSetNewReason")) {
+        if (playerMenuUtility.hasData("BanPlayerSetNewReason")) {
             this.reason = format(player, event.getMessage());
-            player.removeMetadata("BanPlayerSetNewReason", plugin);
+            playerMenuUtility.removeData("BanPlayerSetNewReason");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.NewReasonSet", player, true));
             super.open();

@@ -12,16 +12,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorldCreateMenu extends Menu implements Listener {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private String worldName = "Name";
     private WorldType worldType = WorldType.NORMAL;
     private World.Environment worldEnvironment = World.Environment.NORMAL;
@@ -84,7 +84,7 @@ public class WorldCreateMenu extends Menu implements Listener {
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(nameItem)) {
-            player.setMetadata("createWorldSetName", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("createWorldSetName", true);
             player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player, true));
             player.closeInventory();
         } else if (item.equals(typeItem)) {
@@ -148,6 +148,16 @@ public class WorldCreateMenu extends Menu implements Listener {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         Player player = playerMenuUtility.getOwner();
         String path = "WorldManager.CreateMenu.";
@@ -203,9 +213,9 @@ public class WorldCreateMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("createWorldSetName")) {
+        if (playerMenuUtility.hasData("createWorldSetName")) {
             this.worldName = event.getMessage().replace(" ", "-");
-            player.removeMetadata("createWorldSetName", plugin);
+            playerMenuUtility.removeData("createWorldSetName");
             super.open();
             event.setCancelled(true);
         }

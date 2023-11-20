@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.listeners;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.MenuAddon;
+import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
@@ -19,7 +20,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MenuListener implements Listener {
@@ -32,9 +32,10 @@ public class MenuListener implements Listener {
                 @SuppressWarnings("deprecation")
                 @Override
                 public void run() {
-                    for (Player player : Bukkit.getOnlinePlayers())
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
                         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
-                            if (player.hasMetadata("AdminPanelOpen")) {
+                            if (playerMenuUtility.hasData("AdminPanelOpen")) {
                                 if (br.isCancelled()) return;
 
                                 Location loc = player.getLocation();
@@ -46,7 +47,7 @@ public class MenuListener implements Listener {
                             }
                         } else {
                             if (!VanishAPI.isInvisible(player)) {
-                                if (player.hasMetadata("AdminPanelOpen")) {
+                                if (playerMenuUtility.hasData("AdminPanelOpen")) {
                                     if (br.isCancelled()) return;
 
                                     Location loc = player.getLocation();
@@ -58,7 +59,7 @@ public class MenuListener implements Listener {
                                 }
                             }
                         }
-                    //
+                    }
                 }
             };
             br.runTaskTimer(AdminPanelMain.getPlugin(), 0L, 50L);
@@ -74,7 +75,7 @@ public class MenuListener implements Listener {
         // an InventoryHolder can be a Menu is because our Menu
         // class implements InventoryHolder!!
         if (holder instanceof Menu) {
-            e.setCancelled(true); // prevent them from fucking with the inventory
+            e.setCancelled(true); // prevent them from frickin over the inventory
             if (e.getCurrentItem() == null) { // deal with null exceptions
                 return;
             }
@@ -84,8 +85,8 @@ public class MenuListener implements Listener {
             // Call the handleMenu object which takes the event and processes it
             menu.handleMenu(e);
 
-            for(String menuAddonName : AdminPanelMain.getPlugin().getMenuAddons(menu.getConfigMenuAddonFeatureName()).keySet()) {
-                MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddons(menu.getConfigMenuAddonFeatureName()).get(menuAddonName);
+            for (String menuAddonName : AdminPanelMain.getPlugin().getMenuAddonManager().getMenuAddons(menu.getConfigMenuAddonFeatureName()).keySet()) {
+                MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddonManager().getMenuAddons(menu.getConfigMenuAddonFeatureName()).get(menuAddonName);
                 addon.handleMenu(e);
             }
         }
@@ -93,15 +94,19 @@ public class MenuListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvClose(InventoryCloseEvent event) {
+        Player player = (Player) event.getPlayer();
+        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
         if (event.getInventory().getHolder() instanceof Menu) {
-            if (event.getPlayer().hasMetadata("AdminPanelOpen")) {
-                Menu holder = (Menu) event.getInventory().getHolder();
+            Menu holder = (Menu) event.getInventory().getHolder();
 
-                for(String menuAddonName : AdminPanelMain.getPlugin().getMenuAddons(holder.getConfigMenuAddonFeatureName()).keySet()) {
-                    MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddons(holder.getConfigMenuAddonFeatureName()).get(menuAddonName);
+            holder.handleCloseMenu(event);
+
+            if (playerMenuUtility.hasData("AdminPanelOpen")) {
+                for (String menuAddonName : AdminPanelMain.getPlugin().getMenuAddonManager().getMenuAddons(holder.getConfigMenuAddonFeatureName()).keySet()) {
+                    MenuAddon addon = AdminPanelMain.getPlugin().getMenuAddonManager().getMenuAddons(holder.getConfigMenuAddonFeatureName()).get(menuAddonName);
                     addon.onCloseEvent();
                 }
-                event.getPlayer().removeMetadata("AdminPanelOpen", AdminPanelMain.getPlugin());
+                playerMenuUtility.removeData("AdminPanelOpen");
                 if (holder.getClass().isAssignableFrom(Listener.class)) HandlerList.unregisterAll((Listener) holder);
             }
         }
@@ -110,10 +115,16 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
+        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
         if (event.getInventory().getHolder() instanceof Menu) {
-            if (!player.hasMetadata("AdminPanelOpen")) {
-                player.setMetadata("AdminPanelOpen", new FixedMetadataValue(AdminPanelMain.getPlugin(), true));
+            Menu holder = (Menu) event.getInventory().getHolder();
+
+            holder.handleOpenMenu(event);
+
+            if (!playerMenuUtility.hasData("AdminPanelOpen")) {
+                playerMenuUtility.setData("AdminPanelOpen", true, false);
             }
+
             if (event.getInventory().getHolder() instanceof AdminPanelStartMenu) {
                 FileConfiguration cfg = AdminPanelMain.getPlugin().getConfig();
                 if (cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {

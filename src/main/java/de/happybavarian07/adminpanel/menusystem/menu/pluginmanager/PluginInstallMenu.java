@@ -2,18 +2,20 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.PluginInstallEvent;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.UnknownDependencyException;
@@ -76,11 +78,11 @@ public class PluginInstallMenu extends Menu implements Listener {
 
         if (item == null || !item.hasItemMeta()) return;
         if (item.equals(resourceIDItem)) {
-            player.setMetadata("typeResourceIDInChat", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("typeResourceIDInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", player, true));
             player.closeInventory();
         } else if (item.equals(nameItem)) {
-            player.setMetadata("typeFileNameInChat", new FixedMetadataValue(plugin, true));
+            playerMenuUtility.addData("typeFileNameInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", player, true));
             player.closeInventory();
         } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.true", player, false))) {
@@ -127,6 +129,16 @@ public class PluginInstallMenu extends Menu implements Listener {
     }
 
     @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {
+
+    }
+
+    @Override
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
@@ -164,16 +176,16 @@ public class PluginInstallMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (player.hasMetadata("typeFileNameInChat")) {
+        if (playerMenuUtility.hasData("typeFileNameInChat")) {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");
             this.fileName = message;
-            player.removeMetadata("typeFileNameInChat", plugin);
+            playerMenuUtility.removeData("typeFileNameInChat");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message, true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.FileNameSelected", player, true));
             super.open();
         }
-        if (player.hasMetadata("typeResourceIDInChat")) {
+        if (playerMenuUtility.hasData("typeResourceIDInChat")) {
             event.setCancelled(true);
             String message = event.getMessage();
             try {
@@ -182,7 +194,7 @@ public class PluginInstallMenu extends Menu implements Listener {
                 e.printStackTrace();
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
             }
-            player.removeMetadata("typeResourceIDInChat", plugin);
+            playerMenuUtility.removeData("typeResourceIDInChat");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", message, true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIDSelected", player, true));
             super.open();

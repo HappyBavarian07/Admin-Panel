@@ -9,9 +9,7 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.nio.channels.Channels;
@@ -70,7 +68,7 @@ public class PluginUtils {
 
     public Plugin load(File pluginFile) throws InvalidPluginException, InvalidDescriptionException, UnknownDependencyException {
         plugin.getFileLogger().writeToLog(Level.WARNING,
-                "Loaded Plugin File \"" + pluginFile + "\"", "ActionsLogger - Plugin");
+                "Loaded Plugin File \"" + pluginFile + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
         return Bukkit.getPluginManager().loadPlugin(pluginFile);
     }
 
@@ -199,7 +197,7 @@ public class PluginUtils {
         // This tries to get around the issue where Windows refuses to unlock jar files that were previously loaded into the JVM.
         System.gc();
         this.plugin.getFileLogger().writeToLog(Level.WARNING,
-                "Unloaded the Plugin \"" + plugin + "\"", "ActionsLogger - Plugin");
+                "Unloaded the Plugin \"" + plugin + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
     }
 
     public void reload(Plugin plugin) {
@@ -207,7 +205,7 @@ public class PluginUtils {
             unload(plugin);
             load(plugin);
             this.plugin.getFileLogger().writeToLog(Level.WARNING,
-                    "Reloaded the Plugin \"" + plugin + "\"", "ActionsLogger - Plugin");
+                    "Reloaded the Plugin \"" + plugin + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
         } else {
             throw new NullPointerException("Plugin is null!");
         }
@@ -222,51 +220,65 @@ public class PluginUtils {
 
         File pluginFile = new File(pluginDir, fileName + ".jar");
         URL downloadURL = new URL("https://api.spiget.org/v2/resources/" + resourceID + "/download");
-        FileUtils.copyURLToFile(downloadURL, pluginFile);
+        copyURLToFile(downloadURL, pluginFile);
         Plugin target = load(pluginFile);
         if (enableAfterStart) {
             Bukkit.getPluginManager().enablePlugin(target);
         }
         plugin.getFileLogger().writeToLog(Level.WARNING,
                 "Installed the Plugin \"" + resourceID + "\" under the Name \"" +
-                        "/plugins/" + fileName + ".jar" + "\"", "ActionsLogger - Plugin");
+                        "/plugins/" + fileName + ".jar" + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
         return target;
     }
 
-    private final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36";
+    public static void copyURLToFile(URL sourceUrl, File destinationFile) throws IOException {
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
 
-    public File downloadFileFromURL(File destination, String urlString) throws IOException {
-        URL website = new URL(urlString);
-        HttpURLConnection httpcon = (HttpURLConnection) website.openConnection();
-        httpcon.addRequestProperty("User-Agent", USER_AGENT);
-        httpcon.setReadTimeout(6000);
-        httpcon.connect();
+        try {
+            // Open a connection to the URL
+            connection = (HttpURLConnection) sourceUrl.openConnection();
+            connection.connect();
 
-        ReadableByteChannel rbc = Channels.newChannel(httpcon.getInputStream());
-        FileOutputStream fos = new FileOutputStream(destination);
-        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        fos.close();
-        rbc.close();
-        return destination;
-    }
+            // Check if the response code indicates success (HTTP 200)
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException("HTTP response code: " + responseCode);
+            }
 
-    public File downloadFileFromURL(File destination, URL url) throws IOException {
-        HttpURLConnection httpconn = (HttpURLConnection) url.openConnection();
+            // Open input and output streams
+            inputStream = connection.getInputStream();
+            outputStream = new FileOutputStream(destinationFile);
 
-        httpconn.addRequestProperty("User-Agent", USER_AGENT);
-        httpconn.addRequestProperty("Header", "Accept: text/html");
-        httpconn.addRequestProperty("cookie", "xpzezr54v5qnaoet5v2dx1ias5xx8m4faj7d5mfg4og");
+            // Copy data from the input stream to the output stream
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
 
-        httpconn.setConnectTimeout(2000);
-        httpconn.setInstanceFollowRedirects(false);
-        httpconn.setReadTimeout(6000);
-        httpconn.connect();
-
-        ReadableByteChannel rbc = Channels.newChannel(httpconn.getInputStream());
-        FileOutputStream fos = new FileOutputStream(destination);
-        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        fos.close();
-        rbc.close();
-        return destination;
+            // Flush and close the output stream
+            outputStream.flush();
+        } finally {
+            // Close the streams and disconnect the connection
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 }

@@ -72,7 +72,12 @@ public class ReloadPluginCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return "AdminPanel.AdminPanelAdminCommands.ReloadPlugin";
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }

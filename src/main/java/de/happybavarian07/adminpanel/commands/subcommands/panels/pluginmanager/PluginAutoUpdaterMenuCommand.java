@@ -6,7 +6,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panels.pluginmanager;
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.PlaceholderType;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginAutoUpdaterMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -95,7 +95,12 @@ public class PluginAutoUpdaterMenuCommand extends SubCommand {
     }
 
     @Override
-    public String permission() {
+    public String permissionAsString() {
         return new PluginAutoUpdaterMenu(null).getOpeningPermission();
+    }
+
+    @Override
+    public boolean autoRegisterPermission() {
+        return false;
     }
 }
