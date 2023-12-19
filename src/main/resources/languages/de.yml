@@ -1,4 +1,4 @@
-# Der Sprach Datei für Deutsche Sprache
+# Der Sprach Datei fuer Deutsche Sprache
 # %prefix% = The Prefix of the Plugin (works in every Message)
 LanguageFullName: 'Deutsch'
 LanguageVersion: '8.6.0'
@@ -30,10 +30,10 @@ Messages:
       TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
   BackupSystem:
     SubCommands:
-      # Placeholders:
+      # Placeholders: 
       # %backupName% = equals the Backup Config Name specified
       Start: '%prefix% &9> &aDer Backup Erstellungs Prozess für ''%backupName%'' ist fertig. &r%success%'
-      Load: '%prefix% &9> &aDer Backup Lade Prozess für ''%backupName%'' ist fertig. Du kannst die alten Configs in diesem Zip Archive finden: ''old_configs.yml''. &r%success%'
+      Load: '%prefix% &9> &aDer Backup Lade Prozess für ''%backupName%'' ist fertig. Du kannst die alten Configs in diesem Zip Archive finden ''old_configs.yml''. &r%success%'
         # GetNewestBackup Placeholders:
         # %fileName% = File Name
         # %normalPath% = The Relative Path

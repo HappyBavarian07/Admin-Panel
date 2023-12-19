@@ -1,5 +1,7 @@
 package au.com.xandar.crypto;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -7,12 +9,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 /**
  * Responsible for converting a CryptoPacket into a Base64 String and vice versa.
  */
 public final class CryptoPacketConverter {
+
+    private final Base64 base64 = new Base64();
+
     /**
      * Converts a CryptoPacket into a Base64 encoded String.
      * @param cryptoPacket cryptoPacket
@@ -36,7 +40,7 @@ public final class CryptoPacketConverter {
         }
 
         final byte[] payload = stream.toByteArray();
-        final byte[] base64Payload = Base64.getEncoder().encode(payload);
+        final byte[] base64Payload = base64.encode(payload);
 
         try {
             return new String(base64Payload, "UTF-8");
@@ -55,7 +59,7 @@ public final class CryptoPacketConverter {
     public CryptoPacket convert(final String base64Payload) throws CryptoException {
         final byte[] payloadBytes;
         final byte[] base64PayloadBytes = base64Payload.getBytes(StandardCharsets.UTF_8);
-        payloadBytes = Base64.getDecoder().decode(base64PayloadBytes);
+        payloadBytes = base64.decode(base64PayloadBytes);
 
         final DataInputStream stream = new DataInputStream(new ByteArrayInputStream(payloadBytes));
         final byte[] encryptedData = readByteArray(stream);

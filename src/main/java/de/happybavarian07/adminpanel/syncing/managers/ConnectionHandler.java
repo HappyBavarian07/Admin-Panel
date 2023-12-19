@@ -7,11 +7,11 @@ import au.com.xandar.crypto.CryptoPacket;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.custompayload.CustomPacket;
-import de.happybavarian07.adminpanel.syncing.utils.EncryptionUtils;
-import de.happybavarian07.adminpanel.syncing.utils.Packet;
 import de.happybavarian07.adminpanel.syncing.events.JavaSocketConnectedEvent;
 import de.happybavarian07.adminpanel.syncing.events.JavaSocketDisconnectedEvent;
 import de.happybavarian07.adminpanel.syncing.events.JavaSocketPacketReceivedEvent;
+import de.happybavarian07.adminpanel.syncing.utils.EncryptionUtils;
+import de.happybavarian07.adminpanel.syncing.utils.Packet;
 import de.happybavarian07.adminpanel.utils.Result;
 import de.happybavarian07.adminpanel.utils.StartUpLogger;
 import org.bukkit.ChatColor;
@@ -34,6 +34,7 @@ public class ConnectionHandler {
     private final List<String> otherConnectedClients = new ArrayList<>();
     private final LoggingManager loggingManager;
     private final StartUpLogger pluginLogger;
+    private final StatsManager statsManager;
     private String clientName;
     private Socket socket;
     private ConnectionToServer server;
@@ -41,7 +42,6 @@ public class ConnectionHandler {
     private boolean nameReceived;
     private boolean clientListUpdateRequested = false;
     private PacketHandler packetHandler;
-    private final StatsManager statsManager;
 
     public ConnectionHandler(String ipAddress, int port, String clientName, ThreadGroup dataClientThreadGroup, SettingsManager settingsManager, LoggingManager loggingManager, StatsManager statsManager) {
         this.ipAddress = ipAddress;
@@ -259,7 +259,7 @@ public class ConnectionHandler {
                             handleRegisteredClientName(packetString);
                         } else if (packetString.startsWith("DisconnectingClientFromServer")) {
                             disconnect(false);
-                        }else if(packetString.startsWith("CustomPacket:")) {
+                        } else if (packetString.startsWith("CustomPacket:")) {
                             packetQueue.put(nameReceived ? handleEncodedCustomPacket(packetString) : packetString);
                         } else {
                             packetQueue.put(nameReceived ? handleEncodedPacket(packetString) : packetString);
@@ -267,7 +267,7 @@ public class ConnectionHandler {
                         statsManager.addBytesReceivedThisSession(packetString.getBytes().length);
                     } else if (obj instanceof String[]) {
                         String[] array = (String[]) obj;
-                        if(Objects.equals(array[0], "CustomPacket")) {
+                        if (Objects.equals(array[0], "CustomPacket")) {
                             CustomPacket packet = CustomPacket.fromStringArray(array);
                             packetQueue.put(packet);
                             continue;
@@ -311,7 +311,7 @@ public class ConnectionHandler {
 
         private void handleRegisteredClientName(String packetString) {
             String[] array = packetString.split(":");
-            System.out.println("Registered Client: " + Arrays.toString(array));
+            //System.out.println("Registered Client: " + Arrays.toString(array));
 
             if (array.length >= 3) {
                 setClientName(array[1]);
@@ -331,7 +331,7 @@ public class ConnectionHandler {
             if (encryptedPacketArray.length != 3) return packetString;
             String decryptedString = serverEncryptionUtils.decrypt(encryptedPacketArray[0], encryptedPacketArray[1], encryptedPacketArray[2]);
 
-            System.out.println("Decrypted String: " + decryptedString);
+            //System.out.println("Decrypted String: " + decryptedString);
 
             statsManager.addBytesDecryptedThisSession(decryptedString.getBytes().length);
 
@@ -346,10 +346,10 @@ public class ConnectionHandler {
                 packetArray[i] = packetArray[i].trim();
             }
 
-            System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
-            System.out.println("Decrypted String: " + decryptedString);
+            //System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
+            //System.out.println("Decrypted String: " + decryptedString);
 
-            if(Packet.hasPacketArrayLength(packetArray)) {
+            if (Packet.hasPacketArrayLength(packetArray)) {
                 return Packet.fromStringArray(packetArray);
             } else {
                 return decryptedString;
@@ -357,14 +357,14 @@ public class ConnectionHandler {
         }
 
         private Object handleEncodedCustomPacket(String packetString) {
-            if(packetString.startsWith("CustomPacket:")) {
+            if (packetString.startsWith("CustomPacket:")) {
                 packetString = packetString.replaceFirst("CustomPacket:", "");
             }
             String[] encryptedPacketArray = packetString.split(":");
             if (encryptedPacketArray.length != 3) return packetString;
             String decryptedString = serverEncryptionUtils.decrypt(encryptedPacketArray[0], encryptedPacketArray[1], encryptedPacketArray[2]);
 
-            System.out.println("Decrypted String: " + decryptedString);
+            //System.out.println("Decrypted String: " + decryptedString);
 
             statsManager.addBytesDecryptedThisSession(decryptedString.getBytes().length);
 
@@ -379,10 +379,10 @@ public class ConnectionHandler {
                 packetArray[i] = packetArray[i].trim();
             }
 
-            System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
-            System.out.println("Decrypted String: " + decryptedString);
+            //System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
+            //System.out.println("Decrypted String: " + decryptedString);
 
-            if(CustomPacket.hasPacketArrayLength(packetArray)) {
+            if (CustomPacket.hasPacketArrayLength(packetArray)) {
                 return CustomPacket.fromStringArray(packetArray);
             } else {
                 return decryptedString;
@@ -417,7 +417,7 @@ public class ConnectionHandler {
         }
 
         public void write(Object obj, boolean encryption) {
-            System.out.println("Write Method got finally called: " + obj + " : " + encryption);
+            //System.out.println("Write Method got finally called: " + obj + " : " + encryption);
             try {
                 if (obj instanceof String) {
                     encryption = !((String) obj).startsWith("NameForClientIs:");
@@ -428,7 +428,7 @@ public class ConnectionHandler {
                 } else {
                     if (encryption) {
                         CryptoPacket cryptoPacket = encryptPacket(obj);
-                        out.writeObject(cryptoPacketToString(cryptoPacket));
+                        out.writeObject(cryptoPacketToString(cryptoPacket, (obj instanceof CustomPacket)));
                     } else {
                         out.writeObject(obj.toString());
                     }
@@ -445,6 +445,8 @@ public class ConnectionHandler {
             String content;
             if (obj instanceof Packet) {
                 content = Arrays.toString(((Packet) obj).toStringArray()).trim();
+            } else if (obj instanceof CustomPacket) {
+                content = Arrays.toString(((CustomPacket) obj).toStringArray()).trim();
             } else if (obj instanceof String) {
                 content = ((String) obj).trim();
             } else if (obj instanceof String[]) {
@@ -458,8 +460,9 @@ public class ConnectionHandler {
             return clientEncryptionUtils.encrypt(content);
         }
 
-        private String cryptoPacketToString(CryptoPacket cryptoPacket) {
-            return Base64.getEncoder().encodeToString(cryptoPacket.getEncryptedData()) + ":" +
+        private String cryptoPacketToString(CryptoPacket cryptoPacket, boolean customPacket) {
+            return ((customPacket) ? "CustomPacket:" : "") +
+                    Base64.getEncoder().encodeToString(cryptoPacket.getEncryptedData()) + ":" +
                     Base64.getEncoder().encodeToString(cryptoPacket.getEncryptedSymmetricKey()) + ":" +
                     Base64.getEncoder().encodeToString(cryptoPacket.getSymmetricCipherInitializationVector());
         }

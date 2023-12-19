@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.main;
 
 import com.saicone.ezlib.Ezlib;
-import com.tchristofferson.configupdater.ConfigUpdater;
+import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManagerRegistry;
@@ -271,6 +271,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         ezlib.dependency("org.apache.lucene:lucene-core:9.8.0").parent(true).load();
         logger.message("&e&lLoading Lucene QueryParser Dependency&r");
         ezlib.dependency("org.apache.lucene:lucene-queryparser:9.8.0").parent(true).load();
+        logger.message("&e&lLoading Commons Codec Dependency&r");
+        ezlib.dependency("commons-codec:commons-codec:1.16.0").parent(true).load();
         logger.message("&a&lDone&r").coloredSpacer(ChatColor.RED);
         logger.emptySpacer().emptySpacer();
     }

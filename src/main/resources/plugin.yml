@@ -1,4 +1,4 @@
-name: Admin-Panel
+﻿name: Admin-Panel
 main: de.happybavarian07.adminpanel.main.AdminPanelMain
 version: ${project.version}
 api-version: 1.13

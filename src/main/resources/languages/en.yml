@@ -37,7 +37,7 @@ Messages:
       # Placeholders:
       # %backupName% = equals the Backup Config Name
       Start: '%prefix% &9> &aThe Backup Making Process for ''%backupName%'' finished. &r%success%'
-      Load: '%prefix% &9> &aThe Backup Loading Process for ''%backupName%'' finished. You can find the old Configs in a Zip File named: ''old_configs.yml''. &r%success%'
+      Load: '%prefix% &9> &aThe Backup Loading Process for ''%backupName%'' finished. You can find the old Configs in a Zip File named ''old_configs.yml''. &r%success%'
       # GetNewestBackup Placeholders:
       # %fileName% = File Name
       # %normalPath% = The Relative Path

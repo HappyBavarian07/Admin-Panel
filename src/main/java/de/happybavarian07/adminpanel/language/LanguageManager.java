@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.language;
 
-import com.tchristofferson.configupdater.ConfigUpdater;
+import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
