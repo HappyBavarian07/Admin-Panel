@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 
 
-public class Fireworkgenerator {
+public class FireworkGenerator {
 
     Location location;
     Location spawnlocation;
@@ -20,7 +20,7 @@ public class Fireworkgenerator {
     int Power;
     Plugin plugin;
 
-    public Fireworkgenerator(Plugin plugin) {
+    public FireworkGenerator(Plugin plugin) {
         this.plugin = plugin;
     }
 

@@ -49,7 +49,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             Object result = getPrivateField(Bukkit.getServer().getPluginManager(), "commandMap");
             SimpleCommandMap commandMap = (SimpleCommandMap) result;
             assert commandMap != null;
-            Object map = getPrivateField(commandMap, "knownCommands");
+            /*Object map = getPrivateField(commandMap, "knownCommands");
             @SuppressWarnings("unchecked")
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             assert knownCommands != null;
@@ -58,7 +58,8 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
                 if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())) {
                     knownCommands.remove(alias);
                 }
-            }
+            }*/
+            cmd.unregister(commandMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +70,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             Object result = getPrivateField(Bukkit.getServer().getPluginManager(), "commandMap");
             SimpleCommandMap commandMap = (SimpleCommandMap) result;
             assert commandMap != null;
-            Object map = getPrivateField(commandMap, "knownCommands");
+            /*Object map = getPrivateField(commandMap, "knownCommands");
             @SuppressWarnings("unchecked")
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             assert knownCommands != null;
@@ -78,7 +79,8 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
                 if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(javaPlugin.getName())) {
                     knownCommands.remove(alias);
                 }
-            }
+            }*/
+            cmd.unregister(commandMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,6 +141,32 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             }
         }
 
+        commandManagers.put(cm, data);
+        return true;
+    }
+
+    public void unregister(CommandManager cm) {
+        if (!commandManagers.containsKey(cm) || cm == null) return;
+
+        JavaPlugin javaPlugin = cm.getJavaPlugin();
+
+        // Unregistering the Command on the Server
+        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
+            unregisterCommand(javaPlugin.getCommand(cm.getCommandName()), javaPlugin);
+        } else {
+            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
+            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
+            pluginCommand.setProperty("aliases", cm.getCommandAliases());
+            pluginCommand.setProperty("usage", cm.getCommandUsage());
+            pluginCommand.setProperty("description", cm.getCommandInfo());
+            pluginCommand.setProperty("permission", cm.getCommandPermissionAsString());
+            pluginCommand.setExecutor(this);
+            pluginCommand.setTabCompleter(this);
+            unregisterCommand(pluginCommand, javaPlugin);
+        }
+        // Calling setup() for Adding Sub Commands
+        cm.getSubCommands().clear();
+
         if(cm.autoRegisterPermission()) {
             if (cm.getCommandPermissionAsString().isEmpty()) {
                 if (Bukkit.getPluginManager().getPermissions().contains(cm.getCommandPermissionAsPermission())) {
@@ -167,31 +195,6 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
             }
         }
 
-        commandManagers.put(cm, data);
-        return true;
-    }
-
-    public void unregister(CommandManager cm) {
-        if (!commandManagers.containsKey(cm) || cm == null) return;
-
-        JavaPlugin javaPlugin = cm.getJavaPlugin();
-
-        // Unregistering the Command on the Server
-        if (javaPlugin.getCommand(cm.getCommandName()) != null) {
-            unregisterCommand(javaPlugin.getCommand(cm.getCommandName()), javaPlugin);
-        } else {
-            DCommand pluginCommand = new DCommand(cm.getCommandName(), javaPlugin);
-            pluginCommand.setProperty("label", javaPlugin.getName().toLowerCase());
-            pluginCommand.setProperty("aliases", cm.getCommandAliases());
-            pluginCommand.setProperty("usage", cm.getCommandUsage());
-            pluginCommand.setProperty("description", cm.getCommandInfo());
-            pluginCommand.setProperty("permission", cm.getCommandPermissionAsString());
-            pluginCommand.setExecutor(this);
-            pluginCommand.setTabCompleter(this);
-            unregisterCommand(pluginCommand, javaPlugin);
-        }
-        // Calling setup() for Adding Sub Commands
-        cm.getSubCommands().clear();
         commandManagers.remove(cm);
     }
 
@@ -248,13 +251,13 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (sender instanceof Player) {
-                    return cm.onCommand((Player) sender, args);
+                    return cm.onPlayerCommand((Player) sender, args);
                 } else {
                     if (isPlayerRequired(cm)) {
                         sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
                         return true;
                     }
-                    return cm.onCommand((ConsoleCommandSender) sender, args);
+                    return cm.onConsoleCommand((ConsoleCommandSender) sender, args);
                 }
             }
         }

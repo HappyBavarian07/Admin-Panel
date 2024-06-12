@@ -46,7 +46,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
         }
         this.sortQuery = playerMenuUtility.getData("SortQuery", String.class);
         resetPermList();
-        if (!sortQuery.equals("")) {
+        if (!sortQuery.isEmpty()) {
             tfidfSortPermissions(sortQuery);
         }
         if (action == PermissionAction.ADD) {
@@ -179,7 +179,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                     player.sendMessage(Utils.format(player, "&aName: &6" + current.getName() + "\n" +
                             "&aDescription: &6" + current.getDescription() + "\n" +
                             "&aPermissibles: &6" + current.getPermissibles() + "\n" +
-                            "&aChildrens: &6" + current.getChildren() + "\n" +
+                            "&aChildren: &6" + current.getChildren() + "\n" +
                             "&aDefault: &6" + current.getDefault() + "\n", AdminPanelMain.getPrefix()));
                 }
                 resetPermList();
@@ -262,6 +262,8 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+
         if (playerMenuUtility.hasData("PermissionsSortMetaData-List")) {
             this.sortQuery = ChatColor.stripColor(event.getMessage());
             tfidfSortPermissions(sortQuery);

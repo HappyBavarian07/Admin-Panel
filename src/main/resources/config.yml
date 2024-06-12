@@ -122,6 +122,11 @@ Plugin:
       VAULT_ECONOMY: true
       VAULT_PLUGIN: true
       UPDATER: true
+      WEBUI: true
+      WEBUI_API: true
+      WEBUI_CONSOLE: true
+      WEBUI_LOGIN: true
+      WEBUI_AUTH: true
 
   # The Auto Admin-Panel Updater Section
   Updater:

@@ -86,7 +86,7 @@ public class LanguageManager {
         File[] fileArray = langFolder.listFiles();
         if (fileArray != null) {
             for (File file : fileArray) {
-                LanguageFile languageFile = new LanguageFile(plugin, file.getName().replace(".yml", ""));
+                LanguageFile languageFile = new LanguageFile(plugin, file.getName().replace(".yml", ""), true);
                 if (!registeredLanguages.containsValue(languageFile) && !languageFile.getLangName().equals("default"))
                     this.registeredLanguages.put(languageFile.getLangName(), languageFile);
                 if (log && !languageFile.getLangName().equals("default"))
@@ -240,7 +240,7 @@ public class LanguageManager {
         return placeholders;
     }
 
-    private List<String> getPlaceholderKeysInMessage(String message, PlaceholderType type) {
+    public List<String> getPlaceholderKeysInMessage(String message, PlaceholderType type) {
         List<String> keys = new ArrayList<>();
         for (String key : placeholders.keySet()) {
             if (!message.contains(key)) continue;
@@ -311,7 +311,7 @@ public class LanguageManager {
         if (player == null) return getLang(langName, true);
         if (langName == null && currentLang) return getCurrentLang();
 
-        LanguageFile langFile = plhandler.getPlayerLanguage(player.getUniqueId());
+        LanguageFile langFile = plhandler.getPlayerLanguageFile(player.getUniqueId());
         if (langFile == null) {
             if (currentLang) return getCurrentLang();
             else return getLang(langName, true);

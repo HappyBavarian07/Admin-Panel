@@ -74,7 +74,8 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSettingsMenu(playerMenuUtility, currentPlugin).open();
+            playerMenuUtility.setData("CurrentSelectedPlugin", currentPlugin, true);
+            new PluginSettingsMenu(playerMenuUtility).open();
         } else if (item.equals(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);

@@ -213,6 +213,8 @@ public class WorldCreateMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+        
         if (playerMenuUtility.hasData("createWorldSetName")) {
             this.worldName = event.getMessage().replace(" ", "-");
             playerMenuUtility.removeData("createWorldSetName");

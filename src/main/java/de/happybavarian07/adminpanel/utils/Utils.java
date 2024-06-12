@@ -4,7 +4,6 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.misc.ConfirmationMenu;
-import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -27,10 +26,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -72,11 +70,10 @@ public class Utils {
     }
 
     public static String arrayToString(String[] array) {
-        StringBuilder sbOut = new StringBuilder("");
-        if (array.length <= 0) return sbOut.toString();
+        StringBuilder sbOut = new StringBuilder();
 
         for (String s : array) {
-            if (!s.equals(""))
+            if (!s.isEmpty())
                 sbOut.append(Utils.format(null, s, AdminPanelMain.getPrefix())).append(" ");
         }
         return sbOut.toString();
@@ -122,7 +119,7 @@ public class Utils {
             Player kickedPlayer = Bukkit.getPlayerExact(target);
             assert kickedPlayer != null;
             if (kickedPlayer.isOnline()) {
-                if (!sourcename.equals("")) {
+                if (!sourcename.isEmpty()) {
                     kickedPlayer.kickPlayer(format(kickedPlayer, "&cYou got kicked!\n" +
                             "\n" +
                             "&3By: &e" + sourcename + "\n" +
@@ -256,6 +253,36 @@ public class Utils {
         return result;
     }
 
+    public static Properties getProperties(File propertiesFile) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(propertiesFile));
+        } catch (IOException e) {
+            plugin.getLogger().severe("Could not load properties file: " + propertiesFile.getName());
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Could not load properties file: " + propertiesFile.getName(), LogPrefix.ERROR);
+        }
+        return properties;
+    }
+
+    public static void saveProperties(Properties properties, File propertiesFile) {
+        try {
+            properties.store(new FileOutputStream(propertiesFile), null);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Could not save properties file: " + propertiesFile.getName());
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Could not save properties file: " + propertiesFile.getName(), LogPrefix.ERROR);
+        }
+    }
+
+    public static GameMode getGameMode(String gamemode) {
+        return switch (gamemode) {
+            case "0", "survival", "SURVIVAL" -> GameMode.SURVIVAL;
+            case "1", "creative", "CREATIVE" -> GameMode.CREATIVE;
+            case "2", "adventure", "ADVENTURE" -> GameMode.ADVENTURE;
+            case "3", "spectator", "SPECTATOR" -> GameMode.SPECTATOR;
+            default -> null;
+        };
+    }
+
     private void setInstance(Utils instance) {
         Utils.instance = instance;
     }
@@ -323,18 +350,19 @@ public class Utils {
         return success;
     }
 
-    private static boolean createDisabledItemsSection() {
+    private static void createDisabledItemsSection() {
         FileConfiguration dataConfig = plugin.getDataYML();
         if (!dataConfig.contains("DisabledItems")) dataConfig.set("DisabledItems", new ArrayList<>());
         saveDataConfig();
-        return !dataConfig.contains("DisabledItems");
+        dataConfig.contains("DisabledItems");
     }
 
     private static void saveDataConfig() {
         try {
             plugin.getDataYML().save(new File(plugin.getDataFolder() + "/data.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Could not save data.yml");
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Could not save data.yml", LogPrefix.ERROR);
         }
     }
 
@@ -366,7 +394,8 @@ public class Utils {
                 throw new IOException("Failed to send message to Discord webhook: " + response);
             }
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to send message to Discord webhook", LogPrefix.ERROR);
+            plugin.getLogger().severe("Failed to send message to Discord webhook");
             return false;
         }
         return true;
@@ -404,8 +433,7 @@ public class Utils {
     private static ZipOutputStream zipDirIntoZipFile(ZipOutputStream zos, File directory) throws IOException {
         if(!directory.isDirectory()) return zos;
         File[] filesInDir = directory.listFiles();
-        assert filesInDir != null;
-        if (filesInDir.length > 0) {
+        if (filesInDir != null) {
             for (File fileInDir : filesInDir) {
                 try (FileInputStream fis = new FileInputStream(fileInDir)) {
                     ZipEntry zipEntry = new ZipEntry(
@@ -457,7 +485,8 @@ public class Utils {
             zis.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to unzip files: " + e.getMessage());
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to unzip files: " + e.getMessage(), LogPrefix.ERROR);
         }
     }
 
@@ -502,7 +531,7 @@ public class Utils {
         File folder = new File(pathToFolder);
         if (!folder.isDirectory() || !folder.exists()) return;
         File[] listOfFiles = folder.listFiles();
-        if (listOfFiles == null || listOfFiles.length == 0) return;
+        if (listOfFiles == null) return;
 
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".jar")) {
@@ -531,13 +560,17 @@ public class Utils {
             }
         } catch (ClassNotFoundException e) {
             System.err.println("Class not found: " + fullClassName);
-            e.printStackTrace();
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Class not found: " + fullClassName, LogPrefix.ERROR);
+            plugin.getLogger().severe("Class not found: " + fullClassName);
             return null; // You can modify the return value based on your needs
         } catch (IllegalAccessException | InstantiationException e) {
             System.err.println("Error creating an instance: " + fullClassName);
-            e.printStackTrace();
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error creating an instance: " + fullClassName, LogPrefix.ERROR);
+            plugin.getLogger().severe("Error creating an instance: " + fullClassName);
             return null; // You can modify the return value based on your needs
         } catch (InvocationTargetException | NoSuchMethodException e) {
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error invoking constructor: " + fullClassName, LogPrefix.ERROR);
+            plugin.getLogger().severe("Error invoking constructor: " + fullClassName);
             throw new RuntimeException("Error invoking constructor: " + fullClassName, e);
         }
     }
@@ -580,15 +613,21 @@ public class Utils {
     public static void deleteWorldFolder(File path) {
         if (path.exists() && path.isDirectory()) {
             File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteWorldFolder(file);
-                } else {
-                    file.delete();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteWorldFolder(file);
+                    } else {
+                        file.delete();
+                    }
                 }
             }
         }
         path.delete();
+    }
+    public static String getServerUptime(SimpleDateFormat format) {
+        long uptime = System.currentTimeMillis() - plugin.getLastStartTimeMillis();
+        return format.format(uptime);
     }
 
     public Economy getEconomy() {

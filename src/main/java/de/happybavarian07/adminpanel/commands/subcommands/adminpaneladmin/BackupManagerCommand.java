@@ -8,8 +8,8 @@ import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.language.Placeholder;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.utils.BackupManager;
-import de.happybavarian07.adminpanel.utils.FileBackup;
+import de.happybavarian07.adminpanel.backupmanager.BackupManager;
+import de.happybavarian07.adminpanel.backupmanager.FileBackup;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -46,7 +46,7 @@ public class BackupManagerCommand extends SubCommand {
                     int page = Integer.parseInt(args[1]);
                     List<FileBackup> listOfFiles = new ArrayList<>(backupManager.getFileBackupList().values());
                     PaginatedList<FileBackup> messages = new PaginatedList<>(listOfFiles);
-                    messages.maxItemsPerPage(4).sort();
+                    messages.maxItemsPerPage(4).sort("bubble", false);
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
                     if (!messages.containsPage(page)) {
                         sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackups.PageDoesNotExist", playerOrNull, true));
@@ -76,7 +76,7 @@ public class BackupManagerCommand extends SubCommand {
                     int page = Integer.parseInt(args[2]);
                     List<File> listOfFiles = new ArrayList<>(Arrays.asList(backupManager.getFileBackup(args[1]).getFilesToBackup()));
                     PaginatedList<File> messages = new PaginatedList<>(listOfFiles);
-                    messages.maxItemsPerPage(4).sort();
+                    messages.maxItemsPerPage(4).sort("bubble", false);
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
                     if (!messages.containsPage(page)) {
                         sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListFilesToBackup.PageDoesNotExist", playerOrNull, true));
@@ -101,7 +101,7 @@ public class BackupManagerCommand extends SubCommand {
                     int page = Integer.parseInt(args[2]);
                     List<File> listOfBackupsDone = new ArrayList<>(backupManager.getFileBackup(args[1]).getBackupsDone());
                     PaginatedList<File> messages = new PaginatedList<>(listOfBackupsDone);
-                    messages.maxItemsPerPage(4).sort();
+                    messages.maxItemsPerPage(4).sort("bubble", false);
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
                     if (!messages.containsPage(page)) {
                         sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackupsDone.PageDoesNotExist", playerOrNull, true));

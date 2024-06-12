@@ -213,11 +213,12 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             playerMenuUtility.addData("AddPluginSelectPluginMetaData", true);
         } else if (playerMenuUtility.hasData("AddPluginSelectPluginMetaData")) {
             event.setCancelled(true);
-            String message = event.getMessage().replace(" ", "-");
+            String message = event.getMessage();
             selectedPlugin = new PluginUtils().getPluginByName(message);
             if (selectedPlugin == null) {
                 return;
             }
+            plugin.getPluginDescriptionManager().addPluginDescription(selectedPlugin, "", spigotID);
             playerMenuUtility.removeData("AddPluginSelectPluginMetaData");
             plugin.addPluginToUpdater(selectedPlugin, spigotID, fileName);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);

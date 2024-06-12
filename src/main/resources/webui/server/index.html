@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Control</title>
+    <style>
+        body {
+            background: transparent;
+        }
+
+        .controlButton {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background: #4CAF50; /* Green background */
+            border: none;
+            border-radius: 5px;
+            color: white; /* White text */
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* Styles for screens smaller than 600px */
+        @media only screen and (max-width: 600px) {
+            .controlButton {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+        }
+
+        /* Styles for screens between 600px and 900px */
+        @media only screen and (min-width: 600px) and (max-width: 900px) {
+            .controlButton {
+                font-size: 18px;
+                padding: 9px 18px;
+            }
+        }
+
+        .controlButton:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        .controlButton:active {
+            background-color: #3e8e41;
+            transform: translateY(4px);
+        }
+
+        #buttonDiv {
+            position: absolute;
+            left: 50%;
+            bottom: 14%; /* Adjust this value to change the vertical position */
+            transform: translate(-50%, -50%); /* This centers the div */
+            background-color: #f2f2f2; /* Light grey background */
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Shadow effect */
+        }
+
+        #generalInfosMenu {
+            position: absolute;
+            left: 50%;
+            top: 32%;
+            transform: translate(-50%, -50%);
+            background-color: #f2f2f2;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        #broadcastDiv {
+            position: absolute;
+            left: 50%;
+            bottom: 1%;
+            transform: translate(-50%, -15%);
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        #broadcastMessage {
+            width: 130vh;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+        }
+
+        #broadcastMessageButton {
+            display: block;
+            margin: 10px auto;
+        }
+
+        .helpButton {
+            border: 2px solid #4CAF50; /* Green border */
+            border-radius: 50%; /* Make it round */
+            padding: 5px 10px; /* Adjust padding to keep it circular */
+            margin-left: 10px; /* Space it from the title */
+        }
+
+        #helpMenu {
+            display: none;
+            position: absolute;
+            left: 150px;
+            top: 38%; /* Adjust this value to match the top property of #generalInfosMenu */
+            transform: translateY(-50%);
+            background-color: #f2f2f2; /* Light grey background */
+            padding: 15px 15px 15px 15px; /* Padding around the text */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Shadow effect */
+            width: 20%; /* Width of the help menu */
+            max-height: 610px;
+            overflow-y: auto;
+        }
+
+        .infosText {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+        }
+    </style>
+    <script type="module" src="/js/permissions.js"></script>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+<h1 style="text-align: center">Server Control
+    <button class="controlButton helpButton" id="helpButton">?</button>
+</h1>
+<br>
+<div id="buttonDiv">
+    <button class="controlButton" id="shutdownButton">Shutdown</button>
+    <button class="controlButton" id="restartButton">Restart</button>
+    <button class="controlButton" id="reloadButton">Reload</button>
+</div>
+<div id="generalInfosMenu">
+    <p class="infosText">Server Name: Test Server</p>
+    <p class="infosText">Server IP: 0.0.0.0:00000</p>
+    <p class="infosText">Server Version: 0.0.0</p>
+    <p class="infosText">Player Count: 0/0</p>
+    <p class="infosText">TPS: 0.0</p>
+    <p class="infosText">Uptime: 0:00:00</p>
+    <p class="infosText">RAM used: 0% (0/0) (Free: 0%)</p>
+</div>
+<div id="broadcastDiv">
+    <input type="text" id="broadcastMessage" placeholder="Message to broadcast...">
+    <button class="controlButton" id="broadcastMessageButton">Broadcast</button>
+</div>
+
+<div id="helpMenu">
+    <h2>Help</h2>
+    <p>Click on the <strong>?</strong> button to toggle this menu.</p>
+    <p>Click on the <strong>Shutdown</strong> button to shutdown the server.</p>
+    <p>Click on the <strong>Restart</strong> button to restart the server.</p>
+    <p>Click on the <strong>Reload</strong> button to reload the server.</p>
+    <p>Enter a message in the <strong>Message to broadcast...</strong> field and click on the <strong>Broadcast</strong>
+        button to broadcast a message to all players.</p>
+    <p>The <strong>Server Name</strong> field shows the name of the server.</p>
+    <p>The <strong>Server IP</strong> field shows the IP and port of the server.</p>
+    <p>The <strong>Server Version</strong> field shows the version of the server.</p>
+    <p>The <strong>Player Count</strong> field shows the amount of players online and the maximum amount of players.</p>
+    <p>The <strong>TPS</strong> field shows the TPS of the server.</p>
+    <p>The <strong>Uptime</strong> field shows the uptime of the server.</p>
+    <p>The <strong>RAM used</strong> field shows the RAM used by the server.</p>
+</div>
+<script type="module">
+    import {checkPermission} from "/js/permissions.js";
+    import {serverUrlForAPI} from "/js/config.js";
+    // Check if the user is logged in at the start
+    window.onload = async function () {
+        isAuthTokenAvailable(true, true);
+
+        // Select the buttons
+        const shutdownButton = document.querySelector('#shutdownButton');
+        const restartButton = document.querySelector('#restartButton');
+        const reloadButton = document.querySelector('#reloadButton');
+        const broadcastButton = document.querySelector('#broadcastMessageButton');
+        const helpButton = document.querySelector('#helpButton');
+
+        // Add event listeners to the buttons
+        if (await checkPermission("scp.shutdown")) {
+            shutdownButton.addEventListener('click', shutdown);
+        }
+        if (await checkPermission("scp.restart")) {
+            restartButton.addEventListener('click', restart);
+        }
+        if (await checkPermission("scp.reload")) {
+            reloadButton.addEventListener('click', reload);
+        }
+        if (await checkPermission("scp.broadcast")) {
+            broadcastButton.addEventListener('click', broadcastToServer);
+        }
+        helpButton.addEventListener('click', toggleHelpMenu);
+    };
+
+    function isAuthTokenAvailable(autoLoginRedirect, autoAlert) {
+        fetch(serverUrlForAPI + "/adminpanel/token-check", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(response => {
+            if (response.status === 401) {
+                // If the server returns a 401 Unauthorized response,
+                // show a sign that the user is not logged in
+                if (autoAlert)
+                    alert('You are not logged in!');
+                // Redirect the user to the login page
+                if (autoLoginRedirect)
+                    top.location.href = '/adminpanel/login';
+            } else {
+                return response.text();
+            }
+        });
+    }
+
+    export async function shutdown() {
+        const reloadTheServerConfirmed = confirm("Are you sure you want to shutdown the server?");
+        if (!reloadTheServerConfirmed)
+            return;
+        if (!await checkPermission("scp.shutdown"))
+            return;
+        isAuthTokenAvailable(true, true);
+        fetch(serverUrlForAPI + "/adminpanel/secure-api/action?action=shutdown&data=null", {
+            method: "POST"
+        }).then(handleResponse);
+    }
+
+    export async function restart() {
+        const reloadTheServerConfirmed = confirm("Are you sure you want to restart the server?");
+        if (!reloadTheServerConfirmed)
+            return;
+        if (!await checkPermission("scp.restart"))
+            return;
+        isAuthTokenAvailable(true, true);
+        fetch(serverUrlForAPI + "/adminpanel/secure-api/action?action=restart&data=null", {
+            method: "POST",
+        }).then(handleResponse);
+    }
+
+    export async function broadcastToServer() {
+        isAuthTokenAvailable(true, true);
+        if (!await checkPermission("scp.broadcast"))
+            return;
+        fetch(serverUrlForAPI + "/adminpanel/secure-api/action?action=broadcast&data=message:" + encodeURIComponent(document.getElementById("broadcastMessage").value), {
+            method: "POST"
+        }).then(handleResponse);
+        document.getElementById("broadcastMessage").value = "";
+    }
+
+    export function toggleHelpMenu() {
+        const helpMenu = document.getElementById('helpMenu');
+        if (helpMenu.style.display === "none") {
+            helpMenu.style.display = "block";
+        } else {
+            helpMenu.style.display = "none";
+        }
+    }
+
+    export async function reload() {
+        const reloadTheServerConfirmed = confirm("Are you sure you want to reload the server? This could cause some issues!");
+        if (!reloadTheServerConfirmed)
+            return;
+        if (!await checkPermission("scp.reload"))
+            return;
+        isAuthTokenAvailable(true, true);
+        fetch(serverUrlForAPI + "/adminpanel/secure-api/action?action=reload&data=null", {
+            method: "POST"
+        }).then(handleResponse);
+    }
+
+    function handleResponse(response) {
+        if (response.ok) {
+            alert("Action successful: " + response.status + " " + response.statusText);
+        } else {
+            alert("Action failed: " + response.status + " " + response.statusText);
+        }
+    }
+
+    export async function updateGeneralInfosMenu() {
+        // Get the JWT token from local storage
+        isAuthTokenAvailable(true, true)
+        if (!await checkPermission("scp.serverinfo"))
+            return;
+        // If the token is present, send an API request for the Worlds
+        fetch(serverUrlForAPI + '/adminpanel/secure-api/request?info=generalInfos', {
+            method: 'GET'
+        }).then(response => {
+            if (response.status === 401) {
+                // If the server returns a 401 Unauthorized response,
+                // show a sign that the user is not logged in
+                alert('You are not logged in!');
+                // Remove the token from local storage
+                localStorage.removeItem('jwtToken');
+                // Redirect the user to the login page
+                top.location.href = '/adminpanel/login';
+            } else {
+                return response.json();
+            }
+        }).then(data => {
+            document.querySelector('.infosText:nth-child(1)').textContent = "Server Name: " + data.serverName;
+            document.querySelector('.infosText:nth-child(2)').textContent = "Server IP: " + data.serverIP + ":" + data.serverPort;
+            document.querySelector('.infosText:nth-child(3)').textContent = "Server Version: " + data.serverVersion;
+            document.querySelector('.infosText:nth-child(4)').textContent = "Player Count: " + data.serverOnlinePlayers + "/" + data.serverMaxPlayers;
+            document.querySelector('.infosText:nth-child(5)').textContent = "TPS: " + data.serverTPS;
+            document.querySelector('.infosText:nth-child(6)').textContent = "Uptime: " + data.serverUptime;
+            document.querySelector('.infosText:nth-child(7)').textContent = "RAM used: " + data.memPercentageUsed + "% (" + data.memUsed + "/" + data.memMax + ") (Free: " + data.memPercentageFree + "%)";
+        }).catch(error => console.error('Error:', error));
+    }
+
+    if (await checkPermission("scp.serverinfo")) {
+        // Call the function immediately to populate the data
+        updateGeneralInfosMenu();
+
+        // Then call the function every 3 seconds
+        setInterval(updateGeneralInfosMenu, 3000);
+    }
+</script>
+</body>
+</html>

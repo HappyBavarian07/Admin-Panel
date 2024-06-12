@@ -1,7 +1,9 @@
 # Der Sprach Datei fuer Deutsche Sprache
 # %prefix% = The Prefix of the Plugin (works in every Message)
 LanguageFullName: 'Deutsch'
-LanguageVersion: '8.6.0'
+LanguageVersion: '${project.version}'
+LanguageUUID: '34a3eaac-5fd8-4d82-950e-e52153529b53'
+LanguageDescription: 'Die Deutsche Sprach Datei für das Admin-Panel'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
@@ -273,6 +275,13 @@ Messages:
         SelectSpigotID: '%prefix% &9> &aBitte gebe eine Spigot ID in den Chat ein!'
         SpigotIDSelected: '%prefix% &9> &aDie Spigot ID %spigotID% wurde ausgewählt!'
         PluginSelected: '%prefix% &9> &aDas Plugin %name% wurde ausgewählt!'
+      PluginDescriptionMenu:
+        LoadedFromResourceID: '%prefix %9> &aDie Plugin Beschreibung wurde von der Resource ID geladen!'
+        SetResourceInChat: '%prefix% &9> &aBitte gib die Resource ID in den Chat ein!'
+        SetDescriptionInChat: '%prefix% &9> &aBitte gib die Beschreibung in den Chat ein!'
+        SuccessfullySetDescriptionInChat: '%prefix% &9> &aDie Beschreibung wurde erfolgreich gesetzt!'
+        SuccessfullySetResourceInChat: '%prefix% &9> &aDie Resource ID wurde erfolgreich gesetzt!'
+        SetResourceInChatError: '%prefix% &9> &cDie Resource ID konnte nicht gesetzt werden!'
   PotionMenu:
     NotANumber: '%prefix% &9> &cDas ist keine Nummer!'
     EnterDuration: '%prefix% &9> &aBitte gib eine Dauer ein!'
@@ -1131,6 +1140,22 @@ Items:
       lore:
         - '&2Lade andere Plugins während der Server läuft!'
         - '&2Du brauchst nur den Datei Namen!'
+    PluginDescription:
+      material: WRITABLE_BOOK
+      displayName: '&2Plugin Beschreibung'
+      lore:
+        - '&2Zeige die Beschreibung des Plugins!'
+    PluginDescriptionMenu:
+      LoadFromResourceID:
+        material: BOOKSHELF
+        displayName: '&2Resource ID'
+        lore:
+          - '&2Lade die Beschreibung von Spigot!'
+      SetWithChat:
+        material: PAPER
+        displayName: '&2Setze mit Chat'
+        lore:
+          - '&2Setze die Beschreibung mit dem Chat!'
     AutoUpdateMenu:
       OpenMenuItem:
         material: DIAMOND_BLOCK
@@ -1284,6 +1309,7 @@ MenuTitles:
       Menu: '&3Whitelist Manager'
       PlayerList: '&3Spieler Liste'
   PluginManager:
+    PluginDescriptionMenu: '&3Plugin Beschreibung'
     Selector: '&aWähle ein Plugin'
     Settings: '&3Einstellungen'
     InstallMenu: '&6Installieren'

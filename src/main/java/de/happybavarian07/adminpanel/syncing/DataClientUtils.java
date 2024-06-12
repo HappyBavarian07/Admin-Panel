@@ -161,22 +161,15 @@ public class DataClientUtils {
                 }
         }
 
-        switch (var3) {
-            case 0:
-                return new CustomMap<>(this.plugin.hurtingwater);
-            case 1:
-                return new CustomMap<>(this.plugin.chatmute);
-            case 2:
-                return new CustomMap<>(this.plugin.villagerSounds);
-            case 3:
-                return new CustomMap<>(this.plugin.blockBreakPrevent);
-            case 4:
-                return new CustomMap<>(this.plugin.dupeMobsOnKill);
-            case 5:
-                return new CustomMap<>(this.plugin.freezeplayers);
-            default:
-                return null;
-        }
+        return switch (var3) {
+            case 0 -> new CustomMap<>(this.plugin.hurtingwater);
+            case 1 -> new CustomMap<>(this.plugin.chatmute);
+            case 2 -> new CustomMap<>(this.plugin.villagerSounds);
+            case 3 -> new CustomMap<>(this.plugin.blockBreakPrevent);
+            case 4 -> new CustomMap<>(this.plugin.dupeMobsOnKill);
+            case 5 -> new CustomMap<>(this.plugin.freezeplayers);
+            default -> null;
+        };
     }
 
     private void updateCustomMap(String mapIdentifier, Map<UUID, Boolean> customMap) {

@@ -18,12 +18,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PluginInstallMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -60,7 +62,8 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player, false);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
-        for (String s : resourceIDMeta.getLore()) {
+        assert resourceIDMeta != null;
+        for (String s : Objects.requireNonNull(resourceIDMeta.getLore())) {
             updatedResourceIDLore.add(s.replace("%resourceid%", String.valueOf(this.resourceID)));
         }
         resourceIDMeta.setLore(updatedResourceIDLore);
@@ -69,7 +72,8 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
-        for (String s : nameMeta.getLore()) {
+        assert nameMeta != null;
+        for (String s : Objects.requireNonNull(nameMeta.getLore())) {
             updatedNameLore.add(s.replace("%filename%", this.fileName));
         }
         nameMeta.setLore(updatedNameLore);
@@ -97,7 +101,8 @@ public class PluginInstallMenu extends Menu implements Listener {
                 AdminPanelMain.getAPI().callAdminPanelEvent(installEvent);
                 if (!installEvent.isCancelled()) {
                     try {
-                        AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
+                        Plugin installedPlugin = AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
+                        plugin.getPluginDescriptionManager().addPluginDescription(installedPlugin, "", installEvent.getResourceID());
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
                         player.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", player, true));
@@ -147,7 +152,8 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack resourceIDItem = lgm.getItem(path + "ResourceID", player, false);
         ItemMeta resourceIDMeta = resourceIDItem.getItemMeta();
         List<String> updatedResourceIDLore = new ArrayList<>();
-        for (String s : resourceIDMeta.getLore()) {
+        assert resourceIDMeta != null;
+        for (String s : Objects.requireNonNull(resourceIDMeta.getLore())) {
             updatedResourceIDLore.add(s.replace("%resourceid%", String.valueOf(this.resourceID)));
         }
         resourceIDMeta.setLore(updatedResourceIDLore);
@@ -176,6 +182,8 @@ public class PluginInstallMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+
         if (playerMenuUtility.hasData("typeFileNameInChat")) {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");

@@ -23,10 +23,10 @@ public class PluginSettingsMenu extends Menu {
     private final PluginUtils pluginUtils;
     private final Plugin currentPlugin;
 
-    public PluginSettingsMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {
+    public PluginSettingsMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         this.pluginUtils = new PluginUtils();
-        this.currentPlugin = currentPlugin;
+        this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Open");
     }
 
@@ -70,6 +70,14 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
+        } else if (item.equals(lgm.getItem( "PluginManager.PluginDescription", player, false))) {
+            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.PluginDescription")) {
+                player.sendMessage(noPerms);
+                return;
+            }
+            // Open Plugin Description Menu and put current plugin in the playerdata
+            playerMenuUtility.addData("CurrentSelectedPlugin", currentPlugin);
+            new PluginDescriptionMenu(playerMenuUtility).open();
         } else if (item.equals(lgm.getItem(path + "Disable", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Disable")) {
                 player.sendMessage(noPerms);
@@ -185,6 +193,7 @@ public class PluginSettingsMenu extends Menu {
         String path = "PluginManager.Settings.";
 
         // Items
+        inventory.setItem(getSlot("PluginManager.PluginDescription", 5), lgm.getItem("PluginManager.PluginDescription", player, false));
         inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player, false));
         inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player, false));
         inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player, false));

@@ -1,7 +1,5 @@
 package au.com.xandar.crypto;
 
-import org.apache.commons.codec.binary.Base64;
-
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.*;

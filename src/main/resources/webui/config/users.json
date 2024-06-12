@@ -1,0 +1,21 @@
+{
+  "2c9d43ee-017c-4391-beb1-5c428acc70e6": {
+    "uuid": "2c9d43ee-017c-4391-beb1-5c428acc70e6",
+    "salt": "3f86f7d2239247c5",
+    "username": "user",
+    "hashedPassword": "2bf70a960b589b53e18093d24e4e7e1468b6774c6ec0b765d7e29bc0a0d3e966",
+    "roles": [
+      "default"
+    ]
+  },
+  "a0edf1a5-f2ad-4110-804d-b589c7cd5464": {
+    "uuid": "a0edf1a5-f2ad-4110-804d-b589c7cd5464",
+    "salt": "a7b8c9d0e1f2g3h4",
+    "username": "root",
+    "hashedPassword": "78168027b9fe18312772e6529d193f23bdeaf0feda63b7d4051ecd0922df65e1",
+    "roles": [
+      "default",
+      "admin"
+    ]
+  }
+}

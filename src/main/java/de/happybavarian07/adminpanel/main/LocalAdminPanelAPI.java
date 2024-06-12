@@ -1,7 +1,5 @@
 package de.happybavarian07.adminpanel.main;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;

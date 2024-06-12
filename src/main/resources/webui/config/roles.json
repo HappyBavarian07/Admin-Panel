@@ -1,0 +1,11 @@
+{
+  "roles": {
+    "default": {
+      "name": "default",
+      "permissions": {
+        "SCP_ACCESS": true
+      }
+    }
+  },
+  "roleHierarchy": ["default"]
+}

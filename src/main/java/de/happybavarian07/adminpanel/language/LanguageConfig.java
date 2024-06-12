@@ -17,13 +17,15 @@ public class LanguageConfig {
     private File file;
     private FileConfiguration config;
 
-    public LanguageConfig(File langFile, String langName, JavaPlugin plugin) {
+    public LanguageConfig(File langFile, String langName, JavaPlugin plugin, boolean autoSaveAndLoad) {
         this.plugin = plugin;
         this.langName = langName;
         this.file = langFile;
         //System.out.println("Creating Language Config: " + this.langName + "  |  " + this.file);
-        saveDefaultConfig();
-        this.config = YamlConfiguration.loadConfiguration(file);
+        if(autoSaveAndLoad) {
+            saveDefaultConfig();
+            this.config = YamlConfiguration.loadConfiguration(this.file);
+        }
     }
 
     public void reloadConfig() {

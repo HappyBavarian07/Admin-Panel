@@ -71,7 +71,8 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName()))).open();
+            playerMenuUtility.addData("CurrentSelectedPlugin", Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName())));
+            new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         } else if (item.equals(lgm.getItem(path + "Install", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.InstallPlugins")) {
                 player.sendMessage(noPerms);
@@ -166,7 +167,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                     ItemMeta meta = item.getItemMeta();
                     meta.setDisplayName(Utils.chat("&a" + currentPlugin.getName()));
                     List<String> lore = new ArrayList<>();
-                    Utils utils = Utils.getInstance();
+                    lore.add(Utils.chat("&6Description: &a" + plugin.getPluginDescriptionManager().getDescriptionFromPlugin(currentPlugin)));
                     lore.add(Utils.chat("&6Enabled: &a" + enabled));
                     lore.add(Utils.chat("&6Version: &a" + currentPlugin.getDescription().getVersion()));
                     if (currentPlugin.getDescription().getAuthors().size() == 1) {
@@ -191,6 +192,8 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+
         if (playerMenuUtility.hasData("TypePluginFileNameToLoadInChat")) {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");

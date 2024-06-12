@@ -42,7 +42,7 @@ public abstract class CommandManager {
 
     public abstract boolean autoRegisterPermission();
 
-    public boolean onCommand(Player player, String[] args) {
+    public boolean onPlayerCommand(Player player, String[] args) {
         SubCommand target = this.getSub(args[0]);
 
         if (target == null) {
@@ -84,7 +84,7 @@ public abstract class CommandManager {
         return true;
     }
 
-    public boolean onCommand(ConsoleCommandSender sender, String[] args) {
+    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         SubCommand target = this.getSub(args[0]);
 
         if (target == null) {

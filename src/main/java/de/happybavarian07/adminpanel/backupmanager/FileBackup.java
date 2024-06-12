@@ -1,15 +1,17 @@
-package de.happybavarian07.adminpanel.utils;/*
+package de.happybavarian07.adminpanel.backupmanager;/*
  * @Author HappyBavarian07
  * @Date 28.01.2023 | 16:08
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class FileBackup {
+public class FileBackup implements Comparable<FileBackup> {
     private String identifier;
     private File[] filesToBackup;
     // Relative to the Admin-Panel Plugin Folder
@@ -195,5 +197,20 @@ public class FileBackup {
 
     public void addBackupDone(File backupDone) {
         backupsDone.add(backupDone);
+    }
+
+    @Override
+    public int compareTo(@NotNull FileBackup o) {
+        int identifierComparison = this.identifier.compareTo(o.identifier);
+        if (identifierComparison != 0) {
+            return identifierComparison;
+        }
+
+        int destinationPathComparison = this.destinationPathToBackupToo.compareTo(o.destinationPathToBackupToo);
+        if (destinationPathComparison != 0) {
+            return destinationPathComparison;
+        }
+
+        return this.filesToBackup.length - o.filesToBackup.length;
     }
 }

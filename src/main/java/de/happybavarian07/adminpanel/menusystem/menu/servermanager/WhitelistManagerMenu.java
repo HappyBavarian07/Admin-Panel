@@ -97,6 +97,8 @@ public class WhitelistManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+
         if (playerMenuUtility.hasData("WhitelistManagerAddPlayer")) {
             event.setCancelled(true);
             String message = event.getMessage();

@@ -137,6 +137,8 @@ permissions:
           AdminPanel.PluginManager.PluginSettings.*:
             default: op
             children:
+              AdminPanel.PluginManager.PluginSettings.PluginDescription:
+                default: op
               AdminPanel.PluginManager.PluginSettings.Open:
                 default: op
               AdminPanel.PluginManager.PluginSettings.Enable:

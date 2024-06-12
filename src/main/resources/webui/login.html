@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to top, #40726e, #7b5858); /* Add a slight fade gradient to the background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .title {
+            font-size: 4em; /* Make the font size larger */
+            font-weight: bold; /* Make the text bold */
+            font-family: 'Amiri', sans-serif; /* Change the font to 'Trebuchet MS', sans-serif */
+            font-style: italic;
+            color: #a7bc1b; /* Change the text color */
+            text-align: center; /* Center the text */
+            margin-bottom: 20px; /* Add some space below the title */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form {
+            width: 500px; /* Set a fixed width for the form */
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block; /* Make the label a block element */
+            margin-bottom: 10px; /* Add some space below the label */
+        }
+
+        input[type="text"], input[type="password"], input[type="submit"] {
+            width: calc(100%); /* Subtract the total padding from the width */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        input[type="checkbox"] {
+            margin-top: 5px; /* Add some space above the checkbox */
+            margin-bottom: 20px; /* Add some space below the checkbox */
+            padding-bottom: 20px;
+            width: 20px; /* Increase the size of the checkbox */
+            height: 20px;
+        }
+
+        input[type="submit"] {
+            border: none;
+            color: white;
+            background-color: #5C6BC0;
+        }
+
+        .error-message {
+            color: red; /* Change the text color to red */
+            font-weight: bold; /* Make the text bold */
+            margin-top: 10px; /* Add some space above the error message */
+            display: block; /* Make the error message a block element */
+        }
+    </style>
+    <script type="module" src="/js/permissions.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="title">Log In</h1> <!-- Add the title -->
+    <form id="loginForm">
+        <label>
+            Username
+            <br>
+            <input type="text" name="username" autocomplete="current-username" placeholder="Username" required>
+        </label>
+        <label>
+            Password
+            <input type="password" id="password" name="current-password" autocomplete="current-password"
+                   class="form-control rounded" spellcheck="false" autocorrect="off" autocapitalize="off"
+                   placeholder="Password" required>
+        </label>
+        <label>
+            <input type="checkbox" id="reveal-password"> Show Password
+        </label>
+        <input type="submit" value="Login">
+    </form>
+    <p id="error-message" class="error-message">Invalid username or password</p>
+</div>
+
+<script>
+    function getCookie(name) {
+        const cookieArr = document.cookie.split(";");
+
+        for (let i = 0; i < cookieArr.length; i++) {
+            const cookiePair = cookieArr[i].split("=");
+
+            if (name === cookiePair[0].trim()) {
+                return decodeURIComponent(cookiePair[1]);
+            }
+        }
+
+        return null;
+    }
+
+    async function sha256Hash(message, update) {
+        /*const shaObj = new Sha("SHA-256", "TEXT", { encoding: "UTF8" });
+        shaObj.update(update);
+        shaObj.update(message);
+        return shaObj.getHash('HEX');*/
+        const msgBuffer = new TextEncoder().encode(update + message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function hashPassword(password, salt, challenge) {
+        try {
+            const hash1 = await sha256Hash(password, salt);
+            return await sha256Hash(hash1, challenge);
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent the form from being submitted
+
+        const username = event.target.username.value;
+        let password = event.target.password.value;
+
+        // If the Data is empty, show error message and return
+        if (username === '' || password === '') {
+            document.getElementById('error-message').textContent = 'Please fill in all the fields';
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        }
+
+        // Send an API call to the server with the form data
+        let response = await fetch('/adminpanel/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `username=${encodeURIComponent(username)}`
+        });
+        // Get the salt in Server Response and hash Password then send another req to the server with Username and Password
+        if (!response.ok) {
+            document.getElementById('error-message').textContent = 'Something went wrong. Please try again. (Username may be wrong)';
+            document.getElementById('error-message').style.display = 'block';
+            return null;
+        }
+
+        const {salt, challenge} = await response.json();
+
+        const hashedPassword = await hashPassword(password, salt, challenge);
+        // Send another req to the server with Username and Password
+        if (hashedPassword == null) {
+            console.error('Could not hash the password');
+            document.getElementById('error-message').textContent = 'Something went wrong. Please try again.';
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        }
+        response = await fetch('/adminpanel/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(hashedPassword)}`
+        });
+        // Get the salt in Server Response and hash Password then send another req to the server with Username and Password
+        if (!response.ok) {
+            document.getElementById('error-message').textContent = 'Something went wrong. Please try again. (Username may be wrong)';
+            document.getElementById('error-message').style.display = 'block';
+            return null;
+        }
+        event.target.reset();
+        const responseData = response.text();
+
+        console.log('Success:', responseData);
+        if (responseData == null) {
+            document.getElementById('error-message').textContent = 'Invalid username or password';
+            document.getElementById('error-message').style.display = 'block';
+        } else if (responseData.error) {
+            // Handle error
+            document.getElementById('error-message').textContent = responseData.error;
+            document.getElementById('error-message').style.display = 'block';
+        } else {
+            // Change the error message and make it visible
+            const errorMessage = document.querySelector('.error-message');
+            errorMessage.textContent = 'Login successful.';
+            errorMessage.style.color = 'grey';
+            errorMessage.style.display = 'block';
+
+            // Start countdown from 3
+            let countdown = 3;
+            const intervalId = setInterval(() => {
+                if (countdown > 0) {
+                    // Update the error message to display the remaining time
+                    errorMessage.textContent = `Login successful. Redirecting in ${countdown} seconds...`;
+                    countdown--;
+                } else {
+                    // When the countdown reaches 0, stop the interval and redirect the user
+                    clearInterval(intervalId);
+                    window.location.href = '/adminpanel/dashboard';
+                }
+            }, 1000);
+        }
+        /*catch(error => {
+            console.error('Error:', error);
+            document.getElementById('error-message').textContent = 'Login failed. Please try again.';
+            document.getElementById('error-message').style.display = 'block';
+            event.target.reset();
+        });*/
+    });
+    // Make the Error message invisible by default
+    document.querySelector('.error-message').style.display = 'none';
+
+    // Add an event listener to the checkbox to toggle the password visibility
+    document.getElementById('reveal-password').addEventListener('change', function (event) {
+        // Get the password input field
+        const passwordField = document.getElementById('password');
+
+        // If the checkbox is checked, change the type to 'text' to reveal the password
+        // If the checkbox is not checked, change the type back to 'password' to hide the password
+        passwordField.type = event.target.checked ? 'text' : 'password';
+    });
+</script>
+</body>
+</html>

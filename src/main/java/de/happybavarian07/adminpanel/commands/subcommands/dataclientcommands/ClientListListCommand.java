@@ -27,7 +27,7 @@ public class ClientListListCommand extends SubCommand {
         try {
             int page = Integer.parseInt(args[0]);
             PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
-            messages.maxItemsPerPage(10).sort();
+            messages.maxItemsPerPage(10).sort("bubble", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 player.sendMessage(lgm.getMessage("DataClient.ClientListMessages.PageDoesNotExist", player, true));
@@ -60,7 +60,7 @@ public class ClientListListCommand extends SubCommand {
             int page = Integer.parseInt(args[0]);
             PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
             System.out.println("Other Connected Clients: " + plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
-            messages.maxItemsPerPage(10).sort();
+            messages.maxItemsPerPage(10).sort("bubble", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 sender.sendMessage(lgm.getMessage("DataClient.ClientListMessages.PageDoesNotExist", null, true));

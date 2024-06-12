@@ -1,0 +1,6 @@
+# File for all Plugin Descriptions for the Plugin Manager
+
+descriptions:
+  Admin-Panel:
+    resourceID: 91800
+    description: "Ein Admin-Panel zum Server kontrollieren, zu 98% konfigurierbar"

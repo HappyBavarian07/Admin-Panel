@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.utils;/*
 
 public enum Result {
     SUCCESS(true),
+    WARN(true),
     ERROR(false),
     FAILURE(false),
     EMPTYOBJECT(false),

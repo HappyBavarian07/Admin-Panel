@@ -186,7 +186,9 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (playerMenuUtility.hasData("serverManagerBroadcastMessage")) {
+        if (playerMenuUtility.getOwner() != player) return;
+
+        if (playerMenuUtility.hasData("serverManagerBroadcastMessage") && player == playerMenuUtility.getOwner()) {
             String message = Utils.chat(event.getMessage());
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", message, true);
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player, false));

@@ -26,7 +26,7 @@ public class PerPlayerLanguageHandler {
         return dataConfig.getString("playerdata." + uuid.toString() + ".language", lgm.getCurrentLangName());
     }
 
-    public LanguageFile getPlayerLanguage(UUID uuid) {
+    public LanguageFile getPlayerLanguageFile(UUID uuid) {
         return lgm.getLang(dataConfig.getString("playerdata." + uuid.toString() + ".language", lgm.getCurrentLangName()), true);
     }
 

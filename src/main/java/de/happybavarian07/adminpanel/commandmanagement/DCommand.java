@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class DCommand extends BukkitCommand {
     private CommandExecutor commandExecutor;
@@ -42,8 +43,8 @@ public class DCommand extends BukkitCommand {
     }
 
     @Override
-    public @Nullable List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
-        return tabCompleter != null ? tabCompleter.onTabComplete(sender, this, alias, args) : null;
+    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
+        return Objects.requireNonNull(tabCompleter != null ? tabCompleter.onTabComplete(sender, this, alias, args) : null);
     }
 
     @Override
@@ -94,7 +95,6 @@ public class DCommand extends BukkitCommand {
         }
     }
 
-    @SuppressWarnings("serial")
     public static class CommandNotPreparedException extends RuntimeException{
         public CommandNotPreparedException() {
             super("no CommandExecutor was found");

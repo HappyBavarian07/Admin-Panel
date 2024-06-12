@@ -12,12 +12,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 @CommandData
-public abstract class SubCommand {
+public abstract class SubCommand implements Comparable<SubCommand> {
     protected AdminPanelMain plugin = AdminPanelMain.getPlugin();
     protected LanguageManager lgm = plugin.getLanguageManager();
     protected CommandManagerRegistry registry = plugin.getCommandManagerRegistry();
@@ -94,5 +96,30 @@ public abstract class SubCommand {
         placeholders.put("%subArgs%", new Placeholder("%subArgs%", cmd.subArgs().toString(), PlaceholderType.ALL));
 
         return lgm.replacePlaceholders(in, placeholders);
+    }
+
+    @Override
+    public int compareTo(@NotNull SubCommand o) {
+        int nameComparison = this.name().compareTo(o.name());
+        if (nameComparison != 0) {
+            return nameComparison;
+        }
+
+        int infoComparison = this.info().compareTo(o.info());
+        if (infoComparison != 0) {
+            return infoComparison;
+        }
+
+        int aliasesComparison = Arrays.toString(this.aliases()).compareTo(Arrays.toString(o.aliases()));
+        if (aliasesComparison != 0) {
+            return aliasesComparison;
+        }
+
+        int syntaxComparison = this.syntax().compareTo(o.syntax());
+        if (syntaxComparison != 0) {
+            return syntaxComparison;
+        }
+
+        return this.info().compareTo(o.info());
     }
 }

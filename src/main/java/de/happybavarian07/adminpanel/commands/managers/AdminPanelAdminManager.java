@@ -59,13 +59,13 @@ public class AdminPanelAdminManager extends CommandManager {
     }
 
     @Override
-    public boolean onCommand(Player player, String[] args) {
-        return super.onCommand(player, args);
+    public boolean onPlayerCommand(Player player, String[] args) {
+        return super.onPlayerCommand(player, args);
     }
 
     @Override
-    public boolean onCommand(ConsoleCommandSender player, String[] args) {
-        return super.onCommand(player, args);
+    public boolean onConsoleCommand(ConsoleCommandSender player, String[] args) {
+        return super.onConsoleCommand(player, args);
     }
 
     @Override

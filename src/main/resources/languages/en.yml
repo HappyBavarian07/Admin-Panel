@@ -1,7 +1,9 @@
 # The Language File for English Language
 # %prefix% = The Prefix of the Plugin (works in every Message)
 LanguageFullName: 'English'
-LanguageVersion: '8.6.0'
+LanguageVersion: '${project.version}'
+LanguageUUID: 'd6ef09c8-8cb9-4335-85be-1e95d81d6e93'
+LanguageDescription: 'The English Language File for the Admin-Panel Plugin'
 Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
@@ -265,6 +267,13 @@ Messages:
         SelectSpigotID: '%prefix% &9> &aPlease enter a valid Spigot ID!'
         SpigotIDSelected: '%prefix% &9> &aThe Spigot ID %spigotID% was selected!'
         PluginSelected: '%prefix% &9> &aThe Plugin %name% was selected!'
+      PluginDescriptionMenu:
+        LoadedFromResourceID: '%prefix% &9> &aThe Plugin Description was loaded from the Resource ID!'
+        SetResourceInChat: '%prefix% &9> &aPlease enter the Resource ID in the Chat!'
+        SetDescriptionInChat: '%prefix% &9> &aPlease enter the Description in the Chat!'
+        SuccessfullySetDescriptionInChat: '%prefix% &9> &aThe Description was successfully set!'
+        SuccessfullySetResourceInChat: '%prefix% &9> &aThe Resource ID was successfully set!'
+        SetResourceInChatError: '%prefix% &9> &cThe Resource ID could not be set!'
   PotionMenu:
     NotANumber: '%prefix% &9> &cThat''s not a Number!'
     EnterDuration: '%prefix% &9> &aPlease enter an Duration!'
@@ -275,7 +284,7 @@ Messages:
     EffectRemoved: '%prefix% &9> &cThe Effect &7%type%&c got removed from &7%target%&c!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
-  TomanyArguments: '&4Too many Arguments!'
+  ToManyArguments: '&4Too many Arguments!'
   TooFewArguments: '&4Too few Arguments!'
 Items:
   General:
@@ -1125,6 +1134,22 @@ Items:
       lore:
         - '&2Load Plugins at Server Runtime!'
         - '&2The only thing you need is the File name!'
+    PluginDescription:
+        material: WRITABLE_BOOK
+        displayName: '&2Plugin Description'
+        lore:
+            - '&2Show and edit the Description of the Plugin!'
+    PluginDescriptionMenu:
+      LoadFromResourceID:
+        material: BOOKSHELF
+        displayName: '&2Load from Resource ID'
+        lore:
+          - '&2Load the Description from the Resource ID!'
+      SetWithChat:
+        material: PAPER
+        displayName: '&2Set with Chat'
+        lore:
+          - '&2Set the Description with Chat!'
     AutoUpdateMenu:
       OpenMenuItem:
         material: DIAMOND_BLOCK
@@ -1397,6 +1422,7 @@ MenuTitles:
       Menu: '&3Whitelist Manager'
       PlayerList: '&3Player List'
   PluginManager:
+    PluginDescriptionMenu: '&3Plugin Description'
     Selector: '&aSelect a Plugin'
     Settings: '&3Settings'
     InstallMenu: '&6Install'

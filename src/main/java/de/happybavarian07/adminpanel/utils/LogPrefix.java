@@ -32,7 +32,12 @@ public enum LogPrefix {
     VAULT_CHAT("Vault - Chat", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_CHAT", true)),
     VAULT_ECONOMY("Vault - Economy", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_ECONOMY", true)),
     VAULT_PLUGIN("Vault - Plugin", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_PLUGIN", true)),
-    UPDATER("Updater", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.UPDATER", true));
+    UPDATER("Updater", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.UPDATER", true)),
+    WEBUI("WebUI", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI", true)),
+    WEBUI_API("WebUI - API", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_API", true)),
+    WEBUI_CONSOLE("WebUI - Commands", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_COMMANDS", true)),
+    WEBUI_LOGIN("WebUI - Login", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_LOGIN", true)),
+    WEBUI_AUTH("WebUI - Auth", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_AUTH", true));
 
     private final String logPrefix;
     private final boolean enabled;

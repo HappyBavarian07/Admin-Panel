@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Player Control</title>
+    <style>
+        body {
+            background-color: #56b873;
+        }
+
+        .controlButton {
+            position: sticky;
+            top: 0;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 19px;
+            background: #4a82a5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            z-index: 1; /* Add a z-index to make the buttons appear on top of other elements */
+        }
+
+        .controlButton:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        .controlButton:active {
+            background-color: #3e8e41;
+            transform: translateY(4px);
+        }
+
+        /* Add CSS for the dropdown menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            padding: 12px 16px;
+            z-index: 1;
+            width: 100%; /* Make the dropdown content the same width as the dropdown */
+            transform: scaleY(0); /* Hide the dropdown content by default */
+            transform-origin: top; /* Set the origin of the transform to the top of the element */
+            transition: transform 0.3s ease-in-out; /* Add a transition to the transform property */
+        }
+
+        .dropdown:hover .dropdown-content {
+            transform: scaleY(1); /* Show the dropdown content when hovering over the dropdown */
+        }
+
+        .dropdown-content option {
+            background-color: #f9f9f9;
+            color: green; /* Black text */
+            padding: 5px;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Add a transition to the background-color and color properties */
+        }
+
+        .dropdown-content option:hover {
+            background-color: #4cafac;
+            color: white;
+        }
+
+        .dropdown-content option:checked {
+            background-color: #4cafac;
+            color: white;
+        }
+
+        #controlButtons {
+            position: absolute;
+            background: transparent;
+            right: 0;
+            top: -40px;
+            padding: 5px;
+            z-index: 2;
+        }
+
+        #closeButton {
+            font-size: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #000000; /* Change the color to contrast with the background */
+            z-index: 3; /* Make the button appear above the menu */
+        }
+
+        #playersHelpMenu {
+            position: fixed;
+            top: 70px;
+            background-color: #f2f2f2;
+            border: 1px solid #888;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            width: 500px;
+            margin: auto;
+            right: 40px;
+            overflow-y: auto;
+            z-index: 3;
+        }
+
+        #playersHelpMenu h3 {
+            text-align: center;
+        }
+
+        #playersHelpMenu p {
+            margin-left: 15px;
+        }
+
+        #playersHelpMenu code {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 2px;
+        }
+
+        #helpButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 50%;
+            padding: 5px 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        #selectButtons {
+            display: flex;
+            flex-direction: row; /* Change the direction to row */
+            justify-content: center; /* Center the buttons horizontally */
+            gap: 10px; /* Add a gap between the buttons */
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        #playersList {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-y: auto; /* Add a vertical scrollbar when the content exceeds the height */
+            height: 500px;
+            width: 70%;
+            margin: 10px auto;
+        }
+
+        #playersList::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #playersList::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #playersList::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+
+        #playersList::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        #playersList div {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        #playersList input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        #playersTable {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #playersTable tr {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #000;
+        }
+
+        #playersTable td {
+            flex: 1;
+        }
+
+        .actionsCell {
+            order: 1;
+            text-align: right;
+            flex-grow: 2;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #000;
+        }
+
+        /* Add margin to the table cells for spacing between rows */
+        #playersTable td, #playersTable th {
+            border: 1px solid #000;
+            border-left-color: #ddd;
+            padding: 5px;
+        }
+
+        #playersTable th {
+            border: 1px solid #ddd;
+            background-color: #f2f2f2;
+        }
+
+        #playersTable thead {
+            position: sticky;
+            top: 0;
+            background-color: white; /* Add a background color to the thead to ensure the text is readable */
+        }
+
+        .playerName {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Add styles for the action buttons */
+        .actionButton {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            background: #4a82a5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            justify-content: flex-end; /* Align the buttons to the right */
+        }
+
+        .actionButton:hover {
+            background-color: #1f4358;
+        }
+
+        .actionButton:active {
+            background-color: #1f4358;
+            transform: translateY(4px);
+        }
+
+        /* Add styles for the mode button */
+        .modeButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4a82a5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modeButton:hover {
+            background-color: #1f4358;
+        }
+
+        .modeButton:active {
+            background-color: #1f4358;
+            transform: translateY(4px);
+        }
+
+        /* Add styles for the buttons div */
+        #buttonsDiv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modeDiv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding-left: 20px; /* Add a 20px padding to the left of the modeDiv */
+        }
+
+        .modeTitle {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .selectButton {
+            padding: 10px 20px;
+            font-size: 13px;
+            background: #4a82a5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .selectButton:hover {
+            background-color: #1f4358;
+        }
+
+        .selectButton:active {
+            background-color: #1f4358;
+            transform: translateY(4px);
+        }
+
+        #selectButtons {
+            position: absolute;
+            left: 7%;
+            top: 23%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .actionInfo {
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script type="module" src="/js/permissions.js"></script>
+    <script type="module" src="/js/config.js"></script>
+</head>
+<body>
+<button class="controlButton helpButton" id="helpButton">?</button>
+<div style="display: flex; justify-content: center;">
+    <h1 style="text-align: center; font-size: 28px">Player Control</h1>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <!-- Add your control buttons here -->
+</div>
+
+<!-- Add your main content here -->
+<div id="buttonsDiv">
+    <div class="modeDiv">
+        <h3 class="modeTitle">Change View Mode</h3>
+        <button class="modeButton" id="modeButton" style="text-align: center; right: 0">ALL</button>
+    </div>
+    <div id="selectButtons">
+        <button class="selectButton" id="selectAllButton">Select All</button>
+        <button class="selectButton" id="deselectAllButton">Deselect All</button>
+    </div>
+    <div id="playersList">
+        <!-- Players will be dynamically added here -->
+    </div>
+    <p class="actionInfo" id="actionInfo"></p>
+</div>
+
+<div id="playersHelpMenu" style="display: none">
+    <h3>Player Control Help</h3>
+    <p>
+        This page allows you to control the players on the server. You can use the buttons above the Player List to
+        perform actions on
+        all players, or you can use the buttons next to each player to perform actions on that player only.
+    </p>
+    <p>
+        The following actions are available:
+    </p>
+    <ul>
+        <li><code>kick</code> - Kicks the player from the server</li>
+        <li><code>ban</code> - Bans the player from the server</li>
+        <li><code>unban</code> - Unbans the player from the server</li>
+        <li><code>op</code> - Gives the player operator permissions</li>
+        <li><code>deop</code> - Removes operator permissions from the player</li>
+        <li><code>message</code> - Sends a message to the player</li>
+    </ul>
+    <p>
+        When hovering over a player's name, you will see their UUID. This can be useful for identifying players with
+        similar usernames.
+    </p>
+    <p>
+        You can also use the dropdown menu to perform actions on multiple players at once. To do this, select the
+        players you want to perform the action on, then click the button for the action you want to perform.
+    </p>
+    <p>
+        <strong>Note:</strong> The dropdown menu will only appear if there are players on the server.
+    </p>
+</div>
+
+<script type="module">
+    import {checkPermission} from "/js/permissions.js";
+    import {serverUrlForAPI} from "/js/config.js";
+    import {serverUrlWithWS} from "/js/config.js";
+
+    let playerList = document.getElementById('playersList');
+    let playerTable = document.createElement('table');
+    let actionInfo = document.getElementById('actionInfo');
+    playerTable.id = 'playersTable';
+
+    // This is the example array that gets displayed if the players sent from the servers are null and the server didn't send an error
+    let players = [
+        ['0', {username: 'If You', status: 'BANNED', op: true, uuid: '6e840d3c-b3b3-42a3-b91a-cdf5984b816e'}],
+        ['1', {username: 'See This', status: 'BANNED', op: false, uuid: '5df2f13d-b2c9-41b2-a69f-1a5c8cc03a50'}],
+        ['2', {username: 'That Means', status: 'BANNED', op: true, uuid: '8b8279a1-2e0a-447e-b82f-6e53f433e8e2'}],
+        ['3', {username: 'Something Went', status: 'BANNED', op: false, uuid: 'ada47a29-2731-4c3e-8cde-43e9df15a426'}],
+        ['4', {username: 'terribly wrong', status: 'BANNED', op: true, uuid: '67953f98-c266-4373-9e5d-089861702f8e'}],
+        ['5', {username: 'while loading', status: 'BANNED', op: false, uuid: '1dd39fbc-b506-4d9f-be4c-7be2c45217cc'}],
+        ['6', {username: 'the players.', status: 'BANNED', op: true, uuid: '5aacf122-2018-4d72-8a8f-733efe3de5de'}]
+    ];
+
+    // Create a list to store the UUIDs of the selected players
+    let selectedPlayers = [];
+
+    function getPlayersFromServer() {
+        if (checkPermission('pcp.player_list')) {
+            /*fetch(serverUrlForAPI + '/adminpanel/secure-api/request?info=playerList', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response === 'Server Is Empty. No Players Online.') {
+                    return [];
+                } else {
+                    alert('Failed to get Players: ' + response.status + ' ' + response.statusText);
+                    return null;
+                }
+            }).then(data => {*/
+
+            // Use websocket connection to get players from server
+
+            // Query UserInfo from API to get JWT token and user ID
+            fetch(serverUrlForAPI + '/adminpanel/secure-api/request?info=UserInfo&data=null', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    alert('Failed to get user info: ' + response.status + ' ' + response.statusText);
+                }
+            }).then(async data => {
+                let token = data.token;
+                let userid = data.userID;
+                let socket = new WebSocket(serverUrlWithWS + "/adminpanel/players/list?jwt_token=" + encodeURIComponent(token) + "&userid=" + encodeURIComponent(userid));
+
+                socket.onopen = function () {
+                    // On Connecting the Server the server sends the client the last 300 lines of console output
+                    socket.onclose = function (event) {
+                        if (event.code === 1008) {
+                            alert('You have been logged out');
+                            top.location.href = serverUrlForAPI + '/adminpanel/login';
+                        }
+                    };
+                };
+
+                socket.onmessage = function (event) {
+                    if (event.data === 'Unauthorized') {
+                        alert('You do not have permission to list players');
+                    }
+
+                    let data = JSON.parse(event.data);
+                    if (data && data !== [] && data !== {}) {
+                        players = [];
+                        for (let i = 0; i < data.length; i++) {
+                            let player = data[i][1];
+                            players.push([
+                                i.toString(),
+                                {
+                                    username: player.username,
+                                    status: player.status,
+                                    op: Boolean(player.op),
+                                    uuid: player.uuid
+                                }
+                            ]);
+                        }
+                    }
+                    console.log(data)
+                    console.log(players);
+
+                    players.sort((a, b) => {
+                        const statusOrder = ['ONLINE', 'OFFLINE', 'BANNED'];
+                        return statusOrder.indexOf(a[1].status) - statusOrder.indexOf(b[1].status);
+                    });
+
+                    // Remove all the children from the playerTable
+                    while (playerTable.firstChild) {
+                        playerTable.removeChild(playerTable.firstChild);
+                    }
+
+                    // Create the table header
+                    let thead = document.createElement('thead');
+                    let headerRow = document.createElement('tr');
+                    ['Select', 'Name', 'UUID', 'Status', 'Actions'].forEach(text => {
+                        let th = document.createElement('th');
+                        th.textContent = text;
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+                    playerTable.appendChild(thead);
+
+                    // Create the table body
+                    let tbody = document.createElement('tbody');
+                    tbody.id = 'playersTableBody';
+                    players.forEach((player, id) => {
+                        let playerRow = document.createElement('tr');
+
+                        // Create the checkbox cell
+                        let checkboxCell = document.createElement('td');
+                        let checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = 'checkbox-' + id;
+                        checkboxCell.appendChild(checkbox);
+                        playerRow.appendChild(checkboxCell);
+
+                        // Create the name cell
+                        let nameCell = document.createElement('td');
+                        nameCell.textContent = player[1].username;
+                        nameCell.className = 'playerName';
+                        playerRow.appendChild(nameCell);
+
+                        // Create the UUID cell
+                        let uuidCell = document.createElement('td');
+                        uuidCell.textContent = player[1].uuid;
+                        playerRow.appendChild(uuidCell);
+
+                        // Create the status cell
+                        let statusCell = document.createElement('td');
+                        statusCell.textContent = player[1].status;
+                        playerRow.appendChild(statusCell);
+
+                        // Create the actions cell
+                        let actionsCell = document.createElement('td');
+                        actionsCell.classList.add('actionsCell');
+
+                        // Create the action buttons and append them to the actions cell
+                        ['Kick', 'Ban', 'Send Message', 'Op'].forEach(action => {
+                            let actionButton = document.createElement('button');
+                            if (action === 'Ban') {
+                                if (player[1].status === 'BANNED') {
+                                    actionButton.textContent = 'Unban';
+                                    action = 'Unban';
+                                } else {
+                                    actionButton.textContent = 'Ban';
+                                    action = 'Ban';
+                                }
+                            } else if (action === 'Op') {
+                                if (player[1].op === true) {
+                                    actionButton.textContent = 'Deop';
+                                    action = 'Deop';
+                                } else {
+                                    actionButton.textContent = 'Op';
+                                    action = 'Op';
+                                }
+                            } else {
+                                actionButton.textContent = action;
+                            }
+                            actionButton.className = 'actionButton';
+                            actionButton.addEventListener('click', function () {
+                                handleActionButton(action, player);
+                            });
+                            actionsCell.appendChild(actionButton);
+                        });
+
+                        playerRow.appendChild(actionsCell);
+
+                        tbody.appendChild(playerRow);
+                    });
+                    playerTable.appendChild(tbody);
+
+                    playerList.appendChild(playerTable);
+
+                    /*}).catch(error => {
+                    console.error('Error:', error);
+                });*/
+                }
+            });
+        } else {
+            alert('You do not have permission to control players');
+        }
+    }
+
+    function handleActionButton(action, player) {
+        switch (action) {
+            case 'Kick':
+                //checkPermission('kick', player[1].username, function (hasPermission) {
+                //    if (hasPermission) {
+                //        kickPlayer(player[1].username);
+                //    } else {
+                //        alert('You do not have permission to kick this player');
+                //    }
+                //});
+                actionInfo.textContent = 'Kicking player: ' + player[1].username;
+                console.log('Kicking player: ' + player[1].username);
+                break;
+            case 'Ban':
+                //checkPermission('ban', player[1].username, function (hasPermission) {
+                //    if (hasPermission) {
+                //        banPlayer(player[1].username);
+                //    } else {
+                //        alert('You do not have permission to ban this player');
+                //    }
+                //});
+                actionInfo.textContent = 'Banning player: ' + player[1].username;
+                console.log('Banning player: ' + player[1].username);
+                break;
+            case 'Send Message':
+                if (checkPermission('pcp.send_message') === false) {
+                    alert('You do not have permission to send a message to this player');
+                    break;
+                }
+                // Get Message from Input Alert Box
+                let message = prompt('Enter the message you want to send to ' + player[1].username);
+
+                if (!message) {
+                    break;
+                }
+
+                fetch(serverUrlForAPI + '/adminpanel/secure-api/action?action=playerAction&jsonBodyWithData=true', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        playerAction: 'SENDMESSAGE',
+                        playerUUID: player[1].uuid,
+                        message: message
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        alert('Failed to send message to player: ' + response.status + ' ' + response.statusText);
+                        return null;
+                    }
+                }).then(data => {
+                    if (data) {
+                        console.log(data);
+                        actionInfo.textContent = 'Sending message (' + message + ') to player: ' + player[1].username;
+                        console.log('Sending message to player: ' + player[1].username);
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    actionInfo.textContent = 'Failed to send message to player: ' + player[1].username;
+                });
+                break;
+            case 'Op':
+                //checkPermission('op', player[1].username, function (hasPermission) {
+                //    if (hasPermission) {
+                //        opPlayer(player[1].username);
+                //    } else {
+                //        alert('You do not have permission to op this player');
+                //    }
+                //});
+                actionInfo.textContent = 'Opping player: ' + player[1].username;
+                console.log('Opping player: ' + player[1].username);
+                break;
+            case 'Deop':
+                //checkPermission('deop', player[1].username, function (hasPermission) {
+                //    if (hasPermission) {
+                //        deopPlayer(player[1].username);
+                //    } else {
+                //        alert('You do not have permission to deop this player');
+                //    }
+                //});
+                actionInfo.textContent = 'Deopping player: ' + player[1].username;
+                console.log('Deopping player: ' + player[1].username);
+                break;
+            default:
+                actionInfo.textContent = 'Invalid action: ' + action;
+                console.error('Invalid action: ' + action);
+                break;
+        }
+    }
+
+    document.getElementById("selectAllButton").addEventListener('click', function () {
+        // Get all the checkboxes in the playersTable
+        let checkboxes = document.querySelectorAll('#playersTable input[type="checkbox"]');
+
+        // Add all the players to the selectedPlayers list
+        players.forEach((player, id) => {
+            selectedPlayers.push(player[1].uuid);
+        });
+
+        // Loop through the checkboxes and select them
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    });
+
+    document.getElementById("deselectAllButton").addEventListener('click', function () {
+        // Get all the checkboxes in the playersTable
+        let checkboxes = document.querySelectorAll('#playersTable input[type="checkbox"]');
+
+        // Remove all the players from the selectedPlayers list
+        selectedPlayers = [];
+
+        // Loop through the checkboxes and deselect them
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+
+    let observer = new MutationObserver(function () {
+        // Use setTimeout to change the actionInfo content back to nothing after 3 seconds
+        setTimeout(function () {
+            document.getElementById('actionInfo').textContent = '';
+        }, 3000);
+    });
+
+    observer.observe(document.getElementById('actionInfo'), {childList: true});
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const helpButton = document.querySelector('#helpButton');
+        const playersHelpMenu = document.querySelector('#playersHelpMenu');
+
+        if (helpButton && playersHelpMenu) {
+            helpButton.addEventListener('click', function () {
+                if (playersHelpMenu.style.display === "none") {
+                    playersHelpMenu.style.display = "block";
+                } else {
+                    playersHelpMenu.style.display = "none";
+                }
+            });
+        } else {
+            console.error('Help button or players help menu not found');
+        }
+
+        // Create the mode button
+        let modeButton = document.getElementById('modeButton');
+
+        // Add an event listener to the mode button
+        modeButton.addEventListener('click', function () {
+            // Get the current mode
+            let currentMode = modeButton.textContent;
+
+            // Determine the next mode
+            let nextMode;
+            switch (currentMode) {
+                case 'ALL':
+                    nextMode = 'ONLINE';
+                    break;
+                case 'ONLINE':
+                    nextMode = 'OFFLINE';
+                    break;
+                case 'OFFLINE':
+                    nextMode = 'BANNED';
+                    break;
+                case 'BANNED':
+                    nextMode = 'ALL';
+                    break;
+            }
+
+            // Update the button text
+            modeButton.textContent = nextMode;
+
+            // Update the table content based on the next mode
+            let tbody = document.getElementById('playersTableBody');
+            tbody.innerHTML = ''; // Clear the current table content
+            players.forEach((player, id) => {
+                // Check the player's status based on the next mode
+                let status = player[1].status;
+
+                // If the player's status matches the next mode, add the player to the table
+                if (status === nextMode || nextMode === 'ALL') {
+                    let playerRow = document.createElement('tr');
+
+                    // Create the checkbox cell
+                    let checkboxCell = document.createElement('td');
+                    let checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'checkbox-' + id;
+                    checkboxCell.appendChild(checkbox);
+                    playerRow.appendChild(checkboxCell);
+
+                    // Create the name cell
+                    let nameCell = document.createElement('td');
+                    nameCell.textContent = player[1].username;
+                    nameCell.className = 'playerName';
+                    playerRow.appendChild(nameCell);
+
+                    // Create the UUID cell
+                    let uuidCell = document.createElement('td');
+                    uuidCell.textContent = player[1].uuid;
+                    playerRow.appendChild(uuidCell);
+
+                    // Create the status cell
+                    let statusCell = document.createElement('td');
+                    statusCell.textContent = status;
+                    playerRow.appendChild(statusCell);
+
+                    // Create the actions cell
+                    let actionsCell = document.createElement('td');
+                    actionsCell.classList.add('actionsCell');
+
+                    // Create the action buttons and append them to the actions cell
+                    ['Kick', 'Ban', 'Send Message', 'Op'].forEach(action => {
+                        let actionButton = document.createElement('button');
+                        if (action === 'Ban') {
+                            if (player[1].status === 'BANNED') {
+                                actionButton.textContent = 'Unban';
+                                action = 'Unban';
+                            } else {
+                                actionButton.textContent = 'Ban';
+                                action = 'Ban';
+                            }
+                        } else if (action === 'Op') {
+                            if (player[1].op === true) {
+                                actionButton.textContent = 'Deop';
+                                action = 'Deop';
+                            } else {
+                                actionButton.textContent = 'Op';
+                                action = 'Op';
+                            }
+                        } else {
+                            actionButton.textContent = action;
+                        }
+                        actionButton.className = 'actionButton';
+                        actionButton.addEventListener('click', function () {
+                            handleActionButton(action, player);
+                        });
+                        actionsCell.appendChild(actionButton);
+                    });
+
+                    playerRow.appendChild(actionsCell);
+
+                    tbody.appendChild(playerRow);
+                }
+            });
+        });
+
+        getPlayersFromServer();
+    });
+</script>
+</body>
+</html>

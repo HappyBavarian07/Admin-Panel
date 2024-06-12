@@ -1,0 +1,30 @@
+General:
+  ServerPort: 8080
+  ServerHost: 'localhost'
+  ServerProtocol: 'http'
+  ServerBasePath: '/webui'
+Player:
+  # Supported Plugins right now: LiteBans, BanManager, AdminPanel
+  # Put one of the supported Mute Plugins here (if you dont have one leave it at AdminPanel)
+  MutePlugin: 'AdminPanel'
+    # Put one of the supported Ban Plugins here (if you dont have one leave it at AdminPanel)
+  BanPlugin: 'AdminPanel'
+  # Put one of the supported Kick Plugins here (if you dont have one leave it at AdminPanel)
+  KickPlugin: 'AdminPanel'
+  # Put one of the supported Warn Plugins here (if you dont have one leave it at AdminPanel (this feature will come soon))
+  WarnPlugin: 'AdminPanel'
+
+Database:
+  # This can be either mysql or file for now
+  database_schema: 'file'
+  MySQL:
+    Host: 'localhost'
+    Port: 5432
+    Database: 'database'
+    User: 'user'
+    Password: 'password'
+    SSLMode: 'disable'
+    MaxOpenConns: 10
+  File:
+    Path: '/webui/config/webui.db'
+    MaxOpenConns: 10

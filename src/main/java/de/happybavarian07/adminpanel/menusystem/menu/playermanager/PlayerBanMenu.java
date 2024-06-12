@@ -187,6 +187,8 @@ public class PlayerBanMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
+        if (playerMenuUtility.getOwner() != player) return;
+
         if (playerMenuUtility.hasData("BanPlayerSetNewReason")) {
             this.reason = format(player, event.getMessage());
             playerMenuUtility.removeData("BanPlayerSetNewReason");

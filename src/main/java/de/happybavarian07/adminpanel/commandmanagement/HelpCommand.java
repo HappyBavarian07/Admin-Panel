@@ -25,7 +25,7 @@ public class HelpCommand extends SubCommand {
         try {
             int page = Integer.parseInt(args[0]);
             PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
-            messages.maxItemsPerPage(10).sort();
+            messages.maxItemsPerPage(10).sort("subcommand", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 player.sendMessage(lgm.getMessage("Player.Commands.HelpPageDoesNotExist", player, true));
@@ -57,7 +57,7 @@ public class HelpCommand extends SubCommand {
         try {
             int page = Integer.parseInt(args[0]);
             PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
-            messages.maxItemsPerPage(10).sort();
+            messages.maxItemsPerPage(10).sort("subcommand", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 sender.sendMessage(lgm.getMessage("Player.Commands.HelpPageDoesNotExist", null, true));

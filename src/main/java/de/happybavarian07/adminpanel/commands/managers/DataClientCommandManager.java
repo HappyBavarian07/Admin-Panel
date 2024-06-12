@@ -55,13 +55,13 @@ public class DataClientCommandManager extends CommandManager {
     }
 
     @Override
-    public boolean onCommand(Player player, String[] args) {
-        return super.onCommand(player, args);
+    public boolean onPlayerCommand(Player player, String[] args) {
+        return super.onPlayerCommand(player, args);
     }
 
     @Override
-    public boolean onCommand(ConsoleCommandSender sender, String[] args) {
-        return super.onCommand(sender, args);
+    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
+        return super.onConsoleCommand(sender, args);
     }
 
     @Override

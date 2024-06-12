@@ -4,7 +4,7 @@ import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Fireworkgenerator;
+import de.happybavarian07.adminpanel.utils.FireworkGenerator;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -17,8 +17,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import java.util.UUID;
 
 public class PlayerActionsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -156,7 +154,7 @@ public class PlayerActionsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            Fireworkgenerator fwg = new Fireworkgenerator(plugin);
+            FireworkGenerator fwg = new FireworkGenerator(plugin);
             fwg.setLocation(target.getLocation().add(0, 1.7, 0));
             fwg.setPower(1);
             fwg.setEffect(FireworkEffect.builder().withColor(Color.RED).withColor(Color.AQUA).withColor(Color.YELLOW).withColor(Color.BLUE).withColor(Color.GREEN).with(FireworkEffect.Type.BALL_LARGE).withFlicker().build());

@@ -429,7 +429,7 @@ public class InitMethods {
     }
 
     public void initEvents() {
-        logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Region of Evnts:&r");
+        logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Eventregistration:&r");
         PluginManager pm = plugin.getServer().getPluginManager();
         logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), plugin);
