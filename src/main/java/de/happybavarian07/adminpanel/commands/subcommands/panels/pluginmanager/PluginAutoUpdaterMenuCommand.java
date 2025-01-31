@@ -9,6 +9,7 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginAutoUpdaterMenu;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -77,7 +78,7 @@ public class PluginAutoUpdaterMenuCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         String[] playerNames = new String[Bukkit.getOnlinePlayers().size()];
         int count = 0;

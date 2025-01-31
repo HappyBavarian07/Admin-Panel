@@ -60,7 +60,7 @@ public class MenuCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         String[] playerNames = new String[Bukkit.getOnlinePlayers().size()];
         int count = 0;

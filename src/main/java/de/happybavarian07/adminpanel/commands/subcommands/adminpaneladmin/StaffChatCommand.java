@@ -81,7 +81,7 @@ public class StaffChatCommand extends SubCommand {
         return new String[]{"sc", "staffc"};
     }
 
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap();
         subArgs.put(1, new String[]{"toggle", "disableSC", "[message...]"});
         return subArgs;

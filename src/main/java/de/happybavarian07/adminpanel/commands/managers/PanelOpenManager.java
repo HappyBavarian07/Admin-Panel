@@ -50,7 +50,7 @@ public class PanelOpenManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return adminpanel;
+        return plugin;
     }
 
     @Override
@@ -69,13 +69,8 @@ public class PanelOpenManager extends CommandManager {
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return super.onPlayerCommand(player, args);
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender player, String[] args) {
-        return super.onConsoleCommand(player, args);
+    public boolean onCommand(CommandSender sender, String[] args) {
+        return super.onCommand(sender, args);
     }
 
     @Override
@@ -85,29 +80,24 @@ public class PanelOpenManager extends CommandManager {
 
     @Override
     public void setup() {
-        commands.add(new HelpCommand(getCommandName()));
+        registerSubCommand(new HelpCommand(getCommandName()));
 
         // Panels without Args
-        commands.add(new BannedPlayersMenuCommand(getCommandName()));
-        commands.add(new PlayerSelectMenuCommand(getCommandName()));
-        commands.add(new PluginAutoUpdaterMenuCommand(getCommandName()));
-        commands.add(new PluginInstallMenuCommand(getCommandName()));
-        commands.add(new PluginSelectMenuCommand(getCommandName()));
-        commands.add(new ChatManagerMenuCommand(getCommandName()));
-        commands.add(new ServerManagerMenuCommand(getCommandName()));
-        commands.add(new WhitelistedPlayersMenuCommand(getCommandName()));
-        commands.add(new WhitelistManagerMenuCommand(getCommandName()));
-        commands.add(new WorldCreateMenuCommand(getCommandName()));
-        commands.add(new WorldSelectMenuCommand(getCommandName()));
-        commands.add(new AdminPanelStartMenuCommand(getCommandName()));
-        commands.add(new TempLanguageSelectMenuCommand(getCommandName()));
+        registerSubCommand(new BannedPlayersMenuCommand(getCommandName()));
+        registerSubCommand(new PlayerSelectMenuCommand(getCommandName()));
+        registerSubCommand(new PluginAutoUpdaterMenuCommand(getCommandName()));
+        registerSubCommand(new PluginInstallMenuCommand(getCommandName()));
+        registerSubCommand(new PluginSelectMenuCommand(getCommandName()));
+        registerSubCommand(new ChatManagerMenuCommand(getCommandName()));
+        registerSubCommand(new ServerManagerMenuCommand(getCommandName()));
+        registerSubCommand(new WhitelistedPlayersMenuCommand(getCommandName()));
+        registerSubCommand(new WhitelistManagerMenuCommand(getCommandName()));
+        registerSubCommand(new WorldCreateMenuCommand(getCommandName()));
+        registerSubCommand(new WorldSelectMenuCommand(getCommandName()));
+        registerSubCommand(new AdminPanelStartMenuCommand(getCommandName()));
+        registerSubCommand(new TempLanguageSelectMenuCommand(getCommandName()));
 
         // Panels with Args
         // etc
-    }
-
-    @Override
-    public List<SubCommand> getSubCommands() {
-        return commands;
     }
 }

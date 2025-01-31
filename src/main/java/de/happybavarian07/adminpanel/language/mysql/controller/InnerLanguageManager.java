@@ -282,7 +282,7 @@ public class InnerLanguageManager {
                     CompletableFuture<Boolean> contentFuture = contentManager.addLanguageContentAsync(languageID, languageConverter.convertLanguageToDatabaseFormat(true, null, true, null));
                     contentFuture.thenAccept(future::complete);
                 } else {
-                    future.complete(true);
+                    future.complete(Boolean.TRUE);
                 }
             } catch (SQLException | InterruptedException | ExecutionException e) {
                 plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to add the language to the database: " + e, LogPrefix.ACTIONSLOGGER_PLUGIN);
@@ -324,7 +324,7 @@ public class InnerLanguageManager {
                     CompletableFuture<Boolean> contentFuture = contentManager.addLanguageContentAsync(languageID, languageConverter.convertLanguageToDatabaseFormat(true, null, true, null));
                     contentFuture.thenAccept(future::complete);
                 } else {
-                    future.complete(true);
+                    future.complete(Boolean.TRUE);
                 }
             } catch (SQLException | InterruptedException | ExecutionException e) {
                 plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to add the language to the database: " + e, LogPrefix.ACTIONSLOGGER_PLUGIN);

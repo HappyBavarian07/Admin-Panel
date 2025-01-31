@@ -322,7 +322,7 @@ public class ConnectionHandler {
                 }
                 AdminPanelMain.getPlugin().getStartUpLogger()
                         .dataClientMessage(ChatColor.GREEN, "Client Registered! New Name: '" + getClientName() + "'", true, true);
-                nameReceived = true;
+                setNameReceived(true);
             }
         }
 

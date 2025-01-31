@@ -7,6 +7,7 @@ import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.Utils;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -57,7 +58,7 @@ public class BugReportCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         return new HashMap<>();
     }
 

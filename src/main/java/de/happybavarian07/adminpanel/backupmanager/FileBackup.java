@@ -4,12 +4,16 @@ package de.happybavarian07.adminpanel.backupmanager;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.utils.Utils;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class FileBackup implements Comparable<FileBackup> {
     private String identifier;
@@ -18,11 +22,42 @@ public class FileBackup implements Comparable<FileBackup> {
     private String destinationPathToBackupToo;
     private List<File> backupsDone;
 
-    public FileBackup(String indetifier, File[] filesToBackup, String destinationPathToBackupToo) {
-        this.identifier = indetifier;
+    public FileBackup(String indentifier, File[] filesToBackup, String destinationPathToBackupToo) {
+        this.identifier = indentifier;
         this.filesToBackup = filesToBackup;
         this.destinationPathToBackupToo = destinationPathToBackupToo;
         this.backupsDone = new ArrayList<>();
+    }
+
+    public FileBackup(String identifier, List<RegexFileFilter> fileFilters, List<RegexFileFilter> excludeFilters, String destinationPathToBackupToo) {
+        this.identifier = identifier;
+        this.filesToBackup = getFilesFromFolderWithRegex(AdminPanelMain.getPlugin().getDataFolder(), fileFilters, excludeFilters).toArray(new File[0]);
+        System.out.println("Files to Backup: " + Arrays.toString(filesToBackup));
+        this.destinationPathToBackupToo = destinationPathToBackupToo;
+        this.backupsDone = new ArrayList<>();
+    }
+
+    private List<File> getFilesFromFolderWithRegex(File folder, List<RegexFileFilter> fileFilters, List<RegexFileFilter> excludeFilters) {
+        List<File> files = new ArrayList<>();
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
+            if (file.isDirectory()) {
+                files.addAll(getFilesFromFolderWithRegex(file, fileFilters, excludeFilters));
+            } else {
+                for (RegexFileFilter fileFilter : fileFilters) {
+                    if (fileFilter.accept(file)) {
+                        boolean exclude = false;
+                        for (RegexFileFilter excludeFilter : excludeFilters) {
+                            if (excludeFilter.accept(file)) {
+                                exclude = true;
+                                break;
+                            }
+                        }
+                        if (!exclude) files.add(file);
+                    }
+                }
+            }
+        }
+        return files;
     }
 
     /**
@@ -101,7 +136,16 @@ public class FileBackup implements Comparable<FileBackup> {
         if (filesToBackup == null || filesToBackup.length == 0) return -1;
         if(zipFile == null || !zipFile.exists()) return -3;
         try {
-            File zipFileTemp = new File(AdminPanelMain.getPlugin().getDataFolder() + File.separator + "old_configs.zip");
+            File zipFileTemp = new File(AdminPanelMain.getPlugin().getDataFolder() + File.separator + "old_or_corrupted_configs_.zip");
+            // Check if old_config.zips already exists in the Plugin Folder
+            // and add _1 or any other number till it works to the name
+            if (zipFileTemp.exists()) {
+                int i = 1;
+                while (zipFileTemp.exists()) {
+                    zipFileTemp = new File(AdminPanelMain.getPlugin().getDataFolder() + File.separator + "old_or_corrupted_configs_" + i + ".zip");
+                    i++;
+                }
+            }
             Utils.zipFiles(filesToBackup, zipFileTemp.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +159,44 @@ public class FileBackup implements Comparable<FileBackup> {
 
         // Load new one
 
-        Utils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator);
+        Utils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, true);
+        return 0;
+    }
+
+    public int loadSpecificFilesFromBackup(File zipFile, File[] filesToLoad) {
+        // Add every file to the intenalFilesToBackup Array that is in the filesToLoad Array
+        List<File> internalFilesToBackupList = new ArrayList<>(Arrays.stream(filesToBackup).toList());
+        internalFilesToBackupList.removeIf(f -> !Arrays.asList(filesToLoad).contains(f));
+
+        // Create copy of the old configs
+
+        if (filesToBackup.length == 0) return -1;
+        if(zipFile == null || !zipFile.exists()) return -3;
+        try {
+            File zipFileTemp = new File(AdminPanelMain.getPlugin().getDataFolder() + File.separator + "old_configs.zip");
+            // Check if old_config.zips already exists in the Plugin Folder
+            // and add _1 or any other number till it works to the name
+            if (zipFileTemp.exists()) {
+                int i = 1;
+                while (zipFileTemp.exists()) {
+                    zipFileTemp = new File(AdminPanelMain.getPlugin().getDataFolder() + File.separator + "old_or_corrupted_configs_" + i + ".zip");
+                    i++;
+                }
+            }
+            Utils.zipFiles(internalFilesToBackupList.toArray(new File[0]), zipFileTemp.getAbsolutePath());
+        } catch (IOException e) {
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "An Error occurred while creating a backup of the old files: " + e.getMessage(), LogPrefix.FILE);
+            return -2;
+        }
+        // Delete the Old Configs after creating a copy of those files
+
+        for (File f : filesToLoad) {
+            new File(f.getAbsolutePath()).delete();
+        }
+
+        // Load new one
+
+        Utils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, false);
         return 0;
     }
 

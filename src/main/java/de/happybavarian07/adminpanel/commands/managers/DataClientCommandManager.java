@@ -55,13 +55,8 @@ public class DataClientCommandManager extends CommandManager {
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return super.onPlayerCommand(player, args);
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        return super.onConsoleCommand(sender, args);
+    public boolean onCommand(CommandSender sender, String[] args) {
+        return super.onCommand(sender, args);
     }
 
     @Override
@@ -71,12 +66,12 @@ public class DataClientCommandManager extends CommandManager {
 
     @Override
     public void setup() {
-        commands.add(new HelpCommand(getCommandName()));
+        registerSubCommand(new HelpCommand(getCommandName()));
 
-        commands.add(new PermissonsSyncCommand(getCommandName()));
-        commands.add(new TrollsSyncCommand(getCommandName()));
-        commands.add(new MenuCommand(getCommandName()));
-        commands.add(new ClientListListCommand(getCommandName()));
-        commands.add(new ClientListUpdateCommand(getCommandName()));
+        registerSubCommand(new PermissonsSyncCommand(getCommandName()));
+        registerSubCommand(new TrollsSyncCommand(getCommandName()));
+        registerSubCommand(new MenuCommand(getCommandName()));
+        registerSubCommand(new ClientListListCommand(getCommandName()));
+        registerSubCommand(new ClientListUpdateCommand(getCommandName()));
     }
 }

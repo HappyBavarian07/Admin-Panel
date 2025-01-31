@@ -112,8 +112,8 @@ public class ServerManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.setInMaintenanceMode(false);
-                    if (!plugin.isInMaintenanceMode()) {
+                    plugin.getPluginStateManager().setInMaintenanceMode(false);
+                    if (!plugin.getPluginStateManager().isInMaintenanceMode()) {
                         Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
                         super.open();
                     }
@@ -131,8 +131,8 @@ public class ServerManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.setInMaintenanceMode(true);
-                    if (plugin.isInMaintenanceMode()) {
+                    plugin.getPluginStateManager().setInMaintenanceMode(true);
+                    if (plugin.getPluginStateManager().isInMaintenanceMode()) {
                         for (Player online : Bukkit.getOnlinePlayers()) {
                             if (!online.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) {
                                 online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
@@ -175,7 +175,7 @@ public class ServerManagerMenu extends Menu implements Listener {
         inventory.setItem(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false));
         inventory.setItem(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player, false));
         inventory.setItem(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player, false));
-        if (plugin.isInMaintenanceMode()) {
+        if (plugin.getPluginStateManager().isInMaintenanceMode()) {
             inventory.setItem(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player, false));
         } else {
             inventory.setItem(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player, false));
@@ -204,7 +204,7 @@ public class ServerManagerMenu extends Menu implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) return;
-        if (plugin.isInMaintenanceMode()) {
+        if (plugin.getPluginStateManager().isInMaintenanceMode()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player, true));
         } else {
             event.allow();
@@ -213,7 +213,7 @@ public class ServerManagerMenu extends Menu implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerPing(ServerListPingEvent event) {
-        if (plugin.isInMaintenanceMode()) {
+        if (plugin.getPluginStateManager().isInMaintenanceMode()) {
             event.setMotd(lgm.getMessage("Player.ServerManager.MaintenanceModeMOTD", null, true));
             event.setMaxPlayers(lgm.getCustomObject("Messages.Player.ServerManager.MaintenanceMaxPlayerCount", null, 0, false));
         } else {

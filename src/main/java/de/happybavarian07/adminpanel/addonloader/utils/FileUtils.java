@@ -47,8 +47,7 @@ public class FileUtils {
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add(loaded.asSubclass(clazz));
                     }
-                } catch (final NoClassDefFoundError e) {
-                    e.printStackTrace();
+                } catch (final NoClassDefFoundError ignored) {
                 }
             }
         }

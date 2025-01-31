@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.disableditems;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -43,7 +44,7 @@ public class DisableCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         String[] materials = new String[Material.values().length];
         int count = 0;

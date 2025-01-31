@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -63,10 +64,10 @@ public class StartUpLoggerControlCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
-        Map<Integer, String[]> args = new HashMap<>();
-        args.put(1, new String[] {"Enable", "Disable"});
-        return args;
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
+        Map<Integer, String[]> subArgs = new HashMap<>();
+        subArgs.put(1, new String[] {"Enable", "Disable"});
+        return subArgs;
     }
 
     @Override

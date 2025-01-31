@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
 
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -77,7 +78,7 @@ public class PermissionMenuHelpCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         return new HashMap<>();
     }
 

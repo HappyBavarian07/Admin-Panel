@@ -4,20 +4,20 @@ package de.happybavarian07.adminpanel.utils;/*
  */
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
-import de.happybavarian07.adminpanel.addonloader.api.Dependency;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.commands.AdminPanelOpenCommand;
 import de.happybavarian07.adminpanel.commands.LanguageReloadCommand;
 import de.happybavarian07.adminpanel.commands.PerPlayerLanguageCommand;
 import de.happybavarian07.adminpanel.commands.UpdateCommand;
+import de.happybavarian07.adminpanel.commands.managers.AddonCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
-import de.happybavarian07.adminpanel.listeners.MenuListener;
-import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.LanguageFile;
 import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.listeners.MenuListener;
+import de.happybavarian07.adminpanel.listeners.PlayerEventHandler;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Metrics;
 import de.happybavarian07.adminpanel.placeholders.DataClientExpansion;
 import de.happybavarian07.adminpanel.placeholders.PanelExpansion;
@@ -26,13 +26,9 @@ import de.happybavarian07.adminpanel.placeholders.PluginExpansion;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 
@@ -71,151 +67,6 @@ public class InitMethods {
                 }
             }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
-        if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
-            new Thread(() -> {
-                plugin.getAutoUpdaterPlugins().clear();
-                logger.coloredSpacer(ChatColor.BLUE);
-                logger.message("&1&lAuto Plugin Updater initiated&r");
-                for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
-                    if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
-
-                    ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                    assert section != null;
-                    if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
-                        continue;
-
-                    int spigotID = section.getInt("spigotID");
-                    String fileName = section.getString("fileName");
-                    boolean bypassExternalURL = section.getBoolean("bypassExternalDownload");
-
-                    assert fileName != null;
-                    if (!fileName.endsWith(".jar")) continue;
-
-                    NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
-                    plugin.getAutoUpdaterPlugins().put(sectionString, tempUpdater);
-                    if (!tempUpdater.resourceIsOnSpigot()) continue;
-                    if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
-                        if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
-                        logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
-                        tempUpdater.checkForUpdates(true);
-                        continue;
-                    }
-                    if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
-                        tempUpdater.downloadLatestUpdate(true, true, false);
-                        continue;
-                    }
-
-                    tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
-                    tempUpdater.checkForUpdates(true);
-                    if (tempUpdater.updateAvailable()) {
-                        tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
-                                plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
-                    }
-                }
-                if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            plugin.getAutoUpdaterPlugins().clear();
-                            for (String sectionString : dataYML.getConfigurationSection("PluginsToUpdate").getKeys(false)) {
-                                if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
-
-                                ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                                assert section != null;
-                                if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").equals(""))
-                                    continue;
-
-                                int spigotID = section.getInt("spigotID");
-                                String fileName = section.getString("fileName");
-                                boolean bypassExternalURL = section.getBoolean("bypassExternalDownload");
-
-                                assert fileName != null;
-                                if (!fileName.endsWith(".jar")) continue;
-
-                                NewUpdater tempUpdater = new NewUpdater(plugin, spigotID, fileName, (JavaPlugin) new PluginUtils().getPluginByName(sectionString), section.getString("link", ""), bypassExternalURL);
-                                plugin.getAutoUpdaterPlugins().put(sectionString, tempUpdater);
-                                if (!tempUpdater.resourceIsOnSpigot()) continue;
-                                if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
-                                    if(!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) continue;
-                                    logger.message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
-                                    tempUpdater.checkForUpdates(true);
-                                    continue;
-
-                                }
-                                if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
-                                    tempUpdater.downloadLatestUpdate(true, true, false);
-                                    continue;
-                                }
-
-                                tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
-                                tempUpdater.checkForUpdates(true);
-                                if (tempUpdater.updateAvailable()) {
-                                    tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
-                                            plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
-                                }
-                            }
-                        }
-                    }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
-                }
-            }).start();
-            logger.coloredSpacer(ChatColor.BLUE);
-        }
-    }
-
-    public void initPermissionFiles(FileConfiguration permissionsConfig, File permissionFile, Map<UUID, Map<String, Boolean>> playerPermissions) {
-        if (!permissionsConfig.isConfigurationSection("Permissions")) {
-            permissionsConfig.createSection("Permissions");
-            try {
-                permissionsConfig.save(permissionFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions")).getKeys(false).forEach(player -> {
-            String path = "Permissions." + player + ".Permissions";
-            Map<String, Boolean> perms = new HashMap<>();
-            Objects.requireNonNull(permissionsConfig.getConfigurationSection(path)).getKeys(false)
-                    .forEach(perm ->
-                            perms.put(perm, permissionsConfig.getBoolean(path + "." + perm)));
-            playerPermissions.put(UUID.fromString(player), perms);
-        });
-    }
-
-    public void initPermissions(Map<UUID, PermissionAttachment> playerPermissionsAttachments, Map<UUID, Map<String, Boolean>> playerPermissions) {
-        for(String configSection : plugin.getPermissionsConfig().getConfigurationSection("Permissions").getKeys(false)) {
-            UUID tempUUID = UUID.fromString(configSection);
-            if(!playerPermissionsAttachments.containsKey(tempUUID)) {
-                if (!playerPermissions.containsKey(tempUUID)) {
-                    playerPermissions.put(tempUUID, new HashMap<>());
-                }
-                Map<String, Boolean> permissions = new HashMap<>();
-                for(String permissionName : plugin.getPermissionsConfig().getConfigurationSection("Permissions." + configSection + ".Permissions").getKeys(true)) {
-                    if(plugin.getPermissionsConfig().isConfigurationSection("Permissions." + configSection + ".Permissions." + permissionName)) continue;
-                    if(permissionName.contains("(<->)")) permissionName.replace("(<->)", ".");
-                    permissions.put(permissionName, plugin.getPermissionsConfig().getBoolean("Permissions." + configSection + ".Permissions." + permissionName));
-                }
-                playerPermissions.put(tempUUID, permissions);
-            }
-        }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    if (!playerPermissionsAttachments.containsKey(online.getUniqueId())) {
-                        if (!playerPermissions.containsKey(online.getUniqueId())) {
-                            playerPermissions.put(online.getUniqueId(), new HashMap<>());
-                        }
-                        PermissionAttachment attachment = online.addAttachment(plugin);
-                        Map<String, Boolean> permissions = playerPermissions.get(online.getUniqueId());
-                        for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
-                            attachment.setPermission(perms.getKey(), perms.getValue());
-                        }
-                        playerPermissionsAttachments.put(online.getUniqueId(), attachment);
-                        online.recalculatePermissions();
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 0, 180);
     }
 
     public void initCommands() {
@@ -256,22 +107,13 @@ public class InitMethods {
             map.put("Plugin Updater", plugin.isPluginUpdaterEnabled() ? new int[]{0, 1} : new int[]{1, 0});
             return map;
         }));*/
-        metrics.addCustomChart(new Metrics.SimplePie("servers_with_addonsystem", () -> String.valueOf(plugin.isAddonSystemEnabled())));
-        metrics.addCustomChart(new Metrics.SimplePie("servers_with_updater", () -> String.valueOf(plugin.isUpdaterEnabled())));
-        metrics.addCustomChart(new Metrics.SimplePie("servers_with_pluginupdater", () -> String.valueOf(plugin.isPluginUpdaterEnabled())));
-        metrics.addCustomChart(new Metrics.SimplePie("servers_with_plugin_replace_enabled", () -> String.valueOf(plugin.isUpdateReplacerEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_addonsystem", () -> String.valueOf(plugin.getPluginStateManager().isAddonSystemEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_updater", () -> String.valueOf(plugin.getPluginStateManager().isUpdaterEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_pluginupdater", () -> String.valueOf(plugin.getPluginStateManager().isPluginUpdaterEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_plugin_replace_enabled", () -> String.valueOf(plugin.getPluginStateManager().isUpdateReplacerEnabled())));
+        metrics.addCustomChart(new Metrics.SimplePie("servers_with_config_corruption_check_disabled", () -> String.valueOf(plugin.getPluginStateManager().checkIfCorruptionCheckIsDisabled())));
         if (!plugin.getLanguageManager().getPlhandler().getPlayerLanguages().isEmpty()) {
-            metrics.addCustomChart(new Metrics.SimplePie("most_used_player_lang", () -> {
-                Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPlhandler().getPlayerLanguages();
-                Map<LanguageFile, Integer> popularityMap = new HashMap<>();
-                for (LanguageFile i : playerLangs.values()) {
-                    Integer count = popularityMap.get(i);
-                    popularityMap.put(i, count != null ? count + 1 : 1);
-                }
-                LanguageFile popular = Collections.max(popularityMap.entrySet(),
-                        Map.Entry.comparingByValue()).getKey();
-                return popular.getLangName();
-            }));
+            metrics.addCustomChart(new Metrics.SimplePie("most_used_player_lang", () -> getMostUsedPlayerLang().getLangName()));
         }
     }
 
@@ -279,8 +121,7 @@ public class InitMethods {
         Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPlhandler().getPlayerLanguages();
         Map<LanguageFile, Integer> popularityMap = new HashMap<>();
         for (LanguageFile i : playerLangs.values()) {
-            Integer count = popularityMap.get(i);
-            popularityMap.put(i, count != null ? count + 1 : 1);
+            popularityMap.compute(i, (k, count) -> count != null ? count + 1 : 1);
         }
         return Collections.max(popularityMap.entrySet(),
                 Map.Entry.comparingByValue()).getKey();
@@ -342,9 +183,9 @@ public class InitMethods {
         if (!permissionFile.exists()) {
             logger.spacer().message("&c&lCreating permissions.yml file!&r");
             try {
-                permissionFile.createNewFile();
+                boolean ignored = permissionFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while creating permissions.yml file!", LogPrefix.ERROR);
             }
             logger.message("&e&lDone!&r");
         }
@@ -352,7 +193,10 @@ public class InitMethods {
 
     public void initAddonLoader(AddonLoader loader) {
         new Thread(() -> {
-            logger.coloredMessage(ChatColor.GREEN, "Done with Phase 1/3! (Adding)");
+            logger.emptySpacer();
+            logger.coloredSpacer(ChatColor.BLUE);
+            logger.coloredMessage(ChatColor.GREEN, "Adding Addons to the List!");
+            logger.coloredMessage(ChatColor.GREEN, "Done with Phase 1/3! (Initialization)");
             logger.coloredSpacer(ChatColor.BLUE);
             logger.emptySpacer();
 
@@ -374,7 +218,7 @@ public class InitMethods {
                 try {
                     loader.loadAddon(jarFile);
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while loading Addon: " + jarFile.getName(), LogPrefix.ADDONLOADER);
                 }
             }
 
@@ -386,32 +230,20 @@ public class InitMethods {
 
             for (File addonFile : loader.getLoadedJarFiles().keySet()) {
                 try {
-                    //System.out.println("File: " + addonFile);
-                    Addon addon = loader.getMainClassOfAddon(addonFile);
-                    //System.out.println("Resource:" + addon);
-
-                    if (addon == null) {
-                        //System.out.println("Addon Class is null!");
-                        continue;
+                    if (addonFile != null) {
+                        System.out.println("Addon file is not null: " + addonFile.getName());
+                        Addon mainClass = loader.getMainClassOfAddon(addonFile, false);
+                        System.out.println("Addon Main Class: " + mainClass);
+                        System.out.println("Before enabling addon: " + addonFile.getName());
+                        System.out.println("Calling enableAddon method...");
+                        AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>());
+                        System.out.println("Result from enabling: " + result);
+                        System.out.println("After enabling addon: " + addonFile.getName());
+                    } else {
+                        System.out.println("Addon file is null");
                     }
-
-
-                    boolean allowedToStart = true;
-                    if (!addon.getDependencies().isEmpty()) {
-                        for (Dependency dependency : addon.getDependencies()) {
-                            if (!Bukkit.getPluginManager().isPluginEnabled(dependency.getName())) {
-                                allowedToStart = false;
-                                logger.coloredMessage(ChatColor.DARK_RED, "Dependency Error enabling Addon: " + addon.getName());
-                                logger.coloredMessage(ChatColor.DARK_RED, "Please install the following Dependency '" + dependency.getName() + "' (Link: " + dependency.getLink() + ")!");
-                            }
-                        }
-                    }
-                    if (allowedToStart) {
-                        plugin.getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
-                        addon.onEnable();
-                    }
-
                 } catch (Exception e) {
+                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefix.ADDONLOADER);
                     e.printStackTrace();
                 }
             }
@@ -431,6 +263,8 @@ public class InitMethods {
     public void initEvents() {
         logger.coloredSpacer(ChatColor.DARK_RED).message("&2&lStarting Eventregistration:&r");
         PluginManager pm = plugin.getServer().getPluginManager();
+        logger.message("&3&lLoading Player Event Listener Events!&r");
+        pm.registerEvents(new PlayerEventHandler(AdminPanelMain.getPlugin().getPermissionsManager()), AdminPanelMain.getPlugin());
         logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), plugin);
         logger.message("&3&lLoading Main Class Listener Events!&r");
@@ -444,5 +278,6 @@ public class InitMethods {
         plugin.getCommandManagerRegistry().register(new PanelOpenManager());
         plugin.getCommandManagerRegistry().register(new AdminPanelAdminManager());
         plugin.getCommandManagerRegistry().register(new DataClientCommandManager());
+        plugin.getCommandManagerRegistry().register(new AddonCommandManager());
     }
 }

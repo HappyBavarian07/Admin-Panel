@@ -166,12 +166,12 @@ public class BackupManagerCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
-        Map<Integer, String[]> args = new HashMap<>();
-        args.put(1, new String[]{"start", "load", "delete", "listBackups", "listFiles", "listBackupsDone", "getNewestBackupFile"});
-        args.put(2, plugin.getBackupManager().getFileBackupList().keySet().toArray(new String[0]));
-        args.put(3, new String[]{"BackupFileNumber(0-Infinity)", "Newest(-1)", "<Page>"});
-        return args;
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
+        Map<Integer, String[]> subArgs = new HashMap<>();
+        subArgs.put(1, new String[]{"start", "load", "delete", "listBackups", "listFiles", "listBackupsDone", "getNewestBackupFile"});
+        subArgs.put(2, plugin.getBackupManager().getFileBackupList().keySet().toArray(new String[0]));
+        subArgs.put(3, new String[]{"BackupFileNumber(0-Infinity)", "Newest(-1)", "<Page>"});
+        return subArgs;
     }
 
     @Override

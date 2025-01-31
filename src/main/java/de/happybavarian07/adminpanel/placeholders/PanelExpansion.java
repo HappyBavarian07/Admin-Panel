@@ -37,24 +37,14 @@ public class PanelExpansion extends PlaceholderExpansion {
             return null;
         }
         AdminPanelMain plugin = AdminPanelMain.getPlugin();
-        if (params.equals("openingsound")) {
-            return AdminPanelMain.getPlugin().getConfig().getString("Panel.SoundWhenOpened");
-        }
-        if (params.equals("effectwhileopen")) {
-            return AdminPanelMain.getPlugin().getConfig().getString("Panel.EffectWhenOpened");
-        }
-        if (params.equals("currentlang_shortname")) {
-            return plugin.getLanguageManager().getCurrentLang().getLangName();
-        }
-        if (params.equals("currentlang_fullname")) {
-            return plugin.getLanguageManager().getCurrentLang().getFullName();
-        }
-        if (params.equals("currentlang_version")) {
-            return plugin.getLanguageManager().getCurrentLang().getFileVersion();
-        }
-        if (params.equals("currentlang_path")) {
-            return plugin.getLanguageManager().getCurrentLang().getLangFile().getPath();
-        }
-        return null;
+        return switch (params) {
+            case "openingsound" -> AdminPanelMain.getPlugin().getConfig().getString("Panel.SoundWhenOpened");
+            case "effectwhileopen" -> AdminPanelMain.getPlugin().getConfig().getString("Panel.EffectWhenOpened");
+            case "currentlang_shortname" -> plugin.getLanguageManager().getCurrentLang().getLangName();
+            case "currentlang_fullname" -> plugin.getLanguageManager().getCurrentLang().getFullName();
+            case "currentlang_version" -> plugin.getLanguageManager().getCurrentLang().getFileVersion();
+            case "currentlang_path" -> plugin.getLanguageManager().getCurrentLang().getLangFile().getPath();
+            default -> null;
+        };
     }
 }

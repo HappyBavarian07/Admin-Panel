@@ -282,6 +282,50 @@ Messages:
     AmplifierSet: '%prefix% &9> &aThe new Amplifier has been set!'
     EffectAdded: '%prefix% &9> &aThe Effect &7%type%&r (&aDuration: &7%duration%&r, &aAmplifier: &7%amplifier%&r)&a got added to &7%target%&a!'
     EffectRemoved: '%prefix% &9> &cThe Effect &7%type%&c got removed from &7%target%&c!'
+  AddonCommand:
+    # Format Placeholders:
+    # %addon_name% = Addon Name
+    # %addon_version% = Addon Version
+    # %addon_description% = Addon Description
+    # %addon_dependencies% = Addon Dependencies
+    ListMessage:
+      PageDoesNotExist: '%prefix% &9> &cThis Page does not exist!'
+      # -------------------------------------------------
+      # Header and Footer Placeholders (Command Manager system):
+      # %page% = Current Page
+      # %max_page% = Max Page
+      # -------------------------------------------------
+      Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      Format: '  &b%addon_name% &7- &b%addon_version% &7- &b%addon_description%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+    Enable:
+      EnabledMessage: '%prefix% &9> &aThe Addon &7%addon_name% &a(&7%addon_version%&a) &ahas been enabled!'
+      AddonNotFound: '%prefix% &9> &cThe Addon could not be found! (%addon_name%)'
+      ErrorEnablingAddon: '%prefix% &9> &cAn Error occurred while enabling the Addon!'
+      DependencyError: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &crequires the following Dependencies: &7%addon_dependencies%'
+      AddonAlreadyEnabled: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already enabled!'
+      CircularDependencyError: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &chas a Circular Dependency!'
+    Disable:
+      DisabledMessage: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already disabled!'
+      AddonNotFound: '%prefix% &9> &cThe Addon could not be found! (%addon_name%)'
+      ErrorDisablingAddon: '%prefix% &9> &cAn Error occurred while disabling the Addon!'
+      AddonAlreadyDisabled: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already disabled!'
+    Reload:
+      ReloadedMessage: '%prefix% &9> &aThe Addon &7%addon_name% &a(&7%addon_version%&a) &ahas been reloaded!'
+      AddonNotFound: '%prefix% &9> &cThe Addon could not be found! (%addon_name%)'
+      ErrorReloadingAddon: '%prefix% &9> &cAn Error occurred while reloading the Addon!'
+      AddonAlreadyEnabled: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already enabled!'
+    Info:
+      AddonNotFound: '%prefix% &9> &cThe Addon could not be found! (%addon_name%)'
+      AddonInfoMessage:
+        - '+---------------------------------------------------+'
+        - '+ &aAddon Information &7%addon_name% &a(&7%addon_version%&a) &a+'
+        - '&aAddon Name: &7%addon_name%'
+        - '&aAddon Version: &7%addon_version%'
+        - '&aAddon Description: &7%addon_description%'
+        - '&aAddon Dependencies: &7%addon_dependencies%'
+        - '&aAddon Enabled: &7%addon_enabled%'
+        - '+---------------------------------------------------+'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
   ToManyArguments: '&4Too many Arguments!'
@@ -1135,10 +1179,10 @@ Items:
         - '&2Load Plugins at Server Runtime!'
         - '&2The only thing you need is the File name!'
     PluginDescription:
-        material: WRITABLE_BOOK
-        displayName: '&2Plugin Description'
-        lore:
-            - '&2Show and edit the Description of the Plugin!'
+      material: WRITABLE_BOOK
+      displayName: '&2Plugin Description'
+      lore:
+        - '&2Show and edit the Description of the Plugin!'
     PluginDescriptionMenu:
       LoadFromResourceID:
         material: BOOKSHELF
@@ -1384,12 +1428,12 @@ Items:
             lore:
               - '&cTurn on File Logging!'
         FileLoggingPrefix:
-            material: PAPER
-            displayName: '&aFile Logging Prefix'
-            lore:
-                - '&aCurrent File Logging Prefix:'
-                - '&6%apdataclient_file_logging_prefix%'
-                - '&aClick to change the File Logging Prefix!'
+          material: PAPER
+          displayName: '&aFile Logging Prefix'
+          lore:
+            - '&aCurrent File Logging Prefix:'
+            - '&6%apdataclient_file_logging_prefix%'
+            - '&aClick to change the File Logging Prefix!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   SwitchLanguageMenu: '&aLanguages'

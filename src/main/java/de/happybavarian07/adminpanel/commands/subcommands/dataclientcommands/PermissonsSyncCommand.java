@@ -7,6 +7,7 @@ import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -23,10 +24,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPlayerPermissions().keySet()) {
+            for (UUID permissionHolders : plugin.getPermissionsManager().getPlayerPermissions().keySet()) {
                 plugin.getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPlayerPermissions().get(permissionHolders),
+                        plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -35,10 +36,10 @@ public class PermissonsSyncCommand extends SubCommand {
         } else if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
             System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPlayerPermissions().containsKey(permissionHolder)) return false;
+            if (!plugin.getPermissionsManager().getPlayerPermissions().containsKey(permissionHolder)) return false;
             plugin.getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPlayerPermissions().get(permissionHolder),
+                    plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
@@ -52,10 +53,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPlayerPermissions().keySet()) {
+            for (UUID permissionHolders : plugin.getPermissionsManager().getPlayerPermissions().keySet()) {
                 plugin.getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPlayerPermissions().get(permissionHolders),
+                        plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -65,10 +66,10 @@ public class PermissonsSyncCommand extends SubCommand {
         if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
             System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPlayerPermissions().containsKey(permissionHolder)) return false;
+            if (!plugin.getPermissionsManager().getPlayerPermissions().containsKey(permissionHolder)) return false;
             plugin.getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPlayerPermissions().get(permissionHolder),
+                    plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
@@ -95,7 +96,7 @@ public class PermissonsSyncCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         String[] playerNames = new String[Bukkit.getOnlinePlayers().size()];
         int count = 0;

@@ -44,7 +44,6 @@ Plugin:
     Message_Format: '|------------------------------------------------------------------|'
     # The Spacer Format: Is the Spacer and just prints this message
     Spacer_Format:  '+-------------------------------------------------------------+'
-
   # This is the System to sync Data across all to the Bungee Cord system connected Servers
   # Obivously it needs the Admin Panel Bungee Plugin to work.
   # UNDER DEVELOPMENT
@@ -70,7 +69,20 @@ Plugin:
       # The Name for the Server to register
       ClientName: "ExampleClientName"
       # Socket Settings in the DataClientSettings.yml File
-
+  WebUI:
+    # This is the WebUI Settings
+    enabled: false
+    # This is the Port the WebUI will use
+    port: 8080
+  BackupManager:
+    # This is the Time in which the Backup Manager will create a Backup.
+    # The Time Unit can be added with a 's' for Seconds, 'm' for Minutes, 'h' for Hours, 'd' for Days.
+    # By Default the Time Unit is Hours.
+    BackupTime: 24
+    # This is the Amount of Backups that will be kept
+    NumberOfBackupsAtOnce: 5
+    # This is the Path to the Backup Folder (relative to the Plugin Data Folder)
+    BackupFolder: 'file_backups'
   AddonSystem:
     # This Option disables/enables the Addon System for the Admin-Panel
     # A restart or reload of the Admin-Panel is required to start it!
@@ -169,9 +181,11 @@ Plugin:
       UpdateCheckTime: 5
     # UNDER DEVELOPMENT
 
+  # This will send the Syntax of a Command to the Player if he uses the Command wrong/misses Arguments.
+  SendSyntaxOnArgsZero: true
+
 # These are the settings for the panel
 Panel:
-
   # Here you can set whether there are sounds when opening an inventory of the plugin should be played
   PlaySoundsWhenOpened: true
   # This is the sound that is played when you open a panel / inventory
@@ -185,7 +199,6 @@ Panel:
   # Min: 0.0 Max: 2.0
   # Default: 1.0
   SoundPitch: 1.0
-
   # Here you can set whether an effect should be played when someone has a panel open
   # Of course only if you are not in the Vanish (not possible at the moment!)
   ShowEffectWhenOpened: true
@@ -224,6 +237,7 @@ Pman:
     ExemptPlayers:
       - 'ExamplePlayer'
     # Enables the Warning System in the Actions Menu
+    # UNDER DEVELOPMENT - NOT WORKING
     WarningSystem: false
   Money:
     # This is the currency used for the money part in the Pman

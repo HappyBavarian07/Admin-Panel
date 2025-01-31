@@ -16,16 +16,31 @@ public class BackupManager {
     private Map<String, FileBackup> fileBackupList;
     private int numberOfBackUpsBeforeDeleting;
 
-    public BackupManager(AdminPanelMain plugin, int numberOfBackUpsBeforeDeleting, String backupFolder) {
+    public BackupManager(AdminPanelMain plugin, int numberOfBackUpsBeforeDeleting, long backupRepeatTime, String backupFolder) {
         this.plugin = plugin;
         this.fileBackupList = new HashMap<>();
         this.numberOfBackUpsBeforeDeleting = numberOfBackUpsBeforeDeleting;
         this.backupFolder = backupFolder;
+
+        new Thread(() -> {
+            if (!plugin.isEnabled()) {
+                while (!plugin.isEnabled()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::backupAllFileBackups, backupRepeatTime, backupRepeatTime);
+            } else {
+                plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::backupAllFileBackups, backupRepeatTime, backupRepeatTime);
+            }
+        }).start();
     }
 
     public void addFileBackup(FileBackup backup) {
         File[] filesInBackupFolder = new File(plugin.getDataFolder() + File.separator + backupFolder).listFiles();
-        if (filesInBackupFolder != null && filesInBackupFolder.length != 0) {
+        if (filesInBackupFolder != null) {
             for (File f : filesInBackupFolder) {
                 if ((f.getParentFile().getName() + "/" + f.getName()).contains(backup.getDestinationPathToBackupToo() + "_"))
                     backup.addBackupDone(f);
@@ -97,7 +112,7 @@ public class BackupManager {
     /**
      * Loads a file backup
      *
-     * @param identifier   name of the backup
+     * @param identifier name of the backup
      * @param backupFile number or name of the backup (-1 = newest)
      * @return Error Code (if Backup from identifier is null then -100)
      */

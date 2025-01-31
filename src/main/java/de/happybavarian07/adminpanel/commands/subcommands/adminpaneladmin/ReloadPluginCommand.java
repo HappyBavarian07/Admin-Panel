@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -62,7 +63,7 @@ public class ReloadPluginCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         return new HashMap<>();
     }
 

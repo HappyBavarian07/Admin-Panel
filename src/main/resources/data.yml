@@ -10,5 +10,6 @@
 #     link: '<LinkToFile>'
 #     Use this at your own risk, if the Download URL from the Download Button is a direct URL to a specific Version of the Plugin
 #     bypassExternalDownload: false
+
 PluginsToUpdate: {}
 playerdata: {}

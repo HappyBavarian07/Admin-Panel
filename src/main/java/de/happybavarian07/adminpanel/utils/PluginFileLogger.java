@@ -26,6 +26,7 @@ public class PluginFileLogger {
         logFile = new File(plugin.getDataFolder(), "plugin.log");
     }
 
+    @Deprecated
     public PluginFileLogger writeToLog(Level record, String stringToLog, LogPrefix logPrefix) {
         if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled") || !logPrefix.isEnabled()) return instance;
         try {
@@ -44,6 +45,7 @@ public class PluginFileLogger {
         }
     }
 
+    @Deprecated
     public PluginFileLogger writeToLog(Level record, String stringToLog, String logPrefix) {
         if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled")) return instance;
         try {
@@ -58,6 +60,46 @@ public class PluginFileLogger {
             return instance;
         } catch (IOException fileNotFoundException) {
             fileNotFoundException.printStackTrace();
+            return instance;
+        }
+    }
+
+    public PluginFileLogger writeToLog(Level record, String stringToLog, LogPrefix logPrefix, boolean sendToConsole) {
+        if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled", true) || !logPrefix.isEnabled()) return instance;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
+            Date d = Calendar.getInstance().getTime();
+            String prefix = "[" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " " + record + "]: [" + logPrefix.getLogPrefix() + "] ";
+            bw.write(prefix + stringToLog);
+            bw.newLine();
+            bw.close();
+            if (sendToConsole)
+                plugin.getLogger().log(record, "[" + logPrefix + "] " + stringToLog);
+            return instance;
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+            if (sendToConsole)
+                plugin.getLogger().log(record, "[" + logPrefix + "] " + stringToLog);
+            return instance;
+        }
+    }
+
+    public PluginFileLogger writeToLog(Level record, String stringToLog, String logPrefix, boolean sendToConsole) {
+        if (!plugin.getConfig().getBoolean("Plugin.LogActions.enabled", true)) return instance;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
+            Date d = Calendar.getInstance().getTime();
+            String prefix = "[" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " " + record + "]: [" + logPrefix + "] ";
+            bw.write(prefix + stringToLog);
+            bw.newLine();
+            bw.close();
+            if (sendToConsole)
+                plugin.getLogger().log(record, "[" + logPrefix + "] " + stringToLog);
+            return instance;
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+            if (sendToConsole)
+                plugin.getLogger().log(record, "[" + logPrefix + "] " + stringToLog);
             return instance;
         }
     }

@@ -4,18 +4,22 @@ package de.happybavarian07.adminpanel.utils.managers;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
+import de.happybavarian07.adminpanel.utils.tfidfsearch.TFIDFSearch;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.logging.Level;
 
 public class PermissionsManager {
     private final ThreadGroup fileActionGroup;
@@ -23,6 +27,8 @@ public class PermissionsManager {
     private final File permissionFile;
     private final Map<UUID, PermissionAttachment> playerPermissionsAttachments = new HashMap<>();
     private final Map<UUID, Map<String, Boolean>> playerPermissions = new HashMap<>();
+    private Thread permissionIndexThread;
+    private TFIDFSearch permissionSearcher;
     private FileConfiguration permissionsConfig;
 
     public PermissionsManager(AdminPanelMain plugin) {
@@ -30,6 +36,55 @@ public class PermissionsManager {
         this.fileActionGroup = new ThreadGroup("AdminPanel - Permission File Action Group");
         this.permissionFile = new File(plugin.getDataFolder(), "permissions.yml");
         initAndCheckFiles();
+        permissionSearcher = new TFIDFSearch(new String[]{"permissionName", "permissionDescription", "permissionDefault", "permissionChildren"});
+        this.permissionIndexThread = getPermissionIndexThread();
+    }
+
+    public void setup() {
+        initPermissions();
+        this.permissionIndexThread.start();
+        savePermissionsToConfig();
+    }
+
+    public TFIDFSearch getPermissionSearcher() {
+        return permissionSearcher;
+    }
+
+    public Map<UUID, PermissionAttachment> getPlayerPermissionsAttachments() {
+        return playerPermissionsAttachments;
+    }
+
+    public Map<UUID, Map<String, Boolean>> getPlayerPermissions() {
+        return playerPermissions;
+    }
+
+    @NotNull
+    private Thread getPermissionIndexThread() {
+        Thread permissionIndexThread = new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            List<Permission> permissions = new ArrayList<>(Bukkit.getPluginManager().getPermissions());
+            List<TFIDFSearch.Item> permissionItems = new ArrayList<>();
+
+            for (Permission permission : permissions) {
+                Map<String, Object> permissionData = new HashMap<>();
+                permissionData.put("permissionName", permission.getName());
+                permissionData.put("permissionDescription", permission.getDescription());
+                permissionData.put("permissionDefault", permission.getDefault().toString());
+                permissionData.put("permissionChildren", permission.getChildren().toString());
+                permissionItems.add(new TFIDFSearch.Item(permissionData));
+            }
+
+            try {
+                permissionSearcher.indexItems(permissionItems);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            long endTime = System.currentTimeMillis();
+            plugin.getFileLogger().writeToLog(Level.INFO, "Permission Searcher took '" + (endTime - startTime) + "' ms to index " + permissionItems.size() + " permissions", LogPrefix.DATELOGGER);
+        });
+        permissionIndexThread.setDaemon(true);
+        return permissionIndexThread;
     }
 
     public void initAndCheckFiles() {
@@ -51,6 +106,52 @@ public class PermissionsManager {
                 e.printStackTrace();
             }
         }
+        Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions")).getKeys(false).forEach(player -> {
+            String path = "Permissions." + player + ".Permissions";
+            Map<String, Boolean> perms = new HashMap<>();
+            Objects.requireNonNull(permissionsConfig.getConfigurationSection(path)).getKeys(false)
+                    .forEach(perm ->
+                            perms.put(perm, permissionsConfig.getBoolean(path + "." + perm)));
+            playerPermissions.put(UUID.fromString(player), perms);
+        });
+    }
+
+    public void initPermissions() {
+        for (String configSection : Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions")).getKeys(false)) {
+            UUID tempUUID = UUID.fromString(configSection);
+            if (!playerPermissionsAttachments.containsKey(tempUUID)) {
+                if (!playerPermissions.containsKey(tempUUID)) {
+                    playerPermissions.put(tempUUID, new HashMap<>());
+                }
+                Map<String, Boolean> permissions = new HashMap<>();
+                for (String permissionName : Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions." + configSection + ".Permissions")).getKeys(true)) {
+                    if (permissionsConfig.isConfigurationSection("Permissions." + configSection + ".Permissions." + permissionName))
+                        continue;
+                    if (permissionName.contains("(<->)")) permissionName = permissionName.replace("(<->)", ".");
+                    permissions.put(permissionName, permissionsConfig.getBoolean("Permissions." + configSection + ".Permissions." + permissionName));
+                }
+                playerPermissions.put(tempUUID, permissions);
+            }
+        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    if (!playerPermissionsAttachments.containsKey(online.getUniqueId())) {
+                        if (!playerPermissions.containsKey(online.getUniqueId())) {
+                            playerPermissions.put(online.getUniqueId(), new HashMap<>());
+                        }
+                        PermissionAttachment attachment = online.addAttachment(plugin);
+                        Map<String, Boolean> permissions = playerPermissions.get(online.getUniqueId());
+                        for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
+                            attachment.setPermission(perms.getKey(), perms.getValue());
+                        }
+                        playerPermissionsAttachments.put(online.getUniqueId(), attachment);
+                        online.recalculatePermissions();
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0, 180);
     }
 
     public void addPermission(UUID playerUUID, String permission, boolean value, boolean saveToConfig, boolean reloadPermissions) {
@@ -108,7 +209,7 @@ public class PermissionsManager {
 
     public void setPermissionValues(UUID playerUUID, Map<String, Boolean> permissions, boolean saveToConfig, boolean reloadPermissions) {
         if (playerPermissions.containsKey(playerUUID)) {
-            for(String permission : permissions.keySet()) {
+            for (String permission : permissions.keySet()) {
                 if (!playerPermissions.get(playerUUID).containsKey(permission)) continue;
 
                 playerPermissions.get(playerUUID).replace(permission, permissions.get(permission));
@@ -159,7 +260,14 @@ public class PermissionsManager {
         }
     }
 
-    private void reloadPermissions(Player player) {
+    /**
+     * Reloads the Permissions for a Player
+     * <p>
+     *     This Method reloads the Permissions for a Player.
+     *     It removes the Permissions from the Player and adds them again.
+     * @param player The Player to reload the Permissions for
+     */
+    public void reloadPermissions(Player player) {
         if (playerPermissionsAttachments.containsKey(player.getUniqueId())) {
             player.removeAttachment(playerPermissionsAttachments.get(player.getUniqueId()));
         }
@@ -177,6 +285,13 @@ public class PermissionsManager {
         }
     }
 
+    /**
+     * Reloads the Permissions for all Players on the Server
+     * <p>
+     *     This Method reloads the Permissions for all Players on the Server.
+     *     It removes the Permissions from the Player and adds them again.
+     *
+     */
     public void reloadPermissionsGlobally() {
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (playerPermissionsAttachments.containsKey(online.getUniqueId())) {
@@ -204,6 +319,17 @@ public class PermissionsManager {
         }
     }
 
+    /**
+     * Thread to handle the File Actions for Permissions
+     * <p>
+     *     This Thread is used to handle the File Actions for Permissions. It can add, remove or set Permissions for a Player.
+     *     It can also add or remove multiple Permissions at once.
+     *     It can also save the Permissions to the permissions.yml file.
+     *     <br> <br>
+     *     This Thread is used to prevent the Server from lagging when saving Permissions to the permissions.yml file.
+     *     <br> <br>
+     *     This Thread is a private class of the PermissionsManager Class.
+     */
     private class PermissionFileActionThread extends Thread {
         private final Map<String, Boolean> permissions;
         private final UUID playerUUID;

@@ -56,7 +56,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         Plugin currentPlugin = new PluginUtils().getPluginByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
-        Map<String, NewUpdater> pluginsToUpdate = new HashMap<>(plugin.getAutoUpdaterPlugins());
+        Map<String, NewUpdater> pluginsToUpdate = new HashMap<>(plugin.getAutoUpdaterManager().getAutoUpdaterPlugins());
         ItemStack pluginItem = null;
         if (currentPlugin != null) {
             lgm.addPlaceholder(PlaceholderType.ITEM, "%spigotID%", pluginsToUpdate.get(currentPlugin.getName()).getResourceID(), false);
@@ -148,9 +148,9 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
         inventory.setItem(getSlot(path + "AddPlugin", 46), lgm.getItem(path + "AddPlugin", playerMenuUtility.getOwner(), false));
         inventory.setItem(getSlot(path + "RemovePlugin", 47), lgm.getItem(path + "RemovePlugin", playerMenuUtility.getOwner(), false));
 
-        Map<String, NewUpdater> pluginsToUpdate = plugin.getAutoUpdaterPlugins();
+        Map<String, NewUpdater> pluginsToUpdate = plugin.getAutoUpdaterManager().getAutoUpdaterPlugins();
         System.out.println("Plugins to Update: " + pluginsToUpdate);
-        System.out.println("Plugins to Update: " + plugin.getAutoUpdaterPlugins());
+        System.out.println("Plugins to Update: " + plugin.getAutoUpdaterManager().getAutoUpdaterPlugins());
         ///////////////////////////////////// Pagination loop template
         if (pluginsToUpdate != null && !pluginsToUpdate.isEmpty()) {
             int i = 0;
@@ -220,7 +220,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             }
             plugin.getPluginDescriptionManager().addPluginDescription(selectedPlugin, "", spigotID);
             playerMenuUtility.removeData("AddPluginSelectPluginMetaData");
-            plugin.addPluginToUpdater(selectedPlugin, spigotID, fileName);
+            plugin.getAutoUpdaterManager().addPluginToUpdater(selectedPlugin, spigotID, fileName);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%spigotID%", spigotID, false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fileName%", fileName, false);
@@ -235,7 +235,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
                 return;
             }
             playerMenuUtility.removeData("RemovePluginSelectPluginMetaData");
-            plugin.removePluginFromUpdater(selectedPlugin);
+            plugin.getAutoUpdaterManager().removePluginFromUpdater(selectedPlugin);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.RemovedPlugin", player, true));
             super.open();

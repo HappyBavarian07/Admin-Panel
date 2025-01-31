@@ -10,8 +10,6 @@ import de.happybavarian07.adminpanel.utils.Serialization;
 import de.happybavarian07.adminpanel.utils.StartUpLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 
 import java.io.IOException;
 import java.util.*;
@@ -51,19 +49,19 @@ public class DataClientUtils {
         } else {
             this.logDebugInfo(player, permissionsString, deserializedPermissions);
             if (this.dataClient.getSettingsManager().isOverwritePermissionsEnabled()) {
-                this.plugin.getPlayerPermissions().get(player).clear();
+                this.plugin.getPermissionsManager().getPlayerPermissions().get(player).clear();
             }
 
             for (Entry<String, Boolean> stringBooleanEntry : permissions.entrySet()) {
-                this.plugin.getPlayerPermissions().get(player).put(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
+                this.plugin.getPermissionsManager().getPlayerPermissions().get(player).put(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
                 if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {
-                    this.plugin.getPlayerPermissionsAttachments().get(player).setPermission(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
+                    this.plugin.getPermissionsManager().getPlayerPermissionsAttachments().get(player).setPermission(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
                 }
             }
 
-            this.plugin.savePerms();
-            if (Bukkit.getPlayer(player) != null && ((Player) Objects.requireNonNull(Bukkit.getPlayer(player))).isOnline()) {
-                this.plugin.reloadPerms(Bukkit.getPlayer(player));
+            this.plugin.getPermissionsManager().savePermissionsToConfig();
+            if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {
+                this.plugin.getPermissionsManager().reloadPermissions(Objects.requireNonNull(Bukkit.getPlayer(player)));
             }
 
             return Result.SUCCESS;
@@ -110,12 +108,10 @@ public class DataClientUtils {
 
     private void logDebugInfo(UUID player, String permissionsString, PermissionsMap deserializedPermissions) {
         if (this.dataClient.getSettingsManager().isDebugEnabled()) {
-            StartUpLogger var10000 = this.dataClient.getPluginLogger();
-            ChatColor var10001 = ChatColor.BLUE;
-            String[] var10004 = new String[]{"UUID: " + player, "Data from Server: " + permissionsString, "Deserialized Data: " + deserializedPermissions, null};
-            boolean var10007 = permissionsString.equals(Serialization.serialize(deserializedPermissions));
-            var10004[3] = "Data from Server == Deserialized Data? " + var10007;
-            var10000.dataClientMessage(var10001, false, true, var10004);
+            StartUpLogger logger = this.dataClient.getPluginLogger();
+            String[] data = new String[]{"UUID: " + player, "Data from Server: " + permissionsString, "Deserialized Data: " + deserializedPermissions, null};
+            data[3] = "Data from Server == Deserialized Data? " + permissionsString.equals(Serialization.serialize(deserializedPermissions));
+            logger.dataClientMessage(ChatColor.BLUE, false, true, data);
         }
 
     }
@@ -162,12 +158,12 @@ public class DataClientUtils {
         }
 
         return switch (var3) {
-            case 0 -> new CustomMap<>(this.plugin.hurtingwater);
-            case 1 -> new CustomMap<>(this.plugin.chatmute);
-            case 2 -> new CustomMap<>(this.plugin.villagerSounds);
-            case 3 -> new CustomMap<>(this.plugin.blockBreakPrevent);
-            case 4 -> new CustomMap<>(this.plugin.dupeMobsOnKill);
-            case 5 -> new CustomMap<>(this.plugin.freezeplayers);
+            case 0 -> new CustomMap<>(this.plugin.getPluginStateManager().getHurtingWaterMap());
+            case 1 -> new CustomMap<>(this.plugin.getPluginStateManager().getChatMuteMap());
+            case 2 -> new CustomMap<>(this.plugin.getPluginStateManager().getVillagerSoundsMap());
+            case 3 -> new CustomMap<>(this.plugin.getPluginStateManager().getBlockBreakPreventMap());
+            case 4 -> new CustomMap<>(this.plugin.getPluginStateManager().getDupeMobsOnKillMap());
+            case 5 -> new CustomMap<>(this.plugin.getPluginStateManager().getFreezePlayersMap());
             default -> null;
         };
     }

@@ -38,27 +38,15 @@ public class PlayerExpansion extends PlaceholderExpansion {
             return null;
         }
 
-        if (params.equals("balance")) {
-            return String.valueOf(Utils.getInstance().getEconomy().getBalance(player));
-        }
-        if (params.equals("world")) {
-            return player.getWorld().getName();
-        }
-        if (params.equals("displayname")) {
-            return player.getDisplayName();
-        }
-        if (params.equals("name")) {
-            return player.getName();
-        }
-        if (params.equals("x")) {
-            return String.valueOf((int) player.getLocation().getX());
-        }
-        if (params.equals("y")) {
-            return String.valueOf((int) player.getLocation().getY());
-        }
-        if (params.equals("z")) {
-            return String.valueOf((int) player.getLocation().getZ());
-        }
-        return null;
+        return switch (params) {
+            case "balance" -> String.valueOf(Utils.getInstance().getEconomy().getBalance(player));
+            case "world" -> player.getWorld().getName();
+            case "displayname" -> player.getDisplayName();
+            case "name" -> player.getName();
+            case "x" -> String.valueOf((int) player.getLocation().getX());
+            case "y" -> String.valueOf((int) player.getLocation().getY());
+            case "z" -> String.valueOf((int) player.getLocation().getZ());
+            default -> null;
+        };
     }
 }

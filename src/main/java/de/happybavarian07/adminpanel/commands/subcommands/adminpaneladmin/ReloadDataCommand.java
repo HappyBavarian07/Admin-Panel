@@ -6,6 +6,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.Utils;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -21,7 +22,7 @@ public class ReloadDataCommand extends SubCommand {
     public boolean onPlayerCommand(Player player, String[] args) {
         player.sendMessage(Utils.chat("&7Starting Reload of the Data File!"));
         try {
-            plugin.reloadData();
+            plugin.getAutoUpdaterManager().reloadData();
             player.sendMessage(Utils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,7 +35,7 @@ public class ReloadDataCommand extends SubCommand {
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         sender.sendMessage(Utils.chat("&7Starting Reload of the Data File!"));
         try {
-            plugin.reloadData();
+            plugin.getAutoUpdaterManager().reloadData();
             sender.sendMessage(Utils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,7 +60,7 @@ public class ReloadDataCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         return new HashMap<>();
     }
 

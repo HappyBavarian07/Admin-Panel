@@ -36,7 +36,7 @@ public class DisabledItemsManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return adminpanel;
+        return plugin;
     }
 
     @Override
@@ -57,13 +57,8 @@ public class DisabledItemsManager extends CommandManager {
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return super.onPlayerCommand(player, args);
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender player, String[] args) {
-        return super.onConsoleCommand(player, args);
+    public boolean onCommand(CommandSender sender, String[] args) {
+        return super.onCommand(sender, args);
     }
 
     @Override
@@ -73,15 +68,10 @@ public class DisabledItemsManager extends CommandManager {
 
     @Override
     public void setup() {
-        commands.add(new HelpCommand(getCommandName()));
+        registerSubCommand(new HelpCommand(getCommandName()));
 
-        commands.add(new EnableCommand(getCommandName()));
-        commands.add(new DisableCommand(getCommandName()));
-        commands.add(new ListCommand(getCommandName()));
-    }
-
-    @Override
-    public List<SubCommand> getSubCommands() {
-        return commands;
+        registerSubCommand(new EnableCommand(getCommandName()));
+        registerSubCommand(new DisableCommand(getCommandName()));
+        registerSubCommand(new ListCommand(getCommandName()));
     }
 }

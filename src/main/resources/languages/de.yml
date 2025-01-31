@@ -40,7 +40,7 @@ Messages:
         # %fileName% = File Name
         # %normalPath% = The Relative Path
         # %absolutePath% = The Absolute Path
-        # %parentFile% = The Parent Directory / File
+      # %parentFile% = The Parent Directory / File
       # %exists% = If the File exists
       GetNewestBackupFile: '%prefix% &9> &aDie neueste Backup Datei von ''%backupName%'' ist %fileName%!'
       # DeleteBackup Placeholders:
@@ -292,6 +292,50 @@ Messages:
     EffectRemoved: '%prefix% &9> &cDer Effekt &7%type%&c wurde dem Spieler %7%target%&c weggenommen!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
+AddonCommand:
+  # Format Placeholders:
+  # %addon_name% = Addon Name
+  # %addon_version% = Addon Version
+  # %addon_description% = Addon Description
+  # %addon_dependencies% = Addon Dependencies
+  ListMessage:
+    PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+    # -------------------------------------------------
+    # Header and Footer Placeholders (Command Manager system):
+    # %page% = Current Page
+    # %max_page% = Max Page
+    # -------------------------------------------------
+    Header: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+    Format: '  &b%addon_name% &7- &b%addon_version% &7- &b%addon_description%'
+    Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+  Enable:
+    EnabledMessage: '%prefix% &9> &aDas Addon &7%addon_name% &a(&7%addon_version%&a) &awurde aktiviert!'
+    AddonNotFound: '%prefix% &9> &cDas Addon konnte nicht gefunden werden! (%addon_name%)'
+    ErrorEnablingAddon: '%prefix% &9> &cEin Fehler ist beim Aktivieren des Addons aufgetreten!'
+    DependencyError: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &cbenötigt die folgenden Abhängigkeiten: &7%addon_dependencies%'
+    AddonAlreadyEnabled: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &cist bereits aktiviert!'
+    CircularDependencyError: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &chat eine zirkuläre Abhängigkeit!'
+  Disable:
+    DisabledMessage: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &cist bereits deaktiviert!'
+    AddonNotFound: '%prefix% &9> &cDas Addon konnte nicht gefunden werden! (%addon_name%)'
+    ErrorDisablingAddon: '%prefix% &9> &cEin Fehler ist beim Deaktivieren des Addons aufgetreten!'
+    AddonAlreadyDisabled: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &cist bereits deaktiviert!'
+  Reload:
+    ReloadedMessage: '%prefix% &9> &aDas Addon &7%addon_name% &a(&7%addon_version%&a) &awurde neu geladen!'
+    AddonNotFound: '%prefix% &9> &cDas Addon konnte nicht gefunden werden! (%addon_name%)'
+    ErrorReloadingAddon: '%prefix% &9> &cEin Fehler ist beim Neuladen des Addons aufgetreten!'
+    AddonAlreadyEnabled: '%prefix% &9> &cDas Addon &7%addon_name% &a(&7%addon_version%&a) &cist bereits aktiviert!'
+  Info:
+    AddonNotFound: '%prefix% &9> &cDas Addon konnte nicht gefunden werden! (%addon_name%)'
+    AddonInfoMessage:
+      - '+---------------------------------------------------+'
+      - '+ &aAddon Informationen &7%addon_name% &a(&7%addon_version%&a) &a+'
+      - '&aAddon Name: &7%addon_name%'
+      - '&aAddon Version: &7%addon_version%'
+      - '&aAddon Beschreibung: &7%addon_description%'
+      - '&aAddon Abhängigkeiten: &7%addon_dependencies%'
+      - '&aAddon Aktiviert: &7%addon_enabled%'
+      - '+---------------------------------------------------+'
   ToManyArguments: '&4Zu viele Argumente!'
   TooFewArguments: '&4Zu wenig Argumente!'
 Items:
@@ -306,7 +350,7 @@ Items:
         material: RED_STAINED_GLASS_PANE
         displayName: '&cAbbrechen'
         lore:
-            - '&cBreche deine Auswahl ab!'
+          - '&cBreche deine Auswahl ab!'
       ReasonItem:
         material: PAPER
         displayName: '&aWillst du diese Aktion ausführen?'

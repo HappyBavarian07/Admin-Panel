@@ -7,6 +7,7 @@ import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -100,7 +101,7 @@ public class ClientListListCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         return Collections.emptyMap();
     }
 

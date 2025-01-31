@@ -79,7 +79,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
                 if (!muteChatEvent.isCancelled()) {
-                    plugin.setChatMuted(false);
+                    plugin.getPluginStateManager().setGlobalChatMuted(false);
                     super.open();
                     Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Header", player, true));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Message", player, true));
@@ -97,7 +97,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
                 if (!muteChatEvent.isCancelled()) {
-                    plugin.setChatMuted(true);
+                    plugin.getPluginStateManager().setGlobalChatMuted(true);
                     super.open();
                     Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Header", player, true));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Message", player, true));
@@ -132,7 +132,7 @@ public class ChatManagerMenu extends Menu implements Listener {
         String path = "ChatManager.";
 
         inventory.setItem(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player, false));
-        if (plugin.isChatMuted()) {
+        if (plugin.getPluginStateManager().isGlobalChatMuted()) {
             inventory.setItem(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player, false));
         } else {
             inventory.setItem(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player, false));
@@ -143,7 +143,7 @@ public class ChatManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (plugin.isChatMuted()) {
+        if (plugin.getPluginStateManager().isGlobalChatMuted()) {
             event.setCancelled(true);
             player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player, true));
         }

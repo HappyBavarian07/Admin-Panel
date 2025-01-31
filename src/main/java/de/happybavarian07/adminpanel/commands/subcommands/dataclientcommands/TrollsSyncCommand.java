@@ -6,6 +6,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
 import de.happybavarian07.adminpanel.commandmanagement.CommandData;
 import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -56,10 +57,10 @@ public class TrollsSyncCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
-        Map<Integer, String[]> args = new HashMap<>();
-        args.put(1, new String[]{"HurtingWaterMap", "ChatMuteMap", "VillagerSoundsMap", "BlockBreakPreventMap", "DupeMobsOnKillMap", "FreezePlayerMap"});
-        return args;
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
+        Map<Integer, String[]> subArgs = new HashMap<>();
+        subArgs.put(1, new String[]{"HurtingWaterMap", "ChatMuteMap", "VillagerSoundsMap", "BlockBreakPreventMap", "DupeMobsOnKillMap", "FreezePlayerMap"});
+        return subArgs;
     }
 
     @Override

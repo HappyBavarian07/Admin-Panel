@@ -1,10 +1,11 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.managers.PermissionsManager;
 import de.happybavarian07.adminpanel.utils.tfidfsearch.TFIDFSearch;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,9 +23,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 public class PermissionListMenu extends PaginatedMenu implements Listener {
     private final PlayerMenuUtility playerMenuUtility;
@@ -33,10 +32,12 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
     private List<Permission> permissions = new ArrayList<>();
     private PermissionListMode mode;
     private String sortQuery;
+    private PermissionsManager permissionsManager;
 
     public PermissionListMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         this.playerMenuUtility = playerMenuUtility;
+        this.permissionsManager = plugin.getPermissionsManager();
         this.action = playerMenuUtility.getData("PermissionAction", PermissionAction.class);
         this.targetUUID = playerMenuUtility.getTargetUUID();
         if (mode == null) {
@@ -151,26 +152,24 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%permission%", item.getItemMeta().getDisplayName(), false);
                 if (action.equals(PermissionAction.ADD)) {
                     if (action2.equals(InventoryAction.PICKUP_ALL)) {
-                        plugin.getPlayerPermissions().get(target.getUniqueId()).put(item.getItemMeta().getDisplayName(), true);
-                        plugin.getPlayerPermissionsAttachments().get(target.getUniqueId()).setPermission(item.getItemMeta().getDisplayName(),
-                                true);
+                        permissionsManager.getPlayerPermissions().get(target.getUniqueId()).put(item.getItemMeta().getDisplayName(), true);
+                        permissionsManager.getPlayerPermissionsAttachments().get(target.getUniqueId()).setPermission(item.getItemMeta().getDisplayName(), true);
                     }
                     if (action2.equals(InventoryAction.PICKUP_HALF)) {
-                        plugin.getPlayerPermissions().get(target.getUniqueId()).put(item.getItemMeta().getDisplayName(), false);
-                        plugin.getPlayerPermissionsAttachments().get(target.getUniqueId()).setPermission(item.getItemMeta().getDisplayName(),
-                                false);
+                        permissionsManager.getPlayerPermissions().get(target.getUniqueId()).put(item.getItemMeta().getDisplayName(), false);
+                        permissionsManager.getPlayerPermissionsAttachments().get(target.getUniqueId()).setPermission(item.getItemMeta().getDisplayName(), false);
                     }
-                    plugin.savePerms();
-                    plugin.reloadPerms(target);
+                    permissionsManager.savePermissionsToConfig();
+                    permissionsManager.reloadPermissions(target);
                     if (target.hasPermission(tfidfSearchPermissions(item.getItemMeta().getDisplayName()))) {
                         player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
                     }
                 } else if (action.equals(PermissionAction.REMOVE)) {
                     this.mode = PermissionListMode.getNext(mode);
-                    plugin.getPlayerPermissions().get(target.getUniqueId()).remove(tfidfSearchPermissions(item.getItemMeta().getDisplayName()).getName());
-                    plugin.getPlayerPermissionsAttachments().get(target.getUniqueId()).unsetPermission(item.getItemMeta().getDisplayName());
-                    plugin.savePerms();
-                    plugin.reloadPerms(target);
+                    permissionsManager.getPlayerPermissions().get(target.getUniqueId()).remove(tfidfSearchPermissions(item.getItemMeta().getDisplayName()).getName());
+                    permissionsManager.getPlayerPermissionsAttachments().get(target.getUniqueId()).unsetPermission(item.getItemMeta().getDisplayName());
+                    permissionsManager.savePermissionsToConfig();
+                    permissionsManager.reloadPermissions(target);
                     if (!target.hasPermission(tfidfSearchPermissions(item.getItemMeta().getDisplayName()))) {
                         player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player, true));
                     }
@@ -323,7 +322,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
         if (!query.isEmpty() && !query.isBlank()) {
             try {
                 // Use the search method to get a list of permissions sorted by relevance
-                List<TFIDFSearch.Item> searchResults = plugin.getPermissionSearcher().search(query);
+                List<TFIDFSearch.Item> searchResults = permissionsManager.getPermissionSearcher().search(query);
 
                 // Clear the permissions list and add the search results to it
                 permissions.clear();
@@ -346,7 +345,7 @@ public class PermissionListMenu extends PaginatedMenu implements Listener {
     private Permission tfidfSearchPermissions(String query) {
         try {
             // Use the search method to get the most relevant permission
-            List<TFIDFSearch.Item> searchResults = plugin.getPermissionSearcher().search(query);
+            List<TFIDFSearch.Item> searchResults = permissionsManager.getPermissionSearcher().search(query);
 
             if (!searchResults.isEmpty()) {
                 TFIDFSearch.Item resultItem = searchResults.get(0);

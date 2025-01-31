@@ -3,6 +3,8 @@ package de.happybavarian07.adminpanel.commandmanagement;/*
  * @Date 06.11.2021 | 12:22
  */
 
+import de.happybavarian07.adminpanel.commandmanagement.NaturalOrderComparator;
+
 import java.util.*;
 
 public class PaginatedList<T extends Comparable<T>> {
@@ -112,17 +114,8 @@ public class PaginatedList<T extends Comparable<T>> {
         return this;
     }
 
-    public static class SubCommandComparator implements Comparator<SubCommand> {
-        @Override
-        public int compare(SubCommand subCommand1, SubCommand subCommand2) {
-            // Implement the comparison logic here
-            // For example, you can compare the names of the sub-commands
-            return subCommand1.compareTo(subCommand2);
-        }
-    }
-
     private void subcommandSort() {
-        if(!(listOfThings.get(0) instanceof SubCommand)) {
+        if (!(listOfThings.get(0) instanceof SubCommand)) {
             throw new IllegalArgumentException("SubCommand sort can only be used with SubCommands");
         }
 
@@ -503,6 +496,15 @@ public class PaginatedList<T extends Comparable<T>> {
     public int getMaxPage() throws ListNotSortedException {
         if (!sorted) throw new ListNotSortedException("The List isn't sorted yet! (Method: getMaxPage())");
         return getResultMap().size();
+    }
+
+    public static class SubCommandComparator implements Comparator<SubCommand> {
+        @Override
+        public int compare(SubCommand subCommand1, SubCommand subCommand2) {
+            // Implement the comparison logic here -
+            // For example, you can compare the names of the sub-commands
+            return subCommand1.compareTo(subCommand2);
+        }
     }
 
     public static class ListNotSortedException extends Exception {

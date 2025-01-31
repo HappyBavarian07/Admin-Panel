@@ -27,7 +27,6 @@ public class Packet {
     }
 
     public Packet(String senderName, String destination, String requestId, Action action, List<String> data) {
-        this.requestId = null;
         this.senderName = senderName;
         this.destination = destination;
         this.action = action;

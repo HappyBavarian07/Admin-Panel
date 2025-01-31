@@ -5,16 +5,27 @@ package de.happybavarian07.adminpanel.commandmanagement;
  */
 
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @CommandData
 public class HelpCommand extends SubCommand {
+    private PaginatedList<SubCommand> messages;
+
     public HelpCommand(String mainCommandName) {
         super(mainCommandName);
+    }
+
+    @Override
+    public void postInit() {
+        messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
+        messages.maxItemsPerPage(10).sort("subcommand", false);
     }
 
     @Override
@@ -24,8 +35,6 @@ public class HelpCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
-            messages.maxItemsPerPage(10).sort("subcommand", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 player.sendMessage(lgm.getMessage("Player.Commands.HelpPageDoesNotExist", player, true));
@@ -56,8 +65,6 @@ public class HelpCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<SubCommand> messages = new PaginatedList<>(plugin.getCommandManagerRegistry().getSubCommands(mainCommandName));
-            messages.maxItemsPerPage(10).sort("subcommand", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
                 sender.sendMessage(lgm.getMessage("Player.Commands.HelpPageDoesNotExist", null, true));
@@ -66,7 +73,7 @@ public class HelpCommand extends SubCommand {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
             sender.sendMessage(lgm.getMessage("Player.Commands.HelpMessages.Header", null, false));
             for (SubCommand s : messages.getPage(page)) {
-                if (sender.hasPermission(s.permissionAsPermission()) && !isPlayerRequired()) {
+                if (sender.hasPermission(s.permissionAsPermission()) && !s.isPlayerRequired()) {
                     sender.sendMessage(format(lgm.getMessage("Player.Commands.HelpMessages.Format", null, false), s));
                 }
             }
@@ -97,8 +104,20 @@ public class HelpCommand extends SubCommand {
     }
 
     @Override
-    public Map<Integer, String[]> subArgs() {
-        return new HashMap<>();
+    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
+        Map<Integer, String[]> map = new HashMap<>();
+        // Get Max Page and add it and all the pages before it to the map as a sub argument
+        List<String> pages = new ArrayList<>();
+        try {
+            for (int i = 1; i <= messages.getMaxPage(); i++) {
+                pages.add(String.valueOf(i));
+            }
+        } catch (PaginatedList.ListNotSortedException e) {
+            e.printStackTrace();
+            return map;
+        }
+        map.put(1, pages.toArray(new String[0]));
+        return map;
     }
 
     @Override

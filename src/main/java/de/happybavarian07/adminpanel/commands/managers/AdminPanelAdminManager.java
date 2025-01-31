@@ -36,7 +36,7 @@ public class AdminPanelAdminManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return adminpanel;
+        return plugin;
     }
 
     @Override
@@ -59,13 +59,8 @@ public class AdminPanelAdminManager extends CommandManager {
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return super.onPlayerCommand(player, args);
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender player, String[] args) {
-        return super.onConsoleCommand(player, args);
+    public boolean onCommand(CommandSender sender, String[] args) {
+        return super.onCommand(sender, args);
     }
 
     @Override
@@ -75,24 +70,19 @@ public class AdminPanelAdminManager extends CommandManager {
 
     @Override
     public void setup() {
-        commands.add(new HelpCommand(getCommandName()));
+        registerSubCommand(new HelpCommand(getCommandName()));
 
-        commands.add(new ReloadConfigCommand(getCommandName()));
-        commands.add(new ReloadDataCommand(getCommandName()));
-        commands.add(new ReloadLangCommand(getCommandName()));
-        commands.add(new ReloadPluginCommand(getCommandName()));
-        commands.add(new ReloadCommandManagersCommand(getCommandName()));
-        commands.add(new UpdateConfigCommand(getCommandName()));
-        commands.add(new UpdateLangFilesCommand(getCommandName()));
-        commands.add(new StartUpLoggerControlCommand(getCommandName()));
-        commands.add(new BugReportCommand(getCommandName()));
-        commands.add(new BackupManagerCommand(getCommandName()));
-        commands.add(new PermissionMenuHelpCommand(getCommandName()));
-        commands.add(new StaffChatCommand(getCommandName()));
-    }
-
-    @Override
-    public List<SubCommand> getSubCommands() {
-        return commands;
+        registerSubCommand(new ReloadConfigCommand(getCommandName()));
+        registerSubCommand(new ReloadDataCommand(getCommandName()));
+        registerSubCommand(new ReloadLangCommand(getCommandName()));
+        registerSubCommand(new ReloadPluginCommand(getCommandName()));
+        registerSubCommand(new ReloadCommandManagersCommand(getCommandName()));
+        registerSubCommand(new UpdateConfigCommand(getCommandName()));
+        registerSubCommand(new UpdateLangFilesCommand(getCommandName()));
+        registerSubCommand(new StartUpLoggerControlCommand(getCommandName()));
+        registerSubCommand(new BugReportCommand(getCommandName()));
+        registerSubCommand(new BackupManagerCommand(getCommandName()));
+        registerSubCommand(new PermissionMenuHelpCommand(getCommandName()));
+        registerSubCommand(new StaffChatCommand(getCommandName()));
     }
 }
