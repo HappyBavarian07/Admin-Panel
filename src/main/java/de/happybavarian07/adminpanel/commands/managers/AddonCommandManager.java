@@ -47,7 +47,7 @@ public class AddonCommandManager extends CommandManager {
 
     @Override
     public String getCommandPermissionAsString() {
-        return "Adminpanel.AddonManageCMD";
+        return "AdminPanel.AddonManageCMD";
     }
 
     @Override

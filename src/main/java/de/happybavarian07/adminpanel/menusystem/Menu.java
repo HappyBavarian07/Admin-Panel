@@ -2,8 +2,8 @@ package de.happybavarian07.adminpanel.menusystem;
 
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.general.PanelOpenEvent;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.LogPrefix;
 import org.bukkit.Bukkit;
@@ -47,7 +47,9 @@ public abstract class Menu implements InventoryHolder {
     //let each menu decide their name
     public abstract String getMenuName();
 
-    public abstract String getConfigMenuAddonFeatureName();
+    public String getConfigMenuAddonFeatureName() {
+        return this.getClass().getSimpleName().replace(".class", "");
+    }
 
     //let each menu decide their slot amount
     public abstract int getSlots();

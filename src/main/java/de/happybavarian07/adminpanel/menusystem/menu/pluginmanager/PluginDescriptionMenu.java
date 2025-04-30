@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -21,6 +20,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
 
     public PluginDescriptionMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
+        setOpeningPermission("AdminPanel.PluginManager.PluginSettings.PluginDescription");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + "LoadFromResourceID", player, false))) {
+        if (item.isSimilar(lgm.getItem(itemPath + "LoadFromResourceID", player, false))) {
             // Try to read ResourceID from Description Manager and get description via that and set it to the plugin
             // If not found send a message asking them to set it in chat
             int resourceID = plugin.getPluginDescriptionManager().getResourceID(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class).getName());
@@ -62,11 +62,11 @@ public class PluginDescriptionMenu extends Menu implements Listener {
                 player.closeInventory();
                 playerMenuUtility.addData("SetResourceIDInChat", true);
             }
-        } else if (item.equals(lgm.getItem(itemPath + "SetWithChat", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "SetWithChat", player, false))) {
             player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetDescriptionInChat", player, true));
             player.closeInventory();
             playerMenuUtility.addData("SetDescriptionInChat", true);
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

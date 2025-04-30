@@ -3,8 +3,8 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager.money;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.MoneySetEvent;
 import de.happybavarian07.adminpanel.events.player.MoneyTakeEvent;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionSelectMenu;
@@ -57,7 +57,7 @@ public class MoneyMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Give", target, false))) {
+        if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Give", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
                 player.sendMessage(noPerms);
                 return;
@@ -66,7 +66,7 @@ public class MoneyMenu extends Menu implements Listener {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Take", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Take", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
                 player.sendMessage(noPerms);
                 return;
@@ -75,7 +75,7 @@ public class MoneyMenu extends Menu implements Listener {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PlayerManager.MoneyMenu.Set", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Set", target, false))) {
             if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
                 player.sendMessage(noPerms);
                 return;
@@ -84,7 +84,7 @@ public class MoneyMenu extends Menu implements Listener {
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
             player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("General.Close", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", target, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

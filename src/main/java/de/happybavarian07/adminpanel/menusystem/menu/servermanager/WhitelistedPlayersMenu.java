@@ -52,7 +52,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem("General.Left", null, false))) {
+        if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -63,7 +63,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -74,9 +74,9 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             new WhitelistManagerMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
             super.open();
         }
     }

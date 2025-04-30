@@ -47,7 +47,7 @@ public class WeatherChangeMenu extends Menu {
 
         WeatherChangeEvent changeEvent;
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + Weather.CLEAR, player, false))) {
+        if (item.isSimilar(lgm.getItem(itemPath + Weather.CLEAR, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.CLEAR);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -58,7 +58,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Weather.RAINING, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Weather.RAINING, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.RAINING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -68,7 +68,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Weather.THUNDERING, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Weather.THUNDERING, player, false))) {
             changeEvent = new WeatherChangeEvent(player, world, Weather.THUNDERING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -79,7 +79,7 @@ public class WeatherChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

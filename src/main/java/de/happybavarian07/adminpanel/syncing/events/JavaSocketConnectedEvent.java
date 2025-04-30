@@ -3,12 +3,12 @@ package de.happybavarian07.adminpanel.syncing.events;/*
  * @Date 25.10.2022 | 18:57
  */
 
-import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.syncing.DataClient;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+
 
 public class JavaSocketConnectedEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -61,7 +61,7 @@ public class JavaSocketConnectedEvent extends AdminPanelEvent implements Cancell
     }
 
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 

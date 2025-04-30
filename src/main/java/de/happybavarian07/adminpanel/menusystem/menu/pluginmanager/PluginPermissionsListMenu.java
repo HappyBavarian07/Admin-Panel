@@ -69,14 +69,14 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
             player.sendMessage(Utils.chat("&6Description: &a" + current.getDescription()));
             player.sendMessage(Utils.chat("&6Childrens: &a" + current.getChildren()));
             player.sendMessage(Utils.chat("&6Permissibles: &a" + current.getPermissibles()));
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             playerMenuUtility.setData("CurrentSelectedPlugin", currentPlugin, true);
             new PluginSettingsMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -87,7 +87,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -98,7 +98,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

@@ -37,7 +37,7 @@ public class AddonLoader {
         this.addonClassLoaders = new HashMap<>(); // Initialize the map
 
         if (!addonFolder.isDirectory()) {
-            addonFolder.mkdir();
+            addonFolder.mkdirs();
         }
         List<File> jarfiles = findJarFiles(addonFolder);
         for (File jarFile : jarfiles) {
@@ -101,7 +101,7 @@ public class AddonLoader {
                     Class<?> loaded = addonTemp.getClassLoader().loadClass(names);
 
                     classes.add(loaded);
-                } catch (final NoClassDefFoundError ignored) {
+                } catch (final NoClassDefFoundError | IllegalAccessError ignored) {
                 }
             }
         }
@@ -120,20 +120,21 @@ public class AddonLoader {
                 return loadedAddonMainClasses.get(addon);
             } else {
                 Addon temp = null;
+
+                // Create a custom ClassLoader to load classes from the addon's JAR
+                AddonClassLoader addonClassLoader = new AddonClassLoader(getClass().getClassLoader(), null, addon);
                 try {
-                    temp = FileUtils.findClass(addon, Addon.class).getDeclaredConstructor().newInstance();
+                    temp = (Addon) Objects.requireNonNull(FileUtils.findClass(addon, Addon.class, addonClassLoader)).getDeclaredConstructor().newInstance();
                     checkValidAddonValues(temp);
                 } catch (NullPointerException e) {
                     if (temp == null) {
                         plugin.getFileLogger().writeToLog(Level.SEVERE, "The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!", LogPrefix.ADDONLOADER);
+                        e.printStackTrace();
                         throw new NullPointerException("The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!");
                     }
                 } catch (InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
-
-                // Create a custom ClassLoader to load classes from the addon's JAR
-                AddonClassLoader addonClassLoader = new AddonClassLoader(getClass().getClassLoader(), null, addon);
 
                 // Try and unload the Main Class that got loaded by the old one, because it has to be loaded by the Addon Class Loader
                 String className = temp.getClass().getName();
@@ -173,7 +174,7 @@ public class AddonLoader {
         return addons;
     }
 
-    public EnableResult enableAddon(File addonFile, Set<Addon> currentlyEnabling) throws IOException, ClassNotFoundException {
+    public EnableResult enableAddon(File addonFile, Set<Addon> currentlyEnabling, boolean logging) throws IOException, ClassNotFoundException {
         if (addonFile == null) return EnableResult.NULL_ADDON;
         Addon addon = getMainClassOfAddon(addonFile, false);
 
@@ -192,7 +193,8 @@ public class AddonLoader {
             initAddon(addon);
             addon.onEnable();
             addon.setEnabled(true);
-            plugin.getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
+            if (logging)
+                plugin.getLogger().log(Level.INFO, "Enabled Addon: " + addon.getName());
         } else {
             return EnableResult.DEPENDENCY_MISSING;
         }
@@ -220,7 +222,7 @@ public class AddonLoader {
         DEPENDENCY_MISSING,
         CIRCULAR_DEPENDENCY,
         ALREADY_ENABLED,
-        ERROR;
+        ERROR
     }
 
     private void checkValidAddonValues(Addon temp) throws NullPointerException {
@@ -240,7 +242,7 @@ public class AddonLoader {
         if (!addonDataFolder.exists()) {
             addonDataFolder.mkdirs();
         }
-        if(addonClassLoaders.get(addon.getFile()).getAddon() == null) {
+        if (addonClassLoaders.get(addon.getFile()).getAddon() == null) {
             addonClassLoaders.get(addon.getFile()).initialize(addon);
         }
         /*try {
@@ -263,6 +265,7 @@ public class AddonLoader {
         try {
             for (AddonClassLoader classLoader : addonClassLoaders.values()) {
                 classLoader.close();
+                classLoader.forceClose();
             }
             addonClassLoaders.clear();
         } catch (IOException e) {

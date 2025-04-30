@@ -1,8 +1,8 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
@@ -51,21 +51,21 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Register", player, false))) {
+        if (item.isSimilar(lgm.getItem(path + "Register", player, false))) {
             if (!currentCommand.isRegistered()) {
                 currentCommand.register(getCommandMap());
                 plugin.getDisabledCommands().remove(currentCommand.getName());
             }
-        } else if (item.equals(lgm.getItem(path + "Unregister", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Unregister", player, false))) {
             if (currentCommand.isRegistered()) {
                 currentCommand.unregister(getCommandMap());
                 plugin.getDisabledCommands().add(currentCommand.getName());
             }
-        } else if (item.equals(lgm.getItem(path + "Execute", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Execute", player, false))) {
             if (currentCommand.isRegistered()) {
                 currentCommand.execute(player, currentCommand.getLabel(), new String[]{});
             }
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             new PluginCommandsListMenu(playerMenuUtility, currentCommand.getPlugin()).open();
         }
     }

@@ -53,7 +53,7 @@ public class ChatManagerMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "ClearChat", player, false))) {
+        if (item.isSimilar(lgm.getItem(path + "ClearChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
                 player.sendMessage(noPerms);
                 return;
@@ -70,7 +70,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "UnMuteChat", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "UnMuteChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
@@ -88,7 +88,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "MuteChat", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "MuteChat", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
                 player.sendMessage(noPerms);
                 return;
@@ -106,7 +106,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

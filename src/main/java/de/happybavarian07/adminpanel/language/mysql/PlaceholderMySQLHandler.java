@@ -10,7 +10,6 @@ import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -147,7 +146,7 @@ public class PlaceholderMySQLHandler {
         }
     }
 
-    public void resetPlaceholders(PlaceholderType type, @Nullable List<String> excludeKeys) {
+    public void resetPlaceholders(PlaceholderType type, List<String> excludeKeys) {
         try {
             // Execute a SQL query to get the placeholders from the MySQL database
             ResultSet resultSet = databaseController.getConnectionManager().executeQuery(
@@ -175,7 +174,7 @@ public class PlaceholderMySQLHandler {
         }
     }
 
-    public void resetSpecificPlaceholders(PlaceholderType type, @Nullable List<String> includeKeys) {
+    public void resetSpecificPlaceholders(PlaceholderType type, List<String> includeKeys) {
         try {
             // Execute a SQL query to get the placeholders from the MySQL database
             ResultSet resultSet = databaseController.getConnectionManager().executeQuery(

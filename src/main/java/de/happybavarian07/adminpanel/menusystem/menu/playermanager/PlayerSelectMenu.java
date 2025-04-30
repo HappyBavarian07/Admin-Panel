@@ -68,13 +68,13 @@ public class PlayerSelectMenu extends PaginatedMenu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -85,7 +85,7 @@ public class PlayerSelectMenu extends PaginatedMenu {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -96,13 +96,13 @@ public class PlayerSelectMenu extends PaginatedMenu {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
             }
             super.open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false))) {
             new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }

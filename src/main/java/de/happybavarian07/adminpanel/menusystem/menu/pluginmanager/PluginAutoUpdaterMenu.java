@@ -69,7 +69,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             pluginItem.setItemMeta(itemMeta);
         }
         //System.out.println("Item: " + pluginItem);
-        if (item.equals(pluginItem)) {
+        if (item.isSimilar(pluginItem)) {
             // Update Plugin on Click
             NewUpdater updater = pluginsToUpdate.get(currentPlugin.getName());
             if (!updater.resourceIsOnSpigot()) {
@@ -83,23 +83,23 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             updater.downloadLatestUpdate(updater.updateAvailable(), true, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", currentPlugin.getName(), false);
             player.sendMessage(lgm.getMessage("Player.PluginManager.UpdatedPlugin", player, true));
-        } else if (item.equals(lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false))) {
             // Add Plugin
             playerMenuUtility.addData("AddPluginMetaData", true);
             player.closeInventory();
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", player, false));
-        } else if (item.equals(lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false))) {
             // Remove Plugin
             playerMenuUtility.addData("RemovePluginSelectPluginMetaData", true);
             player.closeInventory();
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", player, false));
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginSelectMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -110,7 +110,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -121,7 +121,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

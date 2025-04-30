@@ -2,12 +2,12 @@ package de.happybavarian07.adminpanel.addonloader.api;
 
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonClassLoader;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.addonloader.utils.Dependency;
+import de.happybavarian07.adminpanel.addonloader.utils.PluginDependency;
 import de.happybavarian07.adminpanel.addonloader.utils.MavenDependency;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 
 import java.io.*;
 import java.net.URL;
@@ -41,10 +41,17 @@ public abstract class Addon implements Comparable<Addon> {
     public void onDisable() {
     }
 
-    public List<Dependency> getDependencies() {
+    public List<PluginDependency> getDependencies() {
         return new ArrayList<>();
     }
 
+    // TODO REMOVE THIS NEXT VERSION
+
+    /**
+     * @deprecated Use {@link de.happybavarian07.adminpanel.utils.dependencyloading.annotations.Dependency} annotation instead.
+     * This won't work with the new DependencyManager.
+     */
+    @Deprecated(forRemoval = true)
     public List<MavenDependency> getMavenDependencies() {
         return new ArrayList<>();
     }
@@ -76,7 +83,7 @@ public abstract class Addon implements Comparable<Addon> {
         newConfig.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
     }
 
-    public void init(@NotNull AddonLoader loader, @NotNull File dataFolder, @NotNull File file, @NotNull AddonClassLoader classLoader) {
+    public void init(AddonLoader loader, File dataFolder, File file, AddonClassLoader classLoader) {
         this.loader = loader;
         this.dataFolder = dataFolder;
         this.file = file;
@@ -95,7 +102,7 @@ public abstract class Addon implements Comparable<Addon> {
         }
     }
 
-    public void saveResource(@NotNull String resourcePath, boolean replace) {
+    public void saveResource(String resourcePath, boolean replace) {
         if (resourcePath == null || resourcePath.equals("")) {
             throw new IllegalArgumentException("ResourcePath cannot be null or empty");
         }
@@ -132,7 +139,7 @@ public abstract class Addon implements Comparable<Addon> {
         }
     }
 
-    public InputStream getResource(@NotNull String filename) {
+    public InputStream getResource(String filename) {
         if (filename == null) {
             throw new IllegalArgumentException("Filename cannot be null");
         }
@@ -152,8 +159,8 @@ public abstract class Addon implements Comparable<Addon> {
         }
     }
 
-    @Nullable
-    protected final Reader getTextResource(@NotNull String file) {
+
+    protected final Reader getTextResource(String file) {
         final InputStream in = getResource(file);
 
         return in == null ? null : new InputStreamReader(in, StandardCharsets.UTF_8);
@@ -188,7 +195,7 @@ public abstract class Addon implements Comparable<Addon> {
     }
 
     @Override
-    public int compareTo(@NotNull Addon o) {
+    public int compareTo(Addon o) {
         int name = this.getName().compareTo(o.getName());
         if (name != 0) return name;
 
@@ -202,7 +209,7 @@ public abstract class Addon implements Comparable<Addon> {
     }
 
     @NotNull
-    public static <T extends Addon> T getAddon(@NotNull Class<T> clazz) {
+    public static <T extends Addon> T getAddon(Class<T> clazz) {
         if (!Addon.class.isAssignableFrom(clazz)) {
             throw new IllegalArgumentException(clazz + " does not extend " + Addon.class);
         }

@@ -89,34 +89,34 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                     notAPanelEventException.printStackTrace();
                 }
             }
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
             new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false))) {
             for (PotionEffect effect : playerMenuUtility.getTarget().getActivePotionEffects()) {
                 playerMenuUtility.getTarget().removePotionEffect(effect.getType());
             }
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.SetDuration", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetDuration", null, false))) {
             playerMenuUtility.addData("SetDurationPotionMenu", true);
             player.sendMessage(lgm.getMessage("PotionMenu.EnterDuration", player, false));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", null, false))) {
             playerMenuUtility.addData("SetAmplifierPotionMenu", true);
             player.sendMessage(lgm.getMessage("PotionMenu.EnterAmplifier", player, false));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("General.Left", null, false)) ||
-                item.equals(lgm.getItem("General.Right", null, false))) {
-            if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false)) ||
+                item.isSimilar(lgm.getItem("General.Right", null, false))) {
+            if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
                 if (page == 0) {
                     player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
                 } else {
                     page = page - 1;
                     super.open();
                 }
-            } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+            } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
                 if (!((index + 1) >= potionList.size())) {
                     page = page + 1;
                     super.open();

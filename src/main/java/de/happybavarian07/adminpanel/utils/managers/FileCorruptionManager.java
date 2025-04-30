@@ -24,7 +24,7 @@ import java.util.logging.Level;
 // You can disable it, along with the Config Backup inside the config.yml
 public class FileCorruptionManager {
     private final AdminPanelMain plugin;
-    private FileBackup configBackup;
+    private final FileBackup configBackup;
 
     public FileCorruptionManager(AdminPanelMain plugin, FileBackup configBackup) {
         this.plugin = plugin;
@@ -163,12 +163,12 @@ public class FileCorruptionManager {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + message + dashes + "Result: " + corruptedString + " (" + ChatColor.GOLD + entry.getValue().getReason() + ChatColor.WHITE + ")");
             }
             if (results.values().stream().anyMatch(CorruptionCheckResult::isCorrupted)) {
-                plugin.getLogger().warning(ChatColor.RED + "Replacing corrupted files and backing them up for checking...");
+                plugin.getLogger().warning(ChatColor.RED + "Trying to replace corrupted files and back them up for checking...");
                 int backupLoadResult = configBackup.loadSpecificFilesFromBackup(configBackup.getNewestBackupFile(), results.keySet().stream().filter(f -> results.get(f).isCorrupted()).toArray(File[]::new));
                 if (backupLoadResult == 0) {
                     plugin.getLogger().info(ChatColor.GREEN + "Backup loaded successfully!");
                 } else {
-                    plugin.getLogger().severe(ChatColor.RED + "Backup could not be loaded! Error Code: " + backupLoadResult);
+                    plugin.getLogger().severe(ChatColor.RED + "Backup could either not be loaded or only half loaded! Error Code: " + backupLoadResult);
                 }
             }
             plugin.getLogger().info(ChatColor.YELLOW + "File Corruption Check finished!");
@@ -177,9 +177,9 @@ public class FileCorruptionManager {
 
     public enum CorruptionCheckResult {
         CHECK_FAILED_SECURITY_EXCEPTION(false, -5, "A security exception was encountered."),
-        CHECK_FAILED_IO_ERROR(false, -4, "An I/O error occurred during the check."),
+        CHECK_FAILED_IO_ERROR(true, -4, "An I/O error occurred during the check."),
         CHECK_FAILED_INVALID_FORMAT(true, -3, "The file format is invalid."),
-        CHECK_FAILED_FILE_IS_DIRECTORY(false, -2, "The file is a directory."),
+        CHECK_FAILED_FILE_IS_DIRECTORY(true, -2, "The file is a directory."),
         CHECK_FAILED_MISSING_RESOURCE(false, -1, "Resource file is missing."),
         VALID(false, 0, "The file is valid."),
         FILE_MISSING(false, 1, "The file could not be found or opened."),

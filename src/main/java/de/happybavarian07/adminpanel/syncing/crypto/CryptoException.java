@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 /**
  * Indicates there was a problem during encryption or decryption.

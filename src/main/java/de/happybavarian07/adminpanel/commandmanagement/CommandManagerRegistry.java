@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -511,7 +510,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
      * indicates that the command was handled and no further processing is required by the server.
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public boolean onCommand(CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         for (CommandManager cm : commandManagers.keySet()) {
             try {
                 if (cm.getCommandName().equalsIgnoreCase(cmd.getName())) {
@@ -613,7 +612,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
      *               This may be used to determine the appropriate tab-completion suggestions.
      * @return a {@link List} of {@link String} containing possible tab-completion options based
      */
-    @Nullable
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         CommandManager cm = findCommandManager(cmd.getName());
@@ -656,7 +655,7 @@ public class CommandManagerRegistry implements CommandExecutor, TabCompleter {
      * @return the {@link CommandManager} associated with the given command name,
      * or {@code null} if no match is found
      */
-    @Nullable
+
     private CommandManager findCommandManager(String commandName) {
         for (CommandManager cm : commandManagers.keySet()) {
             if (cm.getCommandName().equalsIgnoreCase(commandName)) {

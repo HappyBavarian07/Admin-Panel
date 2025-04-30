@@ -47,23 +47,23 @@ public class WhitelistManagerMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "AddPlayer", player, false))) {
+        if (item.isSimilar(lgm.getItem(path + "AddPlayer", player, false))) {
             playerMenuUtility.addData("WhitelistManagerAddPlayer", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem(path + "RemovePlayer", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "RemovePlayer", player, false))) {
             playerMenuUtility.addData("WhitelistManagerRemovePlayer", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem(path + "ListPlayers", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "ListPlayers", player, false))) {
             new WhitelistedPlayersMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(path + "TurnOn", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "TurnOn", player, false))) {
             Bukkit.setWhitelist(true);
-        } else if (item.equals(lgm.getItem(path + "TurnOff", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "TurnOff", player, false))) {
             Bukkit.setWhitelist(false);
-        } else if (item.equals(lgm.getItem(path + "Reload", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Reload", player, false))) {
             Bukkit.reloadWhitelist();
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             new ServerManagerMenu(playerMenuUtility).open();
         }
     }

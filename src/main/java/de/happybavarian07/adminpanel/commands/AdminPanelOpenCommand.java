@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.commands;
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.LanguageManager;
+import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.LogPrefix;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -11,7 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
@@ -25,19 +24,17 @@ public class AdminPanelOpenCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("adminpanel")) {
             if (args.length == 0) {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
+                if (sender instanceof Player player) {
                     new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
                     plugin.getFileLogger().writeToLog(Level.INFO, "Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLAYER);
                 } else {
                     sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
                 }
             } else if (args.length == 1) {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
+                if (sender instanceof Player player) {
                     Player target = Bukkit.getPlayerExact(args[0]);
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], true);
                     String targetPlayerIsNull = lgm.getMessage("Player.General.TargetedPlayerIsNull", player, false);
@@ -54,8 +51,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                         player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                     }
                 }
-                if (sender instanceof ConsoleCommandSender) {
-                    ConsoleCommandSender console = (ConsoleCommandSender) sender;
+                if (sender instanceof ConsoleCommandSender console) {
                     Player target = Bukkit.getPlayerExact(args[0]);
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], true);
                     String targetplayerisnull = lgm.getMessage("Player.General.TargetedPlayerIsNull", null, false);

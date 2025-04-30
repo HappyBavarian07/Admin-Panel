@@ -12,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -235,7 +234,7 @@ public abstract class SubCommand implements Comparable<SubCommand> {
      * equal to, or greater than the specified subcommand.
      */
     @Override
-    public int compareTo(@NotNull SubCommand o) {
+    public int compareTo(SubCommand o) {
         int nameComparison = this.name().compareTo(o.name());
         if (nameComparison != 0) {
             return nameComparison;

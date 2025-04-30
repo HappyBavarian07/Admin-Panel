@@ -1,13 +1,8 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -42,12 +37,7 @@ public final class CryptoPacketConverter {
         final byte[] payload = stream.toByteArray();
         final byte[] base64Payload = base64.encode(payload);
 
-        try {
-            return new String(base64Payload, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // UTF-8 should always be supported.
-            throw new CryptoException("Could not encode Base64 String", e);
-        }
+        return new String(base64Payload, StandardCharsets.UTF_8);
     }
 
     /**

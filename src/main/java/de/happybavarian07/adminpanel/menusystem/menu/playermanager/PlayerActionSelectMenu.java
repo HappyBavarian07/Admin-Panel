@@ -4,7 +4,8 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
-import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionActionSelectMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMode;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,8 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public class PlayerActionSelectMenu extends Menu {
 
@@ -43,20 +42,22 @@ public class PlayerActionSelectMenu extends Menu {
         Player target = Bukkit.getPlayer(playerMenuUtility.getTargetUUID());
         ItemStack item = e.getCurrentItem();
 
-        if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target, false))) {
+        if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target, false))) {
             new PlayerActionsMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target, false))) {
             new MoneyMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target, false))) {
             new PlayerBanMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target, false))) {
             new PlayerKickMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target, false))) {
-            new PermissionActionSelectMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("PlayerManager.WarningMenuItem", target, false))) {
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target, false))) {
+            playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+            playerMenuUtility.addData("SortQuery", "");
+            new PermissionListMenu(playerMenuUtility).open();
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenuItem", target, false))) {
             //new PlayerWarningMenu(playerMenuUtility, targetUUID).open();
             player.sendMessage(Utils.chat("!!!UNDER DEVELOPMENT!!!"));
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;

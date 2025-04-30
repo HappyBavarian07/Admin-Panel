@@ -1,6 +1,5 @@
 package de.happybavarian07.adminpanel.configupdater;
 
-import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,7 +25,9 @@ public class ConfigUpdater {
     }
 
     public static void update(Plugin plugin, String resourceName, File toUpdate, List<String> ignoredSections) throws IOException {
-        Preconditions.checkArgument(toUpdate.exists(), "The toUpdate file doesn't exist!");
+        if (!toUpdate.exists()) {
+            throw new IllegalArgumentException("Die zu aktualisierende Datei existiert nicht!");
+        }
 
         FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(resourceName), StandardCharsets.UTF_8));
         FileConfiguration currentConfig = YamlConfiguration.loadConfiguration(toUpdate);

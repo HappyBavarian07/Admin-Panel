@@ -10,7 +10,7 @@ softdepend:
 load: POSTWORLD
 commands:
   adminpanel:
-    description: Opens the Adminpanel
+    description: Opens the Admin-Panel
     usage: /adminpanel [<Player>]
     aliases: [ apanel, adminp, ap ]
   update:
@@ -26,7 +26,6 @@ commands:
   reloadlang:
     description: Reloads the Languages
     usage: /reloadlang
-  bungeetest:
 permissions:
   AdminPanel.*:
     default: op
@@ -107,7 +106,7 @@ permissions:
             default: op
           AdminPanel.Button.refresh:
             default: op
-      Adminpanel.AdminPanelAdmin:
+      AdminPanel.AdminPanelAdmin:
         default: op
       AdminPanel.AdminPanelAdminCommands:
         default: op
@@ -222,15 +221,12 @@ permissions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Warn:
                 default: op
-              AdminPanel.PlayerManager.PlayerSettings.Permissions:
+              AdminPanel.PlayerManager.PlayerSettings.Permissions.*:
                 default: op
                 children:
-                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Add: true
-                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Info: true
-                  AdminPanel.PlayerManager.PlayerSettings.Permissions.List: true
-                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove: true
                   AdminPanel.PlayerManager.PlayerSettings.Permissions.Open: true
                   AdminPanel.PlayerManager.PlayerSettings.Permissions.MenuHelp: true
+                  AdminPanel.PlayerManager.PlayerSettings.Permissions.Actions: true
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Kick:
@@ -245,7 +241,7 @@ permissions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Money.Give:
                 default: op
-              Adminpanel.PlayerManager.PlayerSettings.Money.Set:
+              AdminPanel.PlayerManager.PlayerSettings.Money.Set:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Money.Take:
                 default: op

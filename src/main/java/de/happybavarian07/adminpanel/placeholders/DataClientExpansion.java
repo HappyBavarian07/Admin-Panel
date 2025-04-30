@@ -7,26 +7,26 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 public class DataClientExpansion extends PlaceholderExpansion {
     @Override
-    public @NotNull String getName() {
+    public String getName() {
         return "Data Client Expansion";
     }
 
     @Override
-    public @NotNull String getIdentifier() {
+    public String getIdentifier() {
         return "apdataclient";
     }
 
     @Override
-    public @NotNull String getAuthor() {
+    public String getAuthor() {
         return "HappyBavarian07";
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public String getVersion() {
         return AdminPanelMain.getPlugin().getDescription().getVersion();
     }
 
@@ -41,7 +41,7 @@ public class DataClientExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, @NotNull String params) {
+    public String onPlaceholderRequest(Player player, String params) {
         if (player == null) {
             return null;
         }

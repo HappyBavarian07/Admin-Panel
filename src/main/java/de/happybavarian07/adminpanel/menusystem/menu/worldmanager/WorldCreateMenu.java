@@ -83,11 +83,11 @@ public class WorldCreateMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(nameItem)) {
+        if (item.isSimilar(nameItem)) {
             playerMenuUtility.addData("createWorldSetName", true);
             player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player, true));
             player.closeInventory();
-        } else if (item.equals(typeItem)) {
+        } else if (item.isSimilar(typeItem)) {
             if (this.worldType == WorldType.NORMAL) {
                 this.worldType = WorldType.FLAT;
             } else if (this.worldType == WorldType.FLAT) {
@@ -98,7 +98,7 @@ public class WorldCreateMenu extends Menu implements Listener {
                 this.worldType = WorldType.NORMAL;
             }
             super.open();
-        } else if (item.equals(environmentItem)) {
+        } else if (item.isSimilar(environmentItem)) {
             if (this.worldEnvironment == World.Environment.NORMAL) {
                 this.worldEnvironment = World.Environment.NETHER;
             } else if (this.worldEnvironment == World.Environment.NETHER) {
@@ -107,25 +107,25 @@ public class WorldCreateMenu extends Menu implements Listener {
                 this.worldEnvironment = World.Environment.NORMAL;
             }
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.true", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "GenerateStructures.true", player, false))) {
             this.generateStructures = false;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "GenerateStructures.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "GenerateStructures.false", player, false))) {
             this.generateStructures = true;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.true", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Hardcore.true", player, false))) {
             this.hardcore = false;
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Hardcore.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Hardcore.false", player, false))) {
             this.hardcore = true;
             super.open();
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new WorldSelectMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(itemPath + "CreateWorld", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "CreateWorld", player, false))) {
             WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);

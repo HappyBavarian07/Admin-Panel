@@ -8,6 +8,7 @@ Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] erfolgreich aktiviert!'
     DisablingMessage: '[Admin-Panel] erfolgreich deaktiviert!'
+    NullMenu: '%prefix% &9> &cDas Menu welches du öffnen wolltest scheint gerade nicht zu funktioniert!'
   DataClient:
     RequestedUpdateMessage: '%prefix% &9> &aErfolgreich Client List Anfrage an den Server gesendet.'
     ClientListMessages:
@@ -36,10 +37,10 @@ Messages:
       # %backupName% = equals the Backup Config Name specified
       Start: '%prefix% &9> &aDer Backup Erstellungs Prozess für ''%backupName%'' ist fertig. &r%success%'
       Load: '%prefix% &9> &aDer Backup Lade Prozess für ''%backupName%'' ist fertig. Du kannst die alten Configs in diesem Zip Archive finden ''old_configs.yml''. &r%success%'
-        # GetNewestBackup Placeholders:
-        # %fileName% = File Name
-        # %normalPath% = The Relative Path
-        # %absolutePath% = The Absolute Path
+      # GetNewestBackup Placeholders:
+      # %fileName% = File Name
+      # %normalPath% = The Relative Path
+      # %absolutePath% = The Absolute Path
       # %parentFile% = The Parent Directory / File
       # %exists% = If the File exists
       GetNewestBackupFile: '%prefix% &9> &aDie neueste Backup Datei von ''%backupName%'' ist %fileName%!'
@@ -183,11 +184,12 @@ Messages:
       OppedMessage: '&aDu hast den Spieler zum Operator gemacht!'
       DeoppedMessage: '&cDu hast dem Spieler die Operatorrechte weggenommen!'
       Permissions:
-        AddedPermission: '%prefix% &9> &aPermission hinzugefügt!'
+        AddedPermission: '%prefix% &9> &aPermission hinzugefügt mit Wert %value%!'
         RemovedPermission: '%prefix% &9> &cPermission entfernt!'
-        ListMenu:
+        GroupMenu:
           EnterSort: '%prefix% &9> &aBitte gib die Sortierung in den Chat ein!'
           SortResult: '%prefix% &9> &aDie Sortierung wird angegewended!'
+          PermissionNotFound: '%prefix% &9> &cDie Permission existiert nicht! (%permission%) (Wenn du willst, dass solche Permissions auch hinzugefügt werden, dann schau in die Config.)'
       KickMenu:
         # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4Du wurdest vom Server geworfen! Grund: %reason%'
@@ -372,6 +374,11 @@ Items:
       displayName: '&cClose'
       lore:
         - '&cSchließe diese Seite!'
+    Back:
+      material: ARROW
+      displayName: '&cZurück'
+      lore:
+        - '&cGehe zur vorherigen Seite!'
     Left:
       material: DARK_OAK_BUTTON
       displayName: '&cLeft'
@@ -746,32 +753,85 @@ Items:
         displayName: '&cVerwalte die Rechte des Spielers'
         lore:
           - '&aVerwalte alle Rechte des Spielers!'
-      Permissions:
-        Add:
-          material: GREEN_CONCRETE
-          displayName: '&cGebe dem Spieler Rechte'
+      PermissionListMenu:
+        InfoItem:
+          material: PAPER
+          displayName: '&eGruppen Info'
+          # %group% = The Group Name
+          # %parent_groups% = The Parent Groups
+          # %sub_group_count% = The Sub Group Count
+          # %sub_permission_count% = The Sub Permission Count
+          # %filtered_result_count% = The Filtered Result Count
           lore:
-            - '&aGebe dem Spieler bestimmte Rechte!'
-            - '&6Links-Klick &9= &6Value: &atrue'
-            - '&6Rechts-Klick &9= &6Value: &cfalse'
-        Remove:
-          material: RED_CONCRETE
-          displayName: '&cNehme dem Spieler Rechte weg'
+            - '&7Gruppe: %group%'
+            - '&7Eltern: %parent_groups%'
+            - '&7Untergruppen: %sub_group_count%'
+            - '&7Berechtigungen: %sub_permission_count%'
+            - ' '
+            - '&7Gefilterte Ergebnisanzahl: %filtered_result_count%'
+        ToTheTop:
+          material: OAK_SIGN
+          displayName: '&cZurück zur Hauptgruppe'
           lore:
-            - '&aNehme dem Spieler bestimmte Rechte weg!'
-        Info:
-          material: WRITABLE_BOOK
-          displayName: '&cInformiere dich über Permissions'
-          lore:
-            - '&aLasse dir ein paar Infos über Permissions ausgeben!'
-        List:
-          material: BOOKSHELF
-          displayName: '&cListe alle Permissions auf'
-          lore:
-            - '&aListe alle Permissions auf:'
-            - '&aModus 1: All Permissions'
-            - '&aModus 2: Player Permissions'
-        ListMenu:
+            - '&aGehe zurück zur Hauptgruppe!'
+        PermissionActions:
+          InfoItem:
+            material: BOOK
+            displayName: '&aPermission Info'
+            # %permission% = The Permission Name
+            # %description% = The Permission Description
+            # %default% = The Default Value
+            # %value% = The Current Value
+            # %target% = The Targeted Player
+            lore:
+              - ' '
+              - '- &6Permission&f: &a%permission%'
+              - '- &6Beschreibung&f: &a%description%'
+              - '- &6Standard&f: &a%default%'
+              - '- &6aktueller Wert&f: &a%value%'
+              - '  (des Spielers: %target%)'
+          SetTrue:
+            material: EMERALD_BLOCK
+            displayName: '&aSetze auf &f''&atrue&f'''
+            lore:
+              - '&aSetze den Wert dieser Permission auf &f''&atrue&f'''
+          SetFalse:
+            material: REDSTONE_BLOCK
+            displayName: '&cSetze auf &f''&4false&f'''
+            lore:
+              - '&cSetze den Wert dieser Permission auf &f''&4false&f'''
+          Remove:
+            material: WRITABLE_BOOK
+            displayName: '&cEntferne diese Permission'
+            lore:
+              - '&aEntferne diese Permission vom Spieler!'
+          Info:
+            material: BOOKSHELF
+            displayName: '&cFinde mehr heraus über die Permission'
+            lore:
+              - '&aFinde mehr heraus über die Permission!'
+              - '&a%permission%'
+        GroupMenu:
+          # %group_name% = The Group Name
+          # %parent_groups% = The Parent Groups
+          # %sub_group_count% = The Sub Group Count
+          # %sub_permission_count% = The Sub Permission Count
+          # %permission_name% = The Permission Name (from the current Group Tree)
+          # %full_permission_name% = The Full Permission Name (from the root Group)
+          GroupItem:
+            material: CHEST
+            displayName: '&a%group_name%'
+            lore:
+              - '&7Zum Durchsuchen anklicken'
+              - ' '
+              - '&7Parent: %parent_groups%'
+              - '&7Untergruppen: %sub_group_count%'
+              - '&7Permissions: %sub_permission_count%'
+          PermissionItem:
+            material: ENCHANTED_BOOK
+            displayName: '&b%permission_name%'
+            lore:
+              - '&7Für Aktionen anklicken'
           Sort:
             material: OAK_SIGN
             displayName: '&cSortieren'
@@ -1337,8 +1397,9 @@ MenuTitles:
     BanMenu: '&cBan'
     KickMenu: '&cKick'
     Permissions:
-      ListMenu: '&aPermission Liste'
+      ListMenu: '&aPermission Liste: %action%'
       ActionSelectMenu: '&aAktionen'
+      GroupMenu: '&aBerechtigungsgruppen'
   WorldManager:
     WorldSelector: '&aWähle eine Welt'
     WorldSettings: '&3Einstellungen'

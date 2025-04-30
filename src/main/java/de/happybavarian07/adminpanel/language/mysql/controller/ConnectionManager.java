@@ -48,7 +48,7 @@ public class ConnectionManager {
                 try (FileInputStream fis = new FileInputStream(propertiesOrDatabaseFile)) {
                     props.load(fis);
                     // Get URL from properties file and create a connection to the database
-                    String url = "jdbc:sqlite:" + Paths.get(plugin.getDataFolder().getAbsolutePath(), props.getProperty("sqlite_path_language"));
+                    String url = "jdbc:sqlite:" + Paths.get(plugin.getDataFolder().getAbsolutePath(), props.getProperty("sqlite_file_path"));
                     tablePrefix = props.getProperty("mysql_prefix");
                     this.connection = DriverManager.getConnection(url);
                 } catch (IOException | SQLException e) {
@@ -67,7 +67,7 @@ public class ConnectionManager {
                             props.getProperty("mysql_database");
                     String user = props.getProperty("mysql_user");
                     String password = props.getProperty("mysql_password");
-                    tablePrefix = props.getProperty("mysql_prefix");
+                    tablePrefix = props.getProperty("database_prefix");
                     DriverManager.registerDriver(new Driver());
                     this.connection = DriverManager.getConnection(url, user, password);
                 } catch (IOException | SQLException e) {

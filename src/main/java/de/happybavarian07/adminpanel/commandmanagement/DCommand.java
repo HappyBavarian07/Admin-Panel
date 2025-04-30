@@ -11,7 +11,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -23,13 +22,13 @@ public class DCommand extends BukkitCommand {
     private TabCompleter tabCompleter;
     private JavaPlugin plugin;
 
-    protected DCommand(@NotNull String name, CommandExecutor executor, TabCompleter tabCompleter) {
+    protected DCommand(String name, CommandExecutor executor, TabCompleter tabCompleter) {
         super(name);
         setExecutor(executor);
         setTabCompleter(tabCompleter);
     }
 
-    public DCommand(@NotNull String name, JavaPlugin plugin) {
+    public DCommand(String name, JavaPlugin plugin) {
         super(name);
         this.plugin = plugin;
     }
@@ -43,7 +42,7 @@ public class DCommand extends BukkitCommand {
     }
 
     @Override
-    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
+    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
         return Objects.requireNonNull(tabCompleter != null ? tabCompleter.onTabComplete(sender, this, alias, args) : null);
     }
 

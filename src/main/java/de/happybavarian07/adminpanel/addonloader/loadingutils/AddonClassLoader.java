@@ -4,6 +4,7 @@ import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +61,7 @@ public class AddonClassLoader extends URLClassLoader {
         return loadClass0(name, resolve, true);
     }
 
-    private Class<?> loadClass0(@NotNull String name, boolean resolve, boolean checkGlobal) throws ClassNotFoundException {
+    private Class<?> loadClass0(String name, boolean resolve, boolean checkGlobal) throws ClassNotFoundException {
         try {
             Class<?> result = super.loadClass(name, resolve);
             if (checkGlobal || result.getClassLoader() == this) {
@@ -77,6 +78,22 @@ public class AddonClassLoader extends URLClassLoader {
         }
 
         throw new ClassNotFoundException(name);
+    }
+
+    @Override
+    public void close() throws IOException {
+        // Instead of closing the jar here, we only close the URLClassLoader.
+        // The jar will remain open so that lazy class loading can work.
+        super.close();
+        // NOTE: Do not call jar.close() here.
+    }
+
+    /**
+     * Force the jar file to close.
+     * Call this only when you are 100% done loading classes from this addon.
+     */
+    public void forceClose() throws IOException {
+        jar.close();
     }
 
     @Override
@@ -128,15 +145,6 @@ public class AddonClassLoader extends URLClassLoader {
         }
 
         return result;
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            super.close();
-        } finally {
-            jar.close();
-        }
     }
 
     @NotNull

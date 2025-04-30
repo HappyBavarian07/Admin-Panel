@@ -3,40 +3,47 @@ package de.happybavarian07.adminpanel.bungee;/*
  * @Date 02.09.2022 | 15:03
  */
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IncomingChannelListener implements PluginMessageListener {
-    private final String incomingChannelName;
+public record IncomingChannelListener(String incomingChannelName) implements PluginMessageListener {
 
-    public IncomingChannelListener(String incomingChannelName) {
-        this.incomingChannelName = incomingChannelName;
-    }
     @Override
-    public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, @NotNull byte[] message) {
-        if(!channel.equals(incomingChannelName)) return;
+    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+        if (!channel.equals(incomingChannelName)) return;
 
-        ByteArrayDataInput input = ByteStreams.newDataInput(message);
-        String subchannel /*First Argument in the Input*/ = input.readUTF();
+        DataInputStream input = new DataInputStream(new ByteArrayInputStream(message));
+        String subchannel;
+        try {
+            subchannel = input.readUTF();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
         System.out.println("Received Plugin Message");
 
-        if(subchannel.equals("BroadcastServerWide")) {
+        if (subchannel.equals("BroadcastServerWide")) {
             List<String> args = new ArrayList<>();
-
-            while (!input.readUTF().equals("")) {
-                args.add(input.readUTF());
+            try {
+                String temp;
+                while (!(temp = input.readUTF()).equals("")) {
+                    args.add(temp);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
             }
 
-            String messageToSend = Utils.arrayToString(args.toArray(new String[]{}));
+            String messageToSend = Utils.arrayToString(args.toArray(new String[0]));
             System.out.println("Received Broadcast Command!" + " Message: " + messageToSend);
             Bukkit.broadcastMessage(Utils.chat("&f|&9BROADCAST&f| &r" + messageToSend));
         }

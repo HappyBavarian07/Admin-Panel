@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 import org.apache.commons.codec.binary.Base64;
 

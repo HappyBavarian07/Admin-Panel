@@ -16,7 +16,6 @@ import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -341,7 +340,7 @@ public interface AdminPanelAPI {
      * @param type der Typ des Placeholders
      * @param excludeKeys die Liste aller Keys die nicht resettet werden sollen
      */
-    void resetPlaceholders(PlaceholderType type, @Nullable List<String> excludeKeys);
+    void resetPlaceholders(PlaceholderType type, List<String> excludeKeys);
 
     /**
      * Diese Methode setzt die gesamte Liste der Placeholders
@@ -349,7 +348,7 @@ public interface AdminPanelAPI {
      * @param type der Typ des Placeholders
      * @param includeKeys die Liste aller Keys die resettet werden sollen
      */
-    void resetSpecificPlaceholders(PlaceholderType type, @Nullable List<String> includeKeys);
+    void resetSpecificPlaceholders(PlaceholderType type, List<String> includeKeys);
 
     /**
      * Gibt die Liste der aktiven Placeholder zurück
@@ -485,5 +484,5 @@ public interface AdminPanelAPI {
      * Returns the Cooldown Time Map
      * @return The Cooldown Time Map
      */
-    public Map<UUID, Long> getCooldownTimeMap();
+    Map<UUID, Long> getCooldownTimeMap();
 }

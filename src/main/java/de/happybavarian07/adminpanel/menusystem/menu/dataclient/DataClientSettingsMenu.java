@@ -48,35 +48,35 @@ public class DataClientSettingsMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false))) {
+            if (item.isSimilar(lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.AutoCheckConnection")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 settingsManager.setCheckConnection(!settingsManager.isCheckConnection());
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.Debug")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 settingsManager.setDebugEnabled(!settingsManager.isDebugEnabled());
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.OverwritePermissions")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 settingsManager.setOverwritePermissionsEnabled(!settingsManager.isOverwritePermissionsEnabled());
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.FileLogging")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 settingsManager.setFileLogging(!settingsManager.isFileLogging());
                 super.open();
-            } else if (item.equals(lgm.getItem(path + ".AutoCheckConnectionTiming", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + ".AutoCheckConnectionTiming", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming")) {
                     player.sendMessage(noPerms);
                     return;
@@ -84,7 +84,7 @@ public class DataClientSettingsMenu extends Menu implements Listener {
                 player.closeInventory();
                 player.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", player, true));
                 playerMenuUtility.addData("AutoCheckConnectionTiming", settingsManager.getCheckConnectionTiming());
-            } else if (item.equals(lgm.getItem(path + ".FileLoggingPrefix", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + ".FileLoggingPrefix", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix")) {
                     player.sendMessage(noPerms);
                     return;
@@ -92,7 +92,7 @@ public class DataClientSettingsMenu extends Menu implements Listener {
                 player.closeInventory();
                 player.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", player, true));
                 playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
-            } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+            } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;

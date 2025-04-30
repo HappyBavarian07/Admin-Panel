@@ -55,7 +55,7 @@ public class PluginSettingsMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Enable", player, false))) {
+        if (item.isSimilar(lgm.getItem(path + "Enable", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Enable")) {
                 player.sendMessage(noPerms);
                 return;
@@ -70,7 +70,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem( "PluginManager.PluginDescription", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("PluginManager.PluginDescription", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.PluginDescription")) {
                 player.sendMessage(noPerms);
                 return;
@@ -78,7 +78,7 @@ public class PluginSettingsMenu extends Menu {
             // Open Plugin Description Menu and put current plugin in the playerdata
             playerMenuUtility.addData("CurrentSelectedPlugin", currentPlugin);
             new PluginDescriptionMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(path + "Disable", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Disable", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Disable")) {
                 player.sendMessage(noPerms);
                 return;
@@ -93,7 +93,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Reload", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Reload", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Reload")) {
                 player.sendMessage(noPerms);
                 return;
@@ -108,7 +108,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Restart", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Restart", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
                 player.sendMessage(noPerms);
                 return;
@@ -125,7 +125,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Unload", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Unload", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Unload")) {
                 player.sendMessage(noPerms);
                 return;
@@ -140,7 +140,7 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Load", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Load", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Load")) {
                 player.sendMessage(noPerms);
                 return;
@@ -155,19 +155,19 @@ public class PluginSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "Commands.Item", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Commands.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Permissions")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginCommandsListMenu(playerMenuUtility, currentPlugin).open();
-        } else if (item.equals(lgm.getItem(path + "Permissions.Item", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Permissions.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Commands")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginPermissionsListMenu(playerMenuUtility, currentPlugin).open();
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

@@ -7,10 +7,8 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -32,7 +30,7 @@ public class FileBackup implements Comparable<FileBackup> {
     public FileBackup(String identifier, List<RegexFileFilter> fileFilters, List<RegexFileFilter> excludeFilters, String destinationPathToBackupToo) {
         this.identifier = identifier;
         this.filesToBackup = getFilesFromFolderWithRegex(AdminPanelMain.getPlugin().getDataFolder(), fileFilters, excludeFilters).toArray(new File[0]);
-        System.out.println("Files to Backup: " + Arrays.toString(filesToBackup));
+        //System.out.println("Files to Backup: " + Arrays.toString(filesToBackup));
         this.destinationPathToBackupToo = destinationPathToBackupToo;
         this.backupsDone = new ArrayList<>();
     }
@@ -281,7 +279,7 @@ public class FileBackup implements Comparable<FileBackup> {
     }
 
     @Override
-    public int compareTo(@NotNull FileBackup o) {
+    public int compareTo(FileBackup o) {
         int identifierComparison = this.identifier.compareTo(o.identifier);
         if (identifierComparison != 0) {
             return identifierComparison;

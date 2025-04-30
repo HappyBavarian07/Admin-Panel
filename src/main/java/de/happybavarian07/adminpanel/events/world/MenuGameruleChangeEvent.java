@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+
 
 public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -56,7 +56,7 @@ public class MenuGameruleChangeEvent extends AdminPanelEvent implements Cancella
     }
 
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 }

@@ -24,11 +24,9 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.profile.PlayerProfile;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -271,12 +269,12 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     @Override
-    public void resetPlaceholders(PlaceholderType type, @Nullable List<String> excludeKeys) {
+    public void resetPlaceholders(PlaceholderType type, List<String> excludeKeys) {
         lgm.resetPlaceholders(type, excludeKeys);
     }
 
     @Override
-    public void resetSpecificPlaceholders(PlaceholderType type, @Nullable List<String> includeKeys) {
+    public void resetSpecificPlaceholders(PlaceholderType type, List<String> includeKeys) {
         lgm.resetSpecificPlaceholders(type, includeKeys);
     }
 

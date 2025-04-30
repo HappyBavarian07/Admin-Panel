@@ -5,12 +5,13 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
  * @Date 02.09.2021
  */
 
+import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
@@ -30,6 +31,8 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
 
 public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -73,13 +76,18 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
             }
             playerMenuUtility.addData("CurrentSelectedPlugin", Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName())));
             new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "Install", player, false))) {
+        }
+        // BECAUSE STUPID JAVA WE HAVE TO DO THIS. SOMEHOW EQUAL ITEMS ARE NOT THE SAME -.-
+        ItemStack installItem = lgm.getItem(path + "Install", player, false);
+        if (item.getItemMeta().getDisplayName().equals(installItem.getItemMeta().getDisplayName()) &&
+                Objects.equals(item.getItemMeta().getLore(), installItem.getItemMeta().getLore()) &&
+                item.getType().equals(installItem.getType())) {
             if (!player.hasPermission("AdminPanel.PluginManager.InstallPlugins")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PluginInstallMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem(path + "Load", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "Load", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.LoadPlugins")) {
                 player.sendMessage(noPerms);
                 return;
@@ -87,19 +95,24 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
             playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.AutoUpdateMenu")) {
                 player.sendMessage(noPerms);
                 return;
             }
+            if (plugin.getAutoUpdaterManager() == null) {
+                player.sendMessage(lgm.getMessage("General.NullMenu", player, true));
+                plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefix.ADMINPANEL_GUI, true);
+                return;
+            }
             new PluginAutoUpdaterMenu(playerMenuUtility).open();
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -110,7 +123,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -121,7 +134,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

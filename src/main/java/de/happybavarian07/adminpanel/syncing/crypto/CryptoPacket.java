@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 import java.util.Arrays;
 
@@ -41,11 +41,9 @@ public final class CryptoPacket {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CryptoPacket)) {
+        if (!(o instanceof CryptoPacket that)) {
             return false;
         }
-
-        CryptoPacket that = (CryptoPacket) o;
 
         if (!Arrays.equals(encryptedData, that.encryptedData)) {
             return false;
@@ -53,11 +51,7 @@ public final class CryptoPacket {
         if (!Arrays.equals(encryptedSymmetricKey, that.encryptedSymmetricKey)) {
             return false;
         }
-        if (!Arrays.equals(symmetricCipherInitializationVector, that.symmetricCipherInitializationVector)) {
-            return false;
-        }
-
-        return true;
+        return Arrays.equals(symmetricCipherInitializationVector, that.symmetricCipherInitializationVector);
     }
 
     @Override

@@ -1,24 +1,24 @@
 package de.happybavarian07.adminpanel.placeholders;
 
-import de.happybavarian07.adminpanel.utils.Utils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 public class PlayerExpansion extends PlaceholderExpansion {
     @Override
-    public @NotNull String getIdentifier() {
+    public String getIdentifier() {
         return "applayer";
     }
 
     @Override
-    public @NotNull String getAuthor() {
+    public String getAuthor() {
         return "HappyBavarian07";
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public String getVersion() {
         return AdminPanelMain.getPlugin().getDescription().getVersion();
     }
 
@@ -33,7 +33,7 @@ public class PlayerExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, @NotNull String params) {
+    public String onPlaceholderRequest(Player player, String params) {
         if (player == null) {
             return null;
         }

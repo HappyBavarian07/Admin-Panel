@@ -221,6 +221,10 @@ Pman:
     # And the player kills an entity!
     # If you do too much, the game will likely lag
     MobDupe: 1
+  Permissions:
+    # This will add the Permissions to the Player even if the Permission is not found by the system
+    # Default: true
+    AddPermissionsEvenWhenPermissionNotFound: true
   Actions:
     # Here you can set how much life you get if someone opens up for you
     # click the Heal Item in the Actions menu in Pman

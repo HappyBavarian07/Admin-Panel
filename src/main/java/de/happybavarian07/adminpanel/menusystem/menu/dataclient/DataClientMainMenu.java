@@ -3,7 +3,6 @@ package de.happybavarian07.adminpanel.menusystem.menu.dataclient;/*
  * @Date 28.09.2023 | 15:28
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.syncing.DataClient;
@@ -49,20 +48,20 @@ public class DataClientMainMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item != null) {
-            if (item.equals(lgm.getItem("General.Close", player, false))) {
+            if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 player.closeInventory();
-            } else if (item.equals(lgm.getItem(path + "Controls.Disconnect", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Controls.Disconnect", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.Disconnect")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 dataClient.disconnect(true);
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "Controls.Connect", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Controls.Connect", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.Connect")) {
                     player.sendMessage(noPerms);
                     return;
@@ -73,7 +72,7 @@ public class DataClientMainMenu extends Menu {
                     throw new RuntimeException(ex);
                 }
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "Controls.Reconnect", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Controls.Reconnect", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.Reconnect")) {
                     player.sendMessage(noPerms);
                     return;
@@ -84,27 +83,27 @@ public class DataClientMainMenu extends Menu {
                     throw new RuntimeException(ex);
                 }
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "Controls.PacketHandling.true", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Controls.PacketHandling.true", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.PacketHandling")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 dataClient.getPacketHandler().stopPacketHandlingThread();
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "Controls.PacketHandling.false", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Controls.PacketHandling.false", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.PacketHandling")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 dataClient.getPacketHandler().startPacketHandlingThread();
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "DataClientName", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "DataClientName", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.DataClientName")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 player.sendMessage(Utils.chat("&7DataClientName: &e" + dataClient.getConnectionHandler().getClientName()));
-            } else if (item.equals(lgm.getItem(path + "DataClientSettings", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "DataClientSettings", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.DataClientSettings")) {
                     player.sendMessage(noPerms);
                     return;

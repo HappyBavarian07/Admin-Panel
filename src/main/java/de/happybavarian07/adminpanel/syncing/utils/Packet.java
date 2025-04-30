@@ -1,11 +1,7 @@
 package de.happybavarian07.adminpanel.syncing.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
+import java.util.*;
+
 
 public class Packet {
     private final String senderName;
@@ -22,7 +18,7 @@ public class Packet {
         this.data = data;
     }
 
-    public Packet(String senderName, String destination, Action action, @NotNull String... data) {
+    public Packet(String senderName, String destination, Action action, String... data) {
         this(senderName, destination, action, Arrays.asList(data));
     }
 

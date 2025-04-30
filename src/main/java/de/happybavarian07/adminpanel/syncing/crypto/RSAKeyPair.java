@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 /**
  * Represents the Base64 stringified values of an RSA Public Key Pair.

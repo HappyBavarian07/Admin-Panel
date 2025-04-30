@@ -48,7 +48,7 @@ public class TimeChangeMenu extends Menu {
 
         TimeChangeEvent changeEvent;
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + Time.SUNRISE, player, false))) {
+        if (item.isSimilar(lgm.getItem(itemPath + Time.SUNRISE, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNRISE);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -58,7 +58,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.DAY, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.DAY, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.DAY);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -68,7 +68,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.MORNING, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.MORNING, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MORNING);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -78,7 +78,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.NOON, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.NOON, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NOON);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -88,7 +88,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.AFTERNOON, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.AFTERNOON, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.AFTERNOON);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -98,7 +98,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.SUNSET, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.SUNSET, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.SUNSET);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -108,7 +108,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.NIGHT, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.NIGHT, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.NIGHT);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -118,7 +118,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + Time.MIDNIGHT, player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + Time.MIDNIGHT, player, false))) {
             changeEvent = new TimeChangeEvent(player, world, Time.MIDNIGHT);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(changeEvent);
@@ -128,7 +128,7 @@ public class TimeChangeMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

@@ -13,7 +13,6 @@ import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +35,7 @@ public class NewUpdater implements Listener {
     private String linkToFile;
     boolean bypassExternalURL;
 
-    public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, @Nullable JavaPlugin pluginToUpdate, String linkToFile, boolean bypassExternalURL) {
+    public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, JavaPlugin pluginToUpdate, String linkToFile, boolean bypassExternalURL) {
         this.plugin = plugin;
         this.pluginUtils = new PluginUtils();
         this.resourceID = resourceID;

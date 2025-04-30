@@ -13,8 +13,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
-
 public class PermissionActionSelectMenu extends Menu {
     private final PlayerMenuUtility playerMenuUtility;
 
@@ -47,43 +45,39 @@ public class PermissionActionSelectMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
         ItemStack item = e.getCurrentItem();
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "Add", player, false))) {
+            if (item.isSimilar(lgm.getItem(path + "Add", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Add")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-                playerMenuUtility.addData("PermissionAction", PermissionAction.ADD);
                 playerMenuUtility.addData("SortQuery", "");
                 new PermissionListMenu(playerMenuUtility).open();
-            } else if (item.equals(lgm.getItem(path + "Remove", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Remove", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Remove")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-                playerMenuUtility.addData("PermissionAction", PermissionAction.REMOVE);
                 playerMenuUtility.addData("SortQuery", "");
                 new PermissionListMenu(playerMenuUtility).open();
-            } else if (item.equals(lgm.getItem(path + "Info", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "Info", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.Info")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-                playerMenuUtility.addData("PermissionAction", PermissionAction.INFO);
                 playerMenuUtility.addData("SortQuery", "");
                 new PermissionListMenu(playerMenuUtility).open();
-            } else if (item.equals(lgm.getItem(path + "List", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "List", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Permissions.List")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-                playerMenuUtility.addData("PermissionAction", PermissionAction.LIST);
                 playerMenuUtility.addData("SortQuery", "");
                 new PermissionListMenu(playerMenuUtility).open();
-            } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+            } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
                 if (!player.hasPermission("AdminPanel.Button.Close")) {
                     player.sendMessage(noPerms);
                     return;

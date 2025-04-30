@@ -6,7 +6,6 @@ import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -81,21 +80,21 @@ public class PluginInstallMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(resourceIDItem)) {
+        if (item.isSimilar(resourceIDItem)) {
             playerMenuUtility.addData("typeResourceIDInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", player, true));
             player.closeInventory();
-        } else if (item.equals(nameItem)) {
+        } else if (item.isSimilar(nameItem)) {
             playerMenuUtility.addData("typeFileNameInChat", true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", player, true));
             player.closeInventory();
-        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.true", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "EnableAfterInstall.true", player, false))) {
             enableAfterInstall = false;
             super.open();
-        } else if (item.equals(lgm.getItem(path + "EnableAfterInstall.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "EnableAfterInstall.false", player, false))) {
             enableAfterInstall = true;
             super.open();
-        } else if (item.equals(lgm.getItem(path + "InstallButton", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "InstallButton", player, false))) {
             PluginInstallEvent installEvent = new PluginInstallEvent(player, resourceID, fileName, enableAfterInstall);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(installEvent);
@@ -124,7 +123,7 @@ public class PluginInstallMenu extends Menu implements Listener {
             this.resourceID = 0;
             this.fileName = null;
             enableAfterInstall = false;
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
@@ -163,7 +162,8 @@ public class PluginInstallMenu extends Menu implements Listener {
         ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
         List<String> updatedNameLore = new ArrayList<>();
-        for (String s : nameMeta.getLore()) {
+        assert nameMeta != null;
+        for (String s : Objects.requireNonNull(nameMeta.getLore())) {
             updatedNameLore.add(s.replace("%filename%", this.fileName));
         }
         nameMeta.setLore(updatedNameLore);

@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -210,7 +209,7 @@ public class LanguageManager {
         }
     }
 
-    public void resetPlaceholders(PlaceholderType type, @Nullable List<String> excludeKeys) {
+    public void resetPlaceholders(PlaceholderType type, List<String> excludeKeys) {
         List<String> keysToRemove = new ArrayList<>();
         for (String key : placeholders.keySet()) {
             if (excludeKeys != null && excludeKeys.contains(key)) continue;
@@ -222,7 +221,7 @@ public class LanguageManager {
         removePlaceholders(type, keysToRemove);
     }
 
-    public void resetSpecificPlaceholders(PlaceholderType type, @Nullable List<String> includeKeys) {
+    public void resetSpecificPlaceholders(PlaceholderType type, List<String> includeKeys) {
         List<String> keysToRemove = new ArrayList<>();
         for (String key : placeholders.keySet()) {
             if (includeKeys != null && !includeKeys.contains(key)) continue;
@@ -306,7 +305,7 @@ public class LanguageManager {
         return new HashMap<>();
     }
 
-    public LanguageFile getLangOrPlayerLang(boolean currentLang, String langName, @Nullable Player player) {
+    public LanguageFile getLangOrPlayerLang(boolean currentLang, String langName, Player player) {
         if (player == null && currentLang) return getCurrentLang();
         if (player == null) return getLang(langName, true);
         if (langName == null && currentLang) return getCurrentLang();
@@ -424,11 +423,11 @@ public class LanguageManager {
         return Utils.format(player, title, prefix);
     }
 
-    public <T> T getCustomObject(String path, @Nullable Player player, T defaultValue, boolean resetAfter) {
+    public <T> T getCustomObject(String path, Player player, T defaultValue, boolean resetAfter) {
         return getCustomObject(path, player, getCurrentLangName(), defaultValue, resetAfter);
     }
 
-    public <T> T getCustomObject(String path, @Nullable Player player, String langName, T defaultValue, boolean resetAfter) {
+    public <T> T getCustomObject(String path, Player player, String langName, T defaultValue, boolean resetAfter) {
         LanguageFile langFile = getLangOrPlayerLang(false, langName, player);
         LanguageConfig langConfig = langFile.getLangConfig();
         if (langConfig == null || langConfig.getConfig() == null)

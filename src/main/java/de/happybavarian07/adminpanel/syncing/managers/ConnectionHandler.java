@@ -3,9 +3,9 @@ package de.happybavarian07.adminpanel.syncing.managers;/*
  * @Date 17.09.2023 | 19:14
  */
 
-import au.com.xandar.crypto.CryptoPacket;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.syncing.crypto.CryptoPacket;
 import de.happybavarian07.adminpanel.syncing.custompayload.CustomPacket;
 import de.happybavarian07.adminpanel.syncing.events.JavaSocketConnectedEvent;
 import de.happybavarian07.adminpanel.syncing.events.JavaSocketDisconnectedEvent;
@@ -253,8 +253,7 @@ public class ConnectionHandler {
             do {
                 try {
                     Object obj = in.readObject();
-                    if (obj instanceof String) {
-                        String packetString = (String) obj;
+                    if (obj instanceof String packetString) {
                         if (packetString.startsWith("RegisteredClientName:")) {
                             handleRegisteredClientName(packetString);
                         } else if (packetString.startsWith("DisconnectingClientFromServer")) {
@@ -265,8 +264,7 @@ public class ConnectionHandler {
                             packetQueue.put(nameReceived ? handleEncodedPacket(packetString) : packetString);
                         }
                         statsManager.addBytesReceivedThisSession(packetString.getBytes().length);
-                    } else if (obj instanceof String[]) {
-                        String[] array = (String[]) obj;
+                    } else if (obj instanceof String[] array) {
                         if (Objects.equals(array[0], "CustomPacket")) {
                             CustomPacket packet = CustomPacket.fromStringArray(array);
                             packetQueue.put(packet);

@@ -1,12 +1,14 @@
 package de.happybavarian07.adminpanel.syncing.utils;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.bungee.IncomingChannelListener;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.messaging.Messenger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class BungeeUtils {
     private final AdminPanelMain plugin;
@@ -18,11 +20,11 @@ public class BungeeUtils {
     public BungeeUtils(String incomingChannelName, String outgoingChannelName) {
         this.incomingChannelName = incomingChannelName;
         this.outgoingChannelName = outgoingChannelName;
-        if (incomingChannelName.equals("")) {
+        if (incomingChannelName.isEmpty()) {
             this.incomingChannelName = "adminpanel:bungeein";
         }
 
-        if (outgoingChannelName.equals("")) {
+        if (outgoingChannelName.isEmpty()) {
             this.outgoingChannelName = "adminpanel:bungeeout";
         }
 
@@ -46,22 +48,21 @@ public class BungeeUtils {
     }
 
     public void sendDataToChannel(String action, String... args) {
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeUTF(action);
-
-        for (String s : args) {
-            output.writeUTF(s);
-        }
-
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
         try {
-            Bukkit.getServer().sendPluginMessage(this.plugin, this.outgoingChannelName, output.toByteArray());
-        } catch (Exception var8) {
+            dos.writeUTF(action);
+            for (String s : args) {
+                dos.writeUTF(s);
+            }
+            dos.flush();
+            Bukkit.getServer().sendPluginMessage(this.plugin, this.outgoingChannelName, baos.toByteArray());
+        } catch (IOException e) {
             this.plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
-            this.plugin.getStartUpLogger().message("&cThere was an Error while sending Data to the BungeeServer: &4" + var8);
-            var8.printStackTrace();
+            this.plugin.getStartUpLogger().message("&cThere was an Error while sending Data to the BungeeServer: &4" + e);
+            e.printStackTrace();
             this.plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
         }
-
     }
 
     public String getIncomingChannelName() {

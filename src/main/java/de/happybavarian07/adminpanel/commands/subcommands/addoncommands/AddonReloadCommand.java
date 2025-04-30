@@ -34,7 +34,7 @@ public class AddonReloadCommand extends SubCommand {
 
         plugin.getAddonLoader().disableAddon(addon.getFile());
         try {
-            AddonLoader.EnableResult result = plugin.getAddonLoader().enableAddon(addon.getFile(), new HashSet<>());
+            AddonLoader.EnableResult result = plugin.getAddonLoader().enableAddon(addon.getFile(), new HashSet<>(), true);
             switch (result) {
                 case SUCCESS:
                     sender.sendMessage(replaceAddonPlaceholders(lgm.getMessage("AddonCommand.Reload.ReloadedMessage", playerOrNull, false), addon));

@@ -64,7 +64,7 @@ public class PlayerWarningMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         assert item != null;
-        if (item.equals(lgm.getItem("PlayerManager.WarningMenu.AddWarning", Bukkit.getPlayer(targetUUID), false))) {
+        if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenu.AddWarning", Bukkit.getPlayer(targetUUID), false))) {
             warningManager.addWarning(targetUUID, new Warning(
                     targetUUID,
                     "TestReason#1",
@@ -107,13 +107,13 @@ public class PlayerWarningMenu extends PaginatedMenu {
                 player.sendMessage(Utils.format(player, "%prefix% &aYou have successfully removed the &f#&6" + warning.getWarningCount() + "%a Warning of the Player &6" + Bukkit.getPlayer(targetUUID).getName() + "&a.", AdminPanelMain.getPrefix()));
             }
             player.sendMessage("Warning: " + itemsToWarnings.getOrDefault(item, new Warning(player.getUniqueId(), "NULL", -1, -1, -12)).toString());
-        } else if (item.equals(lgm.getItem("General.Close", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -124,7 +124,7 @@ public class PlayerWarningMenu extends PaginatedMenu {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -135,7 +135,7 @@ public class PlayerWarningMenu extends PaginatedMenu {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;

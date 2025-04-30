@@ -3,9 +3,9 @@ package de.happybavarian07.adminpanel.commands;/*
  * @Date 26.04.2022 | 19:33
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +29,11 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));
             return true;
         }
-        Player player = (Player) sender;
         if (args.length == 1) {
             if (!sender.hasPermission("AdminPanel.PerPlayerLang")) {
                 sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", (Player) sender, true));
@@ -86,7 +84,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    @Nullable
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (command.getName().equalsIgnoreCase("perplayerlang")) {

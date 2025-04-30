@@ -12,8 +12,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.UUID;
 
 public class DataClientUtils {
     private final DataClient dataClient;
@@ -29,7 +32,7 @@ public class DataClientUtils {
             return Result.EMPTYMAP;
         } else {
             String permissionsString = Serialization.serialize(new PermissionsMap(permissions));
-            Packet packet = new Packet(this.dataClient.getConnectionHandler().getClientName(), destination, Action.SENDPERMISSIONS, new String[]{player.toString(), permissionsString});
+            Packet packet = new Packet(this.dataClient.getConnectionHandler().getClientName(), destination, Action.SENDPERMISSIONS, player.toString(), permissionsString);
             this.logDebugInfo(packet, player, permissions, destination);
 
             try {
@@ -49,17 +52,16 @@ public class DataClientUtils {
         } else {
             this.logDebugInfo(player, permissionsString, deserializedPermissions);
             if (this.dataClient.getSettingsManager().isOverwritePermissionsEnabled()) {
-                this.plugin.getPermissionsManager().getPlayerPermissions().get(player).clear();
+                this.plugin.getPermissionsManager().clearPermissions(player);
             }
 
             for (Entry<String, Boolean> stringBooleanEntry : permissions.entrySet()) {
-                this.plugin.getPermissionsManager().getPlayerPermissions().get(player).put(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
+                this.plugin.getPermissionsManager().addPermission(player, stringBooleanEntry.getKey(), stringBooleanEntry.getValue(), false);
                 if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {
                     this.plugin.getPermissionsManager().getPlayerPermissionsAttachments().get(player).setPermission(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
                 }
             }
 
-            this.plugin.getPermissionsManager().savePermissionsToConfig();
             if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {
                 this.plugin.getPermissionsManager().reloadPermissions(Objects.requireNonNull(Bukkit.getPlayer(player)));
             }
@@ -77,7 +79,7 @@ public class DataClientUtils {
             return Result.EMPTYMAP;
         } else {
             String mapString = Serialization.serialize(map);
-            Packet packet = new Packet(this.dataClient.getConnectionHandler().getClientName(), destination, Action.SENDCUSTOMMAP, new String[]{mapIdentifier, mapString});
+            Packet packet = new Packet(this.dataClient.getConnectionHandler().getClientName(), destination, Action.SENDCUSTOMMAP, mapIdentifier, mapString);
             this.logDebugInfo(packet, map, destination);
 
             try {

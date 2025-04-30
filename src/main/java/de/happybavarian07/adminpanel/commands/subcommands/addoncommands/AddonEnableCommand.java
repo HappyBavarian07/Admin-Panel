@@ -33,7 +33,7 @@ public class AddonEnableCommand extends SubCommand {
         Addon addon = plugin.getAddonLoader().getAddonMainClassByName(addonName);
         AddonLoader.EnableResult result;
         try {
-            result = plugin.getAddonLoader().enableAddon(addon.getFile(), new HashSet<>());
+            result = plugin.getAddonLoader().enableAddon(addon.getFile(), new HashSet<>(), true);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

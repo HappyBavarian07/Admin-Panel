@@ -1,12 +1,12 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
-import de.happybavarian07.adminpanel.events.world.*;
-import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.TimeChangeMenu;
-import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.WeatherChangeMenu;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
+import de.happybavarian07.adminpanel.events.world.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.TimeChangeMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.WeatherChangeMenu;
 import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -16,14 +16,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
-import static org.bukkit.Bukkit.getServer;
 
 public class WorldSettingsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -59,7 +56,7 @@ public class WorldSettingsMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(itemPath + "PVP.true", player, false))) {
+        if (item.isSimilar(lgm.getItem(itemPath + "PVP.true", player, false))) {
             PVPToggleEvent pvpToggleEvent = new PVPToggleEvent(player, world, false);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(pvpToggleEvent);
@@ -70,7 +67,7 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "PVP.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "PVP.false", player, false))) {
             PVPToggleEvent pvpToggleEvent = new PVPToggleEvent(player, world, true);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(pvpToggleEvent);
@@ -81,7 +78,7 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.true", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "AutoSave.true", player, false))) {
             AutoSaveToggleEvent autoSaveEvent = new AutoSaveToggleEvent(player, world, false);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(autoSaveEvent);
@@ -92,7 +89,7 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "AutoSave.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "AutoSave.false", player, false))) {
             AutoSaveToggleEvent autoSaveEvent = new AutoSaveToggleEvent(player, world, true);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(autoSaveEvent);
@@ -103,11 +100,11 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "Time", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Time", player, false))) {
             new TimeChangeMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
-        } else if (item.equals(lgm.getItem(itemPath + "Weather", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Weather", player, false))) {
             new WeatherChangeMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
-        } else if (item.equals(lgm.getItem(itemPath + "Load", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Load", player, false))) {
             WorldLoadEvent loadEvent = new WorldLoadEvent(player, world);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(loadEvent);
@@ -130,7 +127,7 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "Unload", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Unload", player, false))) {
             WorldUnloadEvent unloadEvent = new WorldUnloadEvent(player, world);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(unloadEvent);
@@ -141,7 +138,7 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "Save", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Save", player, false))) {
             WorldSaveEvent saveEvent = new WorldSaveEvent(player, world);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(saveEvent);
@@ -163,11 +160,11 @@ public class WorldSettingsMenu extends Menu {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(itemPath + "TPToSpawn", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "TPToSpawn", player, false))) {
             player.closeInventory();
             player.teleport(world.getSpawnLocation());
             super.open();
-        } else if (item.equals(lgm.getItem(itemPath + "Delete", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "Delete", player, false))) {
             WorldDeleteEvent deleteEvent = new WorldDeleteEvent(player, world);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(deleteEvent);
@@ -198,15 +195,15 @@ public class WorldSettingsMenu extends Menu {
             } catch (NoSuchMethodException ex) {
                 throw new RuntimeException(ex);
             }
-        } else if (item.equals(lgm.getItem(itemPath + "GameRule", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(itemPath + "GameRule", player, false))) {
             new GameRuleMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
-        } else if (item.equals(lgm.getItem("General.Refresh", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
             }
             super.open();
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

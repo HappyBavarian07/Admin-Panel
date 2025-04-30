@@ -50,7 +50,7 @@ public class AdminPanelAdminManager extends CommandManager {
 
     @Override
     public String getCommandPermissionAsString() {
-        return "Adminpanel.AdminPanelAdmin";
+        return "AdminPanel.AdminPanelAdmin";
     }
 
     @Override

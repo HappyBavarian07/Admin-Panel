@@ -15,6 +15,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
@@ -25,11 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class TFIDFSearch {
 
     private static String[] fields;
     private final Directory index;
+    private IndexWriterConfig indexWriterConfig;
     private final Analyzer analyzer;
 
     public TFIDFSearch(String[] fields) {
@@ -38,33 +41,40 @@ public class TFIDFSearch {
         this.index = new ByteBuffersDirectory();
     }
 
-    public void indexItems(List<Item> items) throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        try (IndexWriter writer = new IndexWriter(index, config)) {
-            for (Item item : items) {
-                Document doc = new Document();
-                //doc.add(new TextField("typeName", item.getName(), Field.Store.YES));
-                //doc.add(new TextField("lore", Utils.listToString(item.getLore()), Field.Store.YES));
-                //System.out.println("Fields:" + Arrays.toString(fields));
-                //System.out.println("Item Fields:" + Arrays.toString(item.fieldValues));
-                for (String field : fields) {
-                    doc.add(new TextField(field, item.getFieldValue(field), Field.Store.YES));
-                }
-                writer.addDocument(doc);
+    public CompletableFuture<Void> indexItems(List<Item> items) {
+        return CompletableFuture.runAsync(() -> {
+            this.indexWriterConfig = new IndexWriterConfig(analyzer);
+            try (IndexWriter writer = new IndexWriter(index, indexWriterConfig)) {
+                items.parallelStream().forEach(item -> {
+                    Document doc = new Document();
+                    for (String field : fields) {
+                        doc.add(new TextField(field, item.getFieldValue(field), Field.Store.YES));
+                    }
+                    try {
+                        writer.addDocument(doc);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                writer.commit();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
     }
 
     public List<Item> search(String query) throws Exception {
+        System.out.println("Searching for " + query);
         try (IndexReader reader = DirectoryReader.open(index)) {
             IndexSearcher searcher = new IndexSearcher(reader);
             QueryParser parser = new MultiFieldQueryParser(fields, analyzer);
-            org.apache.lucene.search.Query luceneQuery = parser.parse(query);
+            Query luceneQuery = parser.parse(query);
             TopDocs topDocs = searcher.search(luceneQuery, Integer.MAX_VALUE); // Adjust the number of results as needed
 
             List<Item> results = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
+                System.out.println("ScoreDoc" + scoreDoc.doc);
+                Document doc = searcher.storedFields().document(scoreDoc.doc);
                 Item item = new Item(new HashMap<>());
                 for (String field : fields) {
                     item.setFieldValue(field, doc.get(field));

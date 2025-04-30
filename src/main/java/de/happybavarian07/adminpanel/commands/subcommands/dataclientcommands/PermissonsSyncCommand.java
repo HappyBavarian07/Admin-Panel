@@ -24,10 +24,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPermissionsManager().getPlayerPermissions().keySet()) {
+            for (UUID permissionHolders : plugin.getPermissionsManager().getAllPlayerPermissions().keySet()) {
                 plugin.getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolders),
+                        plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -35,11 +35,11 @@ public class PermissonsSyncCommand extends SubCommand {
             return true;
         } else if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
-            System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPermissionsManager().getPlayerPermissions().containsKey(permissionHolder)) return false;
+            //System.out.println("UUID: " + permissionHolder);
+            if (!plugin.getPermissionsManager().getAllPlayerPermissions().containsKey(permissionHolder)) return false;
             plugin.getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolder),
+                    plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
@@ -53,10 +53,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPermissionsManager().getPlayerPermissions().keySet()) {
+            for (UUID permissionHolders : plugin.getPermissionsManager().getAllPlayerPermissions().keySet()) {
                 plugin.getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolders),
+                        plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -65,11 +65,11 @@ public class PermissonsSyncCommand extends SubCommand {
         }
         if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
-            System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPermissionsManager().getPlayerPermissions().containsKey(permissionHolder)) return false;
+            //System.out.println("UUID: " + permissionHolder);
+            if (!plugin.getPermissionsManager().hasPermissions(permissionHolder)) return false;
             plugin.getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPermissionsManager().getPlayerPermissions().get(permissionHolder),
+                    plugin.getPermissionsManager().getPlayerPermissions(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);

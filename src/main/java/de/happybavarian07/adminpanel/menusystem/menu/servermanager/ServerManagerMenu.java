@@ -57,7 +57,7 @@ public class ServerManagerMenu extends Menu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.equals(lgm.getItem(path + "Broadcast", player, false))) {
+        if (item.isSimilar(lgm.getItem(path + "Broadcast", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.Broadcast")) {
                 player.sendMessage(noPerms);
                 return;
@@ -65,19 +65,19 @@ public class ServerManagerMenu extends Menu implements Listener {
             player.closeInventory();
             playerMenuUtility.addData("serverManagerBroadcastMessage", true);
             player.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player, true));
-        } else if (item.equals(lgm.getItem(path + "ChatManagerItem", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "ChatManagerItem", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "WhiteListMenuItem", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "WhiteListMenuItem", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.Whitelist")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem(path + "KickAllPlayers", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "KickAllPlayers", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.KickAllPlayers")) {
                 player.sendMessage(noPerms);
                 return;
@@ -103,7 +103,7 @@ public class ServerManagerMenu extends Menu implements Listener {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.true", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "MaintenanceMode.true", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
                 player.sendMessage(noPerms);
                 return;
@@ -122,7 +122,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 notAPanelEventException.printStackTrace();
             }
             super.open();
-        } else if (item.equals(lgm.getItem(path + "MaintenanceMode.false", player, false))) {
+        } else if (item.isSimilar(lgm.getItem(path + "MaintenanceMode.false", player, false))) {
             if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
                 player.sendMessage(noPerms);
                 return;
@@ -145,7 +145,7 @@ public class ServerManagerMenu extends Menu implements Listener {
             } catch (NotAPanelEventException notAPanelEventException) {
                 notAPanelEventException.printStackTrace();
             }
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

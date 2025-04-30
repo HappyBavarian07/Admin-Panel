@@ -9,7 +9,7 @@
  * standard practice is to generate a random symmetric key, use that to encrypt all of your data, then encrypt the
  * symmetric key using the private key and transmit the encrypted data and encrypted symmetric key.
  * </p>
- * The core of the package is the {@link au.com.xandar.crypto.AsymmetricCipher} class. The general usage is like so:
+ * The core of the package is the {@link de.happybavarian07.adminpanel.syncing.crypto.AsymmetricCipher} class. The general usage is like so:
  * <pre>
  * {@code
  * final RandomSymmetricCipher cipher = new RandomSymmetricCipher();
@@ -33,4 +33,4 @@
  * @see <a href="stackoverflow.com/questions/9655920/encrypt-long-string-with-rsa-java">Encrypt long string with RSA</a>
  *
  */
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;

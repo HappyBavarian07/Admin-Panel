@@ -1,10 +1,10 @@
 package de.happybavarian07.adminpanel.menusystem.menu;
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.Menu;
+import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginSelectMenu;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ServerManagerMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
 import de.happybavarian07.adminpanel.utils.Utils;
@@ -28,7 +28,7 @@ public class AdminPanelStartMenu extends Menu {
 
     @Override
     public String getConfigMenuAddonFeatureName() {
-        return "AdminpanelStartMenu";
+        return "AdminPanelStartMenu";
     }
 
     @Override
@@ -45,50 +45,50 @@ public class AdminPanelStartMenu extends Menu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item != null) {
-            if (item.equals(lgm.getItem(path + "ServerRestart", player, false))) {
+            if (item.isSimilar(lgm.getItem(path + "ServerRestart", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerRestart")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 Utils.serverRestart(60);
-            } else if (item.equals(lgm.getItem(path + "ServerStop", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "ServerStop", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 Utils.serverStop(60);
-            } else if (item.equals(lgm.getItem(path + "WorldManager", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "WorldManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.WorldManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "PlayerManager", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "PlayerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "PluginManager", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "PluginManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.PluginManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "ServerManager", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "ServerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else if (item.equals(lgm.getItem(path + "ReloadConfig", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "ReloadConfig", player, false))) {
                 if (!player.hasPermission("AdminPanel.ReloadConfig")) {
                     player.sendMessage(noPerms);
                     return;
                 }
                 AdminPanelMain.getAPI().reloadConfigurationFiles(player);
                 super.open();
-            } else if (item.equals(lgm.getItem(path + "SwitchLanguageMenuItem", player, false))) {
+            } else if (item.isSimilar(lgm.getItem(path + "SwitchLanguageMenuItem", player, false))) {
                 if (!player.hasPermission("AdminPanel.SwitchLanguage")) {
                     player.sendMessage(noPerms);
                     return;

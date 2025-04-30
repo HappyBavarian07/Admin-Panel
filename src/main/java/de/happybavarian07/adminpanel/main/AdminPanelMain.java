@@ -1,6 +1,5 @@
 package de.happybavarian07.adminpanel.main;
 
-import com.saicone.ezlib.EzlibLoader;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.backupmanager.BackupManager;
 import de.happybavarian07.adminpanel.backupmanager.FileBackup;
@@ -12,6 +11,11 @@ import de.happybavarian07.adminpanel.language.PerPlayerLanguageHandler;
 import de.happybavarian07.adminpanel.language.mysql.MySQLLanguageManager;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.menusystem.MenuAddonManager;
+import de.happybavarian07.adminpanel.mysql.RepositoryController;
+import de.happybavarian07.adminpanel.mysql.utils.DatabaseProperties;
+import de.happybavarian07.adminpanel.permissions.PermissionsManager;
+import de.happybavarian07.adminpanel.permissions.PlayerPermission;
+import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
@@ -20,19 +24,25 @@ import de.happybavarian07.adminpanel.utils.managers.*;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,6 +79,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private AutoUpdaterManager autoUpdaterManager;
     private PluginStateManager pluginStateManager;
     private FileCorruptionManager fileCorruptionManager;
+    private APDependencyManager dependencyManager;
+    private RepositoryController repositoryController;
 
     /**
      * Returns the Prefix of the Plugin
@@ -101,6 +113,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public FileCorruptionManager getFileCorruptionManager() {
         return fileCorruptionManager;
+    }
+
+    public RepositoryController getRepositoryController() {
+        return repositoryController;
     }
 
     public PermissionsManager getPermissionsManager() {
@@ -211,9 +227,14 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return new File(getDataFolder(), "config.yml");
     }
 
+    public APDependencyManager getDependencyManager() {
+        return dependencyManager;
+    }
+
     @Override
     public void onLoad() {
         setPlugin(this);
+        setupFileLogger();
         setupBackupManager();
         new Utils();
 
@@ -225,7 +246,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         logger = StartUpLogger.create();
 
         // Load Dependencies via Manager
-        new APDependencyManager(this).loadDependenciesOverDependencyManager();
+        dependencyManager = new APDependencyManager(this);
+        dependencyManager.loadCoreDependencies();
 
         // Load Addons via names from the file onLoadExecution.yml if it exists
         File file = new File(getDataFolder() + "/addons/onLoadExecution.yml");
@@ -247,8 +269,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
 
                 try {
-                    loader.enableAddon(addonFile, new HashSet<>());
-                    logger.coloredMessage(ChatColor.GREEN, "Enabled Addon: " + addonName);
+                    AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>(), false);
+                    logger.coloredMessage(ChatColor.GREEN, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "'!");
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -263,14 +285,17 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public void onEnable() {
         pluginDescriptionManager = new PluginDescriptionManager();
         lastStartTimeMillis = System.currentTimeMillis();
+        if (logger == null) {
+            logger = StartUpLogger.create();
+        }
         tpsMeter = new TPSMeter();
         setPlugin(this);
 
-        new APDependencyManager(this).useHookSystem();
+        setupRepositoryController();
+        getDependencyManager().useHookSystem();
         Metrics metrics = setupMetrics();
         sendStartupMessages();
         setupPluginStateManager();
-        setupFileLogger();
         setupMenuAddonManager();
         setupLanguageManager();
         setupCommandManagerRegistry();
@@ -370,6 +395,69 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         ));
     }
 
+    private void setupRepositoryController() {
+        Properties properties = new Properties();
+        File propertiesFile = new File(getDataFolder(), "database.properties");
+        saveResource("database.properties", false);
+        InputStream is = null;
+        try {
+            if (propertiesFile.exists()) {
+                is = new FileInputStream(propertiesFile);
+            } else {
+                is = getClass().getResourceAsStream("/database.properties");
+            }
+            properties.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                assert is != null;
+                is.close();
+            } catch (IOException e) {
+                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefix.ADMINPANEL_MAIN, true);
+            }
+        }
+        String host = properties.getProperty("host", "localhost");
+        int port = Integer.parseInt(properties.getProperty("port", "-1"));
+        String databaseFilePath = properties.getProperty("sqlite_file_path");
+        String username = properties.getProperty("username", "root");
+        String password = properties.getProperty("password", "password");
+        String driver = properties.getProperty("dbtype");
+        String databasePrefix = properties.getProperty("database_prefix", "");
+        if (driver == null || driver.isEmpty()) {
+            driver = "sqlite";
+            if (databaseFilePath.isEmpty()) {
+                databaseFilePath = "AdminPanelDatabase.db";
+            }
+            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
+                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
+            }
+            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefix.ADMINPANEL_MAIN, true);
+            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefix.ADMINPANEL_MAIN, true);
+        } else if (driver.equalsIgnoreCase("sqlite")) {
+            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
+                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
+            }
+        }
+        DatabaseProperties databaseProperties = new DatabaseProperties(
+                host,
+                port,
+                databaseFilePath,
+                username,
+                password,
+                driver,
+                databasePrefix
+        );
+
+        repositoryController = new RepositoryController(new File(getDataFolder(), "repo_registration.json"), databaseProperties);
+        repositoryController.addRepositoryToRegistrationFile(
+                PlayerPermissionRepository.class,
+                PlayerPermission.class,
+                "Repository for PermissionEntry"
+        );
+        repositoryController.loadRepositoriesFromFile();
+    }
+
     private long getTimeInTicks() {
         String backupTime = getConfig().getString("Plugin.BackupManager.BackupTime", "24");
         if (backupTime.isEmpty()) {
@@ -433,7 +521,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void initializeConfigFiles() {
-        initMethods.initConfigFiles(fileLogger, new File(this.getDataFolder() + "/permissions.yml"));
+        initMethods.initConfigFiles(fileLogger);
     }
 
     private void setupPluginStateManager() {
@@ -450,7 +538,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPermissionsManager() {
-        permissionsManager = new PermissionsManager(this);
+        permissionsManager = new PermissionsManager(this, 300 * 20L /*Ticks to wait inbetween clearing the cache*/);
     }
 
     private void initializePrefix() {
@@ -542,8 +630,66 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onServerStartupDone(ServerLoadEvent event) {
+        permissionsManager.onServerLoad(event);
+    }
+
     private void setupPermissions() {
         permissionsManager.setup();
+
+        // Beispielhafte Testdaten
+        /*UUID playerUUID = UUID.randomUUID();
+        Map<String, Boolean> permissionsToInsert = getRandomPermissionTestMap();
+        PlayerPermissionRepository playerPermissionRepository = repositoryController.getRepository(PlayerPermissionRepository.class);
+        for (Map.Entry<String, Boolean> entry : permissionsToInsert.entrySet()) {
+            String permission = entry.getKey();
+            boolean value = entry.getValue();
+            String entryID = generateUniqueNeverChangingEntryID(playerUUID, permission);
+            PlayerPermission playerPermission = new PlayerPermission();
+            playerPermission.setPlayerUUID(playerUUID);
+            playerPermission.setPermission(permission);
+            playerPermission.setValue(value);
+            playerPermission.setEntryID(entryID);
+
+            playerPermissionRepository.save(playerPermission);
+        }
+
+        List<PlayerPermission> permMap = playerPermissionRepository.findByPlayerUUIDAndValue(playerUUID, true);
+        for (PlayerPermission playerPermission : permMap) {
+            System.out.println("Entry: " + playerPermission.getEntryID() + ": " + "Player UUID: " + playerPermission.getPlayerUUID() + " has permission: " + playerPermission.getPermission() + " with value: " + playerPermission.isValue());
+        }*/
+    }
+
+    private @NotNull Map<String, Boolean> getRandomPermissionTestMap() {
+        List<String> firstParts = Arrays.asList("test", "demo", "sample", "admin");
+        List<String> secondParts = Arrays.asList("permission", "access", "privilege", "feature");
+        List<String> thirdParts = Arrays.asList("ownership", "land", "commands", "debug", "player", "admin", "dynamic", "custom");
+        Map<String, Boolean> permissionsToInsert = new HashMap<>();
+        Random random = new Random();
+        int numberOfPermissions = 5 + random.nextInt(5); // erstelle zwischen 5 und 9 Berechtigungen
+        for (int i = 0; i < numberOfPermissions; i++) {
+            String permission = firstParts.get(random.nextInt(firstParts.size())) + "." +
+                    secondParts.get(random.nextInt(secondParts.size())) + "." +
+                    thirdParts.get(random.nextInt(thirdParts.size()));
+            permissionsToInsert.put(permission, random.nextBoolean());
+        }
+        return permissionsToInsert;
+    }
+
+    public String generateUniqueNeverChangingEntryID(UUID playerUUID, String permission) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            String input = playerUUID + ":" + permission;
+            byte[] hash = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
     }
 
     private void initializeCommands() {
@@ -586,7 +732,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             loader.crashAddons();
         }
         loader = null;
-        permissionsManager.savePermissionsToConfig();
         if (warningManager != null) {
             warningManager.saveWarnings();
         }
@@ -657,10 +802,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public PluginStateManager getPluginStateManager() {
         return pluginStateManager;
-    }
-
-    public EzlibLoader getEZLibLoader() {
-        return new EzlibLoader();
     }
 
     public boolean isSendSyntaxOnArgsZero() {

@@ -3,10 +3,10 @@ package de.happybavarian07.adminpanel.menusystem.menu;/*
  * @Date 16.11.2021 | 15:03
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.language.LanguageFile;
 import de.happybavarian07.adminpanel.language.Placeholder;
 import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
@@ -52,13 +52,13 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         assert item != null;
-        if (item.equals(lgm.getItem("General.Close", null, false))) {
+        if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Left", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageleft")) {
                 player.sendMessage(noPerms);
                 return;
@@ -69,7 +69,7 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                 page = page - 1;
                 super.open();
             }
-        } else if (item.equals(lgm.getItem("General.Right", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.pageright")) {
                 player.sendMessage(noPerms);
                 return;
@@ -80,7 +80,7 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
             } else {
                 player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
             }
-        } else if (item.equals(lgm.getItem("General.Refresh", null, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.refresh")) {
                 player.sendMessage(noPerms);
                 return;
@@ -105,7 +105,7 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
                     meta.setLore(updatedLore);
                     head.setItemMeta(meta);
 
-                    if(item.equals(head)) {
+                    if (item.isSimilar(head)) {
                         lgm.setCurrentLang(languages.get(index), true);
                         LanguageFile langFile = languages.get(index);
                         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);

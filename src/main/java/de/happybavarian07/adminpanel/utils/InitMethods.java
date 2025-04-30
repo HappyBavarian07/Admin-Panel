@@ -162,7 +162,7 @@ public class InitMethods {
         }
     }
 
-    public void initConfigFiles(PluginFileLogger fileLogger, File permissionFile) {
+    public void initConfigFiles(PluginFileLogger fileLogger) {
         if (!plugin.getConfigFile().exists()) {
             logger.coloredSpacer(ChatColor.DARK_RED).message("&c&lCreating Default Config!&r");
         }
@@ -180,7 +180,8 @@ public class InitMethods {
             fileLogger.createLogFile();
             logger.message("&e&lDone!&r");
         }
-        if (!permissionFile.exists()) {
+        // Replaced with SQL Database
+        /*if (!permissionFile.exists()) {
             logger.spacer().message("&c&lCreating permissions.yml file!&r");
             try {
                 boolean ignored = permissionFile.createNewFile();
@@ -188,7 +189,7 @@ public class InitMethods {
                 plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while creating permissions.yml file!", LogPrefix.ERROR);
             }
             logger.message("&e&lDone!&r");
-        }
+        }*/
     }
 
     public void initAddonLoader(AddonLoader loader) {
@@ -231,19 +232,21 @@ public class InitMethods {
             for (File addonFile : loader.getLoadedJarFiles().keySet()) {
                 try {
                     if (addonFile != null) {
-                        System.out.println("Addon file is not null: " + addonFile.getName());
+                        //System.out.println("Addon file is not null: " + addonFile.getName());
                         Addon mainClass = loader.getMainClassOfAddon(addonFile, false);
-                        System.out.println("Addon Main Class: " + mainClass);
-                        System.out.println("Before enabling addon: " + addonFile.getName());
-                        System.out.println("Calling enableAddon method...");
-                        AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>());
-                        System.out.println("Result from enabling: " + result);
-                        System.out.println("After enabling addon: " + addonFile.getName());
+                        //System.out.println("Addon Main Class: " + mainClass);
+                        //System.out.println("Before enabling addon: " + addonFile.getName());
+                        //System.out.println("Calling enableAddon method...");
+                        AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>(), false);
+                        this.plugin.getStartUpLogger().coloredMessage(ChatColor.GREEN, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "'!");
+                        this.plugin.getFileLogger().writeToLog(Level.INFO, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "' (" + mainClass.getName() + ")!", LogPrefix.ADDONLOADER, false);
+                        //System.out.println("Result from enabling: " + result);
+                        //System.out.println("After enabling addon: " + addonFile.getName());
                     } else {
-                        System.out.println("Addon file is null");
+                        throw new NullPointerException("Addon file is null");
                     }
                 } catch (Exception e) {
-                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefix.ADDONLOADER);
+                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefix.ADDONLOADER, true);
                     e.printStackTrace();
                 }
             }

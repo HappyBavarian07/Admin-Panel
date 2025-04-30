@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+
 
 public class PluginReloadEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -43,7 +43,7 @@ public class PluginReloadEvent extends AdminPanelEvent implements Cancellable {
     }
 
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 }

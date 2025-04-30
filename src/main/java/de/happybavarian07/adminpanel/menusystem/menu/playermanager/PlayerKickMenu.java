@@ -71,7 +71,7 @@ public class PlayerKickMenu extends Menu implements Listener {
             }
             player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.SuccessfullyKicked", player, true));
             new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.equals(lgm.getItem("General.Close", player, false))) {
+        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;

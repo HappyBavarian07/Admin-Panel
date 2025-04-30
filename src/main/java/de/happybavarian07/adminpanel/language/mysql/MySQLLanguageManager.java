@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +55,7 @@ public class MySQLLanguageManager extends LanguageManager {
             this.databaseController = new LanguageDatabaseController(plugin, propertiesFile, true, type);
         } else if (type.equalsIgnoreCase("sqlite")) {
             // Read the SQLite file from Properties and create a new SQLite file if it doesn't exist
-            File sqliteFile = new File(plugin.getDataFolder(), properties.getProperty("sqlite_path_language"));
+            File sqliteFile = new File(plugin.getDataFolder(), properties.getProperty("sqlite_file_path"));
             if (!sqliteFile.exists()) {
                 sqliteFile.getParentFile().mkdirs();
                 try {
@@ -191,11 +190,11 @@ public class MySQLLanguageManager extends LanguageManager {
     }
 
     @Override
-    public LanguageFile getLangOrPlayerLang(boolean currentLang, String langName, @Nullable Player player) {
+    public LanguageFile getLangOrPlayerLang(boolean currentLang, String langName, Player player) {
         return new LanguageFile(plugin, getLanguageOrPlayerLanguage(currentLang, langName, player).getLanguageShort(), false);
     }
 
-    public Language getLanguageOrPlayerLanguage(boolean currentLang, String langName, @Nullable Player player) {
+    public Language getLanguageOrPlayerLanguage(boolean currentLang, String langName, Player player) {
         if (player == null && currentLang) return getCurrentLanguage();
         if (player == null) return getLanguage(langName, true);
         if (langName == null && currentLang) return getCurrentLanguage();
@@ -325,12 +324,12 @@ public class MySQLLanguageManager extends LanguageManager {
     }
 
     @Override
-    public <T> T getCustomObject(String path, @Nullable Player player, T defaultValue, boolean resetAfter) {
+    public <T> T getCustomObject(String path, Player player, T defaultValue, boolean resetAfter) {
         return getCustomObject(path, player, getCurrentLanguage().getLanguageShort(), defaultValue, resetAfter);
     }
 
     @Override
-    public <T> T getCustomObject(String path, @Nullable Player player, String langName, T defaultValue, boolean resetAfter) {
+    public <T> T getCustomObject(String path, Player player, String langName, T defaultValue, boolean resetAfter) {
         LanguageDatabaseController databaseController = getDatabaseController();
         if (databaseController == null)
             return defaultValue;
@@ -518,12 +517,12 @@ public class MySQLLanguageManager extends LanguageManager {
     }
 
     @Override
-    public void resetPlaceholders(PlaceholderType type, @Nullable List<String> excludeKeys) {
+    public void resetPlaceholders(PlaceholderType type, List<String> excludeKeys) {
         placeholderMySQLHandler.resetPlaceholders(type, excludeKeys);
     }
 
     @Override
-    public void resetSpecificPlaceholders(PlaceholderType type, @Nullable List<String> includeKeys) {
+    public void resetSpecificPlaceholders(PlaceholderType type, List<String> includeKeys) {
         placeholderMySQLHandler.resetSpecificPlaceholders(type, includeKeys);
     }
 

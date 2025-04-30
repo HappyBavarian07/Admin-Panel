@@ -8,6 +8,7 @@ Messages:
   Plugin:
     EnablingMessage: '[Admin-Panel] successfully enabled!'
     DisablingMessage: '[Admin-Panel] successfully disabled!'
+    NullMenu: '%prefix% &9> &cThe Menu you are trying to open seems to not work right now!'
   DataClient:
     RequestedUpdateMessage: '%prefix% &9> &aSuccessfully send Client List Request to the Server.'
     ClientListMessages:
@@ -177,9 +178,10 @@ Messages:
       Permissions:
         AddedPermission: '%prefix% &9> &aPermission added!'
         RemovedPermission: '%prefix% &9> &cPermission removed!'
-        ListMenu:
+        GroupMenu:
           EnterSort: '%prefix% &9> &aPlease enter your Sorting in the Chat!'
           SortResult: '%prefix% &9> &aThe Sorting gets applied!'
+          PermissionNotFound: '%prefix% &9> &cThe permission does not exist! (%permission%) (If you want such permissions to be added as well, then check the config.)'
       KickMenu:
         # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
@@ -365,6 +367,11 @@ Items:
       displayName: '&cClose'
       lore:
         - '&cClose this Page!'
+    Back:
+      material: ARROW
+      displayName: '&cBack'
+      lore:
+        - '&cGo back to the previous Page!'
     Left:
       material: DARK_OAK_BUTTON
       displayName: '&cLeft'
@@ -740,32 +747,85 @@ Items:
         displayName: '&cManage the Permissions of the Player'
         lore:
           - '&aManage the Permissions of the Player!'
-      Permissions:
-        Add:
-          material: GREEN_CONCRETE
-          displayName: '&cAdd Permissions'
+      PermissionListMenu:
+        InfoItem:
+          material: PAPER
+          displayName: '&eGroup Info'
+          # %group% = The Group Name
+          # %parent_groups% = The Parent Groups
+          # %sub_group_count% = The Sub Group Count
+          # %sub_permission_count% = The Sub Permission Count
+          # %filtered_result_count% = The Filtered Result Count
           lore:
-            - '&aAdd Permissions to the Player!'
-            - '&6Left-Click &9= &6Value: &atrue'
-            - '&6Right-Click &9= &6Value: &cfalse'
-        Remove:
-          material: RED_CONCRETE
-          displayName: '&cRemove Permissions'
+            - '&7Group: %group%'
+            - '&7Parent: %parent_groups%'
+            - '&7Subgroups: %sub_group_count%'
+            - '&7Permissions: %sub_permission_count%'
+            - ' '
+            - '&7Filtered Result Count: %filtered_result_count%'
+        ToTheTop:
+          material: OAK_SIGN
+          displayName: '&cBack to root group'
           lore:
-            - '&aRemove Permissions from the Player!'
-        Info:
-          material: WRITABLE_BOOK
-          displayName: '&cFind out about permissions'
-          lore:
-            - '&aGet some information about permissions!'
-        List:
-          material: BOOKSHELF
-          displayName: '&cList all permissions'
-          lore:
-            - '&aList all permissions:'
-            - '&aMode 1: All Permissions'
-            - '&aMode 2: Player Permissions'
-        ListMenu:
+            - '&aBack to the root group!'
+        PermissionActions:
+          InfoItem:
+            material: BOOK
+            displayName: '&aPermission Info'
+            # %permission% = The Permission Name
+            # %description% = The Permission Description
+            # %default% = The Default Value
+            # %value% = The Current Value
+            # %target% = The Targeted Player
+            lore:
+              - ' '
+              - '- &6Permission&f: &a%permission%'
+              - '- &6Description&f: &a%description%'
+              - '- &6Default&f: &a%default%'
+              - '- &6Current Value&f: &a%value%'
+              - '  (of Target: %target%)'
+          SetTrue:
+            material: EMERALD_BLOCK
+            displayName: '&aSet to &f''&atrue&f'''
+            lore:
+              - '&aSet the value of this permission to &f''&atrue&f'''
+          SetFalse:
+            material: REDSTONE_BLOCK
+            displayName: '&cSet to &f''&4false&f'''
+            lore:
+              - '&cSet the value of this permission to &f''&4false&f'''
+          Remove:
+            material: WRITABLE_BOOK
+            displayName: '&cRemove this permission'
+            lore:
+              - '&aRemove this permission from the player!'
+          Info:
+            material: BOOKSHELF
+            displayName: '&cLearn more about the permission'
+            lore:
+              - '&aLearn more about the permission!'
+              - '&a%permission%'
+        GroupMenu:
+          # %group_name% = The Group Name
+          # %parent_groups% = The Parent Groups
+          # %sub_group_count% = The Sub Group Count
+          # %sub_permission_count% = The Sub Permission Count
+          # %permission_name% = The Permission Name (from the current Group Tree)
+          # %full_permission_name% = The Full Permission Name (from the root Group)
+          GroupItem:
+            material: CHEST
+            displayName: '&a%group_name%'
+            lore:
+              - '&7Click to browse group'
+              - ' '
+              - '&7Parent: %parent_groups%'
+              - '&7Subgroups: %sub_group_count%'
+              - '&7Permissions: %sub_permission_count%'
+          PermissionItem:
+            material: ENCHANTED_BOOK
+            displayName: '&b%permission_name%'
+            lore:
+              - '&7Click for actions'
           Sort:
             material: OAK_SIGN
             displayName: '&cSort'
@@ -798,7 +858,6 @@ Items:
         displayName: '&cTake Money'
         lore:
           - '&cTake the Players Money!'
-
     WarningMenuItem:
       material: PAPER
       displayName: '&aWarning Menu'
@@ -1450,8 +1509,9 @@ MenuTitles:
     BanMenu: '&cBan'
     KickMenu: '&cKick'
     Permissions:
-      ListMenu: '&aPermission List'
+      ListMenu: '&aPermission List: %action%'
       ActionSelectMenu: '&aActions'
+      GroupMenu: '&aPermission Groups'
   WorldManager:
     WorldSelector: '&aSelect a World'
     WorldSettings: '&3Settings'

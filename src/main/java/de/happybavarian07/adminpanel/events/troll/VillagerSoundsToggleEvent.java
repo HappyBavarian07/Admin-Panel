@@ -4,7 +4,7 @@ import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+
 
 public class VillagerSoundsToggleEvent extends AdminPanelEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -48,7 +48,7 @@ public class VillagerSoundsToggleEvent extends AdminPanelEvent implements Cancel
     }
 
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 }

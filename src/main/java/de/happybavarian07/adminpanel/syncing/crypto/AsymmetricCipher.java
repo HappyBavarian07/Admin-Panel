@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -84,15 +84,11 @@ public final class AsymmetricCipher {
             symmetricCipher.init(Cipher.ENCRYPT_MODE, symmetricKey);
             encryptedData = symmetricCipher.doFinal(data);
             symmetricCipherInitializationVector = symmetricCipher.getIV();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("JVM does not support the '" + symmetricCipherName + "' cipher");
-        } catch (NoSuchPaddingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException("JVM does not support the '" + symmetricCipherName + "' cipher");
         } catch (InvalidKeyException e) {
             throw new IllegalStateException("All JMs are required to support DESede keys", e);
-        } catch (BadPaddingException e) {
-            throw new CryptoException("Failed to encrypt data with random symmetric key", e);
-        } catch (IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new CryptoException("Failed to encrypt data with random symmetric key", e);
         }
 
@@ -158,15 +154,11 @@ public final class AsymmetricCipher {
             final SymmetricKeyFactory keyFactory = new SymmetricKeyFactory();
             symmetricKey = keyFactory.generateKey(rawSymmetricKey);
 
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("JVM does not support the '" + publicKeyCipherName + "' cipher");
-        } catch (NoSuchPaddingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException("JVM does not support the '" + publicKeyCipherName + "' cipher");
         } catch (InvalidKeyException e) {
             throw new CryptoException("Failed to initialise cipher", e);
-        } catch (BadPaddingException e) {
-            throw new CryptoException("Failed to decrypt symmetric key", e);
-        } catch (IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new CryptoException("Failed to decrypt symmetric key", e);
         }
 
@@ -176,17 +168,11 @@ public final class AsymmetricCipher {
             final IvParameterSpec ivParameterSpec = new IvParameterSpec(cryptoPacket.getSymmetricCipherInitializationVector());
             symmetricCipher.init(Cipher.DECRYPT_MODE, symmetricKey, ivParameterSpec);
             return symmetricCipher.doFinal(cryptoPacket.getEncryptedData());
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException("JVM does not support the '" + symmetricCipherName + "' cipher");
-        } catch (NoSuchPaddingException e) {
-            throw new IllegalStateException("JVM does not support the '" + symmetricCipherName + "' cipher");
-        } catch (IllegalBlockSizeException e) {
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
             throw new CryptoException("Failed to decrypt data", e);
-        } catch (BadPaddingException e) {
-            throw new CryptoException("Failed to decrypt data", e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new CryptoException("Failed to initialise cipher", e);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException("Failed to initialise cipher", e);
         }
     }

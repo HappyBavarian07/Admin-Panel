@@ -1,4 +1,4 @@
-package au.com.xandar.crypto;
+package de.happybavarian07.adminpanel.syncing.crypto;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;

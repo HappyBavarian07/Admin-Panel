@@ -3,13 +3,14 @@ package de.happybavarian07.adminpanel.bungee;/*
  * @Date 02.09.2022 | 14:57
  */
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.messaging.Messenger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class BungeeUtils {
     private final AdminPanelMain plugin;
@@ -21,8 +22,8 @@ public class BungeeUtils {
     public BungeeUtils(String incomingChannelName, String outgoingChannelName) {
         this.incomingChannelName = incomingChannelName;
         this.outgoingChannelName = outgoingChannelName;
-        if (incomingChannelName.equals("")) this.incomingChannelName = "adminpanel:bungeein";
-        if (outgoingChannelName.equals("")) this.outgoingChannelName = "adminpanel:bungeeout";
+        if (incomingChannelName.isEmpty()) this.incomingChannelName = "adminpanel:bungeein";
+        if (outgoingChannelName.isEmpty()) this.outgoingChannelName = "adminpanel:bungeeout";
         this.plugin = AdminPanelMain.getPlugin();
         this.channelListener = new IncomingChannelListener(incomingChannelName);
         messenger = Bukkit.getServer().getMessenger();
@@ -43,18 +44,28 @@ public class BungeeUtils {
     }
 
     public void sendDataToChannel(String action, String... args) {
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeUTF(action);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        try {
+            dos.writeUTF(action);
         for(String s : args) {
-            output.writeUTF(s);
+            dos.writeUTF(s);
+        }
+            dos.flush();
+        } catch (IOException e) {
+            plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
+            plugin.getStartUpLogger().message("&cFehler beim Schreiben in den OutputStream: &4" + e);
+            e.printStackTrace();
+            plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
+            return;
         }
         // Log Success/fail
         // TODO Log More Things in Bungee Cord
         try {
-            Bukkit.getServer().sendPluginMessage(plugin, outgoingChannelName, output.toByteArray());
+            Bukkit.getServer().sendPluginMessage(plugin, outgoingChannelName, baos.toByteArray());
         } catch (Exception e) {
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
-            plugin.getStartUpLogger().message("&cThere was an Error while sending Data to the BungeeServer: &4" + e);
+            plugin.getStartUpLogger().message("&cEs trat ein Fehler beim Senden der Daten an den BungeeServer auf: &4" + e);
             e.printStackTrace();
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
         }
