@@ -29,20 +29,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -81,6 +75,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private FileCorruptionManager fileCorruptionManager;
     private APDependencyManager dependencyManager;
     private RepositoryController repositoryController;
+    private PluginUtils globalPluginUtils;
 
     /**
      * Returns the Prefix of the Plugin
@@ -227,15 +222,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return new File(getDataFolder(), "config.yml");
     }
 
-    public APDependencyManager getDependencyManager() {
-        return dependencyManager;
-    }
-
     @Override
     public void onLoad() {
         setPlugin(this);
-        setupFileLogger();
         setupBackupManager();
+        setupFileLogger();
         new Utils();
 
         // Load File Corruption Manager
@@ -269,8 +260,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 }
 
                 try {
-                    AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>(), false);
-                    logger.coloredMessage(ChatColor.GREEN, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "'!");
+                    loader.enableAddon(addonFile, new HashSet<>(), true);
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -284,10 +274,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         pluginDescriptionManager = new PluginDescriptionManager();
+        globalPluginUtils = new PluginUtils();
         lastStartTimeMillis = System.currentTimeMillis();
-        if (logger == null) {
-            logger = StartUpLogger.create();
-        }
         tpsMeter = new TPSMeter();
         setPlugin(this);
 
@@ -323,9 +311,70 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         logStartupMessage();
     }
 
+    private void setupRepositoryController() {
+        Properties properties = new Properties();
+        File propertiesFile = new File(getDataFolder(), "database.properties");
+        saveResource("database.properties", false);
+        InputStream is = null;
+        try {
+            if (propertiesFile.exists()) {
+                is = new FileInputStream(propertiesFile);
+            } else {
+                is = getClass().getResourceAsStream("/database.properties");
+            }
+            properties.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                assert is != null;
+                is.close();
+            } catch (IOException e) {
+                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefix.ADMINPANEL_MAIN, true);
+            }
+        }
+        String host = properties.getProperty("host", "localhost");
+        int port = Integer.parseInt(properties.getProperty("port", "-1"));
+        String databaseFilePath = properties.getProperty("sqlite_file_path");
+        String username = properties.getProperty("username", "root");
+        String password = properties.getProperty("password", "password");
+        String driver = properties.getProperty("dbtype");
+        String databasePrefix = properties.getProperty("database_prefix", "");
+        if (driver == null || driver.isEmpty()) {
+            driver = "sqlite";
+            if (databaseFilePath.isEmpty()) {
+                databaseFilePath = "AdminPanelDatabase.db";
+            }
+            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
+                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
+            }
+            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefix.ADMINPANEL_MAIN, true);
+            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefix.ADMINPANEL_MAIN, true);
+        } else if (driver.equalsIgnoreCase("sqlite")) {
+            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
+                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
+            }
+        }
+        DatabaseProperties databaseProperties = new DatabaseProperties(
+                host,
+                port,
+                databaseFilePath,
+                username,
+                password,
+                driver,
+                databasePrefix
+        );
+        repositoryController = new RepositoryController(new File(getDataFolder(), "repo_registration.json"), databaseProperties);
+        repositoryController.loadRepositoriesFromFile();
+    }
+
     private Metrics setupMetrics() {
         int bStatsID = 11778;
         return new Metrics(this, bStatsID);
+    }
+
+    public APDependencyManager getDependencyManager() {
+        return dependencyManager;
     }
 
     private void sendStartupMessages() {
@@ -395,69 +444,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         ));
     }
 
-    private void setupRepositoryController() {
-        Properties properties = new Properties();
-        File propertiesFile = new File(getDataFolder(), "database.properties");
-        saveResource("database.properties", false);
-        InputStream is = null;
-        try {
-            if (propertiesFile.exists()) {
-                is = new FileInputStream(propertiesFile);
-            } else {
-                is = getClass().getResourceAsStream("/database.properties");
-            }
-            properties.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                assert is != null;
-                is.close();
-            } catch (IOException e) {
-                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefix.ADMINPANEL_MAIN, true);
-            }
-        }
-        String host = properties.getProperty("host", "localhost");
-        int port = Integer.parseInt(properties.getProperty("port", "-1"));
-        String databaseFilePath = properties.getProperty("sqlite_file_path");
-        String username = properties.getProperty("username", "root");
-        String password = properties.getProperty("password", "password");
-        String driver = properties.getProperty("dbtype");
-        String databasePrefix = properties.getProperty("database_prefix", "");
-        if (driver == null || driver.isEmpty()) {
-            driver = "sqlite";
-            if (databaseFilePath.isEmpty()) {
-                databaseFilePath = "AdminPanelDatabase.db";
-            }
-            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
-                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
-            }
-            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefix.ADMINPANEL_MAIN, true);
-            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefix.ADMINPANEL_MAIN, true);
-        } else if (driver.equalsIgnoreCase("sqlite")) {
-            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
-                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
-            }
-        }
-        DatabaseProperties databaseProperties = new DatabaseProperties(
-                host,
-                port,
-                databaseFilePath,
-                username,
-                password,
-                driver,
-                databasePrefix
-        );
-
-        repositoryController = new RepositoryController(new File(getDataFolder(), "repo_registration.json"), databaseProperties);
-        repositoryController.addRepositoryToRegistrationFile(
-                PlayerPermissionRepository.class,
-                PlayerPermission.class,
-                "Repository for PermissionEntry"
-        );
-        repositoryController.loadRepositoriesFromFile();
-    }
-
     private long getTimeInTicks() {
         String backupTime = getConfig().getString("Plugin.BackupManager.BackupTime", "24");
         if (backupTime.isEmpty()) {
@@ -469,7 +455,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         long ticks;
 
         if (Character.isDigit(lastChar)) {
-            // Default to hours if no unit is found
             timeValue = Long.parseLong(backupTime);
             ticks = timeValue * 20 * 60 * 60;
         } else {
@@ -485,9 +470,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 case 'm' -> timeValue * 20 * 60;
                 case 'h' -> timeValue * 20 * 60 * 60;
                 case 'd' -> timeValue * 20 * 60 * 60 * 24;
-                default ->
-                    // Default to hours if no valid unit is found
-                        timeValue * 20 * 60 * 60;
+                default -> timeValue * 20 * 60 * 60;
             };
         }
 
@@ -538,7 +521,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPermissionsManager() {
-        permissionsManager = new PermissionsManager(this, 300 * 20L /*Ticks to wait inbetween clearing the cache*/);
+        permissionsManager = new PermissionsManager(this, 5 * 60 * 20L);
     }
 
     private void initializePrefix() {
@@ -630,66 +613,14 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
-    public void onServerStartupDone(ServerLoadEvent event) {
-        permissionsManager.onServerLoad(event);
-    }
-
     private void setupPermissions() {
+        repositoryController.addRepositoryToRegistrationFile(
+                PlayerPermissionRepository.class,
+                PlayerPermission.class,
+                "Repository for PermissionEntry",
+                true
+        );
         permissionsManager.setup();
-
-        // Beispielhafte Testdaten
-        /*UUID playerUUID = UUID.randomUUID();
-        Map<String, Boolean> permissionsToInsert = getRandomPermissionTestMap();
-        PlayerPermissionRepository playerPermissionRepository = repositoryController.getRepository(PlayerPermissionRepository.class);
-        for (Map.Entry<String, Boolean> entry : permissionsToInsert.entrySet()) {
-            String permission = entry.getKey();
-            boolean value = entry.getValue();
-            String entryID = generateUniqueNeverChangingEntryID(playerUUID, permission);
-            PlayerPermission playerPermission = new PlayerPermission();
-            playerPermission.setPlayerUUID(playerUUID);
-            playerPermission.setPermission(permission);
-            playerPermission.setValue(value);
-            playerPermission.setEntryID(entryID);
-
-            playerPermissionRepository.save(playerPermission);
-        }
-
-        List<PlayerPermission> permMap = playerPermissionRepository.findByPlayerUUIDAndValue(playerUUID, true);
-        for (PlayerPermission playerPermission : permMap) {
-            System.out.println("Entry: " + playerPermission.getEntryID() + ": " + "Player UUID: " + playerPermission.getPlayerUUID() + " has permission: " + playerPermission.getPermission() + " with value: " + playerPermission.isValue());
-        }*/
-    }
-
-    private @NotNull Map<String, Boolean> getRandomPermissionTestMap() {
-        List<String> firstParts = Arrays.asList("test", "demo", "sample", "admin");
-        List<String> secondParts = Arrays.asList("permission", "access", "privilege", "feature");
-        List<String> thirdParts = Arrays.asList("ownership", "land", "commands", "debug", "player", "admin", "dynamic", "custom");
-        Map<String, Boolean> permissionsToInsert = new HashMap<>();
-        Random random = new Random();
-        int numberOfPermissions = 5 + random.nextInt(5); // erstelle zwischen 5 und 9 Berechtigungen
-        for (int i = 0; i < numberOfPermissions; i++) {
-            String permission = firstParts.get(random.nextInt(firstParts.size())) + "." +
-                    secondParts.get(random.nextInt(secondParts.size())) + "." +
-                    thirdParts.get(random.nextInt(thirdParts.size()));
-            permissionsToInsert.put(permission, random.nextBoolean());
-        }
-        return permissionsToInsert;
-    }
-
-    public String generateUniqueNeverChangingEntryID(UUID playerUUID, String permission) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            String input = playerUUID + ":" + permission;
-            byte[] hash = md.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
-        }
     }
 
     private void initializeCommands() {
@@ -769,29 +700,18 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return fileLogger;
     }
 
-    /**
-     * Returns the File of the Plugin
-     *
-     * @return The File of the Plugin
-     */
     public File getPluginFile() {
         return this.getFile();
     }
 
-    /**
-     * Returns the Addon Loader
-     *
-     * @return The Addon Loader
-     */
     public StartUpLogger getStartUpLogger() {
         return logger;
     }
 
-    /**
-     * Returns the Warning Manager (unfinished)
-     *
-     * @return The Warning Manager
-     */
+    public PluginUtils getPluginUtils() {
+        return globalPluginUtils;
+    }
+
     public WarningManager getWarningManager() {
         return warningManager;
     }

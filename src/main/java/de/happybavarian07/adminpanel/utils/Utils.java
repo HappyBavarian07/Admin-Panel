@@ -8,8 +8,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.*;
 import org.bukkit.BanList.Type;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -43,6 +43,16 @@ public class Utils {
     public Utils() {
         plugin = AdminPanelMain.getPlugin();
         setInstance(this);
+    }
+
+    public static boolean legacyServer() {
+        String serverVersion = Bukkit.getServer().getVersion();
+        return serverVersion.contains("1.12") ||
+                serverVersion.contains("1.11") ||
+                serverVersion.contains("1.10") ||
+                serverVersion.contains("1.9") ||
+                serverVersion.contains("1.8") ||
+                serverVersion.contains("1.7");
     }
 
     public static String chat(String s) {

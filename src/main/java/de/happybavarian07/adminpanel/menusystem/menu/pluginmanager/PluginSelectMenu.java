@@ -7,13 +7,10 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.Head;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.LogPrefix;
-import de.happybavarian07.adminpanel.utils.PluginUtils;
-import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,7 +22,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -36,11 +32,9 @@ import java.util.logging.Level;
 
 public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-    private final PluginUtils pluginUtils;
 
     public PluginSelectMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.pluginUtils = new PluginUtils();
         setOpeningPermission("AdminPanel.PluginManager.Open");
     }
 
@@ -64,7 +58,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         Player player = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         String path = "PluginManager.";
-        List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
+        List<Plugin> plugins = new ArrayList<>(plugin.getPluginUtils().getAllPlugins());
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
@@ -77,7 +71,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
             playerMenuUtility.addData("CurrentSelectedPlugin", Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName())));
             new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
-        // BECAUSE STUPID JAVA WE HAVE TO DO THIS. SOMEHOW EQUAL ITEMS ARE NOT THE SAME -.-
+
         ItemStack installItem = lgm.getItem(path + "Install", player, false);
         if (item.getItemMeta().getDisplayName().equals(installItem.getItemMeta().getDisplayName()) &&
                 Objects.equals(item.getItemMeta().getLore(), installItem.getItemMeta().getLore()) &&
@@ -159,7 +153,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.OpenMenuItem", 45), lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", playerMenuUtility.getOwner(), false));
         inventory.setItem(getSlot("PluginManager.Load", 46), lgm.getItem("PluginManager.Load", playerMenuUtility.getOwner(), false));
         inventory.setItem(getSlot("PluginManager.Install", 47), lgm.getItem("PluginManager.Install", playerMenuUtility.getOwner(), false));
-        List<Plugin> plugins = new ArrayList<>(pluginUtils.getAllPlugins());
+        List<Plugin> plugins = new ArrayList<>(plugin.getPluginUtils().getAllPlugins());
 
         ///////////////////////////////////// Pagination loop template
         if (!plugins.isEmpty()) {
@@ -167,33 +161,21 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 index = super.maxItemsPerPage * page + i;
                 if (index >= plugins.size()) break;
                 if (plugins.get(index) != null) {
-                    ///////////////////////////
-
                     Plugin currentPlugin = plugins.get(index);
                     boolean enabled = currentPlugin.isEnabled();
-                    ItemStack item;
-                    if (enabled) {
-                        item = Head.BLANK_GREEN.getAsItem();
-                    } else {
-                        item = Head.BLANK_RED.getAsItem();
-                    }
-                    ItemMeta meta = item.getItemMeta();
-                    meta.setDisplayName(Utils.chat("&a" + currentPlugin.getName()));
-                    List<String> lore = new ArrayList<>();
-                    lore.add(Utils.chat("&6Description: &a" + plugin.getPluginDescriptionManager().getDescriptionFromPlugin(currentPlugin)));
-                    lore.add(Utils.chat("&6Enabled: &a" + enabled));
-                    lore.add(Utils.chat("&6Version: &a" + currentPlugin.getDescription().getVersion()));
-                    if (currentPlugin.getDescription().getAuthors().size() == 1) {
-                        lore.add(Utils.chat("&6Author: &a" + currentPlugin.getDescription().getAuthors().get(0)));
-                    } else {
-                        lore.add(Utils.chat("&6Authors: &a" + currentPlugin.getDescription().getAuthors()));
-                    }
-                    lore.add(Utils.chat("&6Website: &a" + currentPlugin.getDescription().getWebsite()));
-                    lore.add(Utils.chat("&6API-Version: &a" + currentPlugin.getDescription().getAPIVersion()));
-                    lore.add(Utils.chat("&6Full-Name: &a" + currentPlugin.getDescription().getFullName()));
-                    meta.setLore(lore);
-                    item.setItemMeta(meta);
-                    inventory.addItem(item);
+
+                    lgm.setPathExpressionVariable(playerMenuUtility.getOwnerUUID().toString(), "PluginManager.PluginItem", "pluginEnabled", enabled ? "true" : "false");
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginName%", currentPlugin.getName(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginVersion%", currentPlugin.getDescription().getVersion(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginFullName%", currentPlugin.getDescription().getFullName(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginAuthor%", currentPlugin.getDescription().getAuthors().toString(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginWebsite%", currentPlugin.getDescription().getWebsite() == null ? "null" : currentPlugin.getDescription().getWebsite(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginAPIVersion%", currentPlugin.getDescription().getAPIVersion() == null ? "null" : currentPlugin.getDescription().getAPIVersion(), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginDescription%", plugin.getPluginDescriptionManager().getDescriptionFromPlugin(currentPlugin), false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginFileName%", currentPlugin.getDescription().getFullName() + ".jar", false);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginEnabled%", enabled ? "true" : "false", false);
+
+                    inventory.addItem(lgm.getItem("PluginManager.PluginItem", playerMenuUtility.getOwner(), true));
 
                     ////////////////////////
                 }
@@ -217,7 +199,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 return;
             }
             try {
-                pluginUtils.load(pluginFile);
+                plugin.getPluginUtils().load(pluginFile);
             } catch (Exception e) {
                 player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player, true));
                 return;

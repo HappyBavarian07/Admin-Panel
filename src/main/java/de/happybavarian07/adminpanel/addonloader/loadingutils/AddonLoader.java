@@ -2,30 +2,30 @@ package de.happybavarian07.adminpanel.addonloader.loadingutils;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.utils.FileUtils;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefix;
 import de.happybavarian07.adminpanel.utils.StartUpLogger;
 import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.logging.Level;
 
 public class AddonLoader {
     private static AdminPanelMain plugin;
     private final Map<File, List<Class<?>>> loadedJarFiles;
     private final Map<File, Addon> loadedAddonMainClasses;
     private final Map<String, File> addonNamesToFiles;
-    private final Map<File, AddonClassLoader> addonClassLoaders; // New map to store AddonClassLoaders
+    private final Map<File, AddonClassLoader> addonClassLoaders;
     private final File addonFolder;
     private final StartUpLogger logger;
+    private final DependencyManager dependencyManager;
 
     public AddonLoader(File addonFolder) {
         plugin = AdminPanelMain.getPlugin();
@@ -34,7 +34,8 @@ public class AddonLoader {
         this.loadedJarFiles = new HashMap<>();
         this.loadedAddonMainClasses = new HashMap<>();
         this.addonNamesToFiles = new HashMap<>();
-        this.addonClassLoaders = new HashMap<>(); // Initialize the map
+        this.addonClassLoaders = new HashMap<>();
+        this.dependencyManager = new DependencyManager(this);
 
         if (!addonFolder.isDirectory()) {
             addonFolder.mkdirs();
@@ -184,7 +185,6 @@ public class AddonLoader {
         }
 
         currentlyEnabling.add(addon);
-        DependencyManager dependencyManager = new DependencyManager(this);
 
         if (dependencyManager.checkAndLoadPluginDependencies(addon, currentlyEnabling)) {
             if (!dependencyManager.checkAndLoadMavenDependencies(addon)) {

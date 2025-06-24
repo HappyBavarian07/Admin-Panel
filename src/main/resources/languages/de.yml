@@ -1244,6 +1244,26 @@ Items:
       lore:
         - '&2Lade andere Plugins während der Server läuft!'
         - '&2Du brauchst nur den Datei Namen!'
+    PluginItem:
+      material: 'if pluginEnabled: HEAD_OBJECT(''BLANK_GREEN'') else HEAD_OBJECT(''BLANK_RED'')'
+      displayName: '&a%pluginName%'
+      # Available Placeholders:
+      # %name% = The Plugin Name
+      # %pluginDescription% = The Plugin Description
+      # %pluginEnabled% = Is the Plugin enabled?
+      # %pluginVersion% = The Plugin Version
+      # %pluginAuthor% = The Plugin Author
+      # %pluginWebsite% = The Plugin Website
+      # %pluginAPIVersion% = The Plugin API Version
+      # %pluginFullName% = The Plugin Full Name
+      # %pluginFileName% = The Plugin File Name
+      lore:
+        - '&6Description: &a%pluginDescription%'
+        - '&6Enabled: &a%pluginEnabled%'
+        - '&6Version: &a%pluginVersion%'
+        - '&6Author: &a%pluginAuthor%'
+        - '&6Website: &a%pluginWebsite%'
+        - '&6API-Version: &a%pluginAPIVersion%'
     PluginDescription:
       material: WRITABLE_BOOK
       displayName: '&2Plugin Beschreibung'

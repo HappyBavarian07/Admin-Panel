@@ -108,13 +108,20 @@ public class RepositoryController {
      * @return Implementierung des Repository-Interfaces
      */
     public <T extends Repository<E, ID>, E, ID> T registerRepository(Class<T> repositoryInterface, Class<E> entityClass) {
-        // Prüfen, ob die Entity-Klasse mit @Entity und @Table annotiert ist
+        if (repositories.containsKey(repositoryInterface) && repositories.get(repositoryInterface) != null &&
+                repositories.get(repositoryInterface).getClass().isAssignableFrom(repositoryInterface)) {
+            logWarning("Repository " + repositoryInterface.getName() + " is already registered");
+            return (T) repositories.get(repositoryInterface);
+        }
+        if (!Repository.class.isAssignableFrom(repositoryInterface)) {
+            logWarning("Class " + repositoryInterface.getName() + " does not implement Repository interface");
+            throw new IllegalArgumentException("Class must implement Repository interface");
+        }
         if (!entityClass.isAnnotationPresent(Entity.class) || !entityClass.isAnnotationPresent(Table.class)) {
             logWarning("Entity class " + entityClass.getName() + " must be annotated with @Entity and @Table");
             throw new IllegalArgumentException("Entity class must be annotated with @Entity and @Table");
         }
 
-        // Repository über den RepositoryProxy erstellen
         T repository = RepositoryProxy.create(repositoryInterface, dbProperties.getDatabasePrefix(), sqlExecutor);
         repositories.put(repositoryInterface, repository);
         entityClasses.put(entityClass.getName(), entityClass);
@@ -320,7 +327,8 @@ public class RepositoryController {
     public <T extends Repository<E, ?>, E> void addRepositoryToRegistrationFile(
             Class<T> repositoryClass,
             Class<E> entityClass,
-            String description) {
+            String description,
+            boolean register) {
 
         if (!defaultRegistrationFile.exists()) {
             try {
@@ -367,7 +375,10 @@ public class RepositoryController {
 
             // Datei schreiben
             Files.write(defaultRegistrationFile.toPath(), json.toString(4).getBytes());
-
+            logInfo("Added repository to registration file: " + repositoryClass.getName());
+            if (register) {
+                registerRepository((Class) repositoryClass, (Class) entityClass);
+            }
         } catch (Exception e) {
             logSevere("Failed to add repository to registration file: " + e.getMessage(), e);
         }

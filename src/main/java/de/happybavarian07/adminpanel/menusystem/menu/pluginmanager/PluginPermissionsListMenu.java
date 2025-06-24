@@ -1,6 +1,5 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
 import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.Utils;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PluginPermissionsListMenu extends PaginatedMenu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final Plugin currentPlugin;
 
     public PluginPermissionsListMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {

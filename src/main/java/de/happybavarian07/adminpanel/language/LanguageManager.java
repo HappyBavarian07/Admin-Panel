@@ -1,18 +1,28 @@
 package de.happybavarian07.adminpanel.language;
 
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
+import de.happybavarian07.adminpanel.language.expressionparser.ExpressionParser;
+import de.happybavarian07.adminpanel.language.expressionparser.conditions.HeadMaterialCondition;
+import de.happybavarian07.adminpanel.language.expressionparser.interfaces.MaterialCondition;
+import de.happybavarian07.adminpanel.main.Head;
 import de.happybavarian07.adminpanel.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.profile.PlayerProfile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -21,6 +31,8 @@ public class LanguageManager {
     private final File langFolder;
     private final Map<String, LanguageFile> registeredLanguages;
     private final Map<String, Placeholder> placeholders;
+    private final Map<String, Map<String, Object>> playerPathVariables = new HashMap<>();
+    private final ExpressionParser parser;
     private String prefix;
     private String currentLangName;
     private LanguageFile currentLang;
@@ -32,6 +44,13 @@ public class LanguageManager {
         this.langFolder = langFolder;
         this.registeredLanguages = new LinkedHashMap<>();
         this.placeholders = new LinkedHashMap<>();
+        this.parser = new ExpressionParser();
+
+        this.parser.registerFunction("HEAD", (interpreter, args, type) -> {
+            if (args.size() != 1) throw new RuntimeException("HEAD function expects exactly 1 argument (head name)");
+            String headName = args.get(0).toString();
+            return "HEAD(" + headName + ")";
+        }, "string");
     }
 
     public String getPrefix() {
@@ -66,6 +85,45 @@ public class LanguageManager {
         return currentLang;
     }
 
+    private void handleVariablesSection() {
+        LanguageFile langFile = getCurrentLang();
+        LanguageConfig langConfig = langFile.getLangConfig();
+        if (langConfig == null || langConfig.getConfig() == null) return;
+
+        ConfigurationSection customSection = langConfig.getConfig().getConfigurationSection("CustomVariables");
+        if (customSection == null) return;
+
+        // Clear existing variables before setting new ones
+        parser.clearVariables();
+        parser.clearFunctions();
+
+        for (String key : customSection.getKeys(false)) {
+            Object value = customSection.get(key);
+
+            if (value instanceof String valueStr) {
+                if (valueStr.startsWith("VARIABLE")) {
+                    parser.setVariable(key, valueStr.substring("VARIABLE".length()).trim());
+                } else if (valueStr.startsWith("EXPR") || valueStr.startsWith("EXPRESSION")) {
+                    String expr = valueStr.startsWith("EXPR") ?
+                            valueStr.substring("EXPR".length()).trim() :
+                            valueStr.substring("EXPRESSION".length()).trim();
+                    Object result = parser.parsePrimitive(expr);
+                    parser.setVariable(key, result);
+                } else if (valueStr.startsWith("FUNCTION")) {
+                    String functionDef = valueStr.substring("FUNCTION".length()).trim();
+                    parser.getFunctionManager().registerFunction(functionDef);
+                } else if (valueStr.contains("${") && valueStr.contains("}")) {
+                    String parsedExpression = Utils.format(null, valueStr, prefix);
+                    parser.setVariable(key, parsedExpression);
+                } else {
+                    parser.setVariable(key, valueStr);
+                }
+            } else {
+                parser.setVariable(key, value);
+            }
+        }
+    }
+
     public void setCurrentLang(LanguageFile currentLang, boolean log) throws NullPointerException {
         if (currentLang == null) {
             List<Map.Entry<String, LanguageFile>> list = new ArrayList<>(registeredLanguages.entrySet());
@@ -77,6 +135,7 @@ public class LanguageManager {
             this.currentLangName = currentLang.getLangName();
             this.currentLang = currentLang;
         }
+        handleVariablesSection();
         if (log)
             plugin.getLogger().log(Level.INFO, "Current Language: " + currentLangName);
     }
@@ -179,6 +238,14 @@ public class LanguageManager {
     }
 
     public void addPlaceholder(PlaceholderType type, String key, Object value, boolean resetBefore) {
+        if (key == null || key.isEmpty()) {
+            plugin.getLogger().warning("Tried to add a placeholder with a null or empty key!");
+            return;
+        }
+        if (value == null) {
+            plugin.getLogger().warning("Tried to add a placeholder with a null value for key: " + key);
+            return;
+        }
         if (resetBefore) resetSpecificPlaceholders(type, Collections.singletonList(key));
         if (!placeholders.containsKey(key))
             placeholders.put(key, new Placeholder(key, value, type));
@@ -344,11 +411,113 @@ public class LanguageManager {
         return getMessage("Player.General.NoPermissions", player, true);
     }
 
+    /**
+     * Sets an expression variable for a specific player and path.
+     * These variables will be added to the parser when getItem is called with matching player and path.
+     *
+     * @param playerUUID The UUID of the player this variable is for
+     * @param path       The path this variable is associated with
+     * @param key        The variable key
+     * @param value      The variable value
+     */
+    public void setPathExpressionVariable(String playerUUID, String path, String key, Object value) {
+        String mapKey = playerUUID + ":" + path;
+        if (!playerPathVariables.containsKey(mapKey)) {
+            playerPathVariables.put(mapKey, new HashMap<>());
+        }
+        playerPathVariables.get(mapKey).put(key, value);
+    }
+
+    /**
+     * Removes an expression variable for a specific player and path.
+     *
+     * @param playerUUID The UUID of the player this variable is for
+     * @param path       The path this variable is associated with
+     * @param key        The variable key to remove
+     */
+    public void removePathExpressionVariable(String playerUUID, String path, String key) {
+        String mapKey = playerUUID + ":" + path;
+        if (playerPathVariables.containsKey(mapKey)) {
+            playerPathVariables.get(mapKey).remove(key);
+            if (playerPathVariables.get(mapKey).isEmpty()) {
+                playerPathVariables.remove(mapKey);
+            }
+        }
+    }
+
+    /**
+     * Removes all expression variables for a specific player and path.
+     *
+     * @param playerUUID The UUID of the player
+     * @param path       The path
+     */
+    public void clearPathExpressionVariables(String playerUUID, String path) {
+        String mapKey = playerUUID + ":" + path;
+        playerPathVariables.remove(mapKey);
+    }
+
+    /**
+     * Gets an expression variable for a specific player and path.
+     *
+     * @param playerUUID The UUID of the player
+     * @param path       The path
+     * @param key        The variable key
+     * @return The variable value or null if not found
+     */
+    public Object getPathExpressionVariable(String playerUUID, String path, String key) {
+        String mapKey = playerUUID + ":" + path;
+        if (playerPathVariables.containsKey(mapKey)) {
+            return playerPathVariables.get(mapKey).get(key);
+        }
+        return null;
+    }
+
+    /**
+     * Applies all path-specific expression variables for a player and path to the parser.
+     *
+     * @param player The player
+     * @param path   The path
+     */
+    private void applyPathExpressionVariables(Player player, String path) {
+        if (player == null) return;
+
+        String playerUUID = player.getUniqueId().toString();
+        String mapKey = playerUUID + ":" + path;
+
+        if (playerPathVariables.containsKey(mapKey)) {
+            Map<String, Object> variables = playerPathVariables.get(mapKey);
+            for (Map.Entry<String, Object> entry : variables.entrySet()) {
+                parser.setVariable(entry.getKey(), entry.getValue(), 1);
+            }
+        }
+    }
+
+    public void setExpressionVariable(String key, Object value, int uses) {
+        parser.setVariable(key, value, uses);
+    }
+
+    public void removeExpressionVariable(String key) {
+        parser.removeVariable(key);
+    }
+
+    public Object getExpressionVariable(String key, boolean peek) {
+        return peek ? parser.peekVariable(key) : parser.getVariable(key);
+    }
+
     public ItemStack getItem(String path, Player player, boolean resetAfter) {
         return getItem(path, player, getCurrentLangName(), resetAfter);
     }
 
+    public ItemStack getItem(String path, Player player, boolean resetAfter, MaterialCondition condition) {
+        return getItem(path, player, getCurrentLangName(), resetAfter, condition);
+    }
+
     public ItemStack getItem(String path, Player player, String langName, boolean resetAfter) {
+        return getItem(path, player, langName, resetAfter, null);
+    }
+
+    public ItemStack getItem(String path, Player player, String langName, boolean resetAfter, MaterialCondition condition) {
+        applyPathExpressionVariables(player, path);
         LanguageFile langFile = getLangOrPlayerLang(false, langName, player);
         LanguageConfig langConfig = langFile.getLangConfig();
         ItemStack error = new ItemStack(Material.BARRIER);
@@ -372,19 +541,42 @@ public class LanguageManager {
             return this.getItem("General.DisabledItem", player, false);
         }
         ItemStack item;
-        Material material = Material.matchMaterial(langConfig.getConfig().getString("Items." + path + ".material"));
-        if (material == null) {
-            assert errorMeta != null;
-            errorMeta.setDisplayName("Material not found! (" + langConfig.getConfig().getString("Items." + path + ".material") + ")");
-            errorMeta.setLore(Arrays.asList("If this happens,", "please change the Material from this Item", "to something existing", "Path: Items." + path + ".material"));
-            error.setItemMeta(errorMeta);
-            return error;
+
+        if (condition instanceof HeadMaterialCondition headCondition) {
+            if (headCondition.isHead()) {
+                item = headCondition.getHead().getAsItem();
+            } else {
+                item = createCustomSkull(headCondition.getHeadValue(), headCondition.isTexture());
+            }
+        } else {
+            String materialString = "";
+            if (langConfig.getConfig().get("Items." + path + ".material") instanceof String) {
+                materialString = langConfig.getConfig().getString("Items." + path + ".material");
+            } else if (langConfig.getConfig().get("Items." + path + ".material") instanceof List) {
+                List<?> materialList = (List<?>) Objects.requireNonNull(langConfig.getConfig().get("Items." + path + ".material"));
+                StringBuilder materialBuilder = new StringBuilder();
+                for (Object materialObj : materialList) {
+                    if (materialObj instanceof String materialStr) {
+                        materialBuilder.append(materialStr).append("\n");
+                    }
+                }
+                materialString = materialBuilder.toString().trim();
+            }
+            Material material = getMaterial(materialString, condition);
+            if (material == null) {
+                assert errorMeta != null;
+                errorMeta.setDisplayName("Material not found! (" + langConfig.getConfig().getString("Items." + path + ".material") + ")");
+                errorMeta.setLore(Arrays.asList("If this happens,", "please change the Material from this Item", "to something existing", "Path: Items." + path + ".material"));
+                error.setItemMeta(errorMeta);
+                return error;
+            }
+            item = new ItemStack(material, 1);
         }
+
         String displayName = langConfig.getConfig().getString("Items." + path + ".displayName");
         List<String> lore = langConfig.getConfig().getStringList("Items." + path + ".lore");
         List<String> loreWithPlaceholders = new ArrayList<>();
         List<String> includedKeys = new ArrayList<>();
-        item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         for (String s : lore) {
             includedKeys.addAll(getPlaceholderKeysInMessage(s, PlaceholderType.ITEM));
@@ -404,6 +596,78 @@ public class LanguageManager {
         if (resetAfter) resetSpecificPlaceholders(PlaceholderType.ITEM, includedKeys);
         return item;
     }
+
+    public ItemStack createCustomSkull(String headValue, boolean isTexture) {
+        ItemStack head = new ItemStack(Utils.legacyServer() ? Objects.requireNonNull(Material.matchMaterial("SKULL_ITEM")) : Material.PLAYER_HEAD, 1);
+        if (headValue.isEmpty()) return head;
+
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        if (meta == null) return head;
+
+        try {
+            Head headEnum = Head.valueOf(headValue);
+            return headEnum.getAsItem();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        meta.setDisplayName(Utils.chat(headValue));
+        if (!isTexture) {
+            meta.setOwningPlayer(Bukkit.getOfflinePlayer(headValue));
+            head.setItemMeta(meta);
+            return head;
+        }
+
+        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
+        try {
+            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headValue));
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
+        meta.setOwnerProfile(profile);
+        head.setItemMeta(meta);
+        return head;
+    }
+
+    public Material getMaterial(String materialString, MaterialCondition condition) {
+        if (materialString == null) {
+            return Material.BARRIER;
+        }
+
+        if (materialString.startsWith("HEAD(") && materialString.endsWith(")")) {
+            String headName = materialString.substring(5, materialString.length() - 1).trim();
+            try {
+                try {
+                    Head head = Head.valueOf(headName);
+                    return head.getAsItem().getType();
+                } catch (IllegalArgumentException e) {
+                    return Material.PLAYER_HEAD;
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("Invalid head: " + headName);
+                return Material.BARRIER;
+            }
+        }
+
+        try {
+            MaterialCondition cond = parser.parse(materialString, Material.BARRIER);
+            return cond.getMaterial();
+        } catch (Exception e) {
+            if (materialString.contains("if") || materialString.contains("else")) {
+                plugin.getLogger().warning("Error parsing conditional expression: " + materialString);
+                plugin.getLogger().warning(e.getMessage());
+            }
+        }
+
+        try {
+            return Material.valueOf(materialString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            if (!materialString.equals("PLAYER_HEAD")) {
+                plugin.getLogger().warning("Invalid material name: " + materialString);
+            }
+            return Material.BARRIER;
+        }
+    }
+    // TODO Maybe implement a condition / operation builder with a menu
 
     public String getMenuTitle(String path, Player player) {
         return getMenuTitle(path, player, getCurrentLangName());
