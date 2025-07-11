@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -61,7 +61,7 @@ public class BannedPlayersMenu extends PaginatedMenu {
                 player.sendMessage(noPerms);
                 return;
             }
-            Utils.unban(player, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()));
+            AdminPanelUtils.unban(player, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()));
             inventory.setItem(e.getSlot(), null);
         } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {

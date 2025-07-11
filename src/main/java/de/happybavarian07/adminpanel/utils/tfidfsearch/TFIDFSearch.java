@@ -13,6 +13,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -34,6 +35,7 @@ public class TFIDFSearch {
     private final Directory index;
     private IndexWriterConfig indexWriterConfig;
     private final Analyzer analyzer;
+    private boolean indexInitialized = false;
 
     public TFIDFSearch(String[] fields) {
         TFIDFSearch.fields = fields;
@@ -57,23 +59,61 @@ public class TFIDFSearch {
                     }
                 });
                 writer.commit();
+                indexInitialized = true;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    public List<Item> search(String query) throws Exception {
-        System.out.println("Searching for " + query);
+    public boolean isIndexInitialized() {
+        try {
+            if (indexInitialized) {
+                try (IndexReader reader = DirectoryReader.open(index)) {
+                    return reader.numDocs() > 0;
+                }
+            }
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public List<Item> search(String queryStr) throws Exception {
+        //System.out.println("Searching for " + queryStr);
+        if (!isIndexInitialized()) {
+            return new ArrayList<>();
+        }
+
         try (IndexReader reader = DirectoryReader.open(index)) {
+            if (reader.numDocs() == 0) {
+                return new ArrayList<>();
+            }
+
             IndexSearcher searcher = new IndexSearcher(reader);
             QueryParser parser = new MultiFieldQueryParser(fields, analyzer);
-            Query luceneQuery = parser.parse(query);
-            TopDocs topDocs = searcher.search(luceneQuery, Integer.MAX_VALUE); // Adjust the number of results as needed
+            parser.setAllowLeadingWildcard(true);
+
+            if (queryStr.equals("*") || queryStr.endsWith(":*")) {
+                queryStr = queryStr.replace("*", "*:*");
+            }
+
+            Query luceneQuery;
+            try {
+                luceneQuery = parser.parse(queryStr);
+            } catch (ParseException e) {
+                if (queryStr.contains("*")) {
+                    return searchAllDocuments(reader);
+                } else {
+                    throw e;
+                }
+            }
+
+            TopDocs topDocs = searcher.search(luceneQuery, Integer.MAX_VALUE);
 
             List<Item> results = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-                System.out.println("ScoreDoc" + scoreDoc.doc);
+                //System.out.println("ScoreDoc" + scoreDoc.doc);
                 Document doc = searcher.storedFields().document(scoreDoc.doc);
                 Item item = new Item(new HashMap<>());
                 for (String field : fields) {
@@ -83,6 +123,22 @@ public class TFIDFSearch {
             }
             return results;
         }
+    }
+
+    private List<Item> searchAllDocuments(IndexReader reader) throws IOException {
+        IndexSearcher searcher = new IndexSearcher(reader);
+        List<Item> results = new ArrayList<>();
+
+        for (int i = 0; i < reader.maxDoc(); i++) {
+            Document doc = searcher.storedFields().document(i);
+            Item item = new Item(new HashMap<>());
+            for (String field : fields) {
+                item.setFieldValue(field, doc.get(field));
+            }
+            results.add(item);
+        }
+
+        return results;
     }
 
     // Replace this with your own data structure and logic

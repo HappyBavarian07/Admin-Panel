@@ -3,13 +3,14 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 29.01.2023 | 12:14
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.Placeholder;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.backupmanager.BackupManager;
 import de.happybavarian07.adminpanel.backupmanager.FileBackup;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ public class BackupManagerCommand extends SubCommand {
 
     public BackupManagerCommand(String mainCommandName) {
         super(mainCommandName);
-        this.backupManager = plugin.getBackupManager();
+        this.backupManager = AdminPanelMain.getPlugin().getBackupManager();
     }
 
     @Override
@@ -169,7 +170,7 @@ public class BackupManagerCommand extends SubCommand {
     public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         subArgs.put(1, new String[]{"start", "load", "delete", "listBackups", "listFiles", "listBackupsDone", "getNewestBackupFile"});
-        subArgs.put(2, plugin.getBackupManager().getFileBackupList().keySet().toArray(new String[0]));
+        subArgs.put(2, AdminPanelMain.getPlugin().getBackupManager().getFileBackupList().keySet().toArray(new String[0]));
         subArgs.put(3, new String[]{"BackupFileNumber(0-Infinity)", "Newest(-1)", "<Page>"});
         return subArgs;
     }

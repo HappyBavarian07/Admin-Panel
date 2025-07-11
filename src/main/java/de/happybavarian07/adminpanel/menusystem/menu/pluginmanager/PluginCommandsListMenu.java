@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -23,9 +23,9 @@ public class PluginCommandsListMenu extends PaginatedMenu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final Plugin currentPlugin;
 
-    public PluginCommandsListMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {
+    public PluginCommandsListMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.currentPlugin = currentPlugin;
+        this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Commands");
     }
 
@@ -128,14 +128,14 @@ public class PluginCommandsListMenu extends PaginatedMenu {
                     ItemMeta commandMeta = command.getItemMeta();
                     commandMeta.setDisplayName(cmdName);
                     List<String> lore = new ArrayList<>();
-                    Utils utils = Utils.getInstance();
-                    lore.add(Utils.chat("&6Permission: &a" + currentCommand.getPermission()));
-                    lore.add(Utils.chat("&6Permission-Message: &a" + currentCommand.getPermissionMessage()));
-                    lore.add(Utils.chat("&6Label: &a" + currentCommand.getLabel()));
-                    lore.add(Utils.chat("&6Aliases: &a" + currentCommand.getAliases()));
-                    lore.add(Utils.chat("&6Usage: &a" + currentCommand.getUsage()));
-                    lore.add(Utils.chat("&6Description: &a" + currentCommand.getDescription()));
-                    lore.add(Utils.chat("&6Registered: &a" + currentCommand.isRegistered()));
+                    AdminPanelUtils adminPanelUtils = AdminPanelUtils.getInstance();
+                    lore.add(AdminPanelUtils.chat("&6Permission: &a" + currentCommand.getPermission()));
+                    lore.add(AdminPanelUtils.chat("&6Permission-Message: &a" + currentCommand.getPermissionMessage()));
+                    lore.add(AdminPanelUtils.chat("&6Label: &a" + currentCommand.getLabel()));
+                    lore.add(AdminPanelUtils.chat("&6Aliases: &a" + currentCommand.getAliases()));
+                    lore.add(AdminPanelUtils.chat("&6Usage: &a" + currentCommand.getUsage()));
+                    lore.add(AdminPanelUtils.chat("&6Description: &a" + currentCommand.getDescription()));
+                    lore.add(AdminPanelUtils.chat("&6Registered: &a" + currentCommand.isRegistered()));
                     commandMeta.setLore(lore);
                     command.setItemMeta(commandMeta);
                     inventory.addItem(command);

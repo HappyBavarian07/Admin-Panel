@@ -78,7 +78,7 @@ public class StartUpLogger {
     public StartUpLogger message(String message) {
         /*sender.sendMessage(Utils.format(null, getMessageWithFormat(message),
                 AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));*/
-        addMessageToQueue(Utils.format(null, getMessageWithFormat(message),
+        addMessageToQueue(AdminPanelUtils.format(null, getMessageWithFormat(message),
                 AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));
         return this;
     }
@@ -90,7 +90,7 @@ public class StartUpLogger {
      * @return Formatted Message
      */
     public String getMessage(String message) {
-        return Utils.format(null, getMessageWithFormat(message),
+        return AdminPanelUtils.format(null, getMessageWithFormat(message),
                 AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]");
     }
 
@@ -157,7 +157,7 @@ public class StartUpLogger {
             sender.sendMessage(Utils.format(null, getMessageWithFormat(message),
                     AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));*/
         for (String message : messages)
-            addMessageToQueue(Utils.format(null, getMessageWithFormat(message),
+            addMessageToQueue(AdminPanelUtils.format(null, getMessageWithFormat(message),
                     AdminPanelMain.getPrefix() != null ? AdminPanelMain.getPrefix() : "[Admin-Panel]"));
         return this;
     }

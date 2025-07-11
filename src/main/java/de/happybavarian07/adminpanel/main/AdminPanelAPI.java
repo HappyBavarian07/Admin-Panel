@@ -1,13 +1,13 @@
 package de.happybavarian07.adminpanel.main;
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
-import de.happybavarian07.adminpanel.language.LanguageFile;
-import de.happybavarian07.adminpanel.language.Placeholder;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
+import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

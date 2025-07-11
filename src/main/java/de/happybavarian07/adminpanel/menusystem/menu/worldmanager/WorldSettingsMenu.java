@@ -3,11 +3,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.TimeChangeMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.WeatherChangeMenu;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -29,7 +29,7 @@ public class WorldSettingsMenu extends Menu {
     public WorldSettingsMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
-        setOpeningPermission("AdminPanel.WorldManagment.Settings");
+        setOpeningPermission("AdminPanel.WorldManager.Settings");
     }
 
     @Override
@@ -169,11 +169,11 @@ public class WorldSettingsMenu extends Menu {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(deleteEvent);
                 if (!deleteEvent.isCancelled()) {
-                    Utils.openConfirmationMenu(
+                    AdminPanelUtils.openConfirmationMenu(
                             "World Deletion of World: " + world.getName(),
                             "worldmanager.WorldSelectMenu",
-                            Utils.class.getMethod("deleteMinecraftWorld", World.class),
-                            Utils.getInstance(),
+                            AdminPanelUtils.class.getMethod("deleteMinecraftWorld", World.class),
+                            AdminPanelUtils.getInstance(),
                             List.of(world),
                             Collections.emptyList(),
                             player);

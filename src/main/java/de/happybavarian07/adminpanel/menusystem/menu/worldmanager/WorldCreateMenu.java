@@ -3,8 +3,8 @@ package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WorldCreateEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -30,7 +30,7 @@ public class WorldCreateMenu extends Menu implements Listener {
 
     public WorldCreateMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        setOpeningPermission("AdminPanel.WorldManagment.Create");
+        setOpeningPermission("AdminPanel.WorldManager.Create");
     }
 
     @Override

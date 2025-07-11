@@ -3,9 +3,10 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 26.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,10 +25,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPermissionsManager().getAllPlayerPermissions().keySet()) {
-                plugin.getDataClientUtils().sendPlayerPermissions(
+            for (UUID permissionHolders : AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().keySet()) {
+                AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
+                        AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -36,10 +37,11 @@ public class PermissonsSyncCommand extends SubCommand {
         } else if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
             //System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPermissionsManager().getAllPlayerPermissions().containsKey(permissionHolder)) return false;
-            plugin.getDataClientUtils().sendPlayerPermissions(
+            if (!AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().containsKey(permissionHolder))
+                return false;
+            AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolder),
+                    AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
@@ -53,10 +55,10 @@ public class PermissonsSyncCommand extends SubCommand {
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         if (args.length == 0) {
-            for (UUID permissionHolders : plugin.getPermissionsManager().getAllPlayerPermissions().keySet()) {
-                plugin.getDataClientUtils().sendPlayerPermissions(
+            for (UUID permissionHolders : AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().keySet()) {
+                AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
                         permissionHolders,
-                        plugin.getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
+                        AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
                         "null"
                 );
             }
@@ -66,10 +68,10 @@ public class PermissonsSyncCommand extends SubCommand {
         if (args.length == 1) {
             UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
             //System.out.println("UUID: " + permissionHolder);
-            if (!plugin.getPermissionsManager().hasPermissions(permissionHolder)) return false;
-            plugin.getDataClientUtils().sendPlayerPermissions(
+            if (!AdminPanelMain.getPlugin().getPermissionsManager().hasPermissions(permissionHolder)) return false;
+            AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
                     permissionHolder,
-                    plugin.getPermissionsManager().getPlayerPermissions(permissionHolder),
+                    AdminPanelMain.getPlugin().getPermissionsManager().getPlayerPermissions(permissionHolder),
                     "null"
             );
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);

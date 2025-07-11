@@ -48,13 +48,8 @@ public class APDependencyManager {
         this.dependencyLoader = new DependencyLoader();
     }
 
-    /**
-     * Loads the core dependencies defined by annotations.
-     */
     public void loadCoreDependencies() {
         plugin.getStartUpLogger().coloredSpacer(ChatColor.RED).message("&e&lLoading Core Dependencies&r");
-
-        // Scan and load dependencies from annotations
         try {
             dependencyLoader.scanAndLoadDependencies(true, getClass(), true).get();
         } catch (InterruptedException | ExecutionException e) {

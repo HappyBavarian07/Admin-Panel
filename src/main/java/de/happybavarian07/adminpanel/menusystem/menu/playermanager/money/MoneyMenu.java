@@ -3,13 +3,13 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager.money;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.MoneySetEvent;
 import de.happybavarian07.adminpanel.events.player.MoneyTakeEvent;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionSelectMenu;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -122,7 +122,7 @@ public class MoneyMenu extends Menu implements Listener {
         if (playerMenuUtility.hasData("moneyGiveMenuMetaData")) {
             UUID targetUUIDEvent = UUID.fromString(String.valueOf(playerMenuUtility.getData("moneyGiveMenuMetaData")));
             Player targetPlayer = Bukkit.getPlayer(targetUUIDEvent);
-            Economy eco = Utils.getInstance().getEconomy();
+            Economy eco = AdminPanelUtils.getInstance().getEconomy();
             if (eco.hasAccount(Bukkit.getOfflinePlayer(targetUUIDEvent))) {
                 try {
                     double amount = Double.parseDouble(message);
@@ -135,7 +135,7 @@ public class MoneyMenu extends Menu implements Listener {
                             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                             if (response.transactionSuccess()) {
                                 plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
-                                        "gave " + amount + " to " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                                        "gave " + amount + " to " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.GiveMoney", player, true));
                             } else {
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
@@ -155,7 +155,7 @@ public class MoneyMenu extends Menu implements Listener {
         if (playerMenuUtility.hasData("moneyTakeMenuMetaData")) {
             UUID targetUUIDEvent = UUID.fromString(String.valueOf(playerMenuUtility.getData("moneyTakeMenuMetaData")));
             Player targetPlayer = Bukkit.getPlayer(targetUUIDEvent);
-            Economy eco = Utils.getInstance().getEconomy();
+            Economy eco = AdminPanelUtils.getInstance().getEconomy();
             if (eco.hasAccount(Bukkit.getOfflinePlayer(targetUUIDEvent))) {
                 try {
                     double amount = Double.parseDouble(message);
@@ -169,7 +169,7 @@ public class MoneyMenu extends Menu implements Listener {
                                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                                 if (response.transactionSuccess()) {
                                     plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
-                                            "took " + amount + " from " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefix.VAULT_MONEY);
+                                            "took " + amount + " from " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefixExtension.VAULT_MONEY);
                                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TakeMoney", player, true));
                                 } else {
                                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));
@@ -193,7 +193,7 @@ public class MoneyMenu extends Menu implements Listener {
         if (playerMenuUtility.hasData("moneySetMenuMetaData")) {
             UUID targetUUIDEvent = UUID.fromString(String.valueOf(playerMenuUtility.getData("moneySetMenuMetaData")));
             Player targetPlayer = Bukkit.getPlayer(targetUUIDEvent);
-            Economy eco = Utils.getInstance().getEconomy();
+            Economy eco = AdminPanelUtils.getInstance().getEconomy();
             if (eco.hasAccount(Bukkit.getOfflinePlayer(targetUUIDEvent))) {
                 try {
                     double amount = Double.parseDouble(message);
@@ -207,7 +207,7 @@ public class MoneyMenu extends Menu implements Listener {
                             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", targetPlayer.getName(), false);
                             if (response.transactionSuccess()) {
                                 plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + " (" + player.getUniqueId() + ") " +
-                                        "set the Money to " + amount + " from the Player " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                                        "set the Money to " + amount + " from the Player " + targetPlayer.getName() + " (" + targetPlayer.getUniqueId() + ")", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.SetMoney", player, true));
                             } else {
                                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.TransactionError", player, true));

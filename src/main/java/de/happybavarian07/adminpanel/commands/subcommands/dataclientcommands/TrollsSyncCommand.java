@@ -3,9 +3,10 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 26.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class TrollsSyncCommand extends SubCommand {
         if (args.length != 1) return false;
 
         // TODO Maybe Send Player Specific troll Data
-        boolean result = plugin.getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
+        boolean result = AdminPanelMain.getPlugin().getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%troll%", args[0], false);
         player.sendMessage(lgm.getMessage("DataClient.TrollsSync.TrollDataSendForAllPlayers", player, true));
         return true;
@@ -35,7 +36,7 @@ public class TrollsSyncCommand extends SubCommand {
         if (args.length == 0) return false;
 
         // TODO Maybe Send Player Specific troll Data
-        boolean result = plugin.getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
+        boolean result = AdminPanelMain.getPlugin().getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%troll%", args[0], false);
         sender.sendMessage(lgm.getMessage("DataClient.TrollsSync.TrollDataSendForAllPlayers", null, true));
         return true;

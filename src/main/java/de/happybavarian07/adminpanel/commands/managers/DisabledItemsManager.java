@@ -3,16 +3,14 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  * @Date 14.05.2022 | 20:49
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.disableditems.DisableCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.disableditems.EnableCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.disableditems.ListCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
+import de.happybavarian07.coolstufflib.commandmanagement.HelpCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class DisabledItemsManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return plugin;
+        return AdminPanelMain.getPlugin();
     }
 
     @Override

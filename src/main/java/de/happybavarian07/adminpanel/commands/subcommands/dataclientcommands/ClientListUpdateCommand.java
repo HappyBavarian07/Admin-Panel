@@ -3,8 +3,9 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 29.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -20,14 +21,14 @@ public class ClientListUpdateCommand extends SubCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
-        plugin.getDataClient().getPacketHandler().requestClientListUpdate();
+        AdminPanelMain.getPlugin().getDataClient().getPacketHandler().requestClientListUpdate();
         player.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", player, false));
         return true;
     }
 
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        plugin.getDataClient().getPacketHandler().requestClientListUpdate();
+        AdminPanelMain.getPlugin().getDataClient().getPacketHandler().requestClientListUpdate();
         sender.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", null, false));
         return true;
     }

@@ -3,10 +3,11 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 29.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -27,7 +28,7 @@ public class ClientListListCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
+            PaginatedList<String> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
             messages.maxItemsPerPage(10).sort("bubble", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -59,8 +60,8 @@ public class ClientListListCommand extends SubCommand {
         }
         try {
             int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
-            System.out.println("Other Connected Clients: " + plugin.getDataClient().getConnectionHandler().getOtherConnectedClients());
+            PaginatedList<String> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
+            System.out.println("Other Connected Clients: " + AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
             messages.maxItemsPerPage(10).sort("bubble", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {

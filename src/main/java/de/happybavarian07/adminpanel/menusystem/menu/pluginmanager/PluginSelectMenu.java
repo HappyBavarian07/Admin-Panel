@@ -5,15 +5,13 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
  * @Date 02.09.2021
  */
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +20,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -32,6 +32,7 @@ import java.util.logging.Level;
 
 public class PluginSelectMenu extends PaginatedMenu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
+    private final NamespacedKey pluginItemNamespacedKey = new NamespacedKey(plugin, "pluginItemName");
 
     public PluginSelectMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -63,12 +64,13 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
 
         if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD)) {
+        if (item.getItemMeta().getPersistentDataContainer().has(pluginItemNamespacedKey, PersistentDataType.STRING)) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Open")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            playerMenuUtility.addData("CurrentSelectedPlugin", Bukkit.getPluginManager().getPlugin(ChatColor.stripColor(item.getItemMeta().getDisplayName())));
+            playerMenuUtility.addData("CurrentSelectedPlugin",
+                    plugin.getPluginUtils().getPluginByName(item.getItemMeta().getPersistentDataContainer().get(pluginItemNamespacedKey, PersistentDataType.STRING)));
             new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
 
@@ -95,8 +97,8 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                 return;
             }
             if (plugin.getAutoUpdaterManager() == null) {
-                player.sendMessage(lgm.getMessage("General.NullMenu", player, true));
-                plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefix.ADMINPANEL_GUI, true);
+                player.sendMessage(lgm.getMessage("Player.General.NullMenu", player, true));
+                plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefixExtension.ADMINPANEL_GUI, true);
                 return;
             }
             new PluginAutoUpdaterMenu(playerMenuUtility).open();
@@ -164,7 +166,7 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                     Plugin currentPlugin = plugins.get(index);
                     boolean enabled = currentPlugin.isEnabled();
 
-                    lgm.setPathExpressionVariable(playerMenuUtility.getOwnerUUID().toString(), "PluginManager.PluginItem", "pluginEnabled", enabled ? "true" : "false");
+                    lgm.setPathExpressionVariable(playerMenuUtility.getOwnerUUID().toString(), "PluginManager.PluginItem", "pluginEnabled", enabled);
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginName%", currentPlugin.getName(), false);
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginVersion%", currentPlugin.getDescription().getVersion(), false);
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginFullName%", currentPlugin.getDescription().getFullName(), false);
@@ -174,8 +176,13 @@ public class PluginSelectMenu extends PaginatedMenu implements Listener {
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginDescription%", plugin.getPluginDescriptionManager().getDescriptionFromPlugin(currentPlugin), false);
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginFileName%", currentPlugin.getDescription().getFullName() + ".jar", false);
                     lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginEnabled%", enabled ? "true" : "false", false);
-
-                    inventory.addItem(lgm.getItem("PluginManager.PluginItem", playerMenuUtility.getOwner(), true));
+                    ItemStack item = lgm.getItem("PluginManager.PluginItem", playerMenuUtility.getOwner(), false);
+                    ItemMeta itemMeta = item.getItemMeta();
+                    if (itemMeta != null) {
+                        itemMeta.getPersistentDataContainer().set(pluginItemNamespacedKey, PersistentDataType.STRING, currentPlugin.getName());
+                        item.setItemMeta(itemMeta);
+                    }
+                    inventory.addItem(item);
 
                     ////////////////////////
                 }

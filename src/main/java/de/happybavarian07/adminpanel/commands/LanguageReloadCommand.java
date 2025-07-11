@@ -3,8 +3,8 @@ package de.happybavarian07.adminpanel.commands;/*
  * @Date 11.04.2022 | 16:21
  */
 
-import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.placeholders;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
@@ -39,7 +39,7 @@ public class PlayerExpansion extends PlaceholderExpansion {
         }
 
         return switch (params) {
-            case "balance" -> String.valueOf(Utils.getInstance().getEconomy().getBalance(player));
+            case "balance" -> String.valueOf(AdminPanelUtils.getInstance().getEconomy().getBalance(player));
             case "world" -> player.getWorld().getName();
             case "displayname" -> player.getDisplayName();
             case "name" -> player.getName();

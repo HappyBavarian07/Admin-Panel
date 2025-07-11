@@ -4,9 +4,9 @@ import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.MenuGameruleChangeEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,7 +28,7 @@ public class GameRuleMenu extends PaginatedMenu {
     public GameRuleMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
-        setOpeningPermission("AdminPanel.WorldManagment.Gamerules");
+        setOpeningPermission("AdminPanel.WorldManager.Gamerules");
     }
 
     @Override
@@ -180,18 +180,18 @@ public class GameRuleMenu extends PaginatedMenu {
                     if (value instanceof Boolean) {
                         if ((Boolean) value) {
                             head = Head.BLANK_GREEN.getAsItem();
-                            lore.add(Utils.chat("&6Value: &atrue"));
+                            lore.add(AdminPanelUtils.chat("&6Value: &atrue"));
                         } else {
                             head = Head.BLANK_RED.getAsItem();
-                            lore.add(Utils.chat("&6Value: &cfalse"));
+                            lore.add(AdminPanelUtils.chat("&6Value: &cfalse"));
                         }
                     } else if (value instanceof Integer) {
                         if ((Integer) value > 0) {
                             head = Head.BLANK_GREEN.getAsItem();
-                            lore.add(Utils.chat("&6Value: &a" + value));
+                            lore.add(AdminPanelUtils.chat("&6Value: &a" + value));
                         } else {
                             head = Head.BLANK_RED.getAsItem();
-                            lore.add(Utils.chat("&6Value: &c" + value));
+                            lore.add(AdminPanelUtils.chat("&6Value: &c" + value));
                         }
                     }
                     ItemMeta meta = head.getItemMeta();

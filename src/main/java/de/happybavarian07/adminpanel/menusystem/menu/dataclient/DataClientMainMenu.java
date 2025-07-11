@@ -3,10 +3,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.dataclient;/*
  * @Date 28.09.2023 | 15:28
  */
 
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.DataClient;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -20,7 +21,7 @@ public class DataClientMainMenu extends Menu {
 
     public DataClientMainMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.dataClient = plugin.getDataClient();
+        this.dataClient = AdminPanelMain.getPlugin().getDataClient();
         setOpeningPermission("AdminPanel.DataClient.Menu.Open");
     }
 
@@ -102,7 +103,7 @@ public class DataClientMainMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                player.sendMessage(Utils.chat("&7DataClientName: &e" + dataClient.getConnectionHandler().getClientName()));
+                player.sendMessage(AdminPanelUtils.chat("&7DataClientName: &e" + dataClient.getConnectionHandler().getClientName()));
             } else if (item.isSimilar(lgm.getItem(path + "DataClientSettings", player, false))) {
                 if (!player.hasPermission("AdminPanel.DataClient.Menu.Button.DataClientSettings")) {
                     player.sendMessage(noPerms);

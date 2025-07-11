@@ -3,11 +3,10 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 17.06.2022 | 22:05
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
-import de.happybavarian07.adminpanel.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -23,26 +22,26 @@ public class ReloadPluginCommand extends SubCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
-        player.sendMessage(Utils.chat("&7Starting Reload of Admin-Panel! (Warning: This might break the other Reload Commands)"));
+        player.sendMessage(AdminPanelUtils.chat("&7Starting Reload of Admin-Panel! (Warning: This might break the other Reload Commands)"));
         try {
-            utils.reload(plugin);
-            player.sendMessage(Utils.chat("&7Reload finished!"));
+            utils.reload(AdminPanelMain.getPlugin());
+            player.sendMessage(AdminPanelUtils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            player.sendMessage(Utils.chat("&cAn Error occurred while reloading the Plugin: &6" + e.getMessage() + " &7(Please check the Console)."));
+            player.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while reloading the Plugin: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }
 
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        sender.sendMessage(Utils.chat("&7Starting Reload of Admin-Panel! (Warning: This might break the other Reload Commands)"));
+        sender.sendMessage(AdminPanelUtils.chat("&7Starting Reload of Admin-Panel! (Warning: This might break the other Reload Commands)"));
         try {
-            utils.reload(plugin);
-            sender.sendMessage(Utils.chat("&7Reload finished!"));
+            utils.reload(AdminPanelMain.getPlugin());
+            sender.sendMessage(AdminPanelUtils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            sender.sendMessage(Utils.chat("&cAn Error occurred while reloading the Plugin: &6" + e.getMessage() + " &7(Please check the Console)."));
+            sender.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while reloading the Plugin: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }

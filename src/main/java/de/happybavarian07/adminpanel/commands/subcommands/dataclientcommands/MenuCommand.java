@@ -3,14 +3,13 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 23.11.2022 | 16:53
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.dataclient.DataClientMainMenu;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

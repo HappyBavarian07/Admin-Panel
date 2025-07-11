@@ -3,9 +3,10 @@ package de.happybavarian07.adminpanel.menusystem.menu.dataclient;/*
  * @Date 11.10.2023 | 15:58
  */
 
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.managers.SettingsManager;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +21,7 @@ public class DataClientSettingsMenu extends Menu implements Listener {
 
     public DataClientSettingsMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.settingsManager = plugin.getDataClient().getSettingsManager();
+        this.settingsManager = AdminPanelMain.getPlugin().getDataClient().getSettingsManager();
         setOpeningPermission("AdminPanel.DataClient.Menu.Settings.Open");
     }
 

@@ -2,10 +2,10 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.PluginInstallEvent;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

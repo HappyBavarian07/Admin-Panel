@@ -173,6 +173,7 @@ Messages:
       PerPlayerLangSet: '%prefix% &9> &aErfolgreich ''%langname%'' als deine neue Sprache ausgewählt!'
       # %target% = The Targeted Player
       PerPlayerLangSetOther: '%prefix% &9> &aErfolgreich ''%langname%'' als %target%''s neue Sprache ausgewählt!'
+      NullMenu: '%prefix% &9> &cDas Menu welches du öffnen wolltest scheint gerade nicht zu funktionieren!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aBitte gib einen Namen in den Chat ein!'
@@ -838,16 +839,16 @@ Items:
             lore:
               - '&aSortiere nach bestimmten Permissions'
           Mode:
-            All:
-              material: LEVER
+            Global:
+              material: GRASS_BLOCK
               displayName: '&cModus ändern'
               lore:
-                - '&aModus: &7All Permissions'
+                - '&aModus: &7Alle Permissions'
             Player:
-              material: LEVER
+              material: PLAYER_HEAD
               displayName: '&cModus ändern'
               lore:
-                - '&aModus: &7Player Permissions'
+                - '&aModus: &7Spieler Permissions'
     MoneyMenu:
       Give:
         material: GREEN_WOOL
@@ -1234,7 +1235,7 @@ Items:
         - '&aEntmute den Chat!'
   PluginManager:
     Install:
-      material: ENCHANTING_TABLE
+      material: 'HEAD_OBJECT(''WORLD'')'
       displayName: '&2Plugins Installieren'
       lore:
         - '&2Installiere andere Spigot Plugins!'
@@ -1245,7 +1246,7 @@ Items:
         - '&2Lade andere Plugins während der Server läuft!'
         - '&2Du brauchst nur den Datei Namen!'
     PluginItem:
-      material: 'if pluginEnabled: HEAD_OBJECT(''BLANK_GREEN'') else HEAD_OBJECT(''BLANK_RED'')'
+      material: 'if pluginEnabled: HEAD_OBJECT(''BLANK_GREEN'') else: HEAD_OBJECT(''BLANK_RED'')'
       displayName: '&a%pluginName%'
       # Available Placeholders:
       # %name% = The Plugin Name
@@ -1282,7 +1283,7 @@ Items:
           - '&2Setze die Beschreibung mit dem Chat!'
     AutoUpdateMenu:
       OpenMenuItem:
-        material: DIAMOND_BLOCK
+        material: CHEST
         displayName: '&aAuto Plugin Updater Menü'
         lore:
           - '&aDas Auto Plugin Updater Menü'

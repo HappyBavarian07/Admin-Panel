@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.commands;
 
-import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -62,11 +62,11 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                     if (check) {
                         try {
                             updater.downloadLatestUpdate(false, true, true);
-                            sender.sendMessage(Utils.chat(
+                            sender.sendMessage(AdminPanelUtils.chat(
                                     "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
+                            sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                         }
                     } else {
                         updater.getMessages().sendNoUpdateMessage(sender);
@@ -74,21 +74,21 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("forcedownload")) {
                     try {
                         updater.downloadLatestUpdate(false, true, true);
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aForce Download finished!"));
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() +
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&aForce Download finished!"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() +
                                 "&aNew Version now available in the downloaded-update Folder! (Further Actions required)"));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else if (args[0].equalsIgnoreCase("replace")) {
                     if (check) {
                         try {
                             updater.downloadLatestUpdate(true, true, true);
-                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
+                            sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
+                            sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                         }
                     } else {
                         updater.getMessages().sendNoUpdateMessage(sender);
@@ -96,11 +96,11 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                 } else if (args[0].equalsIgnoreCase("forcereplace")) {
                     try {
                         updater.downloadLatestUpdate(true, true, true);
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aForce Replace finished!"));
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&aForce Replace finished!"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&aNew Version now available to play! (No further Actions required)"));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else if (args[0].equalsIgnoreCase("getlatest")) {
                     try {
@@ -123,10 +123,10 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                                         "&bNew Version Date: &c" + versionDate));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
+                        sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + " &cSomething went completely wrong!"));
                     }
                 } else {
-                    sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
+                    sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
                 }
             }/* else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("download")) {
@@ -144,7 +144,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                     }
                 }
             }*/ else {
-                sender.sendMessage(Utils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
+                sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
             }
             return true;
         }

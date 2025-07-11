@@ -1,10 +1,10 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -120,6 +120,6 @@ public class PlayerKickMenu extends Menu implements Listener {
     }
 
     public String format(Player player, String message) {
-        return Utils.format(player, message, AdminPanelMain.getPrefix());
+        return AdminPanelUtils.format(player, message, AdminPanelMain.getPrefix());
     }
 }

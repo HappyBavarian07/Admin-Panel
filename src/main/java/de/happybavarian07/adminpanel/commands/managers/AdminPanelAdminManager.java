@@ -3,15 +3,13 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  * @Date 17.06.2022 | 21:38
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin.*;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
+import de.happybavarian07.coolstufflib.commandmanagement.HelpCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class AdminPanelAdminManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return plugin;
+        return AdminPanelMain.getPlugin();
     }
 
     @Override

@@ -1,13 +1,13 @@
 package de.happybavarian07.adminpanel.menusystem.menu;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ServerManagerMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -50,13 +50,13 @@ public class AdminPanelStartMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                Utils.serverRestart(60);
+                AdminPanelUtils.serverRestart(60);
             } else if (item.isSimilar(lgm.getItem(path + "ServerStop", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerStop")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                Utils.serverStop(60);
+                AdminPanelUtils.serverStop(60);
             } else if (item.isSimilar(lgm.getItem(path + "WorldManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.WorldManager.open")) {
                     player.sendMessage(noPerms);

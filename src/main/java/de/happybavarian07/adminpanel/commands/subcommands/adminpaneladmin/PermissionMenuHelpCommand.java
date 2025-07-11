@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 02.10.2023 | 17:23
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

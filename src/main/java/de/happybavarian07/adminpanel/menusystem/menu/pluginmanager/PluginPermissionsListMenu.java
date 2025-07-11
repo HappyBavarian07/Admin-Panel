@@ -1,8 +1,8 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,9 +19,9 @@ import java.util.List;
 public class PluginPermissionsListMenu extends PaginatedMenu {
     private final Plugin currentPlugin;
 
-    public PluginPermissionsListMenu(PlayerMenuUtility playerMenuUtility, Plugin currentPlugin) {
+    public PluginPermissionsListMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        this.currentPlugin = currentPlugin;
+        this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Permissions");
     }
 
@@ -61,12 +61,11 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                     current = perm;
                 }
             }
-            Utils utils = Utils.getInstance();
-            player.sendMessage(Utils.chat("&6Name: &a" + current.getName()));
-            player.sendMessage(Utils.chat("&6Default: &a" + current.getDefault()));
-            player.sendMessage(Utils.chat("&6Description: &a" + current.getDescription()));
-            player.sendMessage(Utils.chat("&6Childrens: &a" + current.getChildren()));
-            player.sendMessage(Utils.chat("&6Permissibles: &a" + current.getPermissibles()));
+            player.sendMessage(AdminPanelUtils.chat("&6Name: &a" + current.getName()));
+            player.sendMessage(AdminPanelUtils.chat("&6Default: &a" + current.getDefault()));
+            player.sendMessage(AdminPanelUtils.chat("&6Description: &a" + current.getDescription()));
+            player.sendMessage(AdminPanelUtils.chat("&6Childrens: &a" + current.getChildren()));
+            player.sendMessage(AdminPanelUtils.chat("&6Permissibles: &a" + current.getPermissibles()));
         } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
@@ -134,8 +133,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu {
                     ItemMeta commandMeta = command.getItemMeta();
                     commandMeta.setDisplayName(currentPermission.getName());
                     List<String> lore = new ArrayList<>();
-                    Utils utils = Utils.getInstance();
-                    lore.add(Utils.chat("&6Click for Infos"));
+                    lore.add(AdminPanelUtils.chat("&6Click for Infos"));
                     commandMeta.setLore(lore);
                     command.setItemMeta(commandMeta);
                     inventory.addItem(command);

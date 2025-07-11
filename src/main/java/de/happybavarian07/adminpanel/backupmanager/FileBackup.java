@@ -4,8 +4,8 @@ package de.happybavarian07.adminpanel.backupmanager;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 
 import java.io.File;
@@ -82,7 +82,7 @@ public class FileBackup implements Comparable<FileBackup> {
                     }
                 }
             }
-            Utils.zipFiles(filesToBackup, zipFile.getAbsolutePath());
+            AdminPanelUtils.zipFiles(filesToBackup, zipFile.getAbsolutePath());
             backupsDone.add(zipFile);
             return 0;
         } catch (IOException e) {
@@ -144,7 +144,7 @@ public class FileBackup implements Comparable<FileBackup> {
                     i++;
                 }
             }
-            Utils.zipFiles(filesToBackup, zipFileTemp.getAbsolutePath());
+            AdminPanelUtils.zipFiles(filesToBackup, zipFileTemp.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             return -2;
@@ -157,7 +157,7 @@ public class FileBackup implements Comparable<FileBackup> {
 
         // Load new one
 
-        Utils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, true);
+        AdminPanelUtils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, true);
         return 0;
     }
 
@@ -181,9 +181,9 @@ public class FileBackup implements Comparable<FileBackup> {
                     i++;
                 }
             }
-            Utils.zipFiles(internalFilesToBackupList.toArray(new File[0]), zipFileTemp.getAbsolutePath());
+            AdminPanelUtils.zipFiles(internalFilesToBackupList.toArray(new File[0]), zipFileTemp.getAbsolutePath());
         } catch (IOException e) {
-            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "An Error occurred while creating a backup of the old files: " + e.getMessage(), LogPrefix.FILE);
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "An Error occurred while creating a backup of the old files: " + e.getMessage(), LogPrefixExtension.FILE);
             return -2;
         }
         // Delete the Old Configs after creating a copy of those files
@@ -194,7 +194,7 @@ public class FileBackup implements Comparable<FileBackup> {
 
         // Load new one
 
-        Utils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, false);
+        AdminPanelUtils.unzipFiles(zipFile.getAbsolutePath(), AdminPanelMain.getPlugin().getDataFolder() + File.separator, false);
         return 0;
     }
 

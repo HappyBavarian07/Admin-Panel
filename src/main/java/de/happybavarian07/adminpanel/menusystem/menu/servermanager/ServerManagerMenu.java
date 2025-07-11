@@ -3,12 +3,12 @@ package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.server.KickAllPlayersEvent;
 import de.happybavarian07.adminpanel.events.server.MaintenanceModeToggleEvent;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -94,7 +94,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                 AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
                 if (!kickAllPlayersEvent.isCancelled()) {
                     for (Player online : playersToKick) {
-                        Utils.kick(player, online.getName(),
+                        AdminPanelUtils.kick(player, online.getName(),
                                 lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online, false),
                                 lgm.getMessage("Player.ServerManager.KickAllPlayersSource", player, false));
                     }
@@ -189,7 +189,7 @@ public class ServerManagerMenu extends Menu implements Listener {
         if (playerMenuUtility.getOwner() != player) return;
 
         if (playerMenuUtility.hasData("serverManagerBroadcastMessage") && player == playerMenuUtility.getOwner()) {
-            String message = Utils.chat(event.getMessage());
+            String message = AdminPanelUtils.chat(event.getMessage());
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", message, true);
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player, false));
             Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", player, false));

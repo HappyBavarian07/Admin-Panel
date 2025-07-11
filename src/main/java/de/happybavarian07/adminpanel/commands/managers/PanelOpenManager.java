@@ -3,10 +3,6 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  * @Date 27.04.2022 | 17:07
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.commandmanagement.HelpCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.AdminPanelStartMenuCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.TempLanguageSelectMenuCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.playermanager.BannedPlayersMenuCommand;
@@ -20,10 +16,12 @@ import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.W
 import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.WhitelistedPlayersMenuCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.worldmanager.WorldCreateMenuCommand;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.worldmanager.WorldSelectMenuCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
+import de.happybavarian07.coolstufflib.commandmanagement.HelpCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
@@ -50,7 +48,7 @@ public class PanelOpenManager extends CommandManager {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return plugin;
+        return AdminPanelMain.getPlugin();
     }
 
     @Override

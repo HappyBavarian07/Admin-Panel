@@ -3,9 +3,9 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 17.06.2022 | 22:05
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.utils.PluginUtils;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -20,26 +20,26 @@ public class ReloadDataCommand extends SubCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
-        player.sendMessage(Utils.chat("&7Starting Reload of the Data File!"));
+        player.sendMessage(AdminPanelUtils.chat("&7Starting Reload of the Data File!"));
         try {
-            plugin.getAutoUpdaterManager().reloadData();
-            player.sendMessage(Utils.chat("&7Reload finished!"));
+            AdminPanelMain.getPlugin().getAutoUpdaterManager().reloadData();
+            player.sendMessage(AdminPanelUtils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            player.sendMessage(Utils.chat("&cAn Error occurred while reloading the Data File: &6" + e.getMessage() + " &7(Please check the Console)."));
+            player.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while reloading the Data File: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }
 
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        sender.sendMessage(Utils.chat("&7Starting Reload of the Data File!"));
+        sender.sendMessage(AdminPanelUtils.chat("&7Starting Reload of the Data File!"));
         try {
-            plugin.getAutoUpdaterManager().reloadData();
-            sender.sendMessage(Utils.chat("&7Reload finished!"));
+            AdminPanelMain.getPlugin().getAutoUpdaterManager().reloadData();
+            sender.sendMessage(AdminPanelUtils.chat("&7Reload finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            sender.sendMessage(Utils.chat("&cAn Error occurred while reloading the Data File: &6" + e.getMessage() + " &7(Please check the Console)."));
+            sender.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while reloading the Data File: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="adminpanelinstance"
+                  name="Admin-Panel Instance" start-page="jquery.md">
+
+    <toc-element toc-title="legal">
+        <toc-element topic="jquery.md"/>
+    </toc-element>
+    <toc-element topic="Overview.md"/>
+    <toc-element topic="jqueryUI.md"/>
+</instance-profile>

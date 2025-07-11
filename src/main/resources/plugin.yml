@@ -30,6 +30,10 @@ permissions:
   AdminPanel.*:
     default: op
     children:
+      AdminPanel.open:
+        default: op
+        AdminPanel.open.other:
+          default: op
       AdminPanel.DataClient:
         default: op
         children:
@@ -85,13 +89,11 @@ permissions:
         children:
           AdminPanel.Bypass.AffectedByPlayerManager:
             default: op
-          AdminPanel.Bypass.KickInMainTenanceMode:
+          AdminPanel.Bypass.KickInMaintenanceMode:
             default: op
           AdminPanel.Bypass.ChatMute:
             default: op
           AdminPanel.Bypass.KickAll:
-            default: op
-          AdminPanel.Bypass.ban:
             default: op
           AdminPanel.Bypass.ItemDisable:
             default: op
@@ -118,8 +120,7 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.UpdateConfig: true
           AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
           AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
-      AdminPanel.open:
-        default: op
+
       AdminPanel.open.other:
         default: op
       AdminPanel.PluginManager.*:
@@ -160,22 +161,22 @@ permissions:
         default: op
       AdminPanel.ServerRestart:
         default: op
-      AdminPanel.WorldManagment.*:
+      AdminPanel.WorldManager.*:
         default: op
         children:
-          AdminPanel.WorldManagment.Open:
+          AdminPanel.WorldManager.Open:
             default: op
-          AdminPanel.WorldManagment.Gamerules:
+          AdminPanel.WorldManager.Gamerules:
             default: op
-          AdminPanel.WorldManagment.PVP:
+          AdminPanel.WorldManager.PVP:
             default: op
-          AdminPanel.WorldManagment.Time:
+          AdminPanel.WorldManager.Time:
             default: op
-          AdminPanel.WorldManagment.Weather:
+          AdminPanel.WorldManager.Weather:
             default: op
-          AdminPanel.WorldManagment.Settings:
+          AdminPanel.WorldManager.Settings:
             default: op
-          AdminPanel.WorldManagment.Create:
+          AdminPanel.WorldManager.Create:
             default: op
       AdminPanel.ServerManagment.*:
         default: op

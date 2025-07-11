@@ -1,7 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
@@ -11,9 +10,9 @@ import org.bukkit.plugin.*;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.net.*;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.NotDirectoryException;
 import java.util.*;
 import java.util.logging.Level;
@@ -68,7 +67,7 @@ public class PluginUtils {
 
     public Plugin load(File pluginFile) throws InvalidPluginException, InvalidDescriptionException, UnknownDependencyException {
         plugin.getFileLogger().writeToLog(Level.WARNING,
-                "Loaded Plugin File \"" + pluginFile + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                "Loaded Plugin File \"" + pluginFile + "\"", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
         return Bukkit.getPluginManager().loadPlugin(pluginFile);
     }
 
@@ -155,8 +154,7 @@ public class PluginUtils {
             assert commands != null;
             for (Iterator<Map.Entry<String, Command>> it = commands.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<String, Command> entry = it.next();
-                if (entry.getValue() instanceof PluginCommand) {
-                    PluginCommand c = (PluginCommand) entry.getValue();
+                if (entry.getValue() instanceof PluginCommand c) {
                     if (c.getPlugin() == plugin) {
                         c.unregister(commandMap);
                         it.remove();
@@ -197,7 +195,7 @@ public class PluginUtils {
         // This tries to get around the issue where Windows refuses to unlock jar files that were previously loaded into the JVM.
         System.gc();
         this.plugin.getFileLogger().writeToLog(Level.WARNING,
-                "Unloaded the Plugin \"" + plugin + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                "Unloaded the Plugin \"" + plugin + "\"", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
     }
 
     public void reload(Plugin plugin) {
@@ -205,7 +203,7 @@ public class PluginUtils {
             unload(plugin);
             load(plugin);
             this.plugin.getFileLogger().writeToLog(Level.WARNING,
-                    "Reloaded the Plugin \"" + plugin + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                    "Reloaded the Plugin \"" + plugin + "\"", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
         } else {
             throw new NullPointerException("Plugin is null!");
         }
@@ -227,7 +225,7 @@ public class PluginUtils {
         }
         plugin.getFileLogger().writeToLog(Level.WARNING,
                 "Installed the Plugin \"" + resourceID + "\" under the Name \"" +
-                        "/plugins/" + fileName + ".jar" + "\"", LogPrefix.ACTIONSLOGGER_PLUGIN);
+                        "/plugins/" + fileName + ".jar" + "\"", LogPrefixExtension.ACTIONSLOGGER_PLUGIN);
         return target;
     }
 

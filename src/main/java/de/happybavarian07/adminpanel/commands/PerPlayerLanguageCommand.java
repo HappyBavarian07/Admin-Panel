@@ -3,10 +3,10 @@ package de.happybavarian07.adminpanel.commands;/*
  * @Date 26.04.2022 | 19:33
  */
 
-import de.happybavarian07.adminpanel.language.LanguageManager;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -36,14 +36,14 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 1) {
             if (!sender.hasPermission("AdminPanel.PerPlayerLang")) {
-                sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", (Player) sender, true));
+                sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return true;
             }
             UUID playerUUID = player.getUniqueId();
             String langName = args[0];
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%langname%", langName, true);
             if (langName.equals("default")) {
-                lgm.getPlhandler().removePlayerLanguage(playerUUID);
+                lgm.getPLHandler().removePlayerLanguage(playerUUID);
                 player.sendMessage(lgm.getMessage("Player.General.PerPlayerLangSet", player, true));
                 return true;
             }
@@ -51,11 +51,11 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(lgm.getMessage("Player.General.NotAValidLanguage", player, true));
                 return true;
             }
-            lgm.getPlhandler().setPlayerLanguage(playerUUID, langName);
+            lgm.getPLHandler().setPlayerLanguage(playerUUID, langName);
             player.sendMessage(lgm.getMessage("Player.General.PerPlayerLangSet", player, true));
         } else if (args.length == 2) {
             if (!sender.hasPermission("AdminPanel.PerPlayerLangOther")) {
-                sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", (Player) sender, true));
+                sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return true;
             }
             String langName = args[0];
@@ -68,7 +68,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
             }
             UUID playerUUID = target.getUniqueId();
             if (langName.equals("default")) {
-                lgm.getPlhandler().removePlayerLanguage(playerUUID);
+                lgm.getPLHandler().removePlayerLanguage(playerUUID);
                 player.sendMessage(lgm.getMessage("Player.General.PerPlayerLangSetOther", player, true));
                 return true;
             }
@@ -76,10 +76,10 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(lgm.getMessage("Player.General.NotAValidLanguage", player, true));
                 return true;
             }
-            lgm.getPlhandler().setPlayerLanguage(playerUUID, langName);
+            lgm.getPLHandler().setPlayerLanguage(playerUUID, langName);
             player.sendMessage(lgm.getMessage("Player.General.PerPlayerLangSetOther", player, true));
         } else {
-            Utils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage());
+            AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage());
         }
         return true;
     }

@@ -8,9 +8,9 @@ import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.server.ClearChatEvent;
 import de.happybavarian07.adminpanel.events.server.MuteChatEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,7 +62,7 @@ public class ChatManagerMenu extends Menu implements Listener {
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
                 if (!clearChatEvent.isCancelled()) {
-                    Utils.clearChat(clearChatEvent.getLines(), false, player);
+                    AdminPanelUtils.clearChat(clearChatEvent.getLines(), false, player);
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", player, true));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", player, true));
                     Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", player, true));
@@ -143,7 +143,7 @@ public class ChatManagerMenu extends Menu implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (plugin.getPluginStateManager().isGlobalChatMuted()) {
+        if (plugin.getPluginStateManager().isGlobalChatMuted() && !player.hasPermission("AdminPanel.Bypass.ChatMute")) {
             event.setCancelled(true);
             player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player, true));
         }

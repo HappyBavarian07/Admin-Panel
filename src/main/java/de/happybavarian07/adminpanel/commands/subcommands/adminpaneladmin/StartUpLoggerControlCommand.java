@@ -3,8 +3,9 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 17.12.2022 | 20:43
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -22,10 +23,10 @@ public class StartUpLoggerControlCommand extends SubCommand {
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length != 1) return false;
         if (args[0].equalsIgnoreCase("Enable")) {
-            plugin.getStartUpLogger().enableMessageSystem();
+            AdminPanelMain.getPlugin().getStartUpLogger().enableMessageSystem();
             player.sendMessage("StartUpLogger/ConsoleLogger System enabled!");
         } else if (args[0].equalsIgnoreCase("Disable")) {
-            plugin.getStartUpLogger().disableMessageSystem();
+            AdminPanelMain.getPlugin().getStartUpLogger().disableMessageSystem();
             player.sendMessage("StartUpLogger/ConsoleLogger System disabled!");
         } else {
             return false;
@@ -37,10 +38,10 @@ public class StartUpLoggerControlCommand extends SubCommand {
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
         if (args.length != 1) return false;
         if (args[0].equalsIgnoreCase("Enable")) {
-            plugin.getStartUpLogger().enableMessageSystem();
+            AdminPanelMain.getPlugin().getStartUpLogger().enableMessageSystem();
             sender.sendMessage("StartUpLogger/ConsoleLogger System enabled!");
         } else if (args[0].equalsIgnoreCase("Disable")) {
-            plugin.getStartUpLogger().disableMessageSystem();
+            AdminPanelMain.getPlugin().getStartUpLogger().disableMessageSystem();
             sender.sendMessage("StartUpLogger/ConsoleLogger System disabled!");
         } else {
             return false;

@@ -1,12 +1,12 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMode;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -56,7 +56,7 @@ public class PlayerActionSelectMenu extends Menu {
             new PermissionListMenu(playerMenuUtility).open();
         } else if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenuItem", target, false))) {
             //new PlayerWarningMenu(playerMenuUtility, targetUUID).open();
-            player.sendMessage(Utils.chat("!!!UNDER DEVELOPMENT!!!"));
+            player.sendMessage(AdminPanelUtils.chat("!!!UNDER DEVELOPMENT!!!"));
         } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
@@ -89,7 +89,7 @@ public class PlayerActionSelectMenu extends Menu {
         }
         inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target, false));
         inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target, false));
-        if (plugin.getWarningManager() != null)
+        if (AdminPanelMain.getPlugin().getWarningManager() != null)
             inventory.setItem(getSlot("PlayerManager.WarningMenuItem", 24), lgm.getItem("PlayerManager.WarningMenuItem", target, false));
         inventory.setItem(getSlot(path + "PermissionItem", 4), lgm.getItem(path + "PermissionItem", target, false));
         inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false));

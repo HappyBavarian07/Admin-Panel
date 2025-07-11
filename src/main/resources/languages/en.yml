@@ -165,6 +165,7 @@ Messages:
       PerPlayerLangSet: '%prefix% &9> &aSuccessfully selected ''%langName%'' as your Language!'
       # %target% = The Targeted Player
       PerPlayerLangSetOther: '%prefix% &9> &aSuccessfully selected ''%langName%'' as %target%''s Language!'
+      NullMenu: '%prefix% &9> &cThe Menu you are trying to open seems to not work right now!'
     WorldManager:
       CreateMenu:
         Name: '%prefix% &9> &aPlease enter a Name in the Chat!'
@@ -832,13 +833,13 @@ Items:
             lore:
               - '&aSort by certain permissions'
           Mode:
-            All:
-              material: LEVER
+            Global:
+              material: GRASS_BLOCK
               displayName: '&cChange mode'
               lore:
-                - '&aMode: &7All Permissions'
+                - '&aMode: &7Global Permissions'
             Player:
-              material: LEVER
+              material: PLAYER_HEAD
               displayName: '&cChange mode'
               lore:
                 - '&aMode: &7Player Permissions'
@@ -1227,18 +1228,18 @@ Items:
         - '&aUnmute the Chat!'
   PluginManager:
     Install:
-      material: 'HEAD(WORLD)'
+      material: 'HEAD_OBJECT(''WORLD'')'
       displayName: '&2Install Plugins'
       lore:
         - '&2Install other Spigot Plugins!'
     Load:
-      material: 'HEAD(CAULDRON)'
+      material: CAULDRON
       displayName: '&2Load Plugins'
       lore:
         - '&2Load Plugins at Server Runtime!'
         - '&2The only thing you need is the File name!'
     PluginItem:
-      material: 'if pluginEnabled: HEAD(BLANK_GREEN) else: HEAD(BLANK_RED)'
+      material: 'if pluginEnabled: HEAD_OBJECT(''BLANK_GREEN'') else: HEAD_OBJECT(''BLANK_RED'')'
       displayName: '&a%pluginName%'
       # Available Placeholders:
       # %name% = The Plugin Name
@@ -1275,12 +1276,12 @@ Items:
           - '&2Set the Description with Chat!'
     AutoUpdateMenu:
       OpenMenuItem:
-        material: 'HEAD(BLANK_LIME_GREEN)'
+        material: 'HEAD_OBJECT(BLANK_LIME_GREEN)'
         displayName: '&aAuto Plugin Updater Menu'
         lore:
           - '&aThe Auto Plugin Updater Menu'
       PluginItem:
-        material: 'if pluginEnabled: HEAD_OBJECT(''BLANK_GREEN'') else HEAD_OBJECT(''BLANK_RED'')'
+        material: PAPER
         displayName: '&a%name%'
         lore:
           - '&6Description: &a%plugin_description%'

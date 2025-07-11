@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.disableditems;/*
  * @Date 14.05.2022 | 20:52
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

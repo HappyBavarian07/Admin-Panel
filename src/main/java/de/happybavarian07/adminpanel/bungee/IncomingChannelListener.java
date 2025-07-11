@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.bungee;/*
  * @Date 02.09.2022 | 15:03
  */
 
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -43,9 +43,9 @@ public record IncomingChannelListener(String incomingChannelName) implements Plu
                 return;
             }
 
-            String messageToSend = Utils.arrayToString(args.toArray(new String[0]));
+            String messageToSend = AdminPanelUtils.arrayToString(args.toArray(new String[0]));
             System.out.println("Received Broadcast Command!" + " Message: " + messageToSend);
-            Bukkit.broadcastMessage(Utils.chat("&f|&9BROADCAST&f| &r" + messageToSend));
+            Bukkit.broadcastMessage(AdminPanelUtils.chat("&f|&9BROADCAST&f| &r" + messageToSend));
         }
     }
 }

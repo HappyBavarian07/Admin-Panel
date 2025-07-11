@@ -1,8 +1,10 @@
 package de.happybavarian07.adminpanel.utils.dependencyloading;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.main.CustomPluginFileLogger;
 import de.happybavarian07.adminpanel.utils.StartUpLogger;
 import de.happybavarian07.adminpanel.utils.dependencyloading.annotations.*;
+import de.happybavarian07.coolstufflib.utils.PluginFileLogger;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -40,9 +42,9 @@ import java.util.logging.Level;
  */
 public final class DependencyLoader {
     private static final StartUpLogger logger = AdminPanelMain.getPlugin().getStartUpLogger();
+    private static final PluginFileLogger dependencyLogger = new CustomPluginFileLogger(AdminPanelMain.getPlugin(), ".m2" + File.separator + "DependencyLoader.log");
     private final RepositorySystem repositorySystem;
     private final RepositorySystemSession session;
-    // Verwende eine Threadpool-Instanz, deren maximale Threadzahl konfigurierbar ist.
     private final ExecutorService dependencyResolverPool;
     private final List<RemoteRepository> repositories = new ArrayList<>();
     private final Set<String> loadedDependencies = ConcurrentHashMap.newKeySet();
@@ -50,13 +52,11 @@ public final class DependencyLoader {
     private final DynamicClassLoader dynamicClassLoader;
     private final File failedDepsFile;
     private final File dependencyCacheFile;
-    // Mapping: Maven-Koordinate -> Pfad zur JAR-Datei
     private final Map<String, String> dependencyCache = new ConcurrentHashMap<>();
 
     public DependencyLoader() {
         this.repositorySystem = newRepositorySystem();
         this.session = newSession(repositorySystem);
-        // Setze einen Threadpool – maximal genutzt werden sollen z. B. doppelt so viele Threads wie Processor verfügbar sind
         int corePoolSize = Runtime.getRuntime().availableProcessors();
         int maxPoolSize = corePoolSize * 2;
         this.dependencyResolverPool = new ThreadPoolExecutor(corePoolSize, maxPoolSize,
@@ -69,12 +69,9 @@ public final class DependencyLoader {
         loadFailedDependencies();
         loadDependencyCache();
 
-        // Registriere Standard-Repositories aus der zentralen Konfiguration
-        // Zentralisierte Konfiguration (hier exemplarisch, statisch definiert)
         DependencyConfig dependencyConfig = new DependencyConfig();
         dependencyConfig.getRepositories().forEach(repo ->
                 registerRepository(repo.name(), repo.url(), true));
-        // Preload eines Beispiel-Abhängigkeit (ClassGraph) – dies wird später aus dem Cache geladen
         loadDependency("io.github.classgraph:classgraph:4.8.137", new String[0], true, true, "", false);
     }
 
@@ -101,7 +98,6 @@ public final class DependencyLoader {
         return session;
     }
 
-    // --- Repository-Registrierung ---
 
     public void registerRepository(String name, String url, boolean logging) {
         boolean exists = repositories.stream()
@@ -124,11 +120,6 @@ public final class DependencyLoader {
                 false);
     }
 
-    // --- Dependency-Loading ---
-
-    /**
-     * Synchronous Wrapper.
-     */
     public void loadDependency(String coordinate, String[] exclusions, boolean logging, boolean appendToParent, String topCoordinate, boolean logTransitive) {
         try {
             loadDependencyAsync(coordinate, exclusions, logging, appendToParent, topCoordinate, logTransitive).get();
@@ -148,17 +139,27 @@ public final class DependencyLoader {
         }
     }
 
-    /**
-     * Asynchrone Methode zum Laden einer Abhängigkeit.
-     */
+    private boolean tryResolveArtifactInRepos(Artifact artifact, ArtifactRequest request) {
+        for (RemoteRepository repo : repositories) {
+            request.setRepositories(Collections.singletonList(repo));
+            try {
+                ArtifactResult result = repositorySystem.resolveArtifact(session, request);
+                if (result.isResolved() && result.getArtifact() != null && result.getArtifact().getFile() != null) {
+                    return true;
+                }
+            } catch (Exception ignored) {
+                dependencyLogger.writeToLog(Level.FINE, "Not found: " + artifact + " in repo: " + repo.getUrl(), "DependencyLoader", false);
+            }
+        }
+        return false;
+    }
+
     public CompletableFuture<Void> loadDependencyAsync(String coordinate, String[] exclusions, boolean logging,
                                                        boolean appendToParent, String topCoordinate, boolean logTransitive) {
-        // Falls bereits fehlschlug oder bereits geladen wurde, überspringen
         if (failedDeps.contains(coordinate) || loadedDependencies.contains(coordinate)) {
             return CompletableFuture.completedFuture(null);
         }
 
-        // Prüfe Cache: Wenn vorhanden, versuche JAR direkt hinzuzufügen
         if (dependencyCache.containsKey(coordinate)) {
             File cachedJar = new File(dependencyCache.get(coordinate));
             if (cachedJar.exists()) {
@@ -167,44 +168,68 @@ public final class DependencyLoader {
                     loadedDependencies.add(coordinate);
                     if (logging) {
                         logDependency(coordinate, topCoordinate);
+                        dependencyLogger.writeToLog(Level.INFO, "Loaded dependency from cache: " + coordinate, "DependencyLoader", false);
                     }
                     return CompletableFuture.completedFuture(null);
                 } catch (Exception e) {
-                    logger.coloredMessage(ChatColor.DARK_RED,
-                            "Failed to add cached JAR to ClassLoader: " + cachedJar.getAbsolutePath());
+                    dependencyLogger.writeToLog(Level.WARNING, "Failed to add cached JAR to ClassLoader: " + cachedJar.getAbsolutePath(), "DependencyLoader", false);
                     dependencyCache.remove(coordinate);
                     persistDependencyCache();
                 }
             } else {
-                logger.coloredMessage(ChatColor.DARK_RED,
-                        "Cached dependency not found: " + cachedJar.getAbsolutePath());
+                dependencyLogger.writeToLog(Level.WARNING, "Cached dependency not found: " + cachedJar.getAbsolutePath(), "DependencyLoader", false);
                 dependencyCache.remove(coordinate);
                 persistDependencyCache();
             }
         }
 
-        // Starte asynchron den Download und die (optionale) transitive Auflösung
-        return CompletableFuture.runAsync(() -> {
+        dependencyLogger.writeToLog(Level.INFO, "Starting download: " + coordinate, "DependencyLoader", false);
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 Artifact artifact = new DefaultArtifact(coordinate);
                 ArtifactRequest request = new ArtifactRequest();
                 request.setArtifact(artifact);
-                request.setRepositories(repositories);
+                if (!tryResolveArtifactInRepos(artifact, request)) {
+                    dependencyLogger.writeToLog(Level.WARNING, "Dependency not found in any repository: " + coordinate, "DependencyLoader", false);
+                    failedDeps.add(coordinate);
+                    persistFailedDependencies();
+                    return null;
+                }
                 ArtifactResult result = repositorySystem.resolveArtifact(session, request);
                 File artifactFile = result.getArtifact().getFile();
                 loadedDependencies.add(coordinate);
                 dependencyCache.put(coordinate, artifactFile.getAbsolutePath());
                 persistDependencyCache();
-                // Transitive Abhängigkeiten asynchron laden (max. Tiefe konfigurierbar, z. B. 2)
-                loadTransitives(artifact, exclusions, logTransitive, appendToParent, topCoordinate, 2).join();
-                addJarToClassLoader(artifactFile, appendToParent);
-                if (logging) {
-                    logDependency(coordinate, topCoordinate);
-                }
+                return new Object[]{artifact, artifactFile};
             } catch (Exception e) {
-                handleDependencyError(coordinate, e, topCoordinate);
+                dependencyLogger.writeToLog(Level.WARNING, "Dependency failed to download: " + coordinate + " (" + e.getClass().getSimpleName() + ")", "DependencyLoader", false);
+                failedDeps.add(coordinate);
+                persistFailedDependencies();
+                return null;
             }
-        }, dependencyResolverPool);
+        }, dependencyResolverPool).thenCompose(result -> {
+            if (result == null) return CompletableFuture.completedFuture(null);
+            Artifact artifact = (Artifact) result[0];
+            File artifactFile = (File) result[1];
+            CompletableFuture<Void> transitivesFuture = loadTransitives(artifact, exclusions, logTransitive, appendToParent, topCoordinate, 2);
+            return transitivesFuture.thenRunAsync(() -> {
+                try {
+                    addJarToClassLoader(artifactFile, appendToParent);
+                    if (logging) {
+                        logDependency(coordinate, topCoordinate);
+                    }
+                    dependencyLogger.writeToLog(Level.INFO, "Completed download: " + coordinate, "DependencyLoader", false);
+                } catch (Exception e) {
+                    dependencyLogger.writeToLog(Level.WARNING, "Failed to add JAR to classloader: " + coordinate, "DependencyLoader", false);
+                }
+            }, dependencyResolverPool);
+        }).orTimeout(120, TimeUnit.SECONDS).whenComplete((v, t) -> {
+            if (t != null) {
+                dependencyLogger.writeToLog(Level.WARNING, "Timeout or error for: " + coordinate, "DependencyLoader", false);
+            } else {
+                dependencyLogger.writeToLog(Level.INFO, "Dependency fully loaded: " + coordinate, "DependencyLoader", false);
+            }
+        });
     }
 
     private CompletableFuture<Void> loadTransitives(Artifact artifact, String[] exclusions, boolean logTransitive,
@@ -239,7 +264,6 @@ public final class DependencyLoader {
     }
 
     private void addJarToClassLoader(File jarFile, boolean appendToParent) throws Exception {
-        // Prüfe, ob es sich um eine JAR-Datei handelt
         if (!jarFile.getName().endsWith(".jar")) {
             logger.coloredMessage(ChatColor.DARK_RED,
                     "File is not a JAR: " + jarFile.getAbsolutePath());
@@ -248,7 +272,6 @@ public final class DependencyLoader {
         URL jarUrl = jarFile.toURI().toURL();
         if (appendToParent) {
             try {
-                // Versuche, den JAR zum Parent-Classloader hinzuzufügen
                 dynamicClassLoader.appendToParent(jarUrl, AdminPanelMain.getPlugin().getClass().getClassLoader());
             } catch (Throwable t) {
                 logger.coloredMessage(
@@ -471,60 +494,6 @@ public final class DependencyLoader {
 
     // --- Dynamic ClassLoader ---
 
-    public static final class DynamicClassLoader extends URLClassLoader {
-        static {
-            ClassLoader.registerAsParallelCapable();
-        }
-
-        private final ClassAppender classAppender = new ClassAppender();
-
-        public DynamicClassLoader(String name, ClassLoader parent) {
-            super(name, new URL[0], parent);
-        }
-
-        public void add(URL url) {
-            addURL(url);
-        }
-
-        /**
-         * Appendet die JAR-URL zum Parent-ClassLoader.
-         */
-        public void appendToParent(URL url, ClassLoader parent) {
-            try {
-                classAppender.append(url, parent);
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    // --- Zentrale Dependency-Konfiguration (Beispiel) ---
-
-    private static final class DependencyConfig {
-        private final List<RepositoryInfo> repositories = List.of(
-                new RepositoryInfo("central", "https://repo.maven.apache.org/maven2/"),
-                new RepositoryInfo("jitpack.io", "https://jitpack.io"),
-                new RepositoryInfo("sonatype", "https://oss.sonatype.org/content/groups/public/")
-        );
-        private final Map<String, String> classToDependencyMap = Map.of(
-                "io.github.classgraph.ClassGraph", "io.github.classgraph:classgraph:4.8.137",
-                "org.apache.commons.lang3.StringUtils", "org.apache.commons:commons-lang3:3.12.0",
-                "com.google.gson.Gson", "com.google.code.gson:gson:2.8.9",
-                "org.slf4j.Logger", "org.slf4j:slf4j-api:1.7.36"
-        );
-
-        public List<RepositoryInfo> getRepositories() {
-            return repositories;
-        }
-
-        public String mapClassNameToDependency(String className) {
-            return classToDependencyMap.get(className);
-        }
-    }
-
-    private record RepositoryInfo(String name, String url) {
-    }
-
     // Methode zum Herunterladen von JARs über HTTP (Dummy-Implementierung, sollte durch Maven Resolver erweitert werden)
     // Hier bleibt die Grundidee erhalten, aber ggf. kann hier noch ein Retry-Mechanismus mit Backoff implementiert werden.
     public File downloadJar(String jarUrlString, boolean logging) throws IOException {
@@ -585,8 +554,137 @@ public final class DependencyLoader {
         throw new IOException("Failed to download jar from " + jarUrlString + " after " + maxRetries + " attempts.", lastException);
     }
 
+    // --- Zentrale Dependency-Konfiguration (Beispiel) ---
+
     // Shutdown-Methode, um den Threadpool sauber zu beenden.
     public void shutdown() {
         dependencyResolverPool.shutdown();
+    }
+
+    public void loadDependencies(List<String> coordinates, String[] exclusions, boolean logging, boolean appendToParent, boolean logTransitive) {
+        Map<String, TreeMap<Version, String>> artifactVersionMap = new HashMap<>();
+        Map<String, Set<String>> projectVersionMap = new HashMap<>();
+        for (String coordinate : coordinates) {
+            String[] parts = coordinate.split(":");
+            if (parts.length < 3) continue;
+            String key = parts[0] + ":" + parts[1];
+            Version version = Version.parse(parts[2]);
+            artifactVersionMap.computeIfAbsent(key, k -> new TreeMap<>()).put(version, coordinate);
+            projectVersionMap.computeIfAbsent(key, k -> new HashSet<>()).add(parts[2]);
+        }
+        List<String> deduped = new ArrayList<>();
+        int versionDuplicates = 0;
+        for (Map.Entry<String, TreeMap<Version, String>> entry : artifactVersionMap.entrySet()) {
+            TreeMap<Version, String> versions = entry.getValue();
+            if (versions.size() > 1) {
+                versionDuplicates++;
+                Version newest = versions.lastKey();
+                Version oldest = versions.firstKey();
+                if (newest.major() != oldest.major()) {
+                    dependencyLogger.writeToLog(Level.SEVERE, "Multiple major versions found for " + entry.getKey() + ". Only the newest (" + newest + ") will be loaded. Features may break.", "DependencyLoader", true);
+                } else {
+                    dependencyLogger.writeToLog(Level.WARNING, "Multiple versions found for " + entry.getKey() + ": " + projectVersionMap.get(entry.getKey()), "DependencyLoader", false);
+                }
+            }
+            deduped.add(versions.lastEntry().getValue());
+        }
+        int loaded = 0;
+        int downloaded = 0;
+        int failed = 0;
+        for (String coordinate : deduped) {
+            boolean wasLoaded = loadedDependencies.contains(coordinate);
+            int before = loadedDependencies.size();
+            loadDependency(coordinate, exclusions, logging, appendToParent, "", logTransitive);
+            int after = loadedDependencies.size();
+            if (after > before) {
+                if (wasLoaded) loaded++;
+                else downloaded++;
+            } else {
+                failed++;
+            }
+        }
+        dependencyLogger.writeToLog(Level.INFO, "Dependency summary: total=" + deduped.size() + ", loaded=" + loaded + ", downloaded=" + downloaded + ", failed=" + failed + ", versionDuplicates=" + versionDuplicates, "DependencyLoader", false);
+    }
+
+    private record Version(int major, int minor, int patch, String raw) implements Comparable<Version> {
+        public static Version parse(String s) {
+            String[] parts = s.split("\\.");
+            int major = parts.length > 0 ? parseInt(parts[0]) : 0;
+            int minor = parts.length > 1 ? parseInt(parts[1]) : 0;
+            int patch = parts.length > 2 ? parseInt(parts[2].replaceAll("[^0-9]", "")) : 0;
+            return new Version(major, minor, patch, s);
+        }
+
+        private static int parseInt(String s) {
+            try {
+                return Integer.parseInt(s.replaceAll("[^0-9]", ""));
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        @Override
+        public int compareTo(Version o) {
+            if (major != o.major) return Integer.compare(major, o.major);
+            if (minor != o.minor) return Integer.compare(minor, o.minor);
+            return Integer.compare(patch, o.patch);
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
+    public static final class DynamicClassLoader extends URLClassLoader {
+        static {
+            ClassLoader.registerAsParallelCapable();
+        }
+
+        private final ClassAppender classAppender = new ClassAppender();
+
+        public DynamicClassLoader(String name, ClassLoader parent) {
+            super(name, new URL[0], parent);
+        }
+
+        public void add(URL url) {
+            addURL(url);
+        }
+
+        /**
+         * Appendet die JAR-URL zum Parent-ClassLoader.
+         */
+        public void appendToParent(URL url, ClassLoader parent) {
+            try {
+                classAppender.append(url, parent);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static final class DependencyConfig {
+        private final List<RepositoryInfo> repositories = List.of(
+                new RepositoryInfo("central", "https://repo.maven.apache.org/maven2/"),
+                new RepositoryInfo("jitpack.io", "https://jitpack.io"),
+                new RepositoryInfo("sonatype", "https://oss.sonatype.org/content/groups/public/")
+        );
+        private final Map<String, String> classToDependencyMap = Map.of(
+                "io.github.classgraph.ClassGraph", "io.github.classgraph:classgraph:4.8.137",
+                "org.apache.commons.lang3.StringUtils", "org.apache.commons:commons-lang3:3.12.0",
+                "com.google.gson.Gson", "com.google.code.gson:gson:2.8.9",
+                "org.slf4j.Logger", "org.slf4j:slf4j-api:1.7.36"
+        );
+
+        public List<RepositoryInfo> getRepositories() {
+            return repositories;
+        }
+
+        public String mapClassNameToDependency(String className) {
+            return classToDependencyMap.get(className);
+        }
+    }
+
+    private record RepositoryInfo(String name, String url) {
     }
 }

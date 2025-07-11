@@ -1,11 +1,11 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions;
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -29,12 +29,17 @@ public class PermissionActionMenu extends Menu {
         this.playerMenuUtility = playerMenuUtility;
         this.permissionFullName = playerMenuUtility.getData("SelectedPermission", String.class);
         this.targetUUID = playerMenuUtility.getTargetUUID();
-        this.permissionsManager = plugin.getPermissionsManager();
+        this.permissionsManager = AdminPanelMain.getPlugin().getPermissionsManager();
     }
 
     @Override
     public String getMenuName() {
         return "Permission: " + permissionFullName;
+    }
+
+    @Override
+    public String getConfigMenuAddonFeatureName() {
+        return "PermissionActionMenu";
     }
 
     @Override
@@ -92,24 +97,22 @@ public class PermissionActionMenu extends Menu {
 
         // Set TRUE
         if (clickedItem.isSimilar(lgm.getItem(path + "SetTrue", player, false))) {
-            permissionsManager.addPermission(targetUUID, permissionFullName, true, false);
-            permissionsManager.reloadPermissions(Bukkit.getPlayer(targetUUID));
+            permissionsManager.addPermission(targetUUID, permissionFullName, true, true);
             if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", true, false);
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
             }
             open();
         } else if (clickedItem.isSimilar(lgm.getItem(path + "SetFalse", player, false))) {
-            permissionsManager.addPermission(targetUUID, permissionFullName, false, false);
-            permissionsManager.reloadPermissions(Bukkit.getPlayer(targetUUID));
+            permissionsManager.addPermission(targetUUID, permissionFullName, false, true);
             if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", false, false);
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
             }
             open();
         } else if (clickedItem.isSimilar(lgm.getItem(path + "Remove", player, false))) {
-            permissionsManager.removePermission(targetUUID, permissionFullName, false);
-            permissionsManager.reloadPermissions(Bukkit.getPlayer(targetUUID));
+            permissionsManager.removePermission(targetUUID, permissionFullName, true);
+            // TODO When player is op then permissions dont get removed, because op permissions are always true
             if (!Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player, true));
             }
@@ -117,7 +120,7 @@ public class PermissionActionMenu extends Menu {
         } else if (clickedItem.isSimilar(lgm.getItem(path + "Info", player, false))) {
             Permission perm = Bukkit.getPluginManager().getPermission(permissionFullName);
             if (perm != null) {
-                player.sendMessage(Utils.format(player,
+                player.sendMessage(AdminPanelUtils.format(player,
                         "Info about Permission:" + "\n" +
                                 "  - &aName: &6" + perm.getName() + "\n" +
                                 "  - &aDescription: &6" + (perm.getDescription().isEmpty() ? perm.getDescription() : "None") + "\n" +

@@ -3,12 +3,12 @@ package de.happybavarian07.adminpanel.menusystem.menu;/*
  * @Date 16.11.2021 | 15:03
  */
 
-import de.happybavarian07.adminpanel.language.LanguageFile;
-import de.happybavarian07.adminpanel.language.Placeholder;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
+import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -46,7 +46,6 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
         ItemStack item = e.getCurrentItem();
         Player player = (Player) e.getWhoClicked();
         List<LanguageFile> languages = new ArrayList<>(lgm.getRegisteredLanguages().values());
-        languages.removeIf(lang -> lang.getPlugin() != plugin);
         languages.removeIf(lang -> lang == lgm.getCurrentLang());
 
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
@@ -142,7 +141,6 @@ public class TempLanguageSelectMenu extends PaginatedMenu {
 
         //The thing you will be looping through to place items
         List<LanguageFile> languages = new ArrayList<>(lgm.getRegisteredLanguages().values());
-        languages.removeIf(lang -> lang.getPlugin() != plugin);
         languages.removeIf(lang -> lang == lgm.getCurrentLang());
 
         ///////////////////////////////////// Pagination loop template

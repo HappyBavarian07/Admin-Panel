@@ -1,10 +1,10 @@
 package de.happybavarian07.adminpanel.listeners;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.MenuAddon;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.MenuAddon;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -74,14 +74,13 @@ public class MenuListener implements Listener {
         // is an instance of Menu, then gg. The reason that
         // an InventoryHolder can be a Menu is because our Menu
         // class implements InventoryHolder!!
-        if (holder instanceof Menu) {
+        if (holder instanceof Menu menu) {
             e.setCancelled(true); // prevent them from frickin over the inventory
             if (e.getCurrentItem() == null) { // deal with null exceptions
                 return;
             }
             // Since we know our inventoryholder is a menu, get the Menu Object representing
             // the menu we clicked on
-            Menu menu = (Menu) holder;
             // Call the handleMenu object which takes the event and processes it
             menu.handleMenu(e);
 
@@ -96,8 +95,7 @@ public class MenuListener implements Listener {
     public void onInvClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
-        if (event.getInventory().getHolder() instanceof Menu) {
-            Menu holder = (Menu) event.getInventory().getHolder();
+        if (event.getInventory().getHolder() instanceof Menu holder) {
 
             holder.handleCloseMenu(event);
 
@@ -116,8 +114,7 @@ public class MenuListener implements Listener {
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
         PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
-        if (event.getInventory().getHolder() instanceof Menu) {
-            Menu holder = (Menu) event.getInventory().getHolder();
+        if (event.getInventory().getHolder() instanceof Menu holder) {
 
             holder.handleOpenMenu(event);
 

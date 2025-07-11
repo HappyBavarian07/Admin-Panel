@@ -3,13 +3,13 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;/*
  * @Date 13.11.2022 | 12:49
  */
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.Warning;
 import de.happybavarian07.adminpanel.utils.WarningManager;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -96,15 +96,15 @@ public class PlayerWarningMenu extends PaginatedMenu {
                 // Info
                 Warning warning = itemsToWarnings.get(item);
                 // Print out Info about the Warning to the Player (e.g. Reason, Creation Date, Expiration Date)
-                player.sendMessage(Utils.format(player, "%prefix% &9> &aThis is the &f#&6" + warning.getWarningCount() + "%a Warning of the Player &6" + Bukkit.getPlayer(targetUUID).getName() + "&a.", AdminPanelMain.getPrefix()));
-                player.sendMessage(Utils.format(player, " &f- &3Reason: &6" + warning.getReason(), AdminPanelMain.getPrefix()));
-                player.sendMessage(Utils.format(player, " &f- &3reation Date: &6" + longToFormattedDate(warning.getCreationDate(), "yyyy/MM/dd HH:mm:ss"), AdminPanelMain.getPrefix()));
-                player.sendMessage(Utils.format(player, " &f- &3Expiration Date: &6" + longToFormattedDate(warning.getExpirationDate(), "yyyy/MM/dd HH:mm:ss"), AdminPanelMain.getPrefix()));
+                player.sendMessage(AdminPanelUtils.format(player, "%prefix% &9> &aThis is the &f#&6" + warning.getWarningCount() + "%a Warning of the Player &6" + Bukkit.getPlayer(targetUUID).getName() + "&a.", AdminPanelMain.getPrefix()));
+                player.sendMessage(AdminPanelUtils.format(player, " &f- &3Reason: &6" + warning.getReason(), AdminPanelMain.getPrefix()));
+                player.sendMessage(AdminPanelUtils.format(player, " &f- &3reation Date: &6" + longToFormattedDate(warning.getCreationDate(), "yyyy/MM/dd HH:mm:ss"), AdminPanelMain.getPrefix()));
+                player.sendMessage(AdminPanelUtils.format(player, " &f- &3Expiration Date: &6" + longToFormattedDate(warning.getExpirationDate(), "yyyy/MM/dd HH:mm:ss"), AdminPanelMain.getPrefix()));
             } else if (e.isRightClick()) {
                 // Remove
                 Warning warning = itemsToWarnings.get(item);
                 warningManager.removeWarning(targetUUID, warning.getWarningCount(), true);
-                player.sendMessage(Utils.format(player, "%prefix% &aYou have successfully removed the &f#&6" + warning.getWarningCount() + "%a Warning of the Player &6" + Bukkit.getPlayer(targetUUID).getName() + "&a.", AdminPanelMain.getPrefix()));
+                player.sendMessage(AdminPanelUtils.format(player, "%prefix% &aYou have successfully removed the &f#&6" + warning.getWarningCount() + "%a Warning of the Player &6" + Bukkit.getPlayer(targetUUID).getName() + "&a.", AdminPanelMain.getPrefix()));
             }
             player.sendMessage("Warning: " + itemsToWarnings.getOrDefault(item, new Warning(player.getUniqueId(), "NULL", -1, -1, -12)).toString());
         } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {

@@ -1,15 +1,10 @@
 package de.happybavarian07.adminpanel.listeners;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.permissions.PermissionAttachment;
-
-import java.util.Map;
 
 /*
  * @Author HappyBavarian07
@@ -29,10 +24,7 @@ public class PlayerEventHandler implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        if (permissionsManager.getPlayerPermissionsAttachments().containsKey(player.getUniqueId())) {
-            player.removeAttachment(permissionsManager.getPlayerPermissionsAttachments().get(player.getUniqueId()));
-        }
+        permissionsManager.unloadPlayerPermissions(event.getPlayer());
     }
 
     /**
@@ -42,7 +34,8 @@ public class PlayerEventHandler implements Listener {
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        permissionsManager.loadPlayerPermissions(event.getPlayer());
+        /*Player player = event.getPlayer();
         PermissionAttachment attachment = player.addAttachment(AdminPanelMain.getPlugin());
         if (permissionsManager.getPlayerPermissionsAttachments().containsKey(player.getUniqueId())) {
             Map<String, Boolean> permissions = permissionsManager.getPlayerPermissions(player.getUniqueId());
@@ -51,6 +44,6 @@ public class PlayerEventHandler implements Listener {
             }
             permissionsManager.getPlayerPermissionsAttachments().put(player.getUniqueId(), attachment);
             player.recalculatePermissions();
-        }
+        }*/
     }
 }

@@ -2,8 +2,9 @@ package de.happybavarian07.adminpanel.commands.subcommands.addoncommands;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -26,14 +27,14 @@ public class AddonEnableCommand extends SubCommand {
             return false;
         }
         String addonName = args[0];
-        if(plugin.getAddonLoader().getAddonMainClassByName(addonName) == null) {
+        if (AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName) == null) {
             sender.sendMessage(lgm.getMessage("AddonCommand.Enable.AddonNotFound", playerOrNull, false).replace("%addon_name%", addonName));
             return false;
         }
-        Addon addon = plugin.getAddonLoader().getAddonMainClassByName(addonName);
+        Addon addon = AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName);
         AddonLoader.EnableResult result;
         try {
-            result = plugin.getAddonLoader().enableAddon(addon.getFile(), new HashSet<>(), true);
+            result = AdminPanelMain.getPlugin().getAddonLoader().enableAddon(addon.getFile(), new HashSet<>(), true);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -79,7 +80,7 @@ public class AddonEnableCommand extends SubCommand {
     public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         List<String> addonList = new ArrayList<>();
-        plugin.getAddonLoader().getLoadedAddons().forEach((addon) -> {
+        AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().forEach((addon) -> {
             if (!addon.isEnabled()) {
                 addonList.add(addon.getName());
             }

@@ -1,8 +1,8 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

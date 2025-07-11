@@ -4,7 +4,7 @@ package de.happybavarian07.adminpanel.bungee;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,7 +23,7 @@ public class BungeeTestCommand implements CommandExecutor {
                 case "text":
                     if (!(sender instanceof Player)) return false;
                     args[0] = "";
-                    String text = Utils.arrayToString(args);
+                    String text = AdminPanelUtils.arrayToString(args);
                     AdminPanelMain.getPlugin().getBungeeUtils().sendDataToChannel("BroadcastServerWide", text);
                     sender.sendMessage("Sending Message to Bungee Cord!");
                     break;

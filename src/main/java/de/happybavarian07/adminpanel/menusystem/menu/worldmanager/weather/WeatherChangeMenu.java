@@ -3,9 +3,9 @@ package de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WeatherChangeEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSettingsMenu;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +19,7 @@ public class WeatherChangeMenu extends Menu {
     public WeatherChangeMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
-        setOpeningPermission("AdminPanel.WorldManagment.Weather");
+        setOpeningPermission("AdminPanel.WorldManager.Weather");
     }
 
     @Override

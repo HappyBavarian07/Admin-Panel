@@ -1,19 +1,21 @@
 package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
-import java.util.HashMap;
-import java.util.Map;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StaffChatCommand extends SubCommand {
     private final StaffChatHandler staffChatHandler;
 
     public StaffChatCommand(String mainCommandName) {
         super(mainCommandName);
-        this.staffChatHandler = this.plugin.getStaffChatHandler();
+        this.staffChatHandler = AdminPanelMain.getPlugin().getStaffChatHandler();
     }
 
     public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
@@ -35,7 +37,7 @@ public class StaffChatCommand extends SubCommand {
                     return true;
                 }
             } else if (playerOrNull == null) {
-                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", (Player)null, false));
+                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
                 return false;
             } else {
                 if (this.staffChatHandler.toggleStaffChatForPlayer(playerOrNull)) {
@@ -48,7 +50,7 @@ public class StaffChatCommand extends SubCommand {
             }
         } else if (args[0].equalsIgnoreCase("disableSC")) {
             if (playerOrNull == null) {
-                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", (Player)null, false));
+                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
                 return false;
             } else {
                 if (this.staffChatHandler.toggleDisableStaffChatForPlayer(playerOrNull)) {
@@ -60,7 +62,7 @@ public class StaffChatCommand extends SubCommand {
                 return true;
             }
         } else if (playerOrNull == null) {
-            sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", (Player)null, false));
+            sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
             return false;
         } else {
             String messageFromArgs = String.join(" ", args);

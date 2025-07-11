@@ -6,8 +6,8 @@ import de.happybavarian07.adminpanel.syncing.custompayload.CustomAction;
 import de.happybavarian07.adminpanel.syncing.custompayload.CustomPacket;
 import de.happybavarian07.adminpanel.syncing.utils.Action;
 import de.happybavarian07.adminpanel.syncing.utils.Packet;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.Result;
-import de.happybavarian07.adminpanel.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -181,8 +181,8 @@ public class PacketHandler {
                 break;
             case BROADCAST_MESSAGE:
                 if (!destinationCheck) {
-                    String prefix = Utils.format(null, data.get("Prefix"), AdminPanelMain.getPrefix());
-                    String message = Utils.format(null, data.get("Message"), prefix);
+                    String prefix = AdminPanelUtils.format(null, data.get("Prefix"), AdminPanelMain.getPrefix());
+                    String message = AdminPanelUtils.format(null, data.get("Message"), prefix);
                     Bukkit.broadcastMessage(message);
                 }
                 break;

@@ -3,10 +3,10 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 17.06.2022 | 22:05
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -26,13 +26,13 @@ public class BugReportCommand extends SubCommand {
         int response = AdminPanelMain.getAPI().reportBugToDiscord(player.getUniqueId(), args);
         if (response == -2) {
             long cooldownTimeInMillis = AdminPanelMain.getAPI().getCooldownTimeMap().get(player.getUniqueId()) - System.currentTimeMillis();
-            player.sendMessage(Utils.chat("&cYou are still on Cooldown for %cooldowntime% Seconds")
+            player.sendMessage(AdminPanelUtils.chat("&cYou are still on Cooldown for %cooldowntime% Seconds")
                     .replace("%cooldowntime%", String.valueOf(TimeUnit.SECONDS.toSeconds(cooldownTimeInMillis))));
             return true;
         } else if (response == -1) {
-            player.sendMessage(Utils.chat("&cError! Please look into the Console for more Information!"));
+            player.sendMessage(AdminPanelUtils.chat("&cError! Please look into the Console for more Information!"));
         } else {
-            player.sendMessage(Utils.chat("&aSuccessfully send Report to the Developer. &7You can wait for the Bug Fix Update or just join my Discord."));
+            player.sendMessage(AdminPanelUtils.chat("&aSuccessfully send Report to the Developer. &7You can wait for the Bug Fix Update or just join my Discord."));
         }
         return true;
     }

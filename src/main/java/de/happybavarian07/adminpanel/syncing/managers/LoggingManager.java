@@ -16,13 +16,13 @@ public class LoggingManager {
 
     public void logIntoFile(Level record, String stringToLog) {
         if (settingsManager.isFileLogging()) {
-            AdminPanelMain.getPlugin().getFileLogger().writeToLog(record, stringToLog, settingsManager.getFileLoggingPrefix());
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(record, stringToLog, settingsManager.getFileLoggingPrefix(), false);
         }
     }
 
     public void logIntoFile(Level record, String stringToLog, String prefix) {
         if (settingsManager.isFileLogging()) {
-            AdminPanelMain.getPlugin().getFileLogger().writeToLog(record, stringToLog, prefix);
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(record, stringToLog, prefix, false);
         }
     }
 }

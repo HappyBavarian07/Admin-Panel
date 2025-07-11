@@ -8,9 +8,9 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -160,13 +160,13 @@ public class PluginSettingsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginCommandsListMenu(playerMenuUtility, currentPlugin).open();
+            new PluginCommandsListMenu(playerMenuUtility).open();
         } else if (item.isSimilar(lgm.getItem(path + "Permissions.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Commands")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginPermissionsListMenu(playerMenuUtility, currentPlugin).open();
+            new PluginPermissionsListMenu(playerMenuUtility).open();
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);

@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.addonloader.loadingutils;
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.utils.FileUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.StartUpLogger;
 import org.bukkit.ChatColor;
 
@@ -129,7 +129,7 @@ public class AddonLoader {
                     checkValidAddonValues(temp);
                 } catch (NullPointerException e) {
                     if (temp == null) {
-                        plugin.getFileLogger().writeToLog(Level.SEVERE, "The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!", LogPrefix.ADDONLOADER);
+                        plugin.getFileLogger().writeToLog(Level.SEVERE, "The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!", LogPrefixExtension.ADDONLOADER);
                         e.printStackTrace();
                         throw new NullPointerException("The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!");
                     }
@@ -269,7 +269,7 @@ public class AddonLoader {
             }
             addonClassLoaders.clear();
         } catch (IOException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.ADDONLOADER);
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefixExtension.ADDONLOADER);
             e.printStackTrace();
         } finally {
             // Ensure all AddonClassLoaders are closed to prevent memory leaks

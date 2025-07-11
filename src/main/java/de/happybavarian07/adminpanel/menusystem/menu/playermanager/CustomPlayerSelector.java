@@ -3,10 +3,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;/*
  * @Date 27.11.2022 | 10:51
  */
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -121,7 +122,7 @@ public class CustomPlayerSelector<T, R> extends PaginatedMenu {
                 future.complete(value);
                 return value;
             });
-            future.thenAccept(result -> Bukkit.getScheduler().runTask(plugin, () -> {
+            future.thenAccept(result -> Bukkit.getScheduler().runTask(AdminPanelMain.getPlugin(), () -> {
                 if (oldMenu != null) {
                     oldMenu.open();
                 } else {
@@ -176,7 +177,7 @@ public class CustomPlayerSelector<T, R> extends PaginatedMenu {
                     }
                     return;
                 }
-                future.thenAccept(result -> Bukkit.getScheduler().runTask(plugin, () -> {
+                future.thenAccept(result -> Bukkit.getScheduler().runTask(AdminPanelMain.getPlugin(), () -> {
                     if (oldMenu != null) {
                         oldMenu.open();
                     } else {

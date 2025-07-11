@@ -2,11 +2,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.GiveEffectToPlayerEvent;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -196,8 +196,8 @@ public class PotionMenu extends PaginatedMenu implements Listener {
                         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&a" + potionList.get(index).getName()));
 
                         List<String> lore = new ArrayList<>();
-                        lore.add(Utils.chat("&7Left-Click &a- &7Add Effect"));
-                        lore.add(Utils.chat("&7Right-Click &a- &7Remove Effect"));
+                        lore.add(AdminPanelUtils.chat("&7Left-Click &a- &7Add Effect"));
+                        lore.add(AdminPanelUtils.chat("&7Right-Click &a- &7Remove Effect"));
 
                         meta.setLore(lore);
                         meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);

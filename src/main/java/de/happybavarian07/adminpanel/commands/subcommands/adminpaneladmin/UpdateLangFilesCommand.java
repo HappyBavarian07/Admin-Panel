@@ -3,9 +3,8 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 17.06.2022 | 22:05
  */
 
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.utils.PluginUtils;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -20,28 +19,28 @@ public class UpdateLangFilesCommand extends SubCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
-        player.sendMessage(Utils.chat("&7Starting Update of the Lang Files!"));
+        player.sendMessage(AdminPanelUtils.chat("&7Starting Update of the Lang Files!"));
         try {
             lgm.updateLangFiles();
             lgm.reloadLanguages(player, true);
-            player.sendMessage(Utils.chat("&7Update finished!"));
+            player.sendMessage(AdminPanelUtils.chat("&7Update finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            player.sendMessage(Utils.chat("&cAn Error occurred while updating the Lang Files: &6" + e.getMessage() + " &7(Please check the Console)."));
+            player.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while updating the Lang Files: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }
 
     @Override
     public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        sender.sendMessage(Utils.chat("&7Starting Update of the Lang Files!"));
+        sender.sendMessage(AdminPanelUtils.chat("&7Starting Update of the Lang Files!"));
         try {
             lgm.updateLangFiles();
             lgm.reloadLanguages(sender, true);
-            sender.sendMessage(Utils.chat("&7Update finished!"));
+            sender.sendMessage(AdminPanelUtils.chat("&7Update finished!"));
         } catch (Exception e) {
             e.printStackTrace();
-            sender.sendMessage(Utils.chat("&cAn Error occurred while updating the Lang Files: &6" + e.getMessage() + " &7(Please check the Console)."));
+            sender.sendMessage(AdminPanelUtils.chat("&cAn Error occurred while updating the Lang Files: &6" + e.getMessage() + " &7(Please check the Console)."));
         }
         return true;
     }

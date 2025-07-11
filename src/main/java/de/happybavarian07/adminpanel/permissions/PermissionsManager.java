@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.permissions;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.tfidfsearch.TFIDFSearch;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,10 +24,10 @@ public class PermissionsManager {
     private final AdminPanelMain plugin;
     private final Map<UUID, PermissionAttachment> playerPermissionsAttachments = new HashMap<>();
     private final Map<UUID, Map<String, Boolean>> permissionMapCache = new HashMap<>();
-    private CompletableFuture<Void> permissionIndexFuture;
-    private Thread permissionIndexThread;
     private final TFIDFSearch permissionSearcher;
     private final PlayerPermissionRepository permissionRepository;
+    private CompletableFuture<Void> permissionIndexFuture;
+    private Thread permissionIndexThread;
 
     public PermissionsManager(AdminPanelMain plugin, long cacheClearDelayTicks) {
         // TODO Add Player Groups to this to be like any other Permission system with groups and stuff.
@@ -38,21 +38,12 @@ public class PermissionsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                permissionMapCache.clear();
-            }
-        }.runTaskTimer(plugin, cacheClearDelayTicks, cacheClearDelayTicks);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Reindex permissions every 10 minutes
-                // So we can add new permissions to the index if there are any
                 permissionIndexThread = getPermissionIndexThread();
                 if (!permissionIndexThread.isAlive()) {
                     permissionIndexThread.start();
                 }
             }
-        }.runTaskTimer(plugin, 6 * 60 * 20L, 6 * 60 * 20L);
+        }.runTaskTimer(plugin, 0L, 6 * 60 * 20L);
     }
 
     public void setup() {
@@ -64,18 +55,31 @@ public class PermissionsManager {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for database to be ready: " + e.getMessage(), LogPrefix.DATELOGGER, true);
+                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for database to be ready: " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
                 }
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "Database is ready starting Permission init code", LogPrefix.DATELOGGER, true);
-            // load all permissions from the database
+
+            try {
+                long totalEntries = permissionRepository.count();
+                long uniquePlayers = permissionRepository.countDistinctPlayers();
+                long uniquePermissions = permissionRepository.countDistinctPermissions();
+
+                plugin.getFileLogger().writeToLog(Level.INFO, "Permission Repository Statistics:", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                plugin.getFileLogger().writeToLog(Level.INFO, "- Total permission entries: " + totalEntries, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                plugin.getFileLogger().writeToLog(Level.INFO, "- Unique players with permissions: " + uniquePlayers, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                plugin.getFileLogger().writeToLog(Level.INFO, "- Unique permissions defined: " + uniquePermissions, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                plugin.getFileLogger().writeToLog(Level.WARNING, "Could not retrieve permission repository statistics: " + e, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+            }
+            plugin.getFileLogger().writeToLog(Level.INFO, "Database is ready starting Permission init code", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             initPermissions();
         }).start();
     }
 
     public void onServerLoad(ServerLoadEvent event) {
         if (event.getType() == ServerLoadEvent.LoadType.STARTUP) {
-            plugin.getFileLogger().writeToLog(Level.INFO, "Starting Permission Indexer Thread after Server is done starting now", LogPrefix.DATELOGGER, true);
+            plugin.getFileLogger().writeToLog(Level.INFO, "Starting Permission Indexer Thread after Server is done starting now", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             if (permissionIndexThread == null) {
                 permissionIndexThread = getPermissionIndexThread();
             }
@@ -87,11 +91,11 @@ public class PermissionsManager {
 
     public TFIDFSearch getPermissionSearcher() {
         if (permissionIndexFuture != null && !permissionIndexFuture.isDone()) {
-            plugin.getFileLogger().writeToLog(Level.INFO, "Waiting for permission index to complete...", LogPrefix.DATELOGGER, true);
+            plugin.getFileLogger().writeToLog(Level.INFO, "Waiting for permission index to complete...", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             try {
                 permissionIndexFuture.get();
             } catch (Exception e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for permission index to complete: " + e.getMessage(), LogPrefix.DATELOGGER, true);
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for permission index to complete: " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             }
         }
         return permissionSearcher;
@@ -120,7 +124,7 @@ public class PermissionsManager {
             permissionIndexFuture.join();
 
             long endTime = System.currentTimeMillis();
-            plugin.getFileLogger().writeToLog(Level.INFO, "Permission Searcher took '" + (endTime - startTime) + "' ms to index " + permissionItems.size() + " permissions", LogPrefix.DATELOGGER, true);
+            plugin.getFileLogger().writeToLog(Level.INFO, "Permission Searcher took '" + (endTime - startTime) + "' ms to index " + permissionItems.size() + " permissions", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
         });
         permissionIndexThread.setDaemon(true);
         permissionIndexThread.setName("Permission Indexer Thread");
@@ -182,48 +186,71 @@ public class PermissionsManager {
     }
 
     public void initPermissions() {
-        // Einrichtung eines Timers, der Berechtigungen für alle Online-Spieler aktualisiert
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!permissionRepository.isDatabaseReady()) {
+                    plugin.getFileLogger().writeToLog(Level.WARNING, "Database not ready, skipping permission initialization", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                    return;
+                }
+
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     UUID playerUUID = online.getUniqueId();
                     if (!playerPermissionsAttachments.containsKey(playerUUID)) {
-                        PermissionAttachment attachment = online.addAttachment(plugin);
-                        Map<String, Boolean> permissions;
-                        if (permissionMapCache.containsKey(playerUUID)) {
-                            permissions = permissionMapCache.get(playerUUID);
-                        } else {
-                            // TODO Fix this suddenly not loading permissions anymore -.-
-                            List<PlayerPermission> playerPermissions = permissionRepository.findByPlayerUUID(playerUUID);
-                            permissions = new HashMap<>();
-                            for (PlayerPermission playerPermission : playerPermissions) {
-                                permissions.put(playerPermission.getPermission(), playerPermission.isValue());
+                        try {
+                            PermissionAttachment attachment = online.addAttachment(plugin);
+                            Map<String, Boolean> permissions;
+
+                            if (permissionMapCache.containsKey(playerUUID)) {
+                                permissions = permissionMapCache.get(playerUUID);
+                                plugin.getFileLogger().writeToLog(Level.FINE, "Loading permissions from cache for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
+                            } else {
+                                List<PlayerPermission> playerPermissions = permissionRepository.findByPlayerUUID(playerUUID);
+                                plugin.getFileLogger().writeToLog(Level.FINE, "Loading permissions from database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
+                                permissions = new HashMap<>();
+
+                                if (playerPermissions != null && !playerPermissions.isEmpty()) {
+                                    for (PlayerPermission playerPermission : playerPermissions) {
+                                        if (playerPermission != null && playerPermission.getPermission() != null) {
+                                            permissions.put(playerPermission.getPermission(), playerPermission.isValue());
+                                        }
+                                    }
+                                    plugin.getFileLogger().writeToLog(Level.INFO, "Loaded " + permissions.size() + " permissions from database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                                } else {
+                                    plugin.getFileLogger().writeToLog(Level.INFO, "No permissions found in database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                                }
+
+                                permissionMapCache.put(playerUUID, permissions);
                             }
-                            permissionMapCache.put(playerUUID, permissions);
+
+                            for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
+                                if (perms.getKey() != null) {
+                                    attachment.setPermission(perms.getKey(), perms.getValue());
+                                }
+                            }
+
+                            playerPermissionsAttachments.put(playerUUID, attachment);
+                            online.recalculatePermissions();
+
+                            plugin.getFileLogger().writeToLog(Level.FINE, "Applied " + permissions.size() + " permissions to " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
+
+                        } catch (Exception e) {
+                            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for " + online.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
                         }
-                        for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
-                            attachment.setPermission(perms.getKey(), perms.getValue());
-                        }
-                        playerPermissionsAttachments.put(playerUUID, attachment);
-                        online.recalculatePermissions();
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0, 5 * 60 * 20L); // Alle 5 Minuten
+        }.runTaskTimer(plugin, 20L, 5 * 60 * 20L);
     }
 
     public void addPermission(UUID playerUUID, String permission, boolean value, boolean reloadPermissions) {
-        // Überprüfen, ob ein Eintrag für diese Berechtigung bereits existiert
         List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
         PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
 
         if (firstPermission != null) {
-            // Aktualisieren des bestehenden Eintrags
             firstPermission.setValue(value);
             permissionRepository.save(firstPermission);
         } else {
-            // Erstellen eines neuen Eintrags
             PlayerPermission newPermission = new PlayerPermission();
             newPermission.setPlayerUUID(playerUUID);
             newPermission.setPermission(permission);
@@ -418,5 +445,40 @@ public class PermissionsManager {
 
     public boolean hasPermissions(UUID permissionHolder) {
         return permissionRepository.countEntriesByUUID(permissionHolder) > 0;
+    }
+
+    public void loadPlayerPermissions(Player player) {
+        if (player == null) return;
+
+        UUID playerUUID = player.getUniqueId();
+        if (playerPermissionsAttachments.containsKey(playerUUID)) {
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Player " + player.getName() + " already has permissions loaded, skipping.", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+            return;
+        }
+
+        try {
+            PermissionAttachment attachment = player.addAttachment(plugin);
+            Map<String, Boolean> permissions = getPlayerPermissions(playerUUID);
+
+            for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
+                attachment.setPermission(perms.getKey(), perms.getValue());
+            }
+
+            playerPermissionsAttachments.put(playerUUID, attachment);
+            player.recalculatePermissions();
+            plugin.getFileLogger().writeToLog(Level.INFO, "Loaded permissions for player: " + player.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+        } catch (Exception e) {
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for player " + player.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+        }
+    }
+
+    public void unloadPlayerPermissions(Player player) {
+        if (player == null) return;
+        UUID playerUUID = player.getUniqueId();
+        if (playerPermissionsAttachments.containsKey(playerUUID)) {
+            player.removeAttachment(playerPermissionsAttachments.get(playerUUID));
+            playerPermissionsAttachments.remove(playerUUID);
+        }
+        permissionMapCache.remove(playerUUID);
     }
 }

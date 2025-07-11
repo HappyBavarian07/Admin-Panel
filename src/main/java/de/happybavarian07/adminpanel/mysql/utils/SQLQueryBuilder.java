@@ -162,6 +162,48 @@ public class SQLQueryBuilder {
         return this;
     }
 
+    public SQLQueryBuilder count() {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("COUNT(*)");
+        return this;
+    }
+
+    public SQLQueryBuilder countDistinct(String column) {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("COUNT(DISTINCT " + column + ")");
+        return this;
+    }
+
+    public SQLQueryBuilder sum(String column) {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("SUM(" + column + ")");
+        return this;
+    }
+
+    public SQLQueryBuilder avg(String column) {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("AVG(" + column + ")");
+        return this;
+    }
+
+    public SQLQueryBuilder max(String column) {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("MAX(" + column + ")");
+        return this;
+    }
+
+    public SQLQueryBuilder min(String column) {
+        this.queryType = QueryType.SELECT;
+        selectColumns.clear();
+        selectColumns.add("MIN(" + column + ")");
+        return this;
+    }
+
     // Helper: Präfixiert einen Tabellennamen falls noch nicht vorhanden
     private String applyPrefix(String table) {
         if (!databasePrefix.isEmpty() && !table.startsWith(databasePrefix)) {

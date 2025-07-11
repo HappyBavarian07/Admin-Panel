@@ -83,7 +83,7 @@ public abstract class VersionComparator {
             } catch (NumberFormatException e) {
                 //e.printStackTrace();
                 available = false;
-                AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefix.UPDATER);
+                AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefixExtension.UPDATER);
             }
             return available;
         }

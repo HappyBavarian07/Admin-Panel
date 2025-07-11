@@ -1,17 +1,17 @@
 package de.happybavarian07.adminpanel.main;
 
-import de.happybavarian07.adminpanel.commandmanagement.CommandManager;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
-import de.happybavarian07.adminpanel.language.LanguageFile;
-import de.happybavarian07.adminpanel.language.LanguageManager;
-import de.happybavarian07.adminpanel.language.Placeholder;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.LogPrefix;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
+import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -77,11 +77,11 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     public ItemStack createSkull(String headTexture, String name) {
-        ItemStack head = new ItemStack(Utils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(AdminPanelUtils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
         if (headTexture.isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setDisplayName(Utils.chat(name));
+        meta.setDisplayName(AdminPanelUtils.chat(name));
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
@@ -96,11 +96,11 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     public ItemStack createSkull(Head headTexture, String name) {
-        ItemStack head = new ItemStack(Utils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(AdminPanelUtils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
         if (headTexture.getTexture().isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setDisplayName(Utils.chat(name));
+        meta.setDisplayName(AdminPanelUtils.chat(name));
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
@@ -161,17 +161,17 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
     @Override
     public void clearChat(int lines, boolean broadcastChatClear, Player player) {
-        Utils.clearChat(lines, broadcastChatClear, player);
+        AdminPanelUtils.clearChat(lines, broadcastChatClear, player);
     }
 
     @Override
     public void restartServer(int timeBeforeRestart) {
-        Utils.serverRestart(timeBeforeRestart);
+        AdminPanelUtils.serverRestart(timeBeforeRestart);
     }
 
     @Override
     public void stopServer(int timeBeforeStop) {
-        Utils.serverStop(timeBeforeStop);
+        AdminPanelUtils.serverStop(timeBeforeStop);
     }
 
     @Override
@@ -182,7 +182,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
             cooldownTimeMap.remove(playerUUID);
         }
         Player player = Bukkit.getPlayer(playerUUID);
-        boolean response = Utils.sendMessageToWebhook(
+        boolean response = AdminPanelUtils.sendMessageToWebhook(
                 "**Admin-Panel-Report** from Player '" + (player != null ? "**" + player.getName() + "**" : "**Not found**") + " (UUID: **" + playerUUID + "**)':\n" +
                 reportMessage
         );
@@ -323,7 +323,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         plugin.reloadConfig();
         messageReceiver.sendMessage(lgm.getMessage("Player.General.ReloadedConfig", null, true));
         lgm.reloadLanguages(messageReceiver, true);
-        plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", LogPrefix.API);
+        plugin.getFileLogger().writeToLog(Level.CONFIG, "Reloaded the Configuration Files", LogPrefixExtension.API);
     }
 
     // Events
@@ -331,7 +331,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     public AdminPanelEvent callAdminPanelEvent(Event event) throws NotAPanelEventException {
         if (event instanceof AdminPanelEvent) {
             Bukkit.getPluginManager().callEvent(event);
-            plugin.getFileLogger().writeToLog(Level.CONFIG, "Called the Admin-Panel Event " + event, LogPrefix.API);
+            plugin.getFileLogger().writeToLog(Level.CONFIG, "Called the Admin-Panel Event " + event, LogPrefixExtension.API);
             return (AdminPanelEvent) event;
         } else {
             throw new NotAPanelEventException("The Event: " + event + " is not an Admin-Panel Event!\nThis Error usually happens if a Plugin tryes to call a Normal Bukkit Event with the callAdminPanelEvent Method in the API!\nPlease contact the Developer of this Plugin!");

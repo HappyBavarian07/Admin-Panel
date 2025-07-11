@@ -1,8 +1,8 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
@@ -66,7 +66,8 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
                 currentCommand.execute(player, currentCommand.getLabel(), new String[]{});
             }
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            new PluginCommandsListMenu(playerMenuUtility, currentCommand.getPlugin()).open();
+            playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
+            new PluginCommandsListMenu(playerMenuUtility).open();
         }
     }
 

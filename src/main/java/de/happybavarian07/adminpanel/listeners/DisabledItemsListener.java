@@ -4,8 +4,8 @@ package de.happybavarian07.adminpanel.listeners;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.language.LanguageManager;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,7 +30,7 @@ public class DisabledItemsListener implements Listener {
     public void onIactWithDisabledItems(PlayerInteractEvent event) {
         ItemStack stack = event.getItem();
         assert stack != null;
-        if (Utils.isVanillaItemDisabled(stack) && !event.getPlayer().hasPermission("AdminPanel.Bypass.ItemDisable")) {
+        if (AdminPanelUtils.isVanillaItemDisabled(stack) && !event.getPlayer().hasPermission("AdminPanel.Bypass.ItemDisable")) {
             event.setCancelled(true);
         }
     }
@@ -39,7 +39,7 @@ public class DisabledItemsListener implements Listener {
     public void onCreativeWithDisabledItems(InventoryCreativeEvent event) {
         ItemStack stack = event.getCurrentItem();
         assert stack != null;
-        if (Utils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
+        if (AdminPanelUtils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
             event.setCancelled(true);
         }
     }
@@ -48,7 +48,7 @@ public class DisabledItemsListener implements Listener {
     public void onClickWithDisabledItems(InventoryClickEvent event) {
         ItemStack stack = event.getCurrentItem();
         assert stack != null;
-        if (Utils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
+        if (AdminPanelUtils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
             event.setCancelled(true);
         }
     }
@@ -57,14 +57,14 @@ public class DisabledItemsListener implements Listener {
     public void onDragWithDisabledItems(InventoryDragEvent event) {
         ItemStack stack = event.getCursor();
         assert stack != null;
-        if (Utils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
+        if (AdminPanelUtils.isVanillaItemDisabled(stack) && !event.getWhoClicked().hasPermission("AdminPanel.Bypass.ItemDisable")) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onIactWithDisabledItems(FurnaceSmeltEvent event) {
-        if ((Utils.isVanillaItemDisabled(event.getSource()) || Utils.isVanillaItemDisabled(event.getResult()))) {
+        if ((AdminPanelUtils.isVanillaItemDisabled(event.getSource()) || AdminPanelUtils.isVanillaItemDisabled(event.getResult()))) {
             event.setCancelled(true);
         }
     }

@@ -1,10 +1,10 @@
 package de.happybavarian07.adminpanel.commands.subcommands.addoncommands;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
-import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.commandmanagement.CommandData;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -29,11 +29,11 @@ public class AddonInfoCommand extends SubCommand {
             return false;
         }
         String addonName = args[0];
-        if (plugin.getAddonLoader().getAddonMainClassByName(addonName) == null) {
+        if (AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName) == null) {
             sender.sendMessage(lgm.getMessage("AddonCommand.Enable.AddonNotFound", playerOrNull, false).replace("%addon_name%", addonName));
             return false;
         }
-        Addon addon = plugin.getAddonLoader().getAddonMainClassByName(addonName);
+        Addon addon = AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName);
 
         // Read the StringList using the LanguageManager from the config and then send each message to the player replacing the placeholders using the method and lgm object.
         List<String> addonInfo = lgm.getCustomObject("AddonCommand.Info.AddonInfo", playerOrNull, new ArrayList<>(), false);
@@ -63,7 +63,7 @@ public class AddonInfoCommand extends SubCommand {
     public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
         Map<Integer, String[]> subArgs = new HashMap<>();
         List<String> addonList = new ArrayList<>();
-        plugin.getAddonLoader().getLoadedAddons().forEach((addon) -> {
+        AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().forEach((addon) -> {
             addonList.add(addon.getName());
         });
         subArgs.put(1, addonList.toArray(new String[0]));

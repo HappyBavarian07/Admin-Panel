@@ -14,12 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RepositoryProxy implements InvocationHandler {
+
+    private static final Map<Class<?>, Class<?>> entityTypeCache = new HashMap<>();
     private final Class<?> repositoryInterface;
     private final SQLExecutor sqlExecutor;
-    private String databasePrefix;
     private final Map<Class<?>, String> tableNameCache = new HashMap<>();
-    // Neuer Cache für Entity-Typen
-    private static final Map<Class<?>, Class<?>> entityTypeCache = new HashMap<>();
+    private String databasePrefix;
 
     public RepositoryProxy(Class<?> repositoryInterface, String databasePrefix, SQLExecutor sqlExecutor) {
         this.repositoryInterface = repositoryInterface;
@@ -27,17 +27,25 @@ public class RepositoryProxy implements InvocationHandler {
         this.sqlExecutor = sqlExecutor;
     }
 
-    public void setDatabasePrefix(String databasePrefix) {
-        this.databasePrefix = databasePrefix;
+    public static <T> T create(Class<T> repositoryInterface, String databasePrefix, SQLExecutor sqlExecutor) {
+        return (T) Proxy.newProxyInstance(
+                repositoryInterface.getClassLoader(),
+                new Class<?>[]{repositoryInterface},
+                new RepositoryProxy(repositoryInterface, databasePrefix, sqlExecutor)
+        );
     }
 
     public String getDatabasePrefix() {
         return databasePrefix;
     }
 
+    public void setDatabasePrefix(String databasePrefix) {
+        this.databasePrefix = databasePrefix;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        // Behandlung für die isDatabaseReady-Methode
+
         if (method.getName().equals("isDatabaseReady")) {
             return isDatabaseReady();
         }
@@ -52,6 +60,63 @@ public class RepositoryProxy implements InvocationHandler {
             String sql = parseMethodNameToQuery(method.getName(), tableName);
             ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
             return sqlExecutor.mapResultSet(resultSet, entityType);
+        } else if (method.getName().startsWith("countBy")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseCountMethodNameToQuery(method.getName(), tableName);
+            ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
+            return extractCountResult(resultSet);
+        } else if (method.getName().startsWith("existsBy")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseExistsMethodNameToQuery(method.getName(), tableName);
+            ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
+            return extractExistsResult(resultSet);
+        } else if (method.getName().startsWith("deleteBy")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseDeleteMethodNameToQuery(method.getName(), tableName);
+            sqlExecutor.executeUpdate(sql, args);
+            return null;
+        } else if (method.getName().startsWith("countDistinct")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseCountDistinctMethodToQuery(method.getName(), tableName);
+            ResultSet resultSet = (args == null || args.length == 0) ?
+                    sqlExecutor.executeQuery(sql) :
+                    sqlExecutor.executeQuery(sql, args);
+            return extractCountResult(resultSet);
+        } else if (method.getName().startsWith("findFirst") || method.getName().startsWith("findTop")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseLimitedFindMethodToQuery(method.getName(), tableName);
+            ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
+            List<?> results = sqlExecutor.mapResultSet(resultSet, entityType);
+            if (method.getReturnType() == Optional.class) {
+                return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+            }
+            return results.isEmpty() ? null : results.get(0);
+        } else if (method.getName().startsWith("sumBy") || method.getName().startsWith("avgBy") ||
+                method.getName().startsWith("maxBy") || method.getName().startsWith("minBy")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseAggregateMethodToQuery(method.getName(), tableName);
+            ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
+            return extractAggregateResult(resultSet, method.getReturnType());
+        } else if (method.getName().contains("OrderBy")) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseOrderedMethodToQuery(method.getName(), tableName);
+            ResultSet resultSet = sqlExecutor.executeQuery(sql, args);
+            return sqlExecutor.mapResultSet(resultSet, entityType);
+        } else if (isSpecialCountMethod(method)) {
+            Class<?> entityType = getEntityTypeFromRepository(repositoryInterface);
+            String tableName = getTableName(entityType);
+            String sql = parseSpecialCountMethod(method.getName(), tableName, args);
+            ResultSet resultSet = (args == null || args.length == 0) ?
+                    sqlExecutor.executeQuery(sql) :
+                    sqlExecutor.executeQuery(sql, args);
+            return extractCountResult(resultSet);
         } else if (isCrudMethod(method)) {
             return handleCrudOperation(method, args, proxy);
         }
@@ -66,17 +131,14 @@ public class RepositoryProxy implements InvocationHandler {
      */
     private boolean isDatabaseReady() {
         try {
-            // Einfache Testabfrage ausführen
             sqlExecutor.executeQuery("SELECT 1").close();
             return true;
         } catch (Exception e) {
-            // Bei Fehlern ist die Datenbank nicht bereit
             return false;
         }
     }
 
     private boolean isCrudMethod(Method method) {
-        // Prüfen, ob die Methode zu den CRUD-Operationen gehört
         return Arrays.asList("save", "findById", "findAll", "count", "delete", "existsById").contains(method.getName());
     }
 
@@ -103,7 +165,6 @@ public class RepositoryProxy implements InvocationHandler {
         boolean exists = false;
 
         if (idValue != null) {
-            // Prüfen, ob die Entity bereits existiert
             String existsQuery = "SELECT COUNT(*) FROM " + tableName + " WHERE " + idColumnName + " = ?";
             try (ResultSet rs = sqlExecutor.executeQuery(existsQuery, idValue)) {
                 if (rs.next() && rs.getInt(1) > 0) {
@@ -113,7 +174,7 @@ public class RepositoryProxy implements InvocationHandler {
         }
 
         if (exists) {
-            // UPDATE
+
             StringBuilder updateQuery = new StringBuilder("UPDATE " + tableName + " SET ");
             List<Object> params = new ArrayList<>();
 
@@ -124,13 +185,13 @@ public class RepositoryProxy implements InvocationHandler {
                 }
             }
 
-            updateQuery.setLength(updateQuery.length() - 2); // Entferne letztes Komma und Leerzeichen
+            updateQuery.setLength(updateQuery.length() - 2); 
             updateQuery.append(" WHERE ").append(idColumnName).append(" = ?");
             params.add(idValue);
 
             sqlExecutor.executeUpdate(updateQuery.toString(), params.toArray());
         } else {
-            // INSERT
+
             StringBuilder insertQuery = new StringBuilder("INSERT INTO " + tableName + " (");
             StringBuilder valuePlaceholders = new StringBuilder(") VALUES (");
             List<Object> params = new ArrayList<>();
@@ -141,8 +202,8 @@ public class RepositoryProxy implements InvocationHandler {
                 params.add(entry.getValue());
             }
 
-            insertQuery.setLength(insertQuery.length() - 2); // Entferne letztes Komma und Leerzeichen
-            valuePlaceholders.setLength(valuePlaceholders.length() - 2); // Entferne letztes Komma und Leerzeichen
+            insertQuery.setLength(insertQuery.length() - 2);
+            valuePlaceholders.setLength(valuePlaceholders.length() - 2); 
             valuePlaceholders.append(")");
 
             sqlExecutor.executeUpdate(insertQuery.toString() + valuePlaceholders, params.toArray());
@@ -194,14 +255,14 @@ public class RepositoryProxy implements InvocationHandler {
     }
 
     private String parseMethodNameToQuery(String methodName, String tableName) {
-        // Entfernen des "findBy"-Präfixes
-        String conditions = methodName.substring(6); // "findBy".length() = 6
 
-        // Aufteilen nach "And" und "Or"
+        String conditions = methodName.substring(6);
+
+
         List<String> conditionsList = new ArrayList<>();
         String currentLogicalOperator = " AND ";
 
-        // Komplexere Condition-Parsing mit RegEx
+
         Pattern pattern = Pattern.compile("(And|Or)(?=[A-Z])");
         Matcher matcher = pattern.matcher(conditions);
 
@@ -219,10 +280,10 @@ public class RepositoryProxy implements InvocationHandler {
             lastEnd = matcher.end();
         }
 
-        // Letzte Bedingung hinzufügen
+
         conditionsList.add(conditions.substring(lastEnd));
 
-        // SQL-Abfrage erstellen
+
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(tableName).append(" WHERE ");
 
         for (int i = 0; i < conditionsList.size(); i++) {
@@ -238,7 +299,7 @@ public class RepositoryProxy implements InvocationHandler {
     }
 
     private void appendCondition(StringBuilder sqlBuilder, String condition) {
-        // Erkennung von Operatoren wie GreaterThan, LessThan, etc.
+
         Map<String, String> operators = new HashMap<>();
         operators.put("GreaterThan", " > ");
         operators.put("LessThan", " < ");
@@ -263,7 +324,7 @@ public class RepositoryProxy implements InvocationHandler {
             }
         }
 
-        // Kleinschreibung für den ersten Buchstaben, dann CamelCase zu Snake_case
+
         columnName = camelToSnakeCase(columnName);
 
         sqlBuilder.append(columnName);
@@ -276,12 +337,10 @@ public class RepositoryProxy implements InvocationHandler {
     }
 
     private String camelToSnakeCase(String camelCase) {
-        // Erster Buchstabe in Kleinbuchstaben
+
         String result = Character.toLowerCase(camelCase.charAt(0)) + camelCase.substring(1);
 
-        // Spezialbehandlung für Akronyme wie UUID, damit diese nicht zerlegt werden
-        // Entfernt zusätzliche Unterstriche zwischen aufeinanderfolgenden Großbuchstaben
-        // z.B. "playerUUID" -> "player_uuid" anstatt "player_u_u_i_d"
+
         StringBuilder snakeCase = new StringBuilder();
         boolean lastWasUpper = false;
 
@@ -314,40 +373,40 @@ public class RepositoryProxy implements InvocationHandler {
             return databasePrefix + tableName;
         }
 
-        // Fallback: Klassenname als Tabellennamen verwenden
+
         String tableName = camelToSnakeCase(entityClass.getSimpleName());
         tableNameCache.put(entityClass, tableName);
         return databasePrefix + tableName;
     }
 
     private Class<?> getEntityTypeFromRepository(Class<?> repositoryClass) {
-        // Aus dem Cache abrufen, falls vorhanden
+
         if (entityTypeCache.containsKey(repositoryClass)) {
             return entityTypeCache.get(repositoryClass);
         }
 
-        // Direkt versuchen, den generischen Typ aus den direkt implementierten Interfaces zu extrahieren
+
         for (Type type : repositoryClass.getGenericInterfaces()) {
             if (type instanceof ParameterizedType parameterizedType) {
                 if (Repository.class.equals(parameterizedType.getRawType())) {
                     Type[] typeArguments = parameterizedType.getActualTypeArguments();
                     if (typeArguments.length > 0 && typeArguments[0] instanceof Class<?> entityType) {
-                        // Im Cache speichern
+
                         entityTypeCache.put(repositoryClass, entityType);
                         return entityType;
                     }
                 }
             }
         }
-        // Rekursiver Fallback: Überprüfen der erweiterten Interfaces
+
         for (Class<?> exportedInterface : repositoryClass.getInterfaces()) {
             try {
                 Class<?> entityType = getEntityTypeFromRepository(exportedInterface);
-                // Im Cache speichern
+
                 entityTypeCache.put(repositoryClass, entityType);
                 return entityType;
             } catch (IllegalArgumentException ignored) {
-                // Nächsten Interface prüfen
+
             }
         }
         throw new IllegalArgumentException("Could not determine entity type from repository: " + repositoryClass.getName());
@@ -383,15 +442,362 @@ public class RepositoryProxy implements InvocationHandler {
                 }
             }
         }
-        return "id"; // Standard-ID-Spaltenname als Fallback
+        return "id";
     }
 
-    public static <T> T create(Class<T> repositoryInterface, String databasePrefix, SQLExecutor sqlExecutor) {
-        return (T) Proxy.newProxyInstance(
-                repositoryInterface.getClassLoader(),
-                new Class<?>[]{repositoryInterface},
-                new RepositoryProxy(repositoryInterface, databasePrefix, sqlExecutor)
-        );
+    private String parseCountMethodNameToQuery(String methodName, String tableName) {
+
+        String conditions = methodName.substring(8);
+
+
+        List<String> conditionsList = new ArrayList<>();
+        String currentLogicalOperator = " AND ";
+
+
+        Pattern pattern = Pattern.compile("(And|Or)(?=[A-Z])");
+        Matcher matcher = pattern.matcher(conditions);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            String condition = conditions.substring(lastEnd, matcher.start());
+            conditionsList.add(condition);
+
+            if (matcher.group().equals("Or")) {
+                currentLogicalOperator = " OR ";
+            } else {
+                currentLogicalOperator = " AND ";
+            }
+
+            lastEnd = matcher.end();
+        }
+
+
+        conditionsList.add(conditions.substring(lastEnd));
+
+
+        StringBuilder sqlBuilder = new StringBuilder("SELECT COUNT(*) FROM ").append(tableName).append(" WHERE ");
+
+        for (int i = 0; i < conditionsList.size(); i++) {
+            String condition = conditionsList.get(i);
+            appendCondition(sqlBuilder, condition);
+
+            if (i < conditionsList.size() - 1) {
+                sqlBuilder.append(currentLogicalOperator);
+            }
+        }
+
+        return sqlBuilder.toString();
+    }
+
+    private Long extractCountResult(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return resultSet.getLong(1);
+        }
+        return 0L;
+    }
+
+    private String parseExistsMethodNameToQuery(String methodName, String tableName) {
+
+        String conditions = methodName.substring(8);
+
+
+        List<String> conditionsList = new ArrayList<>();
+        String currentLogicalOperator = " AND ";
+
+
+        Pattern pattern = Pattern.compile("(And|Or)(?=[A-Z])");
+        Matcher matcher = pattern.matcher(conditions);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            String condition = conditions.substring(lastEnd, matcher.start());
+            conditionsList.add(condition);
+
+            if (matcher.group().equals("Or")) {
+                currentLogicalOperator = " OR ";
+            } else {
+                currentLogicalOperator = " AND ";
+            }
+
+            lastEnd = matcher.end();
+        }
+
+
+        conditionsList.add(conditions.substring(lastEnd));
+
+
+        StringBuilder sqlBuilder = new StringBuilder("SELECT COUNT(*) FROM ").append(tableName).append(" WHERE ");
+
+        for (int i = 0; i < conditionsList.size(); i++) {
+            String condition = conditionsList.get(i);
+            appendCondition(sqlBuilder, condition);
+
+            if (i < conditionsList.size() - 1) {
+                sqlBuilder.append(currentLogicalOperator);
+            }
+        }
+
+        return sqlBuilder.toString();
+    }
+
+    private Boolean extractExistsResult(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return resultSet.getInt(1) > 0;
+        }
+        return false;
+    }
+
+    private String parseDeleteMethodNameToQuery(String methodName, String tableName) {
+
+        String conditions = methodName.substring(8);
+
+
+        List<String> conditionsList = new ArrayList<>();
+        String currentLogicalOperator = " AND ";
+
+
+        Pattern pattern = Pattern.compile("(And|Or)(?=[A-Z])");
+        Matcher matcher = pattern.matcher(conditions);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            String condition = conditions.substring(lastEnd, matcher.start());
+            conditionsList.add(condition);
+
+            if (matcher.group().equals("Or")) {
+                currentLogicalOperator = " OR ";
+            } else {
+                currentLogicalOperator = " AND ";
+            }
+
+            lastEnd = matcher.end();
+        }
+
+
+        conditionsList.add(conditions.substring(lastEnd));
+
+
+        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ").append(tableName).append(" WHERE ");
+
+        for (int i = 0; i < conditionsList.size(); i++) {
+            String condition = conditionsList.get(i);
+            appendCondition(sqlBuilder, condition);
+
+            if (i < conditionsList.size() - 1) {
+                sqlBuilder.append(currentLogicalOperator);
+            }
+        }
+
+        return sqlBuilder.toString();
+    }
+
+    private String parseCountDistinctMethodToQuery(String methodName, String tableName) {
+        if (methodName.equals("countDistinctPlayers")) {
+            return "SELECT COUNT(DISTINCT player_uuid) FROM " + tableName;
+        } else if (methodName.equals("countDistinctPermissions")) {
+            return "SELECT COUNT(DISTINCT permission) FROM " + tableName;
+        }
+
+        String conditions = methodName.substring(13);
+        String distinctColumn = camelToSnakeCase(conditions.split("By")[0]);
+
+        if (conditions.contains("By")) {
+            String whereConditions = conditions.substring(conditions.indexOf("By") + 2);
+            List<String> conditionsList = parseConditions(whereConditions);
+            StringBuilder sqlBuilder = new StringBuilder("SELECT COUNT(DISTINCT ").append(distinctColumn).append(") FROM ").append(tableName).append(" WHERE ");
+
+            for (int i = 0; i < conditionsList.size(); i++) {
+                appendCondition(sqlBuilder, conditionsList.get(i));
+                if (i < conditionsList.size() - 1) {
+                    sqlBuilder.append(" AND ");
+                }
+            }
+            return sqlBuilder.toString();
+        } else {
+            return "SELECT COUNT(DISTINCT " + distinctColumn + ") FROM " + tableName;
+        }
+    }
+
+    private boolean isSpecialCountMethod(Method method) {
+        String methodName = method.getName();
+        return methodName.equals("countEntriesByUUID") ||
+                methodName.equals("countTruePermissions") ||
+                methodName.equals("countFalsePermissions") ||
+                methodName.equals("countPermissionsStartingWith") ||
+                methodName.equals("countPlayersWithPermission");
+    }
+
+    private String parseSpecialCountMethod(String methodName, String tableName, Object[] args) {
+        return switch (methodName) {
+            case "countEntriesByUUID" -> "SELECT COUNT(*) FROM " + tableName + " WHERE player_uuid = ?";
+            case "countTruePermissions" -> "SELECT COUNT(*) FROM " + tableName + " WHERE value = true";
+            case "countFalsePermissions" -> "SELECT COUNT(*) FROM " + tableName + " WHERE value = false";
+            case "countPermissionsStartingWith" ->
+                    "SELECT COUNT(*) FROM " + tableName + " WHERE permission LIKE CONCAT(?, '%')";
+            case "countPlayersWithPermission" ->
+                    "SELECT COUNT(DISTINCT player_uuid) FROM " + tableName + " WHERE permission = ?";
+            default -> throw new IllegalArgumentException("Unknown special count method: " + methodName);
+        };
+    }
+
+    private List<String> parseConditions(String conditions) {
+        List<String> conditionsList = new ArrayList<>();
+        Pattern pattern = Pattern.compile("(And|Or)(?=[A-Z])");
+        Matcher matcher = pattern.matcher(conditions);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            conditionsList.add(conditions.substring(lastEnd, matcher.start()));
+            lastEnd = matcher.end();
+        }
+        conditionsList.add(conditions.substring(lastEnd));
+        return conditionsList;
+    }
+
+    private String parseLimitedFindMethodToQuery(String methodName, String tableName) {
+        String baseQuery;
+        int limit = 1;
+
+        if (methodName.startsWith("findFirst")) {
+            String conditions = methodName.substring(9);
+            if (conditions.startsWith("By")) {
+                conditions = conditions.substring(2);
+                List<String> conditionsList = parseConditions(conditions);
+                StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(tableName).append(" WHERE ");
+
+                for (int i = 0; i < conditionsList.size(); i++) {
+                    appendCondition(sqlBuilder, conditionsList.get(i));
+                    if (i < conditionsList.size() - 1) {
+                        sqlBuilder.append(" AND ");
+                    }
+                }
+                baseQuery = sqlBuilder.toString();
+            } else {
+                baseQuery = "SELECT * FROM " + tableName;
+            }
+        } else if (methodName.startsWith("findTop")) {
+            Pattern topPattern = Pattern.compile("findTop(\\d+)(.*)");
+            Matcher matcher = topPattern.matcher(methodName);
+            if (matcher.matches()) {
+                limit = Integer.parseInt(matcher.group(1));
+                String remaining = matcher.group(2);
+                if (remaining.startsWith("By")) {
+                    String conditions = remaining.substring(2);
+                    List<String> conditionsList = parseConditions(conditions);
+                    StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(tableName).append(" WHERE ");
+
+                    for (int i = 0; i < conditionsList.size(); i++) {
+                        appendCondition(sqlBuilder, conditionsList.get(i));
+                        if (i < conditionsList.size() - 1) {
+                            sqlBuilder.append(" AND ");
+                        }
+                    }
+                    baseQuery = sqlBuilder.toString();
+                } else {
+                    baseQuery = "SELECT * FROM " + tableName;
+                }
+            } else {
+                baseQuery = "SELECT * FROM " + tableName;
+            }
+        } else {
+            baseQuery = "SELECT * FROM " + tableName;
+        }
+
+        return baseQuery + " LIMIT " + limit;
+    }
+
+    private String parseAggregateMethodToQuery(String methodName, String tableName) {
+        String aggregateFunction;
+        String columnName = null;
+        String conditions;
+
+        if (methodName.startsWith("sumBy")) {
+            aggregateFunction = "SUM";
+            conditions = methodName.substring(5);
+        } else if (methodName.startsWith("avgBy")) {
+            aggregateFunction = "AVG";
+            conditions = methodName.substring(5);
+        } else if (methodName.startsWith("maxBy")) {
+            aggregateFunction = "MAX";
+            conditions = methodName.substring(5);
+        } else if (methodName.startsWith("minBy")) {
+            aggregateFunction = "MIN";
+            conditions = methodName.substring(5);
+        } else {
+            throw new IllegalArgumentException("Unknown aggregate function in method: " + methodName);
+        }
+
+        String[] parts = conditions.split("And|Or");
+        if (parts.length > 0) {
+            columnName = camelToSnakeCase(parts[0]);
+        }
+
+        if (columnName == null) {
+            columnName = "*";
+        }
+
+        return "SELECT " + aggregateFunction + "(" + columnName + ") FROM " + tableName;
+    }
+
+    private String parseOrderedMethodToQuery(String methodName, String tableName) {
+        String[] parts = methodName.split("OrderBy");
+        String basePart = parts[0];
+        String orderPart = parts.length > 1 ? parts[1] : "";
+
+        StringBuilder sqlBuilder = new StringBuilder();
+
+        if (basePart.startsWith("findBy")) {
+            String conditions = basePart.substring(6);
+            if (!conditions.isEmpty()) {
+                List<String> conditionsList = parseConditions(conditions);
+                sqlBuilder.append("SELECT * FROM ").append(tableName).append(" WHERE ");
+
+                for (int i = 0; i < conditionsList.size(); i++) {
+                    appendCondition(sqlBuilder, conditionsList.get(i));
+                    if (i < conditionsList.size() - 1) {
+                        sqlBuilder.append(" AND ");
+                    }
+                }
+            } else {
+                sqlBuilder.append("SELECT * FROM ").append(tableName);
+            }
+        } else {
+            sqlBuilder.append("SELECT * FROM ").append(tableName);
+        }
+
+        if (!orderPart.isEmpty()) {
+            String direction = "ASC";
+            if (orderPart.endsWith("Desc")) {
+                direction = "DESC";
+                orderPart = orderPart.substring(0, orderPart.length() - 4);
+            } else if (orderPart.endsWith("Asc")) {
+                orderPart = orderPart.substring(0, orderPart.length() - 3);
+            }
+
+            String orderColumn = camelToSnakeCase(orderPart);
+            sqlBuilder.append(" ORDER BY ").append(orderColumn).append(" ").append(direction);
+        }
+
+        return sqlBuilder.toString();
+    }
+
+    private Object extractAggregateResult(ResultSet resultSet, Class<?> returnType) throws SQLException {
+        if (resultSet.next()) {
+            Object value = resultSet.getObject(1);
+            if (value == null) return null;
+
+            if (returnType == Integer.class || returnType == int.class) {
+                return resultSet.getInt(1);
+            } else if (returnType == Long.class || returnType == long.class) {
+                return resultSet.getLong(1);
+            } else if (returnType == Double.class || returnType == double.class) {
+                return resultSet.getDouble(1);
+            } else if (returnType == Float.class || returnType == float.class) {
+                return resultSet.getFloat(1);
+            } else {
+                return value;
+            }
+        }
+        return null;
     }
 }
-

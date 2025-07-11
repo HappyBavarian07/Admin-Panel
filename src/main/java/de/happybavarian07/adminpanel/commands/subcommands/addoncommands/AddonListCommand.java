@@ -1,9 +1,10 @@
 package de.happybavarian07.adminpanel.commands.subcommands.addoncommands;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
-import de.happybavarian07.adminpanel.commandmanagement.PaginatedList;
-import de.happybavarian07.adminpanel.commandmanagement.SubCommand;
-import de.happybavarian07.adminpanel.language.PlaceholderType;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -32,7 +33,7 @@ public class AddonListCommand extends SubCommand {
             }
         }
         try {
-            PaginatedList<Addon> messages = new PaginatedList<>(plugin.getAddonLoader().getLoadedAddons());
+            PaginatedList<Addon> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons());
             messages.maxItemsPerPage(MAX_ITEM_PER_PAGE).sort("bubble", false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
             if (!messages.containsPage(page)) {
@@ -69,8 +70,8 @@ public class AddonListCommand extends SubCommand {
 
     @Override
     public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        int count = plugin.getAddonLoader().getLoadedAddons().size() / MAX_ITEM_PER_PAGE;
-        if (plugin.getAddonLoader().getLoadedAddons().size() % MAX_ITEM_PER_PAGE != 0) {
+        int count = AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().size() / MAX_ITEM_PER_PAGE;
+        if (AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().size() % MAX_ITEM_PER_PAGE != 0) {
             count++;
         }
         return Map.of(1, new String[]{String.valueOf(count)});

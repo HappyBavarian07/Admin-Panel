@@ -1,6 +1,5 @@
 package de.happybavarian07.adminpanel.permissions;
 
-import de.happybavarian07.adminpanel.mysql.annotations.Query;
 import de.happybavarian07.adminpanel.mysql.repository.Repository;
 
 import java.util.List;
@@ -31,6 +30,33 @@ public interface PlayerPermissionRepository extends Repository<PlayerPermission,
         permission.ifPresent(this::delete);
     }
 
-    @Query("SELECT Count(*) FROM player_permissions WHERE player_uuid = ?")
     int countEntriesByUUID(UUID playerUUID);
+
+    long countDistinctPlayers();
+
+    long countDistinctPermissions();
+
+    long countByValue(boolean value);
+
+    long countByPermissionPattern(String permissionPattern);
+
+    long countPlayersWithPermission(String permission);
+
+    long countByPlayerUUIDAndValue(UUID playerUUID, boolean value);
+
+    boolean existsByPlayerUUIDAndPermission(UUID playerUUID, String permission);
+
+    void deleteByPlayerUUIDAndValue(UUID playerUUID, boolean value);
+
+    void deleteByValue(boolean value);
+
+    List<PlayerPermission> findByValue(boolean value);
+
+    List<PlayerPermission> findByPermissionLike(String permissionPattern);
+
+    long countTruePermissions();
+
+    long countFalsePermissions();
+
+    long countPermissionsStartingWith(String prefix);
 }

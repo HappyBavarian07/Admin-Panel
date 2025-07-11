@@ -3,14 +3,9 @@ package de.happybavarian07.adminpanel.main;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.backupmanager.BackupManager;
 import de.happybavarian07.adminpanel.backupmanager.FileBackup;
-import de.happybavarian07.adminpanel.commandmanagement.CommandManagerRegistry;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
-import de.happybavarian07.adminpanel.language.LanguageFile;
-import de.happybavarian07.adminpanel.language.LanguageManager;
-import de.happybavarian07.adminpanel.language.PerPlayerLanguageHandler;
-import de.happybavarian07.adminpanel.language.mysql.MySQLLanguageManager;
+import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
-import de.happybavarian07.adminpanel.menusystem.MenuAddonManager;
 import de.happybavarian07.adminpanel.mysql.RepositoryController;
 import de.happybavarian07.adminpanel.mysql.utils.DatabaseProperties;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
@@ -21,6 +16,13 @@ import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
 import de.happybavarian07.adminpanel.utils.*;
 import de.happybavarian07.adminpanel.utils.managers.*;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
+import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
+import de.happybavarian07.coolstufflib.languagemanager.PerPlayerLanguageHandler;
+import de.happybavarian07.coolstufflib.menusystem.MenuAddonManager;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -31,7 +33,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +47,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private static String prefix;
     private static AdminPanelAPI API;
     private static AdminPanelMain plugin;
-    private static PluginFileLogger fileLogger;
+    private static CustomPluginFileLogger fileLogger;
     private final List<String> disabledCommands = new ArrayList<>();
     public Economy eco = null;
     public net.milkbowl.vault.permission.Permission perms = null;
@@ -76,6 +77,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private APDependencyManager dependencyManager;
     private RepositoryController repositoryController;
     private PluginUtils globalPluginUtils;
+    private CoolStuffLib coolStuffLib;
 
     /**
      * Returns the Prefix of the Plugin
@@ -124,6 +126,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public TPSMeter getTpsMeter() {
         return tpsMeter;
+    }
+
+    public CoolStuffLib getCoolStuffLib() {
+        return coolStuffLib;
     }
 
     public MenuAddonManager getMenuAddonManager() {
@@ -208,7 +214,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
             // Log error using LogToFile From FileLogger
-            fileLogger.writeToLog(Level.SEVERE, "Error updating Config File from AdminPanel", LogPrefix.ADMINPANEL_MAIN);
+            fileLogger.writeToLog(Level.SEVERE, "Error updating Config File from AdminPanel", LogPrefixExtension.ADMINPANEL_MAIN);
             e.printStackTrace();
         }
         reloadConfig();
@@ -227,7 +233,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setPlugin(this);
         setupBackupManager();
         setupFileLogger();
-        new Utils();
+        new AdminPanelUtils();
 
         // Load File Corruption Manager
         fileCorruptionManager = new FileCorruptionManager(this, backupManager.getFileBackup("ConfigBackup"));
@@ -276,6 +282,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         pluginDescriptionManager = new PluginDescriptionManager();
         globalPluginUtils = new PluginUtils();
         lastStartTimeMillis = System.currentTimeMillis();
+        CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
+                .setDataFile(new File(getDataFolder(), "data.yml"))
+                .setPluginFileLogger(fileLogger)
+                .setUsePlayerLangHandler(true)
+                .setSendSyntaxOnZeroArgs(true);
         tpsMeter = new TPSMeter();
         setPlugin(this);
 
@@ -284,9 +295,14 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Metrics metrics = setupMetrics();
         sendStartupMessages();
         setupPluginStateManager();
-        setupMenuAddonManager();
-        setupLanguageManager();
-        setupCommandManagerRegistry();
+        setupMenuAddonManager(coolStuffLibBuilder);
+        setupLanguageManager(coolStuffLibBuilder);
+        setupCommandManagerRegistry(coolStuffLibBuilder);
+        coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
+        coolStuffLib.setup();
+        menuAddonManager = coolStuffLib.getMenuAddonManager();
+        languageManager = coolStuffLib.getLanguageManager();
+        commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();
         setupAPI();
         initializeUtils();
         registerBungeeChannels();
@@ -330,7 +346,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 assert is != null;
                 is.close();
             } catch (IOException e) {
-                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefix.ADMINPANEL_MAIN, true);
+                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
             }
         }
         String host = properties.getProperty("host", "localhost");
@@ -348,8 +364,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
                 databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
             }
-            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefix.ADMINPANEL_MAIN, true);
-            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefix.ADMINPANEL_MAIN, true);
+            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefixExtension.ADMINPANEL_MAIN.getLogPrefix(), true);
+            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefixExtension.ADMINPANEL_MAIN.getLogPrefix(), true);
         } else if (driver.equalsIgnoreCase("sqlite")) {
             if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
                 databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
@@ -385,33 +401,22 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupFileLogger() {
-        fileLogger = new PluginFileLogger();
+        fileLogger = new CustomPluginFileLogger(this, "plugin.log");
     }
 
-    private void setupMenuAddonManager() {
-        menuAddonManager = new MenuAddonManager();
+    private void setupMenuAddonManager(CoolStuffLibBuilder builder) {
+        builder.setMenuAddonManager(new MenuAddonManager());
     }
 
-    private void setupLanguageManager() {
-        boolean mysqlLanguageManagerTemp = false;
-        if (mysqlLanguageManagerTemp) {
-            try {
-                languageManager = new MySQLLanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
-            } catch (RuntimeException e) {
-                if (e.getMessage().contains("Failed to create a connection to the database")) {
-                    languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
-                    mysqlLanguageManagerTemp = false;
-                    plugin.getLogger().warning("Failed to connect to the MySQL Database! Using the File Language Manager instead!");
-                }
-            }
-        } else {
-            languageManager = new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "[Admin-Panel]");
-        }
+    private void setupLanguageManager(CoolStuffLibBuilder builder) {
+        // TODO Maybe reimplement the MySQL Language Manager
+        //boolean mysqlLanguageManagerTemp = false;
+        new InternalCacheHandler(); // unused for now, but we need it.
+        builder.setLanguageManager(new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "languages", "[Admin-Panel]"));
     }
 
-    private void setupCommandManagerRegistry() {
-        commandManagerRegistry = new CommandManagerRegistry(this);
-        commandManagerRegistry.setCommandManagerRegistryReady(true);
+    private void setupCommandManagerRegistry(CoolStuffLibBuilder builder) {
+        builder.setCommandManagerRegistry(new CommandManagerRegistry(this));
     }
 
     private void setupAPI() {
@@ -468,7 +473,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             ticks = switch (lastChar) {
                 case 's' -> timeValue * 20;
                 case 'm' -> timeValue * 20 * 60;
-                case 'h' -> timeValue * 20 * 60 * 60;
                 case 'd' -> timeValue * 20 * 60 * 60 * 24;
                 default -> timeValue * 20 * 60 * 60;
             };
@@ -491,7 +495,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                             getConfig().getString(path + "ClientName"));
                     dataClientUtils = new DataClientUtils(dataClient);
                 } catch (IOException e) {
-                    fileLogger.writeToLog(Level.SEVERE, "Error while initializing DataClient (" + e + ": " + e.getMessage() + ")", LogPrefix.ADMINPANEL_MAIN);
+                    fileLogger.writeToLog(Level.SEVERE, "Error while initializing DataClient (" + e + ": " + e.getMessage() + ")", LogPrefixExtension.ADMINPANEL_MAIN);
                 }
             }
         }
@@ -537,27 +541,22 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupLanguageHandler() {
         dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
-        languageManager.setPlhandler(new PerPlayerLanguageHandler(languageManager, new File(getDataFolder() + "/data.yml"), dataYML));
+        languageManager.setPLHandler(new PerPlayerLanguageHandler(languageManager, new File(getDataFolder() + "/data.yml"), dataYML));
     }
 
     private void enableLanguageManager() {
-        LanguageFile deLang = new LanguageFile(this, "de", true);
-        LanguageFile enLang = new LanguageFile(this, "en", true);
+        LanguageFile deLang = new LanguageFile(new File(getDataFolder() + "/languages"), "languages", "de");
+        LanguageFile enLang = new LanguageFile(new File(getDataFolder() + "/languages"), "languages", "en");
         boolean autoLanguageFileUpdating = getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating");
         languageManager.addLanguagesToList(true);
-        if (languageManager instanceof MySQLLanguageManager) {
-            ((MySQLLanguageManager) languageManager).addLang(UUID.fromString("34a3eaac-5fd8-4d82-950e-e52153529b53"), deLang, deLang.getLangName(), !autoLanguageFileUpdating);
-            ((MySQLLanguageManager) languageManager).addLang(UUID.fromString("d6ef09c8-8cb9-4335-85be-1e95d81d6e93"), enLang, enLang.getLangName(), !autoLanguageFileUpdating);
-        } else {
-            languageManager.addLang(deLang, deLang.getLangName());
-            languageManager.addLang(enLang, enLang.getLangName());
-        }
+        languageManager.addLang(deLang, deLang.getLangName());
+        languageManager.addLang(enLang, enLang.getLangName());
         languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language"), true), true);
         setLanguageManagerEnabled(languageManager != null && languageManager.getCurrentLang() != null);
         if (isLanguageManagerEnabled()) {
             getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null, true));
         } else {
-            getServer().getConsoleSender().sendMessage(Utils.chat("&f[&aAdmin-&ePanel&f] &cLanguage Manager is not enabled, " +
+            getServer().getConsoleSender().sendMessage(AdminPanelUtils.chat("&f[&aAdmin-&ePanel&f] &cLanguage Manager is not enabled, " +
                     "which means all the Items and Messages won't work! " +
                     "The Plugin will automatically unload! " +
                     "Look for Errors from the Admin-Panel in the Console!"));
@@ -575,6 +574,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         boolean autoLanguageFileUpdating = getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating");
         if (autoLanguageFileUpdating) {
             System.out.println("Auto Language File Updating is enabled!");
+            /*
+
             if (languageManager instanceof MySQLLanguageManager) {
                 System.out.println("Language IDs: " + ((MySQLLanguageManager) languageManager).getDatabaseController().getInnerLanguageManager().getLanguageIDs());
                 System.out.println("Language Converter Map: " + ((MySQLLanguageManager) languageManager).getDatabaseController().getInnerLanguageManager().getConverterManager().getLanguageConverterMap());
@@ -592,8 +593,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                     }
                 }.runTaskLater(this, 20L * 10);
             } else {
-                languageManager.reloadLanguages(null, false);
+            languageManager.reloadLanguages(null, false);
             }
+             */
+            languageManager.reloadLanguages(null, false);
         }
     }
 
@@ -654,7 +657,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private void logStartupMessage() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        getFileLogger().writeToLog(Level.INFO, "Admin-Panel successfully started on '" + dtf.format(now) + "'", LogPrefix.DATELOGGER);
+        getFileLogger().writeToLog(Level.INFO, "Admin-Panel successfully started on '" + dtf.format(now) + "'", LogPrefixExtension.DATELOGGER);
     }
 
     @Override
@@ -696,7 +699,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return dataYML;
     }
 
-    public PluginFileLogger getFileLogger() {
+    public CustomPluginFileLogger getFileLogger() {
         return fileLogger;
     }
 

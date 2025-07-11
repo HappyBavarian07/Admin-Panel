@@ -4,14 +4,12 @@ package de.happybavarian07.adminpanel.addonloader.api;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.List;
 
 public class AddonTest extends Addon implements Listener {
     @Override
@@ -42,11 +40,11 @@ public class AddonTest extends Addon implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.setJoinMessage(Utils.format(event.getPlayer(), "%prefix% &9> &a+ &5" + event.getPlayer().getName() + "&a joined! (Example Addon)", "ExampleAddon"));
+        event.setJoinMessage(AdminPanelUtils.format(event.getPlayer(), "%prefix% &9> &a+ &5" + event.getPlayer().getName() + "&a joined! (Example Addon)", "ExampleAddon"));
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
-        event.setQuitMessage(Utils.format(event.getPlayer(), "%prefix% &9> &a- 0&5" + event.getPlayer().getName() + "&a left! (Example Addon)", "ExampleAddon"));
+        event.setQuitMessage(AdminPanelUtils.format(event.getPlayer(), "%prefix% &9> &a- 0&5" + event.getPlayer().getName() + "&a left! (Example Addon)", "ExampleAddon"));
     }
 }

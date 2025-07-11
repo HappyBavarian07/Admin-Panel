@@ -3,10 +3,10 @@ package de.happybavarian07.adminpanel.menusystem.menu.misc;/*
  * @Date 04.11.2023 | 13:27
  */
 
-import de.happybavarian07.adminpanel.language.PlaceholderType;
-import de.happybavarian07.adminpanel.menusystem.Menu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -83,7 +83,7 @@ public class ConfirmationMenu extends Menu {
             // Open the old menu
             String menuToOpenAfter = (String) playerMenuUtility.getData("ConfirmationMenu_MenuToOpenAfter");
             if (menuToOpenAfter != null) {
-                Menu oldMenu = Utils.getMenuByClassName(menuToOpenAfter, player);
+                Menu oldMenu = AdminPanelUtils.getMenuByClassName(menuToOpenAfter, player);
                 if (oldMenu != null) {
                     oldMenu.open();
                 }
@@ -92,7 +92,7 @@ public class ConfirmationMenu extends Menu {
             // Open the old menu
             String menuToOpenAfter = (String) playerMenuUtility.getData("ConfirmationMenu_MenuToOpenAfter");
             if (menuToOpenAfter != null) {
-                Menu oldMenu = Utils.getMenuByClassName(menuToOpenAfter, player);
+                Menu oldMenu = AdminPanelUtils.getMenuByClassName(menuToOpenAfter, player);
                 if (oldMenu != null) {
                     oldMenu.open();
                 }

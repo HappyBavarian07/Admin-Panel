@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.PaginatedMenu;
-import de.happybavarian07.adminpanel.menusystem.PlayerMenuUtility;
-import de.happybavarian07.adminpanel.utils.Utils;
+import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -114,12 +114,12 @@ public class WhitelistedPlayersMenu extends PaginatedMenu {
                     meta.setDisplayName(current.getName());
                     meta.setOwningPlayer(current);
                     List<String> lore = new ArrayList<>();
-                    lore.add(Utils.format(player, "&6Online: &a" + current.isOnline(), ""));
-                    lore.add(Utils.format(player, "&6Banned: &a" + current.isBanned(), ""));
-                    lore.add(Utils.format(player, "&6Op: &a" + current.isOp(), ""));
-                    lore.add(Utils.format(player, "&6UUID: &a" + current.getUniqueId(), ""));
-                    lore.add(Utils.format(player, "&6Last-Played: &a" + current.getLastPlayed(), ""));
-                    lore.add(Utils.format(player, "&6Played-Before: &a" + current.hasPlayedBefore(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6Online: &a" + current.isOnline(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6Banned: &a" + current.isBanned(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6Op: &a" + current.isOp(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6UUID: &a" + current.getUniqueId(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6Last-Played: &a" + current.getLastPlayed(), ""));
+                    lore.add(AdminPanelUtils.format(player, "&6Played-Before: &a" + current.hasPlayedBefore(), ""));
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                     inventory.addItem(head);

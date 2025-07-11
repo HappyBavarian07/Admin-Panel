@@ -13,8 +13,6 @@ import de.happybavarian07.adminpanel.commands.managers.AddonCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
-import de.happybavarian07.adminpanel.language.LanguageFile;
-import de.happybavarian07.adminpanel.language.LanguageManager;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.listeners.PlayerEventHandler;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -23,6 +21,9 @@ import de.happybavarian07.adminpanel.placeholders.DataClientExpansion;
 import de.happybavarian07.adminpanel.placeholders.PanelExpansion;
 import de.happybavarian07.adminpanel.placeholders.PlayerExpansion;
 import de.happybavarian07.adminpanel.placeholders.PluginExpansion;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
+import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
+import de.happybavarian07.coolstufflib.utils.PluginFileLogger;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -84,22 +85,14 @@ public class InitMethods {
 
     public void initbStatsMetrics(Metrics metrics) {
         metrics.addCustomChart(new Metrics.SimplePie("used_language", () -> languageManager.getCurrentLang().getLangName()));
-        metrics.addCustomChart(new Metrics.SimplePie("language_count", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("language_count", () -> String.valueOf(languageManager.getRegisteredLanguages().size())));
+        /*metrics.addCustomChart(new Metrics.SimplePie("external_api_language_count", () -> {
             int value = 0;
             for (LanguageFile lang : languageManager.getRegisteredLanguages().values()) {
-                if (lang.getPlugin() == plugin)
                     value++;
             }
             return String.valueOf(value);
-        }));
-        metrics.addCustomChart(new Metrics.SimplePie("external_api_language_count", () -> {
-            int value = 0;
-            for (LanguageFile lang : languageManager.getRegisteredLanguages().values()) {
-                if (lang.getPlugin() != plugin)
-                    value++;
-            }
-            return String.valueOf(value);
-        }));
+        }));*/
         /*metrics.addCustomChart(new Metrics.AdvancedBarChart("exampleBar", () -> {
             Map<String, int[]> map = new HashMap<>();
             map.put("Addon System", plugin.isAddonSystemEnabled() ? new int[]{0, 1} : new int[]{1, 0});
@@ -112,13 +105,13 @@ public class InitMethods {
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_pluginupdater", () -> String.valueOf(plugin.getPluginStateManager().isPluginUpdaterEnabled())));
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_plugin_replace_enabled", () -> String.valueOf(plugin.getPluginStateManager().isUpdateReplacerEnabled())));
         metrics.addCustomChart(new Metrics.SimplePie("servers_with_config_corruption_check_disabled", () -> String.valueOf(plugin.getPluginStateManager().checkIfCorruptionCheckIsDisabled())));
-        if (!plugin.getLanguageManager().getPlhandler().getPlayerLanguages().isEmpty()) {
+        if (!plugin.getLanguageManager().getPLHandler().getPlayerLanguages().isEmpty()) {
             metrics.addCustomChart(new Metrics.SimplePie("most_used_player_lang", () -> getMostUsedPlayerLang().getLangName()));
         }
     }
 
     public LanguageFile getMostUsedPlayerLang() {
-        Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPlhandler().getPlayerLanguages();
+        Map<UUID, LanguageFile> playerLangs = plugin.getLanguageManager().getPLHandler().getPlayerLanguages();
         Map<LanguageFile, Integer> popularityMap = new HashMap<>();
         for (LanguageFile i : playerLangs.values()) {
             popularityMap.compute(i, (k, count) -> count != null ? count + 1 : 1);
@@ -219,7 +212,7 @@ public class InitMethods {
                 try {
                     loader.loadAddon(jarFile);
                 } catch (IOException | ClassNotFoundException e) {
-                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while loading Addon: " + jarFile.getName(), LogPrefix.ADDONLOADER);
+                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while loading Addon: " + jarFile.getName(), LogPrefixExtension.ADDONLOADER.getLogPrefix(), false);
                 }
             }
 
@@ -239,14 +232,14 @@ public class InitMethods {
                         //System.out.println("Calling enableAddon method...");
                         AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>(), false);
                         this.plugin.getStartUpLogger().coloredMessage(ChatColor.GREEN, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "'!");
-                        this.plugin.getFileLogger().writeToLog(Level.INFO, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "' (" + mainClass.getName() + ")!", LogPrefix.ADDONLOADER, false);
+                        this.plugin.getFileLogger().writeToLog(Level.INFO, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "' (" + mainClass.getName() + ")!", LogPrefixExtension.ADDONLOADER.getLogPrefix(), false);
                         //System.out.println("Result from enabling: " + result);
                         //System.out.println("After enabling addon: " + addonFile.getName());
                     } else {
                         throw new NullPointerException("Addon file is null");
                     }
                 } catch (Exception e) {
-                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefix.ADDONLOADER, true);
+                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefixExtension.ADDONLOADER.getLogPrefix(), true);
                     e.printStackTrace();
                 }
             }
