@@ -25,7 +25,7 @@ public class PluginSelectMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), null).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }
@@ -37,7 +37,7 @@ public class PluginSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true));
 
         return true;
@@ -57,7 +57,7 @@ public class PluginSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         sender.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", null, true));
         return true;
     }
@@ -97,7 +97,7 @@ public class PluginSelectMenuCommand extends SubCommand {
 
     @Override
     public String permissionAsString() {
-        return new PluginSelectMenu(null).getOpeningPermission();
+        return new PluginSelectMenu(null, null).getOpeningPermission();
     }
 
     @Override

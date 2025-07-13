@@ -25,7 +25,7 @@ public class BannedPlayersMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), null).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }
@@ -37,7 +37,7 @@ public class BannedPlayersMenuCommand extends SubCommand {
             return true;
         }
 
-        new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true));
 
         return true;
@@ -57,7 +57,7 @@ public class BannedPlayersMenuCommand extends SubCommand {
             return true;
         }
 
-        new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         sender.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", null, true));
         return true;
     }
@@ -97,7 +97,7 @@ public class BannedPlayersMenuCommand extends SubCommand {
 
     @Override
     public String permissionAsString() {
-        return new BannedPlayersMenu(null).getOpeningPermission();
+        return new BannedPlayersMenu(null, null).getOpeningPermission();
     }
 
     @Override

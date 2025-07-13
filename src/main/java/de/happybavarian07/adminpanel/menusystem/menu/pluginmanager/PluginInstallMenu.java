@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.PluginInstallEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
@@ -128,7 +129,7 @@ public class PluginInstallMenu extends Menu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSelectMenu(playerMenuUtility).open();
+            new PluginSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         }
     }
 

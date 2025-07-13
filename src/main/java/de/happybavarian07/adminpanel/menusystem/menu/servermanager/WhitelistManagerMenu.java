@@ -56,7 +56,7 @@ public class WhitelistManagerMenu extends Menu implements Listener {
             player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
             player.closeInventory();
         } else if (item.isSimilar(lgm.getItem(path + "ListPlayers", player, false))) {
-            new WhitelistedPlayersMenu(playerMenuUtility).open();
+            new WhitelistedPlayersMenu(playerMenuUtility, this).open();
         } else if (item.isSimilar(lgm.getItem(path + "TurnOn", player, false))) {
             Bukkit.setWhitelist(true);
         } else if (item.isSimilar(lgm.getItem(path + "TurnOff", player, false))) {

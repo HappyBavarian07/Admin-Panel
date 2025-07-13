@@ -1,10 +1,9 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -19,11 +18,18 @@ import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class BannedPlayersMenu extends PaginatedMenu {
+public class BannedPlayersMenu extends PaginatedMenu<OfflinePlayer> {
+    List<OfflinePlayer> updatedPlayers = new ArrayList<>();
 
-    public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility) {
-        super(playerMenuUtility);
+    public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
+        super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.PlayerManager.BannedPlayers");
+        for (OfflinePlayer current : getServer().getOfflinePlayers()) {
+            if (current.isBanned() && !current.isOnline()) {
+                updatedPlayers.add(current);
+            }
+        }
+        setPaginatedData(updatedPlayers, this::getPageItem);
     }
 
     @Override
@@ -42,108 +48,41 @@ public class BannedPlayersMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
+    public void preSetMenuItems() {
+
+    }
+
+    @Override
+    public void postSetMenuItems() {
+
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        List<OfflinePlayer> updatedPlayers = new ArrayList<>();
-
-        for (OfflinePlayer current : getServer().getOfflinePlayers()) {
-            if (current.isBanned() && !current.isOnline()) {
-                updatedPlayers.add(current);
-            }
-        }
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null, false).getType())) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.BannedPlayers")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            AdminPanelUtils.unban(player, Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()));
-            inventory.setItem(e.getSlot(), null);
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.getType().equals(Material.DARK_OAK_BUTTON)) {
-            if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-                if (!player.hasPermission("AdminPanel.Button.pageleft")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-                } else {
-                    page = page - 1;
-                    super.open();
-                }
-            } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-                if (!player.hasPermission("AdminPanel.Button.pageright")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                if (!((index + 1) >= updatedPlayers.size())) {
-                    page = page + 1;
-                    super.open();
-                } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-                }
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
-        }
+        if (indexOnPage < 0 || indexOnPage >= updatedPlayers.size()) return;
+        OfflinePlayer target = updatedPlayers.get(indexOnPage);
+        AdminPanelUtils.unban(player, target);
     }
 
     @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+    }
+
+    public ItemStack getPageItem(OfflinePlayer offlinePlayer) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.setOwningPlayer(offlinePlayer);
+        meta.setDisplayName(offlinePlayer.getName());
+        List<String> lore = new ArrayList<>();
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @Override
-    public void setMenuItems() {
-        addMenuBorder();
-
-        //The thing you will be looping through to place items
-        List<OfflinePlayer> updatedPlayers = new ArrayList<>();
-
-        for (OfflinePlayer current : getServer().getOfflinePlayers()) {
-            if (current.isBanned() && !current.isOnline()) {
-                updatedPlayers.add(current);
-            }
-        }
-
-        ///////////////////////////////////// Pagination loop template
-        if (!updatedPlayers.isEmpty()) {
-            for (int i = 0; i < super.maxItemsPerPage; i++) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= updatedPlayers.size()) break;
-                if (updatedPlayers.get(index) != null) {
-                    ///////////////////////////
-
-                    ItemStack head = new ItemStack(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
-                    SkullMeta meta = (SkullMeta) head.getItemMeta();
-                    meta.setOwningPlayer(updatedPlayers.get(index));
-                    meta.setDisplayName(updatedPlayers.get(index).getName());
-                    head.setItemMeta(meta);
-                    inventory.addItem(head);
-
-                    ////////////////////////
-                }
-            }
-        }
-        ////////////////////////
     }
 }

@@ -25,7 +25,7 @@ public class TempLanguageSelectMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), null).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }
@@ -37,7 +37,7 @@ public class TempLanguageSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true));
 
         return true;
@@ -57,7 +57,7 @@ public class TempLanguageSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         sender.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", null, true));
         return true;
     }
@@ -97,7 +97,7 @@ public class TempLanguageSelectMenuCommand extends SubCommand {
 
     @Override
     public String permissionAsString() {
-        return new TempLanguageSelectMenu(null).getOpeningPermission();
+        return new TempLanguageSelectMenu(null, null).getOpeningPermission();
     }
 
     @Override

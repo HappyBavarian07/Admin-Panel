@@ -4,13 +4,13 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,17 +22,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
+public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements Listener {
+    private final List<Plugin> plugins;
+    private final Map<String, NewUpdater> pluginsToUpdate;
     private int spigotID = -1;
     private String fileName = "";
+
 
     public PluginAutoUpdaterMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PluginManager.AutoUpdateMenu");
+        pluginsToUpdate = new HashMap<>(AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins());
+        plugins = new ArrayList<>();
+        for (String pluginName : pluginsToUpdate.keySet()) {
+            Plugin plugin = new PluginUtils().getPluginByName(pluginName);
+            if (plugin != null) plugins.add(plugin);
+        }
+        setPaginatedData(plugins, this::getPageItem);
     }
 
     @Override
@@ -51,136 +62,68 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        ItemStack item = e.getCurrentItem();
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+        inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.AddPlugin", 46), lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", playerMenuUtility.getOwner(), false));
+        inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.RemovePlugin", 47), lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", playerMenuUtility.getOwner(), false));
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        Plugin currentPlugin = new PluginUtils().getPluginByName(ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName()));
-        Map<String, NewUpdater> pluginsToUpdate = new HashMap<>(AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins());
-        ItemStack pluginItem = null;
-        if (currentPlugin != null) {
-            lgm.addPlaceholder(PlaceholderType.ITEM, "%spigotID%", pluginsToUpdate.get(currentPlugin.getName()).getResourceID(), false);
-            lgm.addPlaceholder(PlaceholderType.ITEM, "%fileName%", pluginsToUpdate.get(currentPlugin.getName()).getFileName(), false);
-            lgm.addPlaceholder(PlaceholderType.ITEM, "%onSpigot%", pluginsToUpdate.get(currentPlugin.getName()).resourceIsOnSpigot(), false);
-            lgm.addPlaceholder(PlaceholderType.ITEM, "%externalFile%", pluginsToUpdate.get(currentPlugin.getName()).isExternalFile(), false);
-            pluginItem = lgm.getItem("PluginManager.AutoUpdateMenu.PluginItem", playerMenuUtility.getOwner(), false);
-            ItemMeta itemMeta = pluginItem.getItemMeta();
-            itemMeta.setDisplayName(AdminPanelUtils.format(playerMenuUtility.getOwner(), "&a" + currentPlugin.getName(), ""));
-            pluginItem.setItemMeta(itemMeta);
+        if (indexOnPage < 0 || indexOnPage >= plugins.size()) return;
+        Plugin currentPlugin = plugins.get(indexOnPage);
+        NewUpdater updater = pluginsToUpdate.get(currentPlugin.getName());
+        if (!updater.resourceIsOnSpigot()) {
+            player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIsNotOnSpigot", player, true));
+            return;
         }
-        //System.out.println("Item: " + pluginItem);
-        if (item.isSimilar(pluginItem)) {
-            // Update Plugin on Click
-            NewUpdater updater = pluginsToUpdate.get(currentPlugin.getName());
-            if (!updater.resourceIsOnSpigot()) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIsNotOnSpigot", player, true));
-                return;
-            }
-            if (updater.isExternalFile() && updater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.DownloadFileIsExternal", player, true));
-                return;
-            }
-            updater.downloadLatestUpdate(updater.updateAvailable(), true, true);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", currentPlugin.getName(), false);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.UpdatedPlugin", player, true));
-        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false))) {
-            // Add Plugin
+        if (updater.isExternalFile() && updater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
+            player.sendMessage(lgm.getMessage("Player.PluginManager.DownloadFileIsExternal", player, true));
+            return;
+        }
+        updater.downloadLatestUpdate(updater.updateAvailable(), true, true);
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", currentPlugin.getName(), false);
+        player.sendMessage(lgm.getMessage("Player.PluginManager.UpdatedPlugin", player, true));
+    }
+
+    @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+        Player player = (Player) e.getWhoClicked();
+        if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false))) {
             playerMenuUtility.addData("AddPluginMetaData", true);
             player.closeInventory();
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", player, false));
         } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false))) {
-            // Remove Plugin
-            playerMenuUtility.addData("RemovePluginSelectPluginMetaData", true);
+            playerMenuUtility.addData("RemovePluginSelectMetaData", true);
             player.closeInventory();
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", player, false));
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginSelectMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-            } else {
-                page = page - 1;
-                super.open();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageright")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (!((index + 1) >= pluginsToUpdate.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
+            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
         }
     }
 
-    @Override
+    public ItemStack getPageItem(Plugin plugin) {
+        Map<String, NewUpdater> pluginsToUpdate = new HashMap<>(AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins());
+        NewUpdater updater = pluginsToUpdate.get(plugin.getName());
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%spigotID%", updater.getResourceID(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%fileName%", updater.getFileName(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%onSpigot%", updater.resourceIsOnSpigot(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%externalFile%", updater.isExternalFile(), false);
+        ItemStack item = lgm.getItem("PluginManager.AutoUpdateMenu.PluginItem", playerMenuUtility.getOwner(), true);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(AdminPanelUtils.format(playerMenuUtility.getOwner(), "&a" + plugin.getName(), ""));
+        item.setItemMeta(itemMeta);
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @Override
-    public void setMenuItems() {
-        addMenuBorder();
-        String path = "PluginManager.AutoUpdateMenu.";
-
-        inventory.setItem(getSlot(path + "AddPlugin", 46), lgm.getItem(path + "AddPlugin", playerMenuUtility.getOwner(), false));
-        inventory.setItem(getSlot(path + "RemovePlugin", 47), lgm.getItem(path + "RemovePlugin", playerMenuUtility.getOwner(), false));
-
-        Map<String, NewUpdater> pluginsToUpdate = AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins();
-        //System.out.println("Plugins to Update: " + pluginsToUpdate);
-        //System.out.println("Plugins to Update: " + AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins());
-        ///////////////////////////////////// Pagination loop template
-        if (pluginsToUpdate != null && !pluginsToUpdate.isEmpty()) {
-            int i = 0;
-            for (String pluginName : pluginsToUpdate.keySet()) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= pluginsToUpdate.size()) break;
-                if (pluginsToUpdate.get(pluginName) != null) {
-                    ///////////////////////////
-
-                    NewUpdater currentUpdater = pluginsToUpdate.get(pluginName);
-                    if (currentUpdater == null) continue;
-                    lgm.addPlaceholder(PlaceholderType.ITEM, "%spigotID%", currentUpdater.getResourceID(), false);
-                    lgm.addPlaceholder(PlaceholderType.ITEM, "%fileName%", currentUpdater.getFileName(), false);
-                    lgm.addPlaceholder(PlaceholderType.ITEM, "%onSpigot%", currentUpdater.resourceIsOnSpigot(), false);
-                    lgm.addPlaceholder(PlaceholderType.ITEM, "%externalFile%", currentUpdater.isExternalFile(), false);
-                    ItemStack pluginItem = lgm.getItem("PluginManager.AutoUpdateMenu.PluginItem", playerMenuUtility.getOwner(), true);
-                    ItemMeta itemMeta = pluginItem.getItemMeta();
-                    itemMeta.setDisplayName(AdminPanelUtils.format(playerMenuUtility.getOwner(), "&a" + currentUpdater.getPluginToUpdate().getName(), ""));
-                    pluginItem.setItemMeta(itemMeta);
-                    inventory.addItem(pluginItem);
-
-
-                    ////////////////////////
-                }
-                i++;
-            }
-        }
-        ////////////////////////
     }
 
     @EventHandler
@@ -229,14 +172,14 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu implements Listener {
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.PluginSelected", player, false));
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.AddedPlugin", player, true));
             super.open();
-        } else if (playerMenuUtility.hasData("RemovePluginSelectPluginMetaData")) {
+        } else if (playerMenuUtility.hasData("RemovePluginSelectMetaData")) {
             event.setCancelled(true);
             String message = event.getMessage().replace(" ", "-");
             selectedPlugin = new PluginUtils().getPluginByName(message);
             if (selectedPlugin == null) {
                 return;
             }
-            playerMenuUtility.removeData("RemovePluginSelectPluginMetaData");
+            playerMenuUtility.removeData("RemovePluginSelectMetaData");
             AdminPanelMain.getPlugin().getAutoUpdaterManager().removePluginFromUpdater(selectedPlugin);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);
             player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.RemovedPlugin", player, true));

@@ -66,22 +66,15 @@ public class MenuListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    //@EventHandler(priority = EventPriority.HIGHEST)
     public void onMenuClick(InventoryClickEvent e) {
 
         InventoryHolder holder = e.getInventory().getHolder();
-        // If the inventoryholder of the inventory clicked on
-        // is an instance of Menu, then gg. The reason that
-        // an InventoryHolder can be a Menu is because our Menu
-        // class implements InventoryHolder!!
         if (holder instanceof Menu menu) {
-            e.setCancelled(true); // prevent them from frickin over the inventory
-            if (e.getCurrentItem() == null) { // deal with null exceptions
+            e.setCancelled(true);
+            if (e.getCurrentItem() == null) {
                 return;
             }
-            // Since we know our inventoryholder is a menu, get the Menu Object representing
-            // the menu we clicked on
-            // Call the handleMenu object which takes the event and processes it
             menu.handleMenu(e);
 
             for (String menuAddonName : AdminPanelMain.getPlugin().getMenuAddonManager().getMenuAddons(menu.getConfigMenuAddonFeatureName()).keySet()) {

@@ -1,6 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMode;
@@ -53,7 +54,7 @@ public class PlayerActionSelectMenu extends Menu {
         } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target, false))) {
             playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
             playerMenuUtility.addData("SortQuery", "");
-            new PermissionListMenu(playerMenuUtility).open();
+            new PermissionListMenu(playerMenuUtility, this).open();
         } else if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenuItem", target, false))) {
             //new PlayerWarningMenu(playerMenuUtility, targetUUID).open();
             player.sendMessage(AdminPanelUtils.chat("!!!UNDER DEVELOPMENT!!!"));
@@ -62,7 +63,7 @@ public class PlayerActionSelectMenu extends Menu {
                 player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
                 return;
             }
-            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         }
     }
 

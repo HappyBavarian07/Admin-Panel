@@ -67,7 +67,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
             }
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
-            new PluginCommandsListMenu(playerMenuUtility).open();
+            new PluginCommandsListMenu(playerMenuUtility, this).open();
         }
     }
 

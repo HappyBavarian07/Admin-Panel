@@ -62,19 +62,19 @@ public class AdminPanelStartMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), this).open();
             } else if (item.isSimilar(lgm.getItem(path + "PlayerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.PlayerManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), this).open();
             } else if (item.isSimilar(lgm.getItem(path + "PluginManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.PluginManager.open")) {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), this).open();
             } else if (item.isSimilar(lgm.getItem(path + "ServerManager", player, false))) {
                 if (!player.hasPermission("AdminPanel.ServerManagment.Open")) {
                     player.sendMessage(noPerms);
@@ -93,7 +93,7 @@ public class AdminPanelStartMenu extends Menu {
                     player.sendMessage(noPerms);
                     return;
                 }
-                new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), this).open();
             }
         }
     }

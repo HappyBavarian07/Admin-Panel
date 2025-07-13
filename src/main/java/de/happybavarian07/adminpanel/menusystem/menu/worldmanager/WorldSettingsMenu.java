@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.TimeChangeMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.WeatherChangeMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
@@ -208,7 +209,7 @@ public class WorldSettingsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         }
     }
 

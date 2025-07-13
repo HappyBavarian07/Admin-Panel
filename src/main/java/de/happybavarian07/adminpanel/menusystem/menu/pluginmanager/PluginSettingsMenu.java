@@ -8,6 +8,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
@@ -160,19 +161,19 @@ public class PluginSettingsMenu extends Menu {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginCommandsListMenu(playerMenuUtility).open();
+            new PluginCommandsListMenu(playerMenuUtility, new PluginSettingsMenu(playerMenuUtility)).open();
         } else if (item.isSimilar(lgm.getItem(path + "Permissions.Item", player, false))) {
             if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Commands")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginPermissionsListMenu(playerMenuUtility).open();
+            new PluginPermissionsListMenu(playerMenuUtility, this).open();
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);
                 return;
             }
-            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), new AdminPanelStartMenu(playerMenuUtility)).open();
         }
     }
 

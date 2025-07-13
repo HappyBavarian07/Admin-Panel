@@ -1,6 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionSelectMenu;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
@@ -91,7 +92,7 @@ public class PermissionActionMenu extends Menu {
 
         // Back
         if (clickedItem.isSimilar(lgm.getItem("General.Close", player, false))) {
-            new PermissionListMenu(playerMenuUtility).open();
+            new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();
             return;
         }
 
@@ -116,7 +117,7 @@ public class PermissionActionMenu extends Menu {
             if (!Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player, true));
             }
-            new PermissionListMenu(playerMenuUtility).open();
+            new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();
         } else if (clickedItem.isSimilar(lgm.getItem(path + "Info", player, false))) {
             Permission perm = Bukkit.getPluginManager().getPermission(permissionFullName);
             if (perm != null) {

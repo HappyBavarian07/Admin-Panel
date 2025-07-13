@@ -4,12 +4,10 @@ import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WorldSelectEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
-import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,12 +21,12 @@ import java.util.List;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class WorldSelectMenu extends PaginatedMenu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
-
-    public WorldSelectMenu(PlayerMenuUtility playerMenuUtility) {
-        super(playerMenuUtility);
+public class WorldSelectMenu extends PaginatedMenu<World> {
+    public WorldSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
+        super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.WorldManager.open");
+        List<World> worlds = new ArrayList<>(getServer().getWorlds());
+        setPaginatedData(worlds, this::getPageItem);
     }
 
     @Override
@@ -47,113 +45,59 @@ public class WorldSelectMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        ItemStack item = e.getCurrentItem();
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+        Player player = playerMenuUtility.getOwner();
+        inventory.setItem(45, lgm.getItem("WorldManager.Create", player, false));
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
         List<World> worlds = new ArrayList<>(getServer().getWorlds());
-
         String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-        if (item.getType().equals(legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD)) {
-            WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, Bukkit.getWorld(item.getItemMeta().getDisplayName()));
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);
-                if (!worldSelectEvent.isCancelled()) {
-                    new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), Bukkit.getWorld(item.getItemMeta().getDisplayName())).open();
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
+        if (indexOnPage < 0 || indexOnPage >= worlds.size()) return;
+        World world = worlds.get(indexOnPage);
+        WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, world);
+        try {
+            AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);
+            if (!worldSelectEvent.isCancelled()) {
+                new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
             }
-        } else if (item.isSimilar(lgm.getItem("WorldManager.Create", player, false))) {
+        } catch (NotAPanelEventException notAPanelEventException) {
+            notAPanelEventException.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+        Player player = (Player) e.getWhoClicked();
+        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
+        if (item.isSimilar(lgm.getItem("WorldManager.Create", player, false))) {
             new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-            } else {
-                page = page - 1;
-                super.open();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageright")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (!((index + 1) >= worlds.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
         }
     }
 
-    @Override
+    public ItemStack getPageItem(World world) {
+        ItemStack item = Head.WORLD.getAsItem();
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(world.getName());
+        List<String> lore = new ArrayList<>();
+        lore.add(AdminPanelUtils.chat("&6Players: &6" + world.getPlayers().size()));
+        lore.add(AdminPanelUtils.chat("&6Type: &6" + world.getWorldType().name()));
+        lore.add(AdminPanelUtils.chat("&6Environment: &6" + world.getEnvironment().name()));
+        lore.add(AdminPanelUtils.chat("&6GameTime: &6" + world.getGameTime()));
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    public World getWorld(String name) {
-        for (World world : getServer().getWorlds()) {
-            if (world.getName().equals(name)) {
-                return world;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void setMenuItems() {
-        Player player = playerMenuUtility.getOwner();
-        addMenuBorder();
-
-        inventory.setItem(getSlot("WorldManager.Create", 47), lgm.getItem("WorldManager.Create", player, false));
-
-        //The thing you will be looping through to place items
-        List<World> worlds = new ArrayList<>(getServer().getWorlds());
-
-        ///////////////////////////////////// Pagination loop template
-        if (!worlds.isEmpty()) {
-            for (int i = 0; i < super.maxItemsPerPage; i++) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= worlds.size()) break;
-                if (worlds.get(index) != null) {
-                    ///////////////////////////
-
-                    ItemStack head = AdminPanelMain.getAPI().createSkull(Head.WORLD, worlds.get(index).getName());
-                    ItemMeta meta = head.getItemMeta();
-                    List<String> lore = new ArrayList<>();
-                    lore.add(AdminPanelUtils.chat("&6Players: &b" + worlds.get(index).getPlayers().size()));
-                    lore.add(AdminPanelUtils.chat("&6Type: &b" + worlds.get(index).getWorldType()));
-                    lore.add(AdminPanelUtils.chat("&6Environment: &b" + worlds.get(index).getEnvironment()));
-                    lore.add(AdminPanelUtils.chat("&6GameTime: &b" + worlds.get(index).getGameTime()));
-                    meta.setLore(lore);
-                    head.setItemMeta(meta);
-                    inventory.addItem(head);
-
-                    ////////////////////////
-                }
-            }
-        }
-        ////////////////////////
     }
 }

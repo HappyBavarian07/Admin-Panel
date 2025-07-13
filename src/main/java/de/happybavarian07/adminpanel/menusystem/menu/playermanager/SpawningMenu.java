@@ -1,13 +1,11 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.ChatColor;
+import de.happybavarian07.coolstufflib.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -18,12 +16,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SpawningMenu extends PaginatedMenu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
+public class SpawningMenu extends PaginatedMenu<EntityType> {
+    private final List<EntityType> entityTypes = new ArrayList<>();
 
     public SpawningMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner");
+        Collections.addAll(entityTypes, EntityType.values());
+        entityTypes.removeIf(entity -> entity == null ||
+                entity.equals(EntityType.PLAYER) ||
+                entity.equals(EntityType.ITEM_FRAME) ||
+                entity.equals(EntityType.DROPPED_ITEM) ||
+                entity.equals(EntityType.AREA_EFFECT_CLOUD) ||
+                entity.equals(EntityType.ENDER_SIGNAL) ||
+                entity.equals(EntityType.UNKNOWN));
+        setPaginatedData(entityTypes, this::getPageItem);
     }
 
     @Override
@@ -42,88 +49,39 @@ public class SpawningMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        ItemStack item = e.getCurrentItem();
-        Player player = (Player) e.getWhoClicked();
-        List<EntityType> entityList = new ArrayList<>();
-        Collections.addAll(entityList, EntityType.values());
-        entityList.removeIf(entity -> entity == null ||
-                entity.equals(EntityType.PLAYER) ||
-                entity.equals(EntityType.ITEM_FRAME) ||
-                entity.equals(EntityType.DROPPED_ITEM) ||
-                entity.equals(EntityType.AREA_EFFECT_CLOUD) ||
-                entity.equals(EntityType.ENDER_SIGNAL) ||
-                entity.equals(EntityType.UNKNOWN));
-        if (item.getType().equals(Material.GHAST_SPAWN_EGG)) {
-            try {
-                Location loc = playerMenuUtility.getTarget().getLocation().add(0, 2, 0);
-                playerMenuUtility.getTarget().getWorld().spawnEntity(loc,
-                        EntityType.valueOf(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()));
-            } catch (NullPointerException | IllegalArgumentException ignored) {
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
-                return;
-            }
-            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-            if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-            } else {
-                page = page - 1;
-                super.open();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (!((index + 1) >= entityList.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-            }
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
+        if (indexOnPage < 0 || indexOnPage >= entityTypes.size()) return;
+        EntityType type = entityTypes.get(indexOnPage);
+        try {
+            Location loc = playerMenuUtility.getTarget().getLocation().add(0, 2, 0);
+            playerMenuUtility.getTarget().getWorld().spawnEntity(loc, type);
+        } catch (NullPointerException | IllegalArgumentException ignored) {
         }
     }
 
     @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+    }
+
+    public ItemStack getPageItem(EntityType type) {
+        ItemStack item = new ItemStack(Material.GHAST_SPAWN_EGG);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(Utils.chat("&a" + type.getName()));
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @Override
-    public void setMenuItems() {
-        addMenuBorder();
-
-        List<EntityType> entityList = new ArrayList<>();
-        Collections.addAll(entityList, EntityType.values());
-        entityList.removeIf(entity -> entity == null ||
-                entity.equals(EntityType.PLAYER) ||
-                entity.equals(EntityType.ITEM_FRAME) ||
-                entity.equals(EntityType.DROPPED_ITEM) ||
-                entity.equals(EntityType.AREA_EFFECT_CLOUD) ||
-                entity.equals(EntityType.ENDER_SIGNAL) ||
-                entity.equals(EntityType.UNKNOWN));
-
-        if (!entityList.isEmpty()) {
-            for (int i = 0; i < super.maxItemsPerPage; i++) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= entityList.size()) break;
-                if (entityList.get(index) != null) {
-                    ///////////////////////////
-
-                    ItemStack item = new ItemStack(Material.GHAST_SPAWN_EGG);
-                    ItemMeta meta = item.getItemMeta();
-                    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&a" + entityList.get(index).getName()));
-                    item.setItemMeta(meta);
-                    inventory.addItem(item);
-
-                    ////////////////////////
-                }
-            }
-        }
     }
 }

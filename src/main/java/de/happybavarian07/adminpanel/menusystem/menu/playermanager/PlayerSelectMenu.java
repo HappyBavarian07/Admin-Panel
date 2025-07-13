@@ -3,10 +3,9 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.SelectPlayerEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -16,16 +15,17 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class PlayerSelectMenu extends PaginatedMenu {
+public class PlayerSelectMenu extends PaginatedMenu<Player> {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
-    public PlayerSelectMenu(PlayerMenuUtility playerMenuUtility) {
-        super(playerMenuUtility);
+    public PlayerSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
+        super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.PlayerManager.open");
+        List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
+        setPaginatedData(players, this::getPageItem);
     }
 
     @Override
@@ -44,105 +44,58 @@ public class PlayerSelectMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        ItemStack item = e.getCurrentItem();
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+        Player player = playerMenuUtility.getOwner();
+        inventory.setItem(45, lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", player, false));
+    }
+
+    @Override
+    protected void handlePageItemClick(int slot, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item.getType().equals(lgm.getItem("PlayerManager.PlayerHead", null, false).getType())) {
-            UUID target = Bukkit.getOfflinePlayer(item.getItemMeta().getDisplayName()).getUniqueId();
-            SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, target);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
-                if (!selectPlayerEvent.isCancelled()) {
-                    if (player.getName().equals(item.getItemMeta().getDisplayName()) &&
-                    !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
-                        player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player, true));
-                        return;
-                    }
-                    playerMenuUtility.setTargetUUID(target);
-                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+        int indexOnPage = slot - 10;
+        if (indexOnPage < 0 || indexOnPage >= players.size()) return;
+        Player targetPlayer = players.get(indexOnPage);
+        SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, targetPlayer.getUniqueId());
+        try {
+            AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
+            if (!selectPlayerEvent.isCancelled()) {
+                if (player.getName().equals(targetPlayer.getName()) &&
+                        !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
+                    player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player, true));
+                    return;
                 }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
+                playerMenuUtility.setTargetUUID(targetPlayer.getUniqueId());
+                new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
             }
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-            } else {
-                page = page - 1;
-                super.open();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageright")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (!((index + 1) >= players.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false))) {
-            new BannedPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+        } catch (NotAPanelEventException notAPanelEventException) {
+            notAPanelEventException.printStackTrace();
         }
     }
 
     @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+        if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", playerMenuUtility.getOwner(), false))) {
+            new BannedPlayersMenu(playerMenuUtility, this).open();
+        }
+    }
+
+    public ItemStack getPageItem(Player targetPlayer) {
+        ItemStack item = lgm.getItem("PlayerManager.PlayerHead", targetPlayer, false);
+        if (item.getItemMeta() instanceof SkullMeta meta) {
+            meta.setOwningPlayer(targetPlayer);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @Override
-    public void setMenuItems() {
-        addMenuBorder();
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.BannedPlayers", 47), lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", null, false));
-
-        //The thing you will be looping through to place items
-        List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
-
-        ///////////////////////////////////// Pagination loop template
-        if (!players.isEmpty()) {
-            for (int i = 0; i < super.maxItemsPerPage; i++) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= players.size()) break;
-                if (players.get(index) != null) {
-                    ///////////////////////////
-
-                    ItemStack head = AdminPanelMain.getPlugin().getLanguageManager().getItem("PlayerManager.PlayerHead", players.get(index), false);
-                    SkullMeta meta = (SkullMeta) head.getItemMeta();
-                    meta.setOwningPlayer(players.get(index));
-                    head.setItemMeta(meta);
-                    inventory.addItem(head);
-
-                    ////////////////////////
-                }
-            }
-        }
-        ////////////////////////
     }
 }

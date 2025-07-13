@@ -1,6 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
@@ -167,7 +168,7 @@ public class PlayerBanMenu extends Menu implements Listener {
             minutes = 0;
             seconds = 0;
             player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.SuccessfullyBanned", player, true));
-            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
             if (!player.hasPermission("AdminPanel.Button.Close")) {
                 player.sendMessage(noPerms);

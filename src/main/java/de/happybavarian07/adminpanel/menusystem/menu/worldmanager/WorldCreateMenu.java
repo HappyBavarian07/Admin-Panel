@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WorldCreateEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
@@ -124,7 +125,7 @@ public class WorldCreateMenu extends Menu implements Listener {
                 player.sendMessage(noPerms);
                 return;
             }
-            new WorldSelectMenu(playerMenuUtility).open();
+            new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         } else if (item.isSimilar(lgm.getItem(itemPath + "CreateWorld", player, false))) {
             WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
             try {

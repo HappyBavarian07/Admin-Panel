@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
@@ -17,16 +17,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class PluginCommandsListMenu extends PaginatedMenu {
+public class PluginCommandsListMenu extends PaginatedMenu<String> {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final Plugin currentPlugin;
+    private final List<String> commandNames;
 
-    public PluginCommandsListMenu(PlayerMenuUtility playerMenuUtility) {
-        super(playerMenuUtility);
+    public PluginCommandsListMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
+        super(playerMenuUtility, savedMenu);
         this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Commands");
+        commandNames = new ArrayList<>(currentPlugin.getDescription().getCommands().keySet());
+        setPaginatedData(commandNames, this::getPageItem);
     }
 
     @Override
@@ -45,106 +47,59 @@ public class PluginCommandsListMenu extends PaginatedMenu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "PluginManager.Commands.";
-        Map<String, Map<String, Object>> commands = currentPlugin.getDescription().getCommands();
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(Material.COMMAND_BLOCK)) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Open")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginCommandSettingsMenu(playerMenuUtility, ((JavaPlugin) currentPlugin).getCommand(item.getItemMeta().getDisplayName())).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            playerMenuUtility.setData("CurrentSelectedPlugin", currentPlugin, true);
-            new PluginSettingsMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageleft")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (page == 0) {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-            } else {
-                page = page - 1;
-                super.open();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.pageright")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            if (!((index + 1) >= commands.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Refresh", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
-        }
+        if (indexOnPage < 0 || indexOnPage >= commandNames.size()) return;
+        String commandName = commandNames.get(indexOnPage);
+        new PluginCommandSettingsMenu(playerMenuUtility, ((JavaPlugin) currentPlugin).getCommand(commandName)).open();
     }
 
     @Override
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
+    }
+
+    public ItemStack getPageItem(String commandName) {
+        ItemStack item = new ItemStack(Material.COMMAND_BLOCK);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(commandName);
+        // Permission, Permission-Message, Label, Aliases, Usage, Description, Registered
+        List<String> lore = new ArrayList<>();
+        PluginCommand command = ((JavaPlugin) currentPlugin).getCommand(commandName);
+        if (command != null) {
+            String permission = command.getPermission() != null ? command.getPermission() : "None";
+            String permissionMessage = command.getPermissionMessage() != null ? command.getPermissionMessage() : "None";
+            String label = command.getLabel();
+            String aliases = command.getAliases().isEmpty() ? "None" : String.join(", ", command.getAliases());
+            String usage = command.getUsage();
+            String description = command.getDescription();
+            boolean registered = plugin.getServer().getPluginCommand(commandName) != null;
+
+            lore.add("&7Permission: &f" + permission);
+            lore.add("&7Permission Message: &f" + permissionMessage);
+            lore.add("&7Label: &f" + label);
+            lore.add("&7Aliases: &f" + aliases);
+            lore.add("&7Usage: &f" + usage);
+            lore.add("&7Description: &f" + description);
+            lore.add("&7Registered: &f" + (registered ? "Yes" : "No"));
+        } else {
+            lore.add("&cCommand not found in plugin description!");
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
-    @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @Override
-    public void setMenuItems() {
-        addMenuBorder();
-
-        Map<String, Map<String, Object>> commands = currentPlugin.getDescription().getCommands();
-        ///////////////////////////////////// Pagination loop template
-        if (!commands.isEmpty()) {
-            int i = 0;
-            for (String cmdName : commands.keySet()) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= commands.size()) break;
-                if (commands.get(cmdName) != null) {
-                    ///////////////////////////
-
-                    PluginCommand currentCommand = ((JavaPlugin) currentPlugin).getCommand(cmdName);
-                    if (currentCommand == null) continue;
-                    ItemStack command = new ItemStack(Material.COMMAND_BLOCK, 1);
-                    ItemMeta commandMeta = command.getItemMeta();
-                    commandMeta.setDisplayName(cmdName);
-                    List<String> lore = new ArrayList<>();
-                    AdminPanelUtils adminPanelUtils = AdminPanelUtils.getInstance();
-                    lore.add(AdminPanelUtils.chat("&6Permission: &a" + currentCommand.getPermission()));
-                    lore.add(AdminPanelUtils.chat("&6Permission-Message: &a" + currentCommand.getPermissionMessage()));
-                    lore.add(AdminPanelUtils.chat("&6Label: &a" + currentCommand.getLabel()));
-                    lore.add(AdminPanelUtils.chat("&6Aliases: &a" + currentCommand.getAliases()));
-                    lore.add(AdminPanelUtils.chat("&6Usage: &a" + currentCommand.getUsage()));
-                    lore.add(AdminPanelUtils.chat("&6Description: &a" + currentCommand.getDescription()));
-                    lore.add(AdminPanelUtils.chat("&6Registered: &a" + currentCommand.isRegistered()));
-                    commandMeta.setLore(lore);
-                    command.setItemMeta(commandMeta);
-                    inventory.addItem(command);
-
-                    ////////////////////////
-                }
-                i++;
-            }
-        }
-        ////////////////////////
     }
 }

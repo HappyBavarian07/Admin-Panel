@@ -25,7 +25,7 @@ public class PlayerSelectMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), null).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }
@@ -37,7 +37,7 @@ public class PlayerSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true));
 
         return true;
@@ -57,7 +57,7 @@ public class PlayerSelectMenuCommand extends SubCommand {
             return true;
         }
 
-        new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
+        new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target), null).open();
         sender.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelfForOther", null, true));
         return true;
     }
@@ -97,7 +97,7 @@ public class PlayerSelectMenuCommand extends SubCommand {
 
     @Override
     public String permissionAsString() {
-        return new PlayerSelectMenu(null).getOpeningPermission();
+        return new PlayerSelectMenu(null, null).getOpeningPermission();
     }
 
     @Override

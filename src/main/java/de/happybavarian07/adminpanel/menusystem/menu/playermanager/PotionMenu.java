@@ -3,11 +3,10 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.player.GiveEffectToPlayerEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.ChatColor;
+import de.happybavarian07.coolstufflib.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,9 +24,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-public class PotionMenu extends PaginatedMenu implements Listener {
+public class PotionMenu extends PaginatedMenu<PotionEffectType> implements Listener {
     private int amplifier;
     private int duration;
 
@@ -36,6 +34,9 @@ public class PotionMenu extends PaginatedMenu implements Listener {
         amplifier = 1; // in Int
         duration = 60; // in Ticks
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions");
+        List<PotionEffectType> potionList = new ArrayList<>();
+        Collections.addAll(potionList, PotionEffectType.values());
+        setPaginatedData(potionList, this::getPageItem);
     }
 
     @Override
@@ -54,87 +55,91 @@ public class PotionMenu extends PaginatedMenu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent event) {
-        ItemStack item = event.getCurrentItem();
+    public void preSetMenuItems() {
+    }
+
+    @Override
+    public void postSetMenuItems() {
+        Player player = playerMenuUtility.getOwner();
+        inventory.setItem(47, lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", player, false));
+        inventory.setItem(45, lgm.getItem("PlayerManager.ActionsMenu.SetDuration", player, false));
+        inventory.setItem(46, lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", player, false));
+    }
+
+    @Override
+    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         List<PotionEffectType> potionList = new ArrayList<>();
         Collections.addAll(potionList, PotionEffectType.values());
+        if (indexOnPage < 0 || indexOnPage >= potionList.size()) return;
+        PotionEffectType type = potionList.get(indexOnPage);
         lgm.addPlaceholder(PlaceholderType.ALL, "%target%", player.getName(), false);
         lgm.addPlaceholder(PlaceholderType.ALL, "%duration%", duration, false);
         lgm.addPlaceholder(PlaceholderType.ALL, "%amplifier%", amplifier, false);
-        if (item.getType().equals(Material.POTION)) {
-            lgm.addPlaceholder(PlaceholderType.ALL, "%type%", PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()).getName(), false);
-            if (event.isRightClick()) {
-                if (player.hasPotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase())))) {
-                    player.removePotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase())));
-                    player.sendMessage(lgm.getMessage("PotionMenu.EffectRemoved", player, true));
-                }
-            } else if (event.isLeftClick()) {
-                if (player.hasPotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase()))))
-                    return;
-                if (duration < 0 || amplifier < 1 || duration > 1000000 || amplifier > 255) return;
-                PotionEffect effect = new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase())),
-                        duration, amplifier - 1, false, false, false);
-                GiveEffectToPlayerEvent giveEffectToPlayerEvent = new GiveEffectToPlayerEvent(player, effect);
-                try {
-                    AdminPanelMain.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
-                    if (!giveEffectToPlayerEvent.isCancelled()) {
-                        try {
-                            playerMenuUtility.getTarget().addPotionEffect(effect);
-                            player.sendMessage(lgm.getMessage("PotionMenu.EffectAdded", player, true));
-                        } catch (NullPointerException | IllegalArgumentException ignored) {
-                        }
+        lgm.addPlaceholder(PlaceholderType.ALL, "%type%", type.getName(), false);
+        if (event.isRightClick()) {
+            if (player.hasPotionEffect(type)) {
+                player.removePotionEffect(type);
+                player.sendMessage(lgm.getMessage("PotionMenu.EffectRemoved", player, true));
+            }
+        } else if (event.isLeftClick()) {
+            if (player.hasPotionEffect(type)) return;
+            if (duration < 0 || amplifier < 1 || duration > 1000000 || amplifier > 255) return;
+            PotionEffect effect = new PotionEffect(type, duration, amplifier - 1, false, false, false);
+            GiveEffectToPlayerEvent giveEffectToPlayerEvent = new GiveEffectToPlayerEvent(player, effect);
+            try {
+                AdminPanelMain.getAPI().callAdminPanelEvent(giveEffectToPlayerEvent);
+                if (!giveEffectToPlayerEvent.isCancelled()) {
+                    try {
+                        playerMenuUtility.getTarget().addPotionEffect(effect);
+                        player.sendMessage(lgm.getMessage("PotionMenu.EffectAdded", player, true));
+                    } catch (NullPointerException | IllegalArgumentException ignored) {
                     }
-                } catch (NotAPanelEventException notAPanelEventException) {
-                    notAPanelEventException.printStackTrace();
                 }
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
-                return;
-            }
-            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", null, false))) {
-            for (PotionEffect effect : playerMenuUtility.getTarget().getActivePotionEffects()) {
-                playerMenuUtility.getTarget().removePotionEffect(effect.getType());
-            }
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetDuration", null, false))) {
-            playerMenuUtility.addData("SetDurationPotionMenu", true);
-            player.sendMessage(lgm.getMessage("PotionMenu.EnterDuration", player, false));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", null, false))) {
-            playerMenuUtility.addData("SetAmplifierPotionMenu", true);
-            player.sendMessage(lgm.getMessage("PotionMenu.EnterAmplifier", player, false));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("General.Left", null, false)) ||
-                item.isSimilar(lgm.getItem("General.Right", null, false))) {
-            if (item.isSimilar(lgm.getItem("General.Left", null, false))) {
-                if (page == 0) {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnFirstPage", player, true));
-                } else {
-                    page = page - 1;
-                    super.open();
-                }
-            } else if (item.isSimilar(lgm.getItem("General.Right", null, false))) {
-                if (!((index + 1) >= potionList.size())) {
-                    page = page + 1;
-                    super.open();
-                } else {
-                    player.sendMessage(lgm.getMessage("Player.General.AlreadyOnLastPage", player, true));
-                }
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
             }
         }
     }
 
     @Override
-    public void handleOpenMenu(InventoryOpenEvent e) {
-
+    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
+            new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", player, false))) {
+            for (PotionEffect effect : playerMenuUtility.getTarget().getActivePotionEffects()) {
+                playerMenuUtility.getTarget().removePotionEffect(effect.getType());
+            }
+            super.open();
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetDuration", player, false))) {
+            playerMenuUtility.setData("SetDurationPotionMenu", true, true);
+            player.sendMessage(lgm.getMessage("PotionMenu.EnterDuration", player, true));
+            player.closeInventory();
+        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", player, false))) {
+            playerMenuUtility.setData("SetAmplifierPotionMenu", true, true);
+            player.sendMessage(lgm.getMessage("PotionMenu.EnterAmplifier", player, true));
+            player.closeInventory();
+        }
     }
 
-    @Override
-    public void handleCloseMenu(InventoryCloseEvent e) {
+    public ItemStack getPageItem(PotionEffectType type) {
+        ItemStack item = new ItemStack(Material.POTION);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(Utils.chat("&a" + type.getName()));
+        List<String> lore = new ArrayList<>();
+        lore.add(Utils.chat("&7Left-Click &a- &7Add Effect"));
+        lore.add(Utils.chat("&7Right-Click &c- &7Remove Effect"));
+        meta.setLore(lore);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        item.setItemMeta(meta);
+        return item;
+    }
 
+    public void handleOpenMenu(InventoryOpenEvent e) {
+    }
+
+    public void handleCloseMenu(InventoryCloseEvent e) {
     }
 
     @EventHandler
@@ -163,50 +168,6 @@ public class PotionMenu extends PaginatedMenu implements Listener {
             } finally {
                 this.open();
                 event.setCancelled(true);
-            }
-        }
-    }
-
-    @Override
-    public void setMenuItems() {
-        Player player = playerMenuUtility.getOwner();
-        addMenuBorder();
-        lgm.addPlaceholder(PlaceholderType.ALL, "%duration%", duration, false);
-        lgm.addPlaceholder(PlaceholderType.ALL, "%amplifier%", amplifier, false);
-
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.ClearPotions", 47), lgm.getItem("PlayerManager.ActionsMenu.ClearPotions", player, false));
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.SetDuration", 45), lgm.getItem("PlayerManager.ActionsMenu.SetDuration", player, false));
-        inventory.setItem(getSlot("PlayerManager.ActionsMenu.SetAmplifier", 46), lgm.getItem("PlayerManager.ActionsMenu.SetAmplifier", player, false));
-
-
-        List<PotionEffectType> potionList = new ArrayList<>();
-        Collections.addAll(potionList, PotionEffectType.values());
-
-        if (!potionList.isEmpty()) {
-            for (int i = 0; i < super.maxItemsPerPage; i++) {
-                index = super.maxItemsPerPage * page + i;
-                if (index >= potionList.size()) break;
-                if (potionList.get(index) != null) {
-                    ///////////////////////////
-
-                    if (potionList.get(index) != null) {
-                        ItemStack item = new ItemStack(Material.POTION);
-                        ItemMeta meta = item.getItemMeta();
-                        assert meta != null;
-                        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&a" + potionList.get(index).getName()));
-
-                        List<String> lore = new ArrayList<>();
-                        lore.add(AdminPanelUtils.chat("&7Left-Click &a- &7Add Effect"));
-                        lore.add(AdminPanelUtils.chat("&7Right-Click &a- &7Remove Effect"));
-
-                        meta.setLore(lore);
-                        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-                        item.setItemMeta(meta);
-                        inventory.addItem(item);
-                    }
-
-                    ////////////////////////
-                }
             }
         }
     }
