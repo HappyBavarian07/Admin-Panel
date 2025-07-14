@@ -1,9 +1,9 @@
 package de.happybavarian07.adminpanel.permissions;
 
-import de.happybavarian07.adminpanel.mysql.annotations.Column;
-import de.happybavarian07.adminpanel.mysql.annotations.Entity;
-import de.happybavarian07.adminpanel.mysql.annotations.Id;
-import de.happybavarian07.adminpanel.mysql.annotations.Table;
+import de.happybavarian07.coolstufflib.jpa.annotations.Column;
+import de.happybavarian07.coolstufflib.jpa.annotations.Entity;
+import de.happybavarian07.coolstufflib.jpa.annotations.Id;
+import de.happybavarian07.coolstufflib.jpa.annotations.Table;
 
 import java.util.UUID;
 

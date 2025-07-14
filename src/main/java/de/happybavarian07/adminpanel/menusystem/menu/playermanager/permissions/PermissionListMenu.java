@@ -9,7 +9,6 @@ import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.utils.LogPrefix;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -27,7 +26,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.PermissionMenuItem> implements Listener {
     private List<PermissionMenuItem> menuItemsCache = null;
@@ -84,11 +82,9 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
         return 54;
     }
 
-
     @Override
     public void preSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
-
         if (sortQuery != null && !sortQuery.isEmpty() && !sortQuery.equals(lastProcessedSearchQuery)) {
             List<String> searchResults = tfidfSearchPermissions(sortQuery);
             if (searchResults.isEmpty()) {
@@ -109,42 +105,29 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
                 menuItemsCache = null;
             }
         }
-
         boolean isSearchActive = sortQuery != null && !sortQuery.isEmpty();
         boolean shouldRebuildCache = menuItemsCache == null ||
                 lastCachedGroup != currentGroup ||
                 !targetUUID.equals(lastCachedTargetUUID);
-
         if (shouldRebuildCache) {
             menuItemsCache = new ArrayList<>();
-
             for (PermissionGroup group : currentGroup.getSubGroups().values()) {
-                try {
-                    if (filterMode == PermissionFilterMode.PLAYER) {
-                        boolean groupHasPlayerPermissions = hasPlayerPermissionsInGroup(group, Bukkit.getPlayer(targetUUID));
-                        if (!groupHasPlayerPermissions) {
-                            continue;
-                        }
-                    }
-                    menuItemsCache.add(new PermissionMenuItem(group));
-                } catch (Exception e) {
-                    player.sendMessage("§cFehler beim Laden der Gruppeninformationen: " + e.getMessage());
-                    lib.getPluginFileLogger().writeToLog(Level.WARNING, "Error loading group information: " + e.getMessage(), LogPrefix.ERROR, false);
-                }
-            }
-
-            if (menuItemsCache != null) {
-                for (CustomPermission cp : currentGroup.getPermissions()) {
-                    try {
-                        menuItemsCache.add(new PermissionMenuItem(cp));
-                    } catch (Exception e) {
-                        player.sendMessage("§cFehler beim Laden der Berechtigungsinformationen: " + e.getMessage());
-                        lib.getPluginFileLogger().writeToLog(Level.WARNING, "Error loading permission information: " + e.getMessage(), LogPrefix.ERROR, false);
+                if (filterMode == PermissionFilterMode.PLAYER) {
+                    Player targetPlayer = Bukkit.getPlayer(targetUUID);
+                    if (!hasPlayerPermissionsInGroup(group, targetPlayer)) {
+                        continue;
                     }
                 }
+                menuItemsCache.add(new PermissionMenuItem(group));
             }
-
-            if (menuItemsCache != null && !isSearchActive) {
+            for (CustomPermission cp : currentGroup.getPermissions()) {
+                Player targetPlayer = Bukkit.getPlayer(targetUUID);
+                if (filterMode == PermissionFilterMode.PLAYER && (targetPlayer == null || !targetPlayer.hasPermission(cp.getFullPermission()))) {
+                    continue;
+                }
+                menuItemsCache.add(new PermissionMenuItem(cp));
+            }
+            if (!isSearchActive) {
                 lastCachedGroup = currentGroup;
                 lastCachedTargetUUID = targetUUID;
             }
@@ -154,7 +137,6 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
     @Override
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
-
         String groupFullName = currentGroup.getFullName();
         String parentGroups = (currentGroup.getParent() != null)
                 ? currentGroup.getParent().getFullName() : "None";
@@ -164,13 +146,11 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
         lgm.addPlaceholder(PlaceholderType.ITEM, "%parent_groups%", parentGroups, false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%sub_group_count%", String.valueOf(subGroupCount), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%sub_permission_count%", String.valueOf(subPermissionCount), false);
-
         if (!currentGroup.getName().equals("root")) {
             inventory.setItem(getSlot("General.Back", 45), lgm.getItem("General.Back", player, false));
             inventory.setItem(getSlot(path + "ToTheTop", 46), lgm.getItem(path + "ToTheTop", player, false));
         }
         inventory.setItem(getSlot(path + "GroupMenu.Sort", 47), lgm.getItem(path + "GroupMenu.Sort", player, false));
-
         if (filterMode == PermissionFilterMode.GLOBAL) {
             inventory.setItem(getSlot(path + "GroupMenu.Mode.Global", 52), lgm.getItem(path + "GroupMenu.Mode.Global", player, false));
         } else if (filterMode == PermissionFilterMode.PLAYER) {
@@ -199,12 +179,6 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
 
     @Override
     protected void handlePageItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        int indexOnPage = slot - 10;
-        List<PermissionMenuItem> currentMenuItems = getCurrentMenuItems();
-        if (indexOnPage < 0 || indexOnPage >= currentMenuItems.size()) {
-            return;
-        }
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
             return;
@@ -225,6 +199,18 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
                 new PermissionActionMenu(playerMenuUtility).open();
             }
         }
+    }
+
+    private int getPageStartSlot() {
+        return 10;
+    }
+
+    private int getCurrentPage() {
+        return page;
+    }
+
+    private int getMaxItemsPerPage() {
+        return maxItemsPerPage;
     }
 
     @Override
@@ -478,13 +464,16 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
         if (group == null || player == null) {
             return false;
         }
-
         for (CustomPermission permission : group.getPermissions()) {
             if (player.hasPermission(permission.getFullPermission())) {
                 return true;
             }
         }
-
+        for (PermissionGroup subGroup : group.getSubGroups().values()) {
+            if (hasPlayerPermissionsInGroup(subGroup, player)) {
+                return true;
+            }
+        }
         return false;
     }
 

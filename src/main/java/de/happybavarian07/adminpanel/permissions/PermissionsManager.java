@@ -421,6 +421,7 @@ public class PermissionsManager {
 
         playerPermissionsAttachments.put(playerUUID, attachment);
         player.recalculatePermissions();
+        player.updateCommands();
     }
 
     /**
@@ -468,6 +469,7 @@ public class PermissionsManager {
             player.recalculatePermissions();
             plugin.getFileLogger().writeToLog(Level.INFO, "Loaded permissions for player: " + player.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
         } catch (Exception e) {
+            e.printStackTrace();
             plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for player " + player.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
         }
     }

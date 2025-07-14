@@ -62,6 +62,10 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
 
     @Override
     public void postSetMenuItems() {
+        Player player = playerMenuUtility.getOwner();
+        inventory.setItem(getSlots() - 9, lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false));
+        inventory.setItem(getSlots() - 8, lgm.getItem("PluginManager.Load", player, false));
+        inventory.setItem(getSlots() - 7, lgm.getItem("PluginManager.Install", player, false));
     }
 
     @Override

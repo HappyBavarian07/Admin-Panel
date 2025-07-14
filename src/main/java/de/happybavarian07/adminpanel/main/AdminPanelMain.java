@@ -6,8 +6,6 @@ import de.happybavarian07.adminpanel.backupmanager.FileBackup;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
-import de.happybavarian07.adminpanel.mysql.RepositoryController;
-import de.happybavarian07.adminpanel.mysql.utils.DatabaseProperties;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.permissions.PlayerPermission;
 import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
@@ -19,6 +17,8 @@ import de.happybavarian07.adminpanel.utils.managers.*;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
+import de.happybavarian07.coolstufflib.jpa.RepositoryController;
+import de.happybavarian07.coolstufflib.jpa.utils.DatabaseProperties;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.languagemanager.PerPlayerLanguageHandler;
@@ -213,7 +213,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         try {
             ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
-            // Log error using LogToFile From FileLogger
             fileLogger.writeToLog(Level.SEVERE, "Error updating Config File from AdminPanel", LogPrefixExtension.ADMINPANEL_MAIN);
             e.printStackTrace();
         }
@@ -235,18 +234,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setupFileLogger();
         new AdminPanelUtils();
 
-        // Load File Corruption Manager
         fileCorruptionManager = new FileCorruptionManager(this, backupManager.getFileBackup("ConfigBackup"));
         fileCorruptionManager.handleConfigBackupCheck();
 
         saveDefaultConfig();
         logger = StartUpLogger.create();
 
-        // Load Dependencies via Manager
         dependencyManager = new APDependencyManager(this);
         dependencyManager.loadCoreDependencies();
 
-        // Load Addons via names from the file onLoadExecution.yml if it exists
         File file = new File(getDataFolder() + "/addons/onLoadExecution.yml");
         if (file.exists()) {
             logger.coloredSpacer(ChatColor.BLUE);
@@ -284,7 +280,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         lastStartTimeMillis = System.currentTimeMillis();
         CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
                 .setDataFile(new File(getDataFolder(), "data.yml"))
-                .setPluginFileLogger(fileLogger)
+                .withLogging().create(fileLogger).build()
                 .setUsePlayerLangHandler(true)
                 .setSendSyntaxOnZeroArgs(true);
         tpsMeter = new TPSMeter();
@@ -349,6 +345,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
             }
         }
+        DatabaseProperties databaseProperties = new DatabaseProperties();
         String host = properties.getProperty("host", "localhost");
         int port = Integer.parseInt(properties.getProperty("port", "-1"));
         String databaseFilePath = properties.getProperty("sqlite_file_path");
@@ -371,16 +368,17 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
             }
         }
-        DatabaseProperties databaseProperties = new DatabaseProperties(
-                host,
-                port,
-                databaseFilePath,
-                username,
-                password,
-                driver,
-                databasePrefix
-        );
-        repositoryController = new RepositoryController(new File(getDataFolder(), "repo_registration.json"), databaseProperties);
+        databaseProperties.setDriver(driver);
+        databaseProperties.setHost(host);
+        databaseProperties.setPort(String.valueOf(port));
+        databaseProperties.setDatabase(databaseFilePath);
+        databaseProperties.setUsername(username);
+        databaseProperties.setPassword(password);
+        databaseProperties.setDatabasePrefix(databasePrefix);
+        fileLogger.writeToLog(Level.INFO, "Using Database: " + databaseProperties.getDriver() + " at " + databaseProperties.getHost() + ":" + databaseProperties.getPort() +
+                " with Database File: " + databaseProperties.getDatabase(), LogPrefixExtension.ADMINPANEL_MAIN, true);
+
+        repositoryController = new RepositoryController(this, new File(getDataFolder(), "repo_registration.json"), databaseProperties);
         repositoryController.loadRepositoriesFromFile();
     }
 
@@ -405,18 +403,23 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupMenuAddonManager(CoolStuffLibBuilder builder) {
-        builder.setMenuAddonManager(new MenuAddonManager());
+        builder.withMenuSystem().build();
     }
 
     private void setupLanguageManager(CoolStuffLibBuilder builder) {
         // TODO Maybe reimplement the MySQL Language Manager
         //boolean mysqlLanguageManagerTemp = false;
-        new InternalCacheHandler(); // unused for now, but we need it.
-        builder.setLanguageManager(new LanguageManager(this, new File(this.getDataFolder() + "/languages"), "languages", "[Admin-Panel]"));
+        new InternalCacheHandler();
+        builder.withLanguageManager()
+                .setLanguageFolder(new File(this.getDataFolder() + "/languages"))
+                .setResourceDirectory("languages")
+                .setPrefix("[Admin-Panel]")
+                .enablePlayerLanguageHandler()
+                .build();
     }
 
     private void setupCommandManagerRegistry(CoolStuffLibBuilder builder) {
-        builder.setCommandManagerRegistry(new CommandManagerRegistry(this));
+        builder.withCommandManager().enableSyntaxOnZeroArgs().build();
     }
 
     private void setupAPI() {

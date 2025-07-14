@@ -13,7 +13,6 @@ import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +37,6 @@ public class DependencyManager {
 
         for (PluginDependency dependency : addon.getDependencies()) {
             if (dependency.addonDependency()) {
-                // Handle Addon Dependency
                 File dependencyFile = new File(loader.getAddonFolder(), dependency.name() + ".jar");
                 if (!loader.getLoadedJarFiles().containsKey(dependencyFile)) {
                     allowedToStart = handleMissingPluginDependency(dependency, addon);
@@ -118,12 +116,11 @@ public class DependencyManager {
             }
         });
 
-        addon.getMavenDependencies().forEach(dependency -> {
+        /*addon.getMavenDependencies().forEach(dependency -> {
             if (dependency.getGroupId() == null || dependency.getArtifactId() == null || dependency.getVersion() == null) {
                 logger.coloredMessage(ChatColor.DARK_RED, "Maven dependency has invalid attributes: " + dependency);
                 allowedToStart.set(false);
             } else {
-                // Convert MavenDependency to Dependency
                 Dependency convertedDependency = new Dependency() {
                     @Override
                     public Class<? extends Annotation> annotationType() {
@@ -192,7 +189,7 @@ public class DependencyManager {
                 };
                 dependencyList.add(convertedDependency);
             }
-        });
+        });*/
 
         for (Dependency dependency : dependencyList) {
             // Validate dependency attributes

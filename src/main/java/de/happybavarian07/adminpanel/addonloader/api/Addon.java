@@ -3,11 +3,9 @@ package de.happybavarian07.adminpanel.addonloader.api;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonClassLoader;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.addonloader.utils.PluginDependency;
-import de.happybavarian07.adminpanel.addonloader.utils.MavenDependency;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-
 
 import java.io.*;
 import java.net.URL;
@@ -42,17 +40,6 @@ public abstract class Addon implements Comparable<Addon> {
     }
 
     public List<PluginDependency> getDependencies() {
-        return new ArrayList<>();
-    }
-
-    // TODO REMOVE THIS NEXT VERSION
-
-    /**
-     * @deprecated Use {@link de.happybavarian07.adminpanel.utils.dependencyloading.annotations.Dependency} annotation instead.
-     * This won't work with the new DependencyManager.
-     */
-    @Deprecated(forRemoval = true)
-    public List<MavenDependency> getMavenDependencies() {
         return new ArrayList<>();
     }
 
