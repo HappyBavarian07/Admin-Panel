@@ -21,8 +21,11 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +41,23 @@ public class TFIDFSearch {
     private boolean indexInitialized = false;
 
     public TFIDFSearch(String[] fields) {
+        this(fields, null);
+    }
+
+    public TFIDFSearch(String[] fields, File indexDir) {
         TFIDFSearch.fields = fields;
         this.analyzer = new StandardAnalyzer();
-        this.index = new ByteBuffersDirectory();
+        if (indexDir != null) {
+            try {
+                Path p = indexDir.toPath();
+                if (!indexDir.exists()) indexDir.mkdirs();
+                this.index = FSDirectory.open(p);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to open FSDirectory for TFIDF index", e);
+            }
+        } else {
+            this.index = new ByteBuffersDirectory();
+        }
     }
 
     public CompletableFuture<Void> indexItems(List<Item> items) {
@@ -72,6 +89,10 @@ public class TFIDFSearch {
                 try (IndexReader reader = DirectoryReader.open(index)) {
                     return reader.numDocs() > 0;
                 }
+            }
+            try (IndexReader reader = DirectoryReader.open(index)) {
+                return reader.numDocs() > 0;
+            } catch (IOException ignored) {
             }
             return false;
         } catch (IOException e) {
@@ -141,6 +162,13 @@ public class TFIDFSearch {
         return results;
     }
 
+    public void close() {
+        try {
+            index.close();
+        } catch (IOException ignored) {
+        }
+    }
+
     // Replace this with your own data structure and logic
     public static class Item {
         private final String[] fieldValues = new String[fields.length]; // Store field values here
@@ -173,4 +201,3 @@ public class TFIDFSearch {
         }
     }
 }
-

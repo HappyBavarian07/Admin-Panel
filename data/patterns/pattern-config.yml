@@ -1,0 +1,6 @@
+# pattern-config: override detector rules (regex path -> pattern)
+# Example: match any player UUID under playerdata and enforce language property
+# key is a regex matched against the full path (dots between map keys, array indices in brackets)
+playerdata\.[0-9a-fA-F\-]{36}\.language: "REGEX:^[a-z]{2}$"
+# Example: force plugin spigotID to be numeric
+PluginsToUpdate\..*\.spigotID: "REGEX:^[0-9]+$"

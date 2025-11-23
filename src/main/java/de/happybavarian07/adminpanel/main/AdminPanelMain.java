@@ -9,6 +9,9 @@ import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.permissions.PlayerPermission;
 import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
+import de.happybavarian07.adminpanel.service.api.DataService;
+import de.happybavarian07.adminpanel.service.api.DataServiceConfig;
+import de.happybavarian07.adminpanel.service.impl.DataServiceFactory;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
@@ -21,8 +24,9 @@ import de.happybavarian07.coolstufflib.jpa.RepositoryController;
 import de.happybavarian07.coolstufflib.jpa.utils.DatabaseProperties;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
-import de.happybavarian07.coolstufflib.languagemanager.PerPlayerLanguageHandler;
 import de.happybavarian07.coolstufflib.menusystem.MenuAddonManager;
+import de.happybavarian07.coolstufflib.service.api.ServiceRegistry;
+import de.happybavarian07.coolstufflib.service.impl.DefaultServiceRegistry;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -78,6 +82,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private RepositoryController repositoryController;
     private PluginUtils globalPluginUtils;
     private CoolStuffLib coolStuffLib;
+    private ServiceRegistry serviceRegistry;
+    private UUID dataServiceUUID;
 
     /**
      * Returns the Prefix of the Plugin
@@ -138,6 +144,15 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public BackupManager getBackupManager() {
         return backupManager;
+    }
+
+    public DataService getDataService() {
+        return serviceRegistry.getAs(dataServiceUUID, DataService.class).orElseGet(
+                () -> {
+                    fileLogger.writeToLog(Level.SEVERE, "Data Service is not registered!", LogPrefixExtension.ADMINPANEL_MAIN);
+                    return null;
+                }
+        );
     }
 
     public boolean isLanguageManagerEnabled() {
@@ -280,9 +295,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         lastStartTimeMillis = System.currentTimeMillis();
         CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
                 .setDataFile(new File(getDataFolder(), "data.yml"))
-                .withLogging().create(fileLogger).build()
-                .setUsePlayerLangHandler(true)
-                .setSendSyntaxOnZeroArgs(true);
+                .withLogging().create(fileLogger).build();
         tpsMeter = new TPSMeter();
         setPlugin(this);
 
@@ -294,6 +307,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setupMenuAddonManager(coolStuffLibBuilder);
         setupLanguageManager(coolStuffLibBuilder);
         setupCommandManagerRegistry(coolStuffLibBuilder);
+        setupServiceRegistry();
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
         menuAddonManager = coolStuffLib.getMenuAddonManager();
@@ -422,6 +436,29 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         builder.withCommandManager().enableSyntaxOnZeroArgs().build();
     }
 
+    private void setupServiceRegistry() {
+        serviceRegistry = new DefaultServiceRegistry();
+        DataServiceFactory dataServiceFactory = new DataServiceFactory(new DataServiceConfig("sqlite", "plugin_data.db"));
+        UUID factoryId = dataServiceFactory.getServiceDescriptor().id();
+        serviceRegistry.registerFactory(dataServiceFactory.getServiceDescriptor(), dataServiceFactory, factoryId);
+        dataServiceUUID = factoryId;
+        try {
+            serviceRegistry.start(factoryId).exceptionally(ex -> {
+                fileLogger.writeToLog(Level.SEVERE, "Failed to create DataService: " + ex.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
+                return null;
+            }).join();
+        } catch (Exception e) {
+            fileLogger.writeToLog(Level.SEVERE, "Error while creating DataService: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
+        }
+        try {
+            DataService ds = getDataService();
+            if (ds != null && pluginStateManager != null) {
+                pluginStateManager.setDataService(ds);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     private void setupAPI() {
         API = new LocalAdminPanelAPI(this);
     }
@@ -515,7 +552,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPluginStateManager() {
-        pluginStateManager = new PluginStateManager(getConfig(), this);
+        pluginStateManager = new PluginStateManager(getConfig(), getDataYML(), this);
     }
 
     private void initializeWarningManager() {
@@ -544,7 +581,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupLanguageHandler() {
         dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
-        languageManager.setPLHandler(new PerPlayerLanguageHandler(languageManager, new File(getDataFolder() + "/data.yml"), dataYML));
+        languageManager.setPLHandler(new AdminPanelPerPlayerLanguageHandler(languageManager, new File(getDataFolder() + "/data.yml"), dataYML));
     }
 
     private void enableLanguageManager() {
@@ -672,6 +709,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         if (warningManager != null) {
             warningManager.saveWarnings();
         }
+        if (pluginStateManager != null) {
+            pluginStateManager.saveAllState();
+        }
         if (pluginStateManager.checkIfBungee(false)) {
             bungeeUtils.closeBungeeChannel();
             String path = "Plugin.BungeeSyncSystem.JavaSockets.";
@@ -685,6 +725,12 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null, true));
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
+        }
+        try {
+            if (languageManager != null && languageManager.getPLHandler() instanceof AdminPanelPerPlayerLanguageHandler handler) {
+                handler.flushSync();
+            }
+        } catch (Exception ignored) {
         }
     }
 

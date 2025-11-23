@@ -1,0 +1,5 @@
+descriptions:
+  ".+":
+    resourceID: "REGEX:^[0-9]+$"
+    description: "REGEX:^.{1,200}$"
+

@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -81,11 +81,15 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
             player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIsNotOnSpigot", player, true));
             return;
         }
-        if (updater.isExternalFile() && updater.getLinkToFile().equals("") && !updater.bypassExternalURL()) {
+        if (updater.isExternalFile() && updater.getLinkToFile().isEmpty() && !updater.bypassExternalURL()) {
             player.sendMessage(lgm.getMessage("Player.PluginManager.DownloadFileIsExternal", player, true));
             return;
         }
-        updater.downloadLatestUpdate(updater.updateAvailable(), true, true);
+        boolean replace = AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace");
+        updater.checkForUpdatesAsync(false, (available, latest) -> {
+            if (available) updater.downloadLatestUpdateAsync(replace, true, true, r -> {
+            });
+        });
         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", currentPlugin.getName(), false);
         player.sendMessage(lgm.getMessage("Player.PluginManager.UpdatedPlugin", player, true));
     }
@@ -115,8 +119,10 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
         lgm.addPlaceholder(PlaceholderType.ITEM, "%externalFile%", updater.isExternalFile(), false);
         ItemStack item = lgm.getItem("PluginManager.AutoUpdateMenu.PluginItem", playerMenuUtility.getOwner(), true);
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(AdminPanelUtils.format(playerMenuUtility.getOwner(), "&a" + plugin.getName(), ""));
-        item.setItemMeta(itemMeta);
+        if (itemMeta != null) {
+            itemMeta.setDisplayName(AdminPanelUtils.format(playerMenuUtility.getOwner(), "&a" + plugin.getName(), ""));
+            item.setItemMeta(itemMeta);
+        }
         return item;
     }
 
@@ -127,7 +133,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
     }
 
     @EventHandler
-    public void onChat(PlayerChatEvent event) {
+    public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         Plugin selectedPlugin;
         if (playerMenuUtility.hasData("AddPluginMetaData")) {

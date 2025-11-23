@@ -132,7 +132,6 @@ public class PermissionsManager {
     }
 
     private void migrateOldPermissions() {
-        // Überprüfen ob die alte permissions.yml existiert und Daten enthält
         File permissionFile = new File(plugin.getDataFolder(), "permissions.yml");
         if (!permissionFile.exists()) {
             plugin.getFileLogger().writeToLog(Level.WARNING, "Old permissions.yml file does not exist or is empty: No migration needed!", "Permission Manager", true);

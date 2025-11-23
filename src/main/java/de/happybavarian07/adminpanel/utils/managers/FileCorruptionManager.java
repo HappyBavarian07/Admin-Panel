@@ -11,37 +11,61 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
-/*
- * @Author HappyBavarian07
- * @Date September 11, 2024 | 16:10
+/**
+ * <p>FileCorruptionManager provides integrity checking, structure validation, and backup restoration for plugin files.</p>
+ * <ul>
+ *   <li>Checks files and directories for corruption, missing resources, and format errors.</li>
+ *   <li>Supports pattern-based validation using regexes for dynamic content.</li>
+ *   <li>Restores corrupted files from backup if available.</li>
+ *   <li>Integrates with the plugin's resource and backup systems.</li>
+ * </ul>
+ * <pre><code>FileCorruptionManager manager = new FileCorruptionManager(plugin, backup);
+ * CorruptionCheckResult result = manager.checkFileForCorruption(file);
+ * </code></pre>
  */
-// This Class is used to manage the File Corruption of the Plugin
-// If a File is corrupted, it will be backed up and the corrupted file will be replaced with the backup hopefully
-// This is used to prevent data loss
-// It will run by default on startup before the backup process happens, so that it can catch any corrupted files before they are backed up
-// This is a very important class, as it can prevent data loss in case of a corrupted file
-// You can disable it, along with the Config Backup inside the config.yml
 public class FileCorruptionManager {
     private final AdminPanelMain plugin;
     private final FileBackup configBackup;
 
+    /**
+     * <p>Constructs a new FileCorruptionManager for managing file integrity and backup operations.</p>
+     * <pre><code>FileCorruptionManager manager = new FileCorruptionManager(plugin, backup);</code></pre>
+     *
+     * @param plugin       the plugin instance
+     * @param configBackup the backup manager
+     */
     public FileCorruptionManager(AdminPanelMain plugin, FileBackup configBackup) {
         this.plugin = plugin;
         this.configBackup = configBackup;
     }
 
-    // This Method is used to check if the Config is corrupted
-    // This method will check one file against the hopefully correct stored File in the Plugin's Resources
+    /**
+     * <p>Checks a file for corruption by validating its structure, integrity, and optionally matching it against a pattern file.</p>
+     * <pre><code>CorruptionCheckResult result = manager.checkFileForCorruption(file);</code></pre>
+     *
+     * @param file the file to check
+     * @return the result of the corruption check
+     */
     public CorruptionCheckResult checkFileForCorruption(File file) {
         if (file.isDirectory()) {
             return CorruptionCheckResult.CHECK_FAILED_FILE_IS_DIRECTORY;
         }
         if (file.exists()) {
             String resourceName = file.getAbsolutePath().replace(plugin.getDataFolder().getAbsolutePath(), "").substring(1).replace(File.separator, "/");
+            InputStream patternResourceIn = plugin.getResource(resourceName + ".pattern");
+            if (patternResourceIn != null) {
+                try {
+                    if (!PatternFileValidator.matchesPattern(file, patternResourceIn)) {
+                        return CorruptionCheckResult.PATTERN_MISMATCH;
+                    }
+                } catch (Exception ex) {
+                    plugin.getLogger().log(Level.WARNING, "Pattern validation failed for file: " + file.getAbsolutePath(), ex);
+                    return CorruptionCheckResult.CHECK_FAILED_IO_ERROR;
+                }
+            }
             InputStream resourceIn = plugin.getResource(resourceName);
-            //System.out.println("ResourceIn: " + resourceIn);
-            //System.out.println("ResourceName: " + resourceName);
             if (resourceIn == null) {
                 return CorruptionCheckResult.CHECK_FAILED_MISSING_RESOURCE;
             }
@@ -52,23 +76,12 @@ public class FileCorruptionManager {
             }
 
             // Do the Integrity Check
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(file));
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 reader.readLine();
             } catch (IOException ex) {
                 return CorruptionCheckResult.INTEGRITY_ERROR;
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ex) {
-                        plugin.getLogger().log(Level.SEVERE, "An error occurred while closing the BufferedReader!", ex);
-                    }
-                }
             }
 
-            // Check file type and handle accordingly
             String fileName = file.getName();
             if (fileName.endsWith(".yml")) {
                 try {
@@ -87,11 +100,18 @@ public class FileCorruptionManager {
                     FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
                     Set<String> resourceKeys = resourceConfig.getKeys(true);
                     Set<String> fileKeys = fileConfig.getKeys(true);
-                    // Go through all keys in the resource file and check if they are in the file
-                    for (String key : resourceKeys) {
-                        if (!fileKeys.contains(key)) {
+                    boolean found = false;
+                    for (String resourceKey : resourceKeys) {
+                        for (String fileKey : fileKeys) {
+                            if (Pattern.matches(resourceKey, fileKey)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
                             return CorruptionCheckResult.DATA_ERROR;
                         }
+                        found = false;
                     }
                 } catch (IllegalArgumentException ex) {
                     return CorruptionCheckResult.FILE_MISSING;
@@ -102,10 +122,18 @@ public class FileCorruptionManager {
                     properties.load(new FileInputStream(file));
                     Properties resourceProperties = new Properties();
                     resourceProperties.load(resourceIn);
-                    for (String key : resourceProperties.stringPropertyNames()) {
-                        if (!properties.containsKey(key)) {
+                    boolean found = false;
+                    for (String resourceKey : resourceProperties.stringPropertyNames()) {
+                        for (String fileKey : properties.stringPropertyNames()) {
+                            if (Pattern.matches(resourceKey, fileKey)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
                             return CorruptionCheckResult.DATA_ERROR;
                         }
+                        found = false;
                     }
                 } catch (IOException ex) {
                     return CorruptionCheckResult.CORRUPTED;
@@ -114,12 +142,18 @@ public class FileCorruptionManager {
                 return CorruptionCheckResult.CHECK_FAILED_INVALID_FORMAT;
             }
 
-            // If the File is not corrupted, return VALID
             return CorruptionCheckResult.VALID;
         }
         return CorruptionCheckResult.FILE_MISSING;
     }
 
+    /**
+     * <p>Checks an array of files for corruption, including recursive directory traversal.</p>
+     * <pre><code>Map<File, CorruptionCheckResult> results = manager.checkFilesForCorruption(files);</code></pre>
+     *
+     * @param files the files to check
+     * @return a map of files to their corruption check results
+     */
     public Map<File, CorruptionCheckResult> checkFilesForCorruption(File[] files) {
         Map<File, CorruptionCheckResult> results = new HashMap<>();
         for (File file : files) {
@@ -132,6 +166,13 @@ public class FileCorruptionManager {
         return results;
     }
 
+    /**
+     * <p>Recursively checks a directory and its contents for corruption.</p>
+     * <pre><code>Map<File, CorruptionCheckResult> results = manager.checkDirectoryForCorruption(directory);</code></pre>
+     *
+     * @param directory the directory to check
+     * @return a map of files to their corruption check results
+     */
     public Map<File, CorruptionCheckResult> checkDirectoryForCorruption(File directory) {
         Map<File, CorruptionCheckResult> results = new HashMap<>();
         for (File file : Objects.requireNonNull(directory.listFiles())) {
@@ -144,6 +185,10 @@ public class FileCorruptionManager {
         return results;
     }
 
+    /**
+     * <p>Runs the corruption check and attempts to restore corrupted files from backup if needed.</p>
+     * <pre><code>manager.handleConfigBackupCheck();</code></pre>
+     */
     public void handleConfigBackupCheck() {
         // TODO Tell the user about this way of disabling the Config Backup Check
         if (!new File(plugin.getDataFolder(), "DisableConfigBackupCorruptionCheckIKnowWhatIAmDoingISwear").exists()) {
@@ -152,11 +197,11 @@ public class FileCorruptionManager {
             for (Map.Entry<File, CorruptionCheckResult> entry : results.entrySet()) {
                 String relativePath = entry.getKey().getAbsolutePath().replace(plugin.getDataFolder().getAbsolutePath(), "").substring(1).replace(File.separator, "/");
                 String corruptedString = entry.getValue().isCorrupted() ? ChatColor.RED + "Corrupted" : ChatColor.GREEN + "Not Corrupted";
-                int totalLength = 120; // Adjust this value as needed
+                int totalLength = 120;
                 String message = "[Admin-Panel] Checked File '" + ChatColor.YELLOW + relativePath + ChatColor.WHITE + "' for corruption.";
                 int messageLength = ChatColor.stripColor(message).length();
                 int dashRepeatLength = totalLength - messageLength - 1;
-                if(dashRepeatLength < 0) {
+                if (dashRepeatLength < 0) {
                     dashRepeatLength = 1;
                 }
                 String dashes = " " + "-".repeat(dashRepeatLength) + " ";
@@ -175,6 +220,10 @@ public class FileCorruptionManager {
         }
     }
 
+    /**
+     * <p>Enum representing the result of a file corruption check.</p>
+     * <pre><code>CorruptionCheckResult result = CorruptionCheckResult.VALID;</code></pre>
+     */
     public enum CorruptionCheckResult {
         CHECK_FAILED_SECURITY_EXCEPTION(false, -5, "A security exception was encountered."),
         CHECK_FAILED_IO_ERROR(true, -4, "An I/O error occurred during the check."),
@@ -186,18 +235,32 @@ public class FileCorruptionManager {
         EMPTY(true, 2, "The file is empty."),
         INTEGRITY_ERROR(true, 3, "The file integrity check failed."),
         DATA_ERROR(true, 4, "The file contains data errors."),
-        CORRUPTED(true, 5, "The file is corrupted, but the System couldn't find a reason.");
+        CORRUPTED(true, 5, "The file is corrupted, but the System couldn't find a reason."),
+        PATTERN_MISMATCH(true, 6, "The file does not match the required pattern.");
 
         private final boolean corrupted;
         private final int errorCode;
         private final String reason;
 
+        /**
+         * Constructs a CorruptionCheckResult with the specified parameters.
+         *
+         * @param corrupted whether the file is corrupted
+         * @param errorCode the error code associated with the corruption check
+         * @param reason    the reason for the corruption check result
+         */
         CorruptionCheckResult(boolean corrupted, int errorCode, String reason) {
             this.corrupted = corrupted;
             this.errorCode = errorCode;
             this.reason = reason;
         }
 
+        /**
+         * Returns whether the file is corrupted or not
+         * If the file is corrupted, it will return true, otherwise false
+         *
+         * @return true if the file is corrupted, false otherwise
+         */
         public boolean isCorrupted() {
             return corrupted;
         }

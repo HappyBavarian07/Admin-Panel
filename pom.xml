@@ -58,7 +58,6 @@
                                         <exclude>META-INF/*.RSA</exclude>
                                     </excludes>
                                 </filter>
-                                <!-- Falls nötig, weitere Filter hier einfügen, um wichtige compile-Klassen zu behalten -->
                             </filters>
                         </configuration>
                     </execution>
@@ -224,7 +223,7 @@
     </scm>
 
     <properties>
-        <java.version>17</java.version> <!-- Aktualisieren auf Java 17 -->
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
     </properties>
@@ -274,7 +273,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
@@ -299,22 +297,16 @@
             <version>2.10.9</version>
             <scope>provided</scope>
         </dependency>
-        <!-- SuperVanish -->
         <dependency>
             <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
             <version>6.2.7</version>
             <scope>provided</scope>
         </dependency>
-        <!--dependency>
-            <groupId>com.tchristofferson</groupId>
-            <artifactId>ConfigUpdater</artifactId>
-            <version>2.1-SNAPSHOT</version>
-        </dependency-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.14.1</version> <!-- Ensure this version matches the version used at runtime -->
+            <version>2.17.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -323,14 +315,12 @@
             <version>1.16.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Apache Commons IO -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.14.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Hook Plugins Start -->
         <dependency>
             <groupId>com.gitlab.ruany</groupId>
             <artifactId>LiteBansAPI</artifactId>
@@ -379,30 +369,24 @@
             <version>3.3.3</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Hook Plugins End -->
-
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.resolver/maven-resolver-api -->
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-api</artifactId>
             <version>2.0.7</version>
             <scope>compile</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-aether-provider -->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-aether-provider</artifactId>
             <version>3.3.9</version>
             <scope>compile</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.resolver/maven-resolver-transport-http -->
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>2.0.0-alpha-2</version>
             <scope>compile</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.resolver/maven-resolver-connector-basic -->
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-connector-basic</artifactId>
@@ -420,9 +404,21 @@
             <artifactId>CoolStuffLib</artifactId>
             <version>2.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
     <profiles>
-        <!-- GPG Signature on release -->
         <profile>
             <id>release-sign-artifacts</id>
             <activation>

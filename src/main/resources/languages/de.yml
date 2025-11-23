@@ -259,7 +259,7 @@ Messages:
       FileNameSelected: '%prefix% &9> &aDer Datei Name %filename% wurde ausgewählt!'
       TypeResourceIDInChat: '%prefix% &9> &aBitte gib die Resource ID an!'
       TypeFileNameInChat: '%prefix% &9> &aBitte gib den Datei Namen an!'
-      TypePluginFileNameToLoadInChat: '%prefix% &9> &aBitte gib den Plugin Datei Namen (name.jar) an!'
+      TypePluginFileNameToLoadInChat: '%prefix% &9> &aBitte gib den Plugin Datei Namen (name.jar) an! Um zum Menu zu gelangen gib ''cancel'' oder ''exit'' ein!'
       PluginFileNameSelected: '%prefix% &9> &aDas Plugin %filename% wurde geladen!'
       SuccessfullyInstalled: '%prefix% &9> &aDas Plugin %resourceid% wurde erfoglreich in die Datei %filename%.jar gedownloaded!'
       ErrorInInstallProccess: '%prefix% &9> &cWährend des Installationsvorgangs ist ein Fehler aufgetreten!'
@@ -295,6 +295,28 @@ Messages:
     EffectRemoved: '%prefix% &9> &cDer Effekt &7%type%&c wurde dem Spieler %7%target%&c weggenommen!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
+  ConfigReloadMenu:
+    ConfigReloaded: '%prefix% &9> &aKonfiguration erfolgreich neu geladen!'
+    LanguagesReloaded: '%prefix% &9> &aSprachen erfolgreich neu geladen!'
+    DataReloaded: '%prefix% &9> &aDatenservice erfolgreich neu geladen!'
+    BackupToggled: '%prefix% &9> &aBackup-System ist jetzt %backup_state%!'
+    CreatingBackup: '%prefix% &9> &aErstelle Backups...'
+    BackupCreated: '%prefix% &9> &aBackups erfolgreich erstellt!'
+    ReloadingPlugin: '%prefix% &9> &cLade Plugin neu...'
+  LanguageMigration:
+    Error:
+      NoLanguageFileSelected: '%prefix% &9> &cKeine Sprachdatei ausgewählt!'
+    Message:
+      NoEntriesSelected: '%prefix% &9> &cKeine Einträge für Migration ausgewählt!'
+      MigrationFailed: '%prefix% &9> &cMigration fehlgeschlagen! Prüfe die Konsole für Fehler.'
+      MigrationApplied: '%prefix% &9> &aMigration erfolgreich angewendet!'
+  LanguageMigrator:
+    EntryEditMenu:
+      EnterFinalValue: '%prefix% &9> &aGib den Endwert im Chat ein.'
+      EnterFinalValueFormat: '&7Formate: &eGanzzahl (123)&7, &eDezimalzahl (12.3)&7, &eBoolean (true/false)&7, &eListe ([a,b,c])&7, &eText (beliebig)&7. Tippe &ccancel &7zum Abbrechen.'
+      FinalValueSet: '%prefix% &9> &aEndwert gesetzt auf: &f%final_value%'
+      EditCancelled: '%prefix% &9> &cBearbeitung abgebrochen.'
+      InvalidInput: '%prefix% &9> &cUngültige Eingabe! Wird als Text verwendet.'
 AddonCommand:
   # Format Placeholders:
   # %addon_name% = Addon Name
@@ -765,7 +787,7 @@ Items:
           # %filtered_result_count% = The Filtered Result Count
           lore:
             - '&7Gruppe: %group%'
-            - '&7Eltern: %parent_groups%'
+            - '&7Parent: %parent_groups%'
             - '&7Untergruppen: %sub_group_count%'
             - '&7Berechtigungen: %sub_permission_count%'
             - ' '
@@ -1402,6 +1424,159 @@ Items:
           displayName: '&2Permissions'
           lore:
             - '&2Liste aller Permissions!'
+  ConfigReloadMenu:
+    ReloadConfig:
+      material: WRITABLE_BOOK
+      displayName: '&aKonfiguration neu laden'
+      lore:
+        - '&7Lädt die Plugin-Konfiguration'
+        - '&7ohne Server-Neustart neu.'
+        - ''
+        - '&eKlicke zum Neuladen!'
+    ReloadLanguages:
+      material: BOOK
+      displayName: '&aSprachen neu laden'
+      lore:
+        - '&7Lädt alle Sprachdateien'
+        - '&7und Übersetzungen neu.'
+        - ''
+        - '&eKlicke zum Neuladen!'
+    ReloadData:
+      material: CHEST
+      displayName: '&aDaten neu laden'
+      lore:
+        - '&7Lädt den DataService und'
+        - '&7alle persistenten Daten neu.'
+        - ''
+        - '&eKlicke zum Neuladen!'
+    BackupAll:
+      material: ENDER_CHEST
+      displayName: '&6Backups erstellen'
+      lore:
+        - '&7Erstellt Backups aller'
+        - '&7registrierten Dateien.'
+        - ''
+        - '&eKlicke zum Sichern!'
+    ReloadPlugin:
+      material: REDSTONE
+      displayName: '&cPlugin neu laden'
+      lore:
+        - '&7Lädt das Plugin komplett neu'
+        - '&7(Deaktivieren + Aktivieren).'
+        - ''
+        - '&c&lWarnung: Kann Probleme verursachen!'
+        - '&eKlicke zum Neuladen!'
+  LanguageMigration:
+    Migration:
+      MigrationItem:
+        material: PAPER
+        displayName: '&6%key%'
+        lore:
+          - '&7Status: &e%migration_status%'
+          - ''
+          - '&7Benutzerwert:'
+          - '&f%user_value%'
+          - ''
+          - '&7Ressourcenwert:'
+          - '&f%resource_value%'
+          - ''
+          - '&eKlicke zum Bearbeiten!'
+      FilterItem:
+        material: HOPPER
+        displayName: '&6Filter-Modus'
+        lore:
+          - '&7Aktuell: &e%status_filter_mode%'
+          - ''
+          - '%selected_all_filter%'
+          - '%selected_changed_only_filter%'
+          - '%selected_unchanged_only_filter%'
+          - '%selected_missing_only_filter%'
+          - ''
+          - '&eKlicke zum Wechseln!'
+      ApplyChanges:
+        material: EMERALD
+        displayName: '&aÄnderungen übernehmen'
+        lore:
+          - '&7Gesamteinträge: &e%total_migration_count%'
+          - '&7Gefiltert: &e%filtered_migration_count%'
+          - '&7Übernommen: &a%actually_applied_migration_count%'
+          - ''
+          - '&eKlicke zum Übernehmen!'
+  LanguageMigrator:
+    EntryEditMenu:
+      Name:
+        material: NAME_TAG
+        displayName: '&6Eintrag: %migration_entry_name%'
+        lore:
+          - '&7Status: &e%migration_entry_status%'
+      KeepUserValue:
+        material: GREEN_WOOL
+        displayName: '&aBenutzerwert behalten'
+        lore:
+          - '&7Aktueller Benutzerwert:'
+          - '&f%migration_entry_user_value%'
+          - ''
+          - '&eKlicke für Vorschau'
+          - '&eShift-Klick zum Übernehmen!'
+      KeepResourceValue:
+        material: BLUE_WOOL
+        displayName: '&9Ressourcenwert behalten'
+        lore:
+          - '&7Ressourcenwert:'
+          - '&f%migration_entry_resource_value%'
+          - ''
+          - '&eKlicke für Vorschau'
+          - '&eShift-Klick zum Übernehmen!'
+      DeleteEntryFromFile:
+        material: RED_WOOL
+        displayName: '&cEintrag löschen'
+        lore:
+          - '&7Entfernt diesen Eintrag aus'
+          - '&7der Sprachdatei.'
+          - ''
+          - '&eKlicke für Vorschau'
+          - '&eShift-Klick zum Übernehmen!'
+      KeepRemovedFromFile:
+        material: BARRIER
+        displayName: '&cEntfernt lassen'
+        lore:
+          - '&7Lässt diesen Eintrag'
+          - '&7aus der Datei entfernt.'
+          - ''
+          - '&eKlicke für Vorschau'
+          - '&eShift-Klick zum Übernehmen!'
+      EditFinalValue:
+        material: WRITABLE_BOOK
+        displayName: '&6Eigenen Wert bearbeiten'
+        lore:
+          - '&7Gib einen eigenen Wert'
+          - '&7im Chat ein.'
+          - ''
+          - '&7Unterstützt:'
+          - '&8• &7Ganzzahlen (123)'
+          - '&8• &7Dezimalzahlen (123.45)'
+          - '&8• &7Boolesche Werte (true/false)'
+          - '&8• &7Listen ([item1, item2])'
+          - '&8• &7Zeichenketten (beliebiger Text)'
+          - ''
+          - '&eKlicke zum Bearbeiten!'
+      FinalValueDisplay:
+        material: PAPER
+        displayName: '&aEndwert-Vorschau'
+        lore:
+          - '&7Dies wird gespeichert:'
+          - '&f%migration_entry_final_value%'
+      Close:
+        material: EMERALD_BLOCK
+        displayName: '&aBestätigen & Schließen'
+        lore:
+          - '&7Speichert den Endwert und'
+          - '&7kehrt zum Migrationsmenü zurück.'
+          - ''
+          - '&7Tipp: Drücke ESC zum Abbrechen'
+          - '&7ohne Änderungen zu speichern.'
+          - ''
+          - '&eKlicke zum Bestätigen!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   SwitchLanguageMenu: '&aSprachen'
@@ -1448,5 +1623,10 @@ MenuTitles:
       Settings: '&3Einstellungen'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Einstellungen'
+  ConfigReloadMenu: '&aKonfigurations-Manager'
+  LanguageMigration:
+    Migration: '&6Sprach-Migration'
+  LanguageMigrator:
+    EntryEditMenu: '&6Bearbeiten: %migration_entry_name%'
   Misc:
     ConfirmationMenu: '&aBestätigungs Menu'

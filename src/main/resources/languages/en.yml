@@ -251,7 +251,7 @@ Messages:
       FileNameSelected: '%prefix% &9> &aThe file name %filename% has been selected!'
       TypeResourceIDInChat: '%prefix% &9> &aPlease enter the resource ID!'
       TypeFileNameInChat: '%prefix% &9> &aPlease enter the file name!'
-      TypePluginFileNameToLoadInChat: '%prefix% &9> &aPlease enter the Plugin File Name (name.jar)!'
+      TypePluginFileNameToLoadInChat: '%prefix% &9> &aPlease enter the Plugin File Name (name.jar)! To leave, type ''exit'' or ''cancel'''
       PluginFileNameSelected: '%prefix% &9> &aThe Plugin %filename% has been loaded!'
       SuccessfullyInstalled: '%prefix% &9> &aThe plugin %resourceid% was successfully downloaded to the file %filename%.jar!'
       ErrorInInstallProccess: '%prefix% &9> &cAn error occurred during the installation process!'
@@ -331,6 +331,28 @@ Messages:
         - '+---------------------------------------------------+'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
+  ConfigReloadMenu:
+    ConfigReloaded: '%prefix% &9> &aConfiguration reloaded successfully!'
+    LanguagesReloaded: '%prefix% &9> &aLanguages reloaded successfully!'
+    DataReloaded: '%prefix% &9> &aData service reloaded successfully!'
+    BackupToggled: '%prefix% &9> &aBackup system is now %backup_state%!'
+    CreatingBackup: '%prefix% &9> &aCreating backups...'
+    BackupCreated: '%prefix% &9> &aBackups created successfully!'
+    ReloadingPlugin: '%prefix% &9> &cReloading plugin...'
+  LanguageMigration:
+    Error:
+      NoLanguageFileSelected: '%prefix% &9> &cNo language file selected!'
+    Message:
+      NoEntriesSelected: '%prefix% &9> &cNo entries selected for migration!'
+      MigrationFailed: '%prefix% &9> &cMigration failed! Check console for errors.'
+      MigrationApplied: '%prefix% &9> &aMigration applied successfully!'
+  LanguageMigrator:
+    EntryEditMenu:
+      EnterFinalValue: '%prefix% &9> &aEnter the final value in chat.'
+      EnterFinalValueFormat: '&7Formats: &eInteger (123)&7, &eFloat (12.3)&7, &eBoolean (true/false)&7, &eList ([a,b,c])&7, &eString (text)&7. Type &ccancel &7to abort.'
+      FinalValueSet: '%prefix% &9> &aFinal value set to: &f%final_value%'
+      EditCancelled: '%prefix% &9> &cEdit cancelled.'
+      InvalidInput: '%prefix% &9> &cInvalid input! Using as string instead.'
   ToManyArguments: '&4Too many Arguments!'
   TooFewArguments: '&4Too few Arguments!'
 Items:
@@ -726,10 +748,10 @@ Items:
       KickMenu:
         Reason:
           material: PAPER
-          displayName: '&cSet the Reason of the Ban'
+          displayName: '&cSet the Reason of the Kick'
           # %reason% = The Reason
           lore:
-            - '&cSet the Reason of the Ban'
+            - '&cSet the Reason of the Kick'
             - '&c%reason%'
         Kick:
           material: BEDROCK
@@ -1516,6 +1538,159 @@ Items:
             - '&aCurrent File Logging Prefix:'
             - '&6%apdataclient_file_logging_prefix%'
             - '&aClick to change the File Logging Prefix!'
+  ConfigReloadMenu:
+    ReloadConfig:
+      material: WRITABLE_BOOK
+      displayName: '&aReload Config'
+      lore:
+        - '&7Reload the plugin configuration'
+        - '&7without restarting the server.'
+        - ''
+        - '&eClick to reload config!'
+    ReloadLanguages:
+      material: BOOK
+      displayName: '&aReload Languages'
+      lore:
+        - '&7Reload all language files'
+        - '&7and translations.'
+        - ''
+        - '&eClick to reload languages!'
+    ReloadData:
+      material: CHEST
+      displayName: '&aReload Data'
+      lore:
+        - '&7Reload the DataService'
+        - '&7and all persistent data.'
+        - ''
+        - '&eClick to reload data!'
+    BackupAll:
+      material: ENDER_CHEST
+      displayName: '&6Create Backups'
+      lore:
+        - '&7Create backups of all'
+        - '&7registered files.'
+        - ''
+        - '&eClick to backup!'
+    ReloadPlugin:
+      material: REDSTONE
+      displayName: '&cReload Plugin'
+      lore:
+        - '&7Completely reload the plugin'
+        - '&7(disable + enable cycle).'
+        - ''
+        - '&c&lWarning: This may cause issues!'
+        - '&eClick to reload plugin!'
+  LanguageMigration:
+    Migration:
+      MigrationItem:
+        material: PAPER
+        displayName: '&6%key%'
+        lore:
+          - '&7Status: &e%migration_status%'
+          - ''
+          - '&7User Value:'
+          - '&f%user_value%'
+          - ''
+          - '&7Resource Value:'
+          - '&f%resource_value%'
+          - ''
+          - '&eClick to edit this entry!'
+      FilterItem:
+        material: HOPPER
+        displayName: '&6Filter Mode'
+        lore:
+          - '&7Current: &e%status_filter_mode%'
+          - ''
+          - '%selected_all_filter%'
+          - '%selected_changed_only_filter%'
+          - '%selected_unchanged_only_filter%'
+          - '%selected_missing_only_filter%'
+          - ''
+          - '&eClick to cycle filter modes!'
+      ApplyChanges:
+        material: EMERALD
+        displayName: '&aApply Changes'
+        lore:
+          - '&7Total entries: &e%total_migration_count%'
+          - '&7Filtered: &e%filtered_migration_count%'
+          - '&7Applied: &a%actually_applied_migration_count%'
+          - ''
+          - '&eClick to apply selected changes!'
+  LanguageMigrator:
+    EntryEditMenu:
+      Name:
+        material: NAME_TAG
+        displayName: '&6Entry: %migration_entry_name%'
+        lore:
+          - '&7Status: &e%migration_entry_status%'
+      KeepUserValue:
+        material: GREEN_WOOL
+        displayName: '&aKeep User Value'
+        lore:
+          - '&7Current user value:'
+          - '&f%migration_entry_user_value%'
+          - ''
+          - '&eClick to preview'
+          - '&eShift-click to apply!'
+      KeepResourceValue:
+        material: BLUE_WOOL
+        displayName: '&9Keep Resource Value'
+        lore:
+          - '&7Resource value:'
+          - '&f%migration_entry_resource_value%'
+          - ''
+          - '&eClick to preview'
+          - '&eShift-click to apply!'
+      DeleteEntryFromFile:
+        material: RED_WOOL
+        displayName: '&cDelete Entry'
+        lore:
+          - '&7Remove this entry from'
+          - '&7the language file.'
+          - ''
+          - '&eClick to preview'
+          - '&eShift-click to apply!'
+      KeepRemovedFromFile:
+        material: BARRIER
+        displayName: '&cKeep Removed'
+        lore:
+          - '&7Keep this entry removed'
+          - '&7from the file.'
+          - ''
+          - '&eClick to preview'
+          - '&eShift-click to apply!'
+      EditFinalValue:
+        material: WRITABLE_BOOK
+        displayName: '&6Edit Custom Value'
+        lore:
+          - '&7Enter a custom value'
+          - '&7in chat.'
+          - ''
+          - '&7Supports:'
+          - '&8• &7Integers (123)'
+          - '&8• &7Floats (123.45)'
+          - '&8• &7Booleans (true/false)'
+          - '&8• &7Lists ([item1, item2])'
+          - '&8• &7Strings (any text)'
+          - ''
+          - '&eClick to edit!'
+      FinalValueDisplay:
+        material: PAPER
+        displayName: '&aFinal Value Preview'
+        lore:
+          - '&7This is what will be saved:'
+          - '&f%migration_entry_final_value%'
+      Close:
+        material: EMERALD_BLOCK
+        displayName: '&aConfirm & Close'
+        lore:
+          - '&7Save the final value and'
+          - '&7return to migration menu.'
+          - ''
+          - '&7Tip: Press ESC to cancel'
+          - '&7without saving changes.'
+          - ''
+          - '&eClick to confirm!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   SwitchLanguageMenu: '&aLanguages'
@@ -1562,5 +1737,10 @@ MenuTitles:
       Settings: '&3Settings'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Settings'
+  ConfigReloadMenu: '&aConfiguration Manager'
+  LanguageMigration:
+    Migration: '&6Language Migration'
+  LanguageMigrator:
+    EntryEditMenu: '&6Edit: %migration_entry_name%'
   Misc:
     ConfirmationMenu: '&aConfirmation Menu'

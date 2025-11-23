@@ -165,6 +165,7 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
                 filterStatus = "Showing " + filteredResultCount + " results for: " + sortQuery;
             }
         }
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%parent_groups%", parentGroups, false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%filtered_result_count%", filterStatus, false);
         ItemStack infoItem = lgm.getItem(path + "InfoItem", player, false);
         inventory.setItem(getSlot(path + "InfoItem", 4), infoItem);

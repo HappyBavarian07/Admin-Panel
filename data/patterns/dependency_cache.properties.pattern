@@ -1,0 +1,6 @@
+# Cached dependencies pattern: key -> path
+# Lines of the form coordinate=path
+# coordinate pattern: group:artifact:version
+# path: any non-empty string
+REGEX:^.+\:.+\:.+=.+$
+

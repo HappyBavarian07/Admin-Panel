@@ -11,6 +11,7 @@ import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -71,8 +72,10 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
     @Override
     protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        if (indexOnPage < 0 || indexOnPage >= plugins.size()) return;
-        Plugin selectedPlugin = plugins.get(indexOnPage);
+        Plugin selectedPlugin = plugins.get(item.getItemMeta().getPersistentDataContainer().get(pluginItemNamespacedKey, PersistentDataType.STRING) != null ?
+                plugins.indexOf(plugin.getPluginUtils().getPluginByName(
+                        item.getItemMeta().getPersistentDataContainer().get(pluginItemNamespacedKey, PersistentDataType.STRING)))
+                : indexOnPage);
         playerMenuUtility.setData("CurrentSelectedPlugin", selectedPlugin, true);
         new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
     }
@@ -113,7 +116,7 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
 
     public ItemStack getPageItem(Plugin plugin) {
         boolean enabled = plugin.isEnabled();
-        lgm.setPathExpressionVariable(playerMenuUtility.getOwnerUUID().toString(), "PluginManager.PluginItem", "pluginEnabled", enabled);
+        lgm.setPathExpressionVariable(playerMenuUtility.getOwnerUUID().toString(), "PluginManager.PluginItem", "pluginEnabled", enabled, 1);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginName%", plugin.getName(), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginVersion%", plugin.getDescription().getVersion(), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%pluginFullName%", plugin.getDescription().getFullName(), false);
@@ -142,7 +145,12 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
 
         if (playerMenuUtility.hasData("TypePluginFileNameToLoadInChat")) {
             event.setCancelled(true);
-            String message = event.getMessage().replace(" ", "-");
+            String message = ChatColor.stripColor(event.getMessage()).trim();
+            if (message.equals("cancel") || message.equals("exit")) {
+                playerMenuUtility.removeData("TypePluginFileNameToLoadInChat");
+                super.open();
+                return;
+            }
             File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message + ".jar", true);
             if (!pluginFile.exists()) {

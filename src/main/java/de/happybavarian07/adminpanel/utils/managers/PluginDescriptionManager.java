@@ -4,6 +4,7 @@ package de.happybavarian07.adminpanel.utils.managers;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.service.api.DataService;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -31,6 +32,20 @@ public class PluginDescriptionManager {
         }
         this.config = YamlConfiguration.loadConfiguration(configFile);
         loadPluginDescriptions();
+
+        try {
+            DataService ds = plugin.getDataService();
+            if (ds != null) {
+                Map<String, String> saved = ds.loadMap("plugin.descriptions", String.class).join();
+                if (saved != null && !saved.isEmpty()) {
+                    pluginDescriptionMap.clear();
+                    pluginDescriptionMap.putAll(saved);
+                } else {
+                    if (!pluginDescriptionMap.isEmpty()) ds.save("plugin.descriptions", pluginDescriptionMap);
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public void loadPluginDescriptions() {
@@ -38,12 +53,10 @@ public class PluginDescriptionManager {
             plugin.saveResource("plugin_descriptions.yml", false);
             this.config = YamlConfiguration.loadConfiguration(configFile);
         }
-        //System.out.println("Loading Plugin Descriptions...");
-        //System.out.println("Contents of the Config: " + config.getKeys(true));
-        //System.out.println("Contents of the Config 2: " + config.getConfigurationSection("descriptions").getKeys(false));
-        for (String pluginName : config.getConfigurationSection("descriptions").getKeys(false)) {
-            pluginDescriptionMap.put(pluginName, config.getString("descriptions." + pluginName + ".description"));
-            //System.out.println("Loaded Plugin Description for " + pluginName + " with Description: " + config.getString("descriptions." + pluginName + ".description"));
+        if (config.isConfigurationSection("descriptions")) {
+            for (String pluginName : config.getConfigurationSection("descriptions").getKeys(false)) {
+                pluginDescriptionMap.put(pluginName, config.getString("descriptions." + pluginName + ".description"));
+            }
         }
     }
 
@@ -71,6 +84,11 @@ public class PluginDescriptionManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            DataService ds = AdminPanelMain.getPlugin().getDataService();
+            if (ds != null) ds.save("plugin.descriptions", pluginDescriptionMap);
+        } catch (Exception ignored) {
+        }
     }
 
     public void addPluginDescription(String pluginName, String description, int resourceID) {
@@ -91,6 +109,11 @@ public class PluginDescriptionManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        try {
+            DataService ds = AdminPanelMain.getPlugin().getDataService();
+            if (ds != null) ds.save("plugin.descriptions", pluginDescriptionMap);
+        } catch (Exception ignored) {
         }
     }
 

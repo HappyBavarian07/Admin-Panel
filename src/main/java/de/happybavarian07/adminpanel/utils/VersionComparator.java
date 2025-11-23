@@ -1,36 +1,5 @@
 package de.happybavarian07.adminpanel.utils;
-/*
- * The idea is from Spiget but i tried to write it myself:
- * https://github.com/InventivetalentDev/Spiget-Update/blob/6879dfdc0cabecc60b446205d096e434f53de2dd/Core/src/main/java/org/inventivetalent/update/spiget/comparator/VersionComparator.java#L84
- * and if its not unequal enough i put the copyright disclaimer down below!!!
- */
-/*
- * Copyright 2016 inventivetalent. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and contributors and should not be interpreted as representing official policies,
- *  either expressed or implied, of anybody else.
- */
+
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 
@@ -45,49 +14,113 @@ public abstract class VersionComparator {
         }
     };
 
-    public static final VersionComparator SEMATIC_VERSION = new VersionComparator() {
+    public static final VersionComparator SEMANTIC_VERSION = new VersionComparator() {
         @Override
         public boolean updateAvailable(String pluginVersionString, String spigotVersionString) {
-            spigotVersionString = spigotVersionString.replace(".", "");
-            pluginVersionString = pluginVersionString.replace(".", "");
+            if (pluginVersionString == null || spigotVersionString == null) return false;
+            Version pluginVersion = parseVersion(pluginVersionString);
+            Version spigotVersion = parseVersion(spigotVersionString);
+            return compare(pluginVersion, spigotVersion) < 0;
+        }
 
-            boolean available;
-            try {
-                //System.out.println("Versions: S:" + spigotVersionString + " | P:" + pluginVersionString);
-                if(pluginVersionString.length() != spigotVersionString.length()) {
-                    if (pluginVersionString.length() < spigotVersionString.length()) {
-                        StringBuilder pluginVersionStringBuilder = new StringBuilder(pluginVersionString);
-                        int index = pluginVersionStringBuilder.length();
-                        while(index < spigotVersionString.length()) {
-                            pluginVersionStringBuilder.append("0");
-                            index++;
-                        }
-                        pluginVersionString = pluginVersionStringBuilder.toString();
-                        //System.out.println("Versions Between: S:" + spigotVersionString + " | P:" + pluginVersionStringBuilder);
-                    } else {
-                        StringBuilder spigotVersionStringBuilder = new StringBuilder(spigotVersionString);
-                        int index = spigotVersionStringBuilder.length();
-                        while(index < pluginVersionString.length()) {
-                            spigotVersionStringBuilder.append("0");
-                            index++;
-                        }
-                        spigotVersionString = spigotVersionStringBuilder.toString();
-                        //System.out.println("Versions Between: S:" + spigotVersionStringBuilder + " | P:" + pluginVersionString);
-                    }
-                }
-                //System.out.println("Versions: S:" + spigotVersionString + " | P:" + pluginVersionString);
-                int pluginVersion = Integer.parseInt(pluginVersionString);
-                int spigotVersion = Integer.parseInt(spigotVersionString);
-
-                available = pluginVersion < spigotVersion;
-            } catch (NumberFormatException e) {
-                //e.printStackTrace();
-                available = false;
-                AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefixExtension.UPDATER);
+        private Version parseVersion(String v) {
+            String work = v;
+            String build = null;
+            int plusIndex = work.indexOf('+');
+            if (plusIndex >= 0) {
+                build = work.substring(plusIndex + 1);
+                work = work.substring(0, plusIndex);
             }
-            return available;
+            String pre = null;
+            int dashIndex = work.indexOf('-');
+            if (dashIndex >= 0) {
+                pre = work.substring(dashIndex + 1);
+                work = work.substring(0, dashIndex);
+            }
+            String[] coreParts = work.split("\\.");
+            int[] numeric = new int[coreParts.length];
+            for (int i = 0; i < coreParts.length; i++) {
+                numeric[i] = parseNumericPrefix(coreParts[i]);
+            }
+            String[] preIdentifiers = pre == null ? null : pre.split("[.-]");
+            return new Version(numeric, preIdentifiers, build);
+        }
+
+        private int parseNumericPrefix(String part) {
+            if (part == null || part.isEmpty()) return 0;
+            int j = 0;
+            while (j < part.length() && Character.isDigit(part.charAt(j))) j++;
+            if (j == 0) return 0;
+            try {
+                return Integer.parseInt(part.substring(0, j));
+            } catch (NumberFormatException e) {
+                AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.WARNING, "Failed to parse version part '" + part + "' treating as 0", LogPrefixExtension.UPDATER);
+                return 0;
+            }
+        }
+
+        private int compare(Version a, Version b) {
+            int max = Math.max(a.core.length, b.core.length);
+            for (int i = 0; i < max; i++) {
+                int av = i < a.core.length ? a.core[i] : 0;
+                int bv = i < b.core.length ? b.core[i] : 0;
+                if (av != bv) return av < bv ? -1 : 1;
+            }
+            if (a.pre == null && b.pre == null) return 0;
+            if (a.pre == null) return 1;
+            if (b.pre == null) return -1;
+            int maxPre = Math.max(a.pre.length, b.pre.length);
+            for (int i = 0; i < maxPre; i++) {
+                String ai = i < a.pre.length ? a.pre[i] : null;
+                String bi = i < b.pre.length ? b.pre[i] : null;
+                if (ai == null && bi == null) return 0;
+                if (ai == null) return -1;
+                if (bi == null) return 1;
+                boolean aNum = isNumeric(ai);
+                boolean bNum = isNumeric(bi);
+                if (aNum && bNum) {
+                    try {
+                        long an = Long.parseLong(ai);
+                        long bn = Long.parseLong(bi);
+                        if (an != bn) return an < bn ? -1 : 1;
+                    } catch (NumberFormatException e) {
+                        int c = ai.compareTo(bi);
+                        if (c != 0) return c < 0 ? -1 : 1;
+                    }
+                } else if (aNum != bNum) {
+                    return aNum ? -1 : 1;
+                } else {
+                    int c = ai.compareTo(bi);
+                    if (c != 0) return c < 0 ? -1 : 1;
+                }
+            }
+            return 0;
+        }
+
+        private boolean isNumeric(String s) {
+            if (s == null || s.isEmpty()) return false;
+            for (int i = 0; i < s.length(); i++) if (!Character.isDigit(s.charAt(i))) return false;
+            return true;
+        }
+
+        private record Version(int[] core, String[] pre, String build) {
         }
     };
+
+    @Deprecated
+    public static final VersionComparator SEMANTIC_VERSIONS = SEMANTIC_VERSION;
+    @Deprecated
+    public static final VersionComparator SEMATIC_VERSION = SEMANTIC_VERSION;
+
+    public enum VersionStatus {EQUAL, NEWER_AVAILABLE, INVALID_INPUT}
+
+    public static VersionStatus evaluateStatus(String pluginVersionString, String spigotVersionString) {
+        if (pluginVersionString == null || spigotVersionString == null || pluginVersionString.isEmpty() || spigotVersionString.isEmpty()) {
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.WARNING, "Version comparison received null/empty input", LogPrefixExtension.UPDATER);
+            return VersionStatus.INVALID_INPUT;
+        }
+        return SEMANTIC_VERSION.updateAvailable(pluginVersionString, spigotVersionString) ? VersionStatus.NEWER_AVAILABLE : VersionStatus.EQUAL;
+    }
 
     public abstract boolean updateAvailable(String pluginVersionString, String spigotVersionString);
 }

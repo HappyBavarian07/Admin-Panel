@@ -1,6 +1,8 @@
 package de.happybavarian07.adminpanel.utils.managers;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.service.api.DataService;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.VersionComparator;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 
 /*
  * @Author HappyBavarian07
@@ -40,6 +43,11 @@ public class AutoUpdaterManager {
             plugin.getAutoUpdaterManager().getAutoUpdaterPlugins().clear();
             plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
             plugin.getStartUpLogger().message("&1&lAuto Plugin Updater initiated&r");
+            DataService ds = null;
+            try {
+                ds = AdminPanelMain.getPlugin().getDataService();
+            } catch (Exception ignored) {
+            }
             for (String sectionString : Objects.requireNonNull(dataYML.getConfigurationSection("PluginsToUpdate")).getKeys(false)) {
                 if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
 
@@ -49,6 +57,22 @@ public class AutoUpdaterManager {
                     continue;
 
                 handleNewUpdater(sectionString, section, adminPanelUpdater);
+
+                if (ds != null) {
+                    try {
+                        Map<String, Object> meta = ds.loadMap("updater.meta." + sectionString, Object.class).join();
+                        if (meta != null) {
+                            NewUpdater nu = autoUpdaterPlugins.get(sectionString);
+                            if (nu != null) {
+                                Object latest = meta.get("latestVersion");
+                                if (latest != null) {
+
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
             }
             if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
                 new BukkitRunnable() {
@@ -86,21 +110,41 @@ public class AutoUpdaterManager {
         if (tempUpdater.isExternalFile() && tempUpdater.getLinkToFile().isEmpty() && !updater.bypassExternalURL()) {
             if (!plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) return;
             plugin.getStartUpLogger().message("Plugin: " + tempUpdater.getPluginName() + " is external and the Plugin will not download it!");
-            tempUpdater.checkForUpdates(true);
+            tempUpdater.checkForUpdatesAsync(true, (available, latest) -> {
+            });
             return;
 
         }
         if ((tempUpdater.getPluginName() == null) && plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadIfNotExists")) {
-            tempUpdater.downloadLatestUpdate(true, true, false);
+            tempUpdater.downloadLatestUpdateAsync(true, true, false, r -> {
+            });
             return;
         }
 
-        tempUpdater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
-        tempUpdater.checkForUpdates(true);
-        if (tempUpdater.updateAvailable()) {
-            tempUpdater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
-                    plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"), true);
-        }
+        tempUpdater.setVersionComparator(VersionComparator.SEMANTIC_VERSION);
+        tempUpdater.checkForUpdatesAsync(true, (available, latest) -> {
+            if (available) {
+                tempUpdater.downloadLatestUpdateAsync(
+                        plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.automaticReplace"),
+                        plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.downloadPluginUpdate"),
+                        true,
+                        r -> {
+                        }
+                );
+            }
+            // Persist small metadata about this plugin updater
+            try {
+                DataService ds = AdminPanelMain.getPlugin().getDataService();
+                if (ds != null) {
+                    Map<String, Object> meta = new HashMap<>();
+                    meta.put("lastCheckMillis", System.currentTimeMillis());
+                    meta.put("latestVersion", latest);
+                    meta.put("available", available);
+                    ds.save("updater.meta." + sectionString, meta);
+                }
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     /**
@@ -114,25 +158,25 @@ public class AutoUpdaterManager {
         try {
             dataYML.save(new File(plugin.getDataFolder() + "/data.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getStartUpLogger().message("Failed to save data.yml while removing plugin: " + e.getMessage());
         }
         autoUpdaterPlugins.remove(selectedPlugin.getName());
     }
 
-    public void addPluginToUpdater(Plugin plugin, int spigotID, String fileName) {
-        String path = "PluginsToUpdate." + plugin.getName() + ".";
+    public void addPluginToUpdater(Plugin pl, int spigotID, String fileName) {
+        String path = "PluginsToUpdate." + pl.getName() + ".";
         dataYML.set(path + "spigotID", spigotID);
         dataYML.set(path + "fileName", fileName);
         dataYML.set(path + "link", "");
         dataYML.set(path + "bypassExternalDownload", false);
 
         try {
-            dataYML.save(new File(plugin.getDataFolder() + "/data.yml"));
+            dataYML.save(new File(AdminPanelMain.getPlugin().getDataFolder() + "/data.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "Failed to save data.yml while adding plugin: " + e.getMessage(), LogPrefixExtension.UPDATER);
         }
-        NewUpdater updater = new NewUpdater(AdminPanelMain.getPlugin(), spigotID, fileName, (JavaPlugin) plugin, "", false);
-        autoUpdaterPlugins.put(plugin.getName(), updater);
+        NewUpdater updater = new NewUpdater(AdminPanelMain.getPlugin(), spigotID, fileName, (JavaPlugin) pl, "", false);
+        autoUpdaterPlugins.put(pl.getName(), updater);
     }
 
     /**

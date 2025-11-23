@@ -52,19 +52,33 @@ public class InitMethods {
     }
 
     public void initUpdater(NewUpdater updater, FileConfiguration dataYML) {
-        updater.setVersionComparator(VersionComparator.SEMATIC_VERSION);
+        updater.setVersionComparator(VersionComparator.SEMANTIC_VERSION);
         if (plugin.getConfig().getBoolean("Plugin.Updater.checkForUpdates")) {
-            updater.checkForUpdates(true);
-            if (updater.updateAvailable()) {
-                updater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace"), plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"), true);
-            }
+            updater.checkForUpdatesAsync(true, (available, latest) -> {
+                if (available) {
+                    updater.downloadLatestUpdateAsync(
+                            plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace"),
+                            plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"),
+                            true,
+                            r -> {
+                            }
+                    );
+                }
+            });
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    updater.checkForUpdates(false);
-                    if (updater.updateAvailable()) {
-                        updater.downloadLatestUpdate(plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace"), plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"), true);
-                    }
+                    updater.checkForUpdatesAsync(false, (available, latest) -> {
+                        if (available) {
+                            updater.downloadLatestUpdateAsync(
+                                    plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace"),
+                                    plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate"),
+                                    true,
+                                    r -> {
+                                    }
+                            );
+                        }
+                    });
                 }
             }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.UpdateCheckTime") * 60 * 20));
         }
@@ -74,7 +88,7 @@ public class InitMethods {
         try {
             Objects.requireNonNull(plugin.getCommand("update")).setExecutor(new UpdateCommand());
         } catch (JSONException e) {
-            e.printStackTrace();
+            plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to initialize UpdateCommand: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
         }
         Objects.requireNonNull(plugin.getCommand("adminpanel")).setExecutor(new AdminPanelOpenCommand());
         PerPlayerLanguageCommand perPLanguageCommand = new PerPlayerLanguageCommand();
@@ -239,8 +253,8 @@ public class InitMethods {
                         throw new NullPointerException("Addon file is null");
                     }
                 } catch (Exception e) {
-                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + addonFile.getName(), LogPrefixExtension.ADDONLOADER.getLogPrefix(), true);
-                    e.printStackTrace();
+                    String name = addonFile != null ? addonFile.getName() : "unknown";
+                    this.plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while enabling Addon: " + name + " (" + e.getClass().getSimpleName() + ": " + e.getMessage() + ")", LogPrefixExtension.ADDONLOADER.getLogPrefix(), true);
                 }
             }
 

@@ -31,50 +31,106 @@ permissions:
     default: op
     children:
       AdminPanel.open:
+        description: Open the Admin Panel
         default: op
         AdminPanel.open.other:
+          description: Open the Admin Panel for another player
           default: op
       AdminPanel.DataClient:
+        description: Access DataClient features
         default: op
         children:
-          AdminPanel.DataClient.executeCommands: true
+          AdminPanel.DataClient.executeCommands:
+            description: Allow executing DataClient commands
+            default: true
           AdminPanel.DataClient.SubCommands:
             default: op
             children:
-              AdminPanel.DataClient.SubCommands.Menu: true
-              AdminPanel.DataClient.SubCommands.SyncPermissions: true
-              AdminPanel.DataClient.SubCommands.SyncTrolls: true
-              AdminPanel.DataClient.SubCommands.ListClients: true
-              AdminPanel.DataClient.SubCommands.UpdateClients: true
+              AdminPanel.DataClient.SubCommands.Menu:
+                description: Open DataClient subcommands menu
+                default: true
+              AdminPanel.DataClient.SubCommands.SyncPermissions:
+                description: Sync permissions via DataClient
+                default: true
+              AdminPanel.DataClient.SubCommands.SyncTrolls:
+                description: Sync trolls via DataClient
+                default: true
+              AdminPanel.DataClient.SubCommands.ListClients:
+                description: List DataClients
+                default: true
+              AdminPanel.DataClient.SubCommands.UpdateClients:
+                description: Update DataClients
+                default: true
           AdminPanel.DataClient.Menu:
             default: op
             children:
               AdminPanel.DataClient.Menu.Settings:
+                description: Access DataClient settings menu
                 default: op
                 children:
-                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnection: true
-                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming: true
-                  AdminPanel.DataClient.Menu.Settings.Debug: true
-                  AdminPanel.DataClient.Menu.Settings.OverwritePermissions: true
-                  AdminPanel.DataClient.Menu.Settings.FileLogging: true
-                  AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix: true
-
+                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnection:
+                    description: Enable automatic connection checks
+                    default: true
+                  AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming:
+                    description: Configure automatic connection check timing
+                    default: true
+                  AdminPanel.DataClient.Menu.Settings.Debug:
+                    description: Enable DataClient debug logging
+                    default: true
+                  AdminPanel.DataClient.Menu.Settings.OverwritePermissions:
+                    description: Allow overwriting permissions via DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Settings.FileLogging:
+                    description: Enable file logging for DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix:
+                    description: Use prefix for DataClient file logs
+                    default: true
               AdminPanel.DataClient.Menu.Button:
                 default: op
                 children:
-                  AdminPanel.DataClient.Menu.Button.Disconnect: true
-                  AdminPanel.DataClient.Menu.Button.Connect: true
-                  AdminPanel.DataClient.Menu.Button.Reconnect: true
-                  AdminPanel.DataClient.Menu.Button.PacketHandling: true
-                  AdminPanel.DataClient.Menu.Button.DataClientName: true
-                  AdminPanel.DataClient.Menu.Button.DataClientSettings: true
-      AdminPanel.PerPlayerLang: true
-      AdminPanel.PerPlayerLangOther: true
-      AdminPanel.SwitchLanguage: true
-      AdminPanel.ReloadLanguages: true
-      AdminPanel.ReloadConfig: true
-      AdminPanel.updatenotify: true
-      AdminPanel.update: true
+                  AdminPanel.DataClient.Menu.Button.Disconnect:
+                    description: Disconnect DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Button.Connect:
+                    description: Connect DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Button.Reconnect:
+                    description: Reconnect DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Button.PacketHandling:
+                    description: Toggle packet handling for DataClient
+                    default: true
+                  AdminPanel.DataClient.Menu.Button.DataClientName:
+                    description: Edit DataClient name
+                    default: true
+                  AdminPanel.DataClient.Menu.Button.DataClientSettings:
+                    description: Open DataClient settings
+                    default: true
+      AdminPanel.PerPlayerLang:
+        description: Set your per-player AdminPanel language
+        default: true
+      AdminPanel.PerPlayerLangOther:
+        description: Set per-player language for another player
+        default: true
+      AdminPanel.SwitchLanguage:
+        description: Switch available languages
+        default: true
+      AdminPanel.ReloadLanguages:
+        description: Reload language resource files
+        default: true
+      AdminPanel.ReloadConfig:
+        description: Reload plugin configuration
+        default: true
+      AdminPanel.updatenotify:
+        description: Receive update notifications when joining the server
+        default: true
+      adminpanel.updatenotify:
+        description: Receive update notifications when joining the server (legacy/lowercase alias)
+        default: op
+      AdminPanel.update:
+        description: Run update commands
+        default: true
       AdminPanel.DisabledItems.*:
         default: op
         children:
@@ -96,17 +152,20 @@ permissions:
           AdminPanel.Bypass.KickAll:
             default: op
           AdminPanel.Bypass.ItemDisable:
+            description: Bypass item-disable restrictions
             default: op
       AdminPanel.Button.*:
         default: op
         children:
           AdminPanel.Button.Close:
+            description: Permission to use menu close button
             default: op
           AdminPanel.Button.pageright:
             default: op
           AdminPanel.Button.pageleft:
             default: op
           AdminPanel.Button.refresh:
+            description: Permission to use menu refresh button
             default: op
       AdminPanel.AdminPanelAdmin:
         default: op
@@ -121,8 +180,6 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
           AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
 
-      AdminPanel.open.other:
-        default: op
       AdminPanel.PluginManager.*:
         default: op
         children:
@@ -298,3 +355,20 @@ permissions:
                     default: op
                   AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation:
                     default: op
+      AdminPanel.LanguageMigration:
+        default: op
+        children:
+          AdminPanel.LanguageMigration.Open:
+            description: Open the language migration UI
+            default: op
+          AdminPanel.LanguageMigration.Apply:
+            description: Apply selected language migration changes
+            default: op
+
+  adminpanel.updatenotify:
+    default: op
+    description: Receive update notifications when joining the server
+
+  AdminPanel.AdminPanelAdminCommands.StaffChat:
+    default: op
+    description: Use staff chat (send/receive staff-only messages)

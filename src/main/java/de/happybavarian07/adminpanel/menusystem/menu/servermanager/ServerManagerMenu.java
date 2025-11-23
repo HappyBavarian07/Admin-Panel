@@ -203,7 +203,9 @@ public class ServerManagerMenu extends Menu implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (player.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) return;
+        if (player.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode") ||
+                player.hasPermission("AdminPanel.*") ||
+                player.hasPermission("AdminPanel.Bypass.*")) return;
         if (plugin.getPluginStateManager().isInMaintenanceMode()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player, true));
         } else {

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,78 +25,88 @@ public class PaginatedListTest {
         assertEquals(3, paginatedList.getMaxItemsPerPage());
     }
 
-    private Map<Integer, List<Integer>> testSortAlgorithm(String algorithm) {
+    private PaginatedList<Integer> testSortAlgorithm(String algorithm) {
         paginatedList.maxItemsPerPage(3);
         paginatedList.sort(algorithm, false);
+        return paginatedList;
+    }
+
+    private <E extends Comparable<E>> void assertPageEquals(PaginatedList<E> pl, int page, List<E> expected) {
         try {
-            Map<Integer, List<Integer>> resultMap = paginatedList.getResultMap();
-            System.out.println("Results for " + algorithm + " sort:");
-            resultMap.forEach((key, value) -> System.out.println("Page " + key + ": " + value));
-            return resultMap;
+            assertEquals(expected, pl.getPage(page));
         } catch (PaginatedList.ListNotSortedException e) {
             fail("List should be sorted");
-            return null;
         }
     }
 
     @Test
     public void testBubbleSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("bubble");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("bubble");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testQuickSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("quick");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("quick");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 3, Collections.singletonList(7));
     }
 
     @Test
     public void testInsertionSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("insertion");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("insertion");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testSelectionSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("selection");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("selection");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testMergeSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("merge");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("merge");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testHeapSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("heap");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("heap");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testShellSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("shell");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("shell");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 3, Collections.singletonList(7));
     }
 
     @Test
     public void testCombSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("comb");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("comb");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testCountingSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("counting");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("counting");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 2, Arrays.asList(4, 5, 6));
     }
 
     @Test
     public void testRadixSort() {
-        Map<Integer, List<Integer>> resultMap = testSortAlgorithm("radix");
-        assertEquals(Arrays.asList(1, 2, 3), resultMap.get(0));
+        PaginatedList<Integer> pl = testSortAlgorithm("radix");
+        assertPageEquals(pl, 1, Arrays.asList(1, 2, 3));
+        assertPageEquals(pl, 3, Collections.singletonList(7));
     }
 
     @Test
@@ -105,15 +115,8 @@ public class PaginatedListTest {
         PaginatedList<String> paginatedList = new PaginatedList<>(listOfThings);
         paginatedList.maxItemsPerPage(3);
         paginatedList.sort("alphanumeric", false);
-        try {
-            List<String> firstPage = paginatedList.getPage(0);
-            Map<Integer, List<String>> resultMap = paginatedList.getResultMap();
-            System.out.println("Results for alphanumeric sort:");
-            resultMap.forEach((key, value) -> System.out.println("Page " + key + ": " + value));
-            assertEquals(Arrays.asList("item1", "item2", "item3"), firstPage);
-        } catch (PaginatedList.ListNotSortedException e) {
-            fail(e.getMessage());
-        }
+        assertPageEquals(paginatedList, 1, Arrays.asList("item1", "item2", "item3"));
+        assertPageEquals(paginatedList, 2, Arrays.asList("item10", "item20"));
     }
 
     @Test
@@ -122,15 +125,8 @@ public class PaginatedListTest {
         PaginatedList<String> paginatedList = new PaginatedList<>(listOfThings);
         paginatedList.maxItemsPerPage(3);
         paginatedList.sort("alphabetic", false);
-        try {
-            List<String> firstPage = paginatedList.getPage(0);
-            Map<Integer, List<String>> resultMap = paginatedList.getResultMap();
-            System.out.println("Results for alphabetic sort:");
-            resultMap.forEach((key, value) -> System.out.println("Page " + key + ": " + value));
-            assertEquals(Arrays.asList("itemA", "itemB", "itemC"), firstPage);
-        } catch (PaginatedList.ListNotSortedException e) {
-            fail(e.getMessage());
-        }
+        assertPageEquals(paginatedList, 1, Arrays.asList("itemA", "itemB", "itemC"));
+        assertPageEquals(paginatedList, 2, Arrays.asList("itemD", "itemE"));
     }
 
     @Test
@@ -138,7 +134,7 @@ public class PaginatedListTest {
         paginatedList.maxItemsPerPage(3);
         paginatedList.sort("bubble", false);
         try {
-            List<Integer> firstPage = paginatedList.getPage(0);
+            List<Integer> firstPage = paginatedList.getPage(1);
             assertEquals(Arrays.asList(1, 2, 3), firstPage);
         } catch (PaginatedList.ListNotSortedException e) {
             fail("List should be sorted");
@@ -150,8 +146,8 @@ public class PaginatedListTest {
         paginatedList.maxItemsPerPage(3);
         paginatedList.sort("bubble", false);
         try {
-            assertTrue(paginatedList.containsPage(0));
-            assertFalse(paginatedList.containsPage(3));
+            assertTrue(paginatedList.containsPage(1));
+            assertFalse(paginatedList.containsPage(4));
         } catch (PaginatedList.ListNotSortedException e) {
             fail("List should be sorted");
         }
