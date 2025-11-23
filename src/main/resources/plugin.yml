@@ -124,9 +124,6 @@ permissions:
         default: true
       AdminPanel.updatenotify:
         description: Receive update notifications when joining the server
-        default: true
-      adminpanel.updatenotify:
-        description: Receive update notifications when joining the server (legacy/lowercase alias)
         default: op
       AdminPanel.update:
         description: Run update commands
@@ -179,7 +176,7 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.UpdateConfig: true
           AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
           AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
-
+          AdminPanel.AdminPanelAdminCommands.StaffChat: true
       AdminPanel.PluginManager.*:
         default: op
         children:
@@ -364,11 +361,3 @@ permissions:
           AdminPanel.LanguageMigration.Apply:
             description: Apply selected language migration changes
             default: op
-
-  adminpanel.updatenotify:
-    default: op
-    description: Receive update notifications when joining the server
-
-  AdminPanel.AdminPanelAdminCommands.StaffChat:
-    default: op
-    description: Use staff chat (send/receive staff-only messages)
