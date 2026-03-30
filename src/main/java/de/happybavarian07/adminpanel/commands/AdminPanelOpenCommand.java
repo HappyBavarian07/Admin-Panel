@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.commands;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.utils.CardboardCommandGuard;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
@@ -25,6 +26,10 @@ public class AdminPanelOpenCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        return CardboardCommandGuard.executeGuarded(sender, command, label, args, this::executeCommand);
+    }
+
+    private boolean executeCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("adminpanel")) {
             if (args.length == 0) {
                 if (sender instanceof Player player) {

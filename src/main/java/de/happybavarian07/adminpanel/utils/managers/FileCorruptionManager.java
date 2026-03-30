@@ -149,7 +149,7 @@ public class FileCorruptionManager {
 
     /**
      * <p>Checks an array of files for corruption, including recursive directory traversal.</p>
-     * <pre><code>Map<File, CorruptionCheckResult> results = manager.checkFilesForCorruption(files);</code></pre>
+     * {@code Map<File, CorruptionCheckResult> results = manager.checkFilesForCorruption(files);}
      *
      * @param files the files to check
      * @return a map of files to their corruption check results
@@ -168,7 +168,7 @@ public class FileCorruptionManager {
 
     /**
      * <p>Recursively checks a directory and its contents for corruption.</p>
-     * <pre><code>Map<File, CorruptionCheckResult> results = manager.checkDirectoryForCorruption(directory);</code></pre>
+     * {@code Map<File, CorruptionCheckResult> results = manager.checkDirectoryForCorruption(directory);}
      *
      * @param directory the directory to check
      * @return a map of files to their corruption check results

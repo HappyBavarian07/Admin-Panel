@@ -5,7 +5,7 @@
 
     <groupId>io.github.happybavarian07</groupId>
     <artifactId>Admin-Panel</artifactId>
-    <version>9.0.0</version>
+    <version>9.0.1</version>
 
     <name>Admin-Panel</name>
     <description>An Minecraft Plugin to control your Server!</description>
@@ -121,7 +121,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>E:\Weitere Minecraft Test Server\Spigot 1.20.2\plugins</outputDirectory>
+                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.20.2\plugins</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
@@ -142,7 +142,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>E:\Weitere Minecraft Test Server\Spigot 1.21.1\plugins</outputDirectory>
+                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.1\plugins</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
@@ -163,7 +163,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>E:\Weitere Minecraft Test Server\Spigot 1.21.5\plugins</outputDirectory>
+                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.5\plugins</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
@@ -244,7 +244,7 @@
         </repository>
         <repository>
             <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/releases/</url>
         </repository>
         <repository>
             <id>maven-central</id>
@@ -294,13 +294,13 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.9</version>
+            <version>2.11.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>6.2.7</version>
+            <version>6.2.18-3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -402,7 +402,7 @@
         <dependency>
             <groupId>io.github.happybavarian07</groupId>
             <artifactId>CoolStuffLib</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -486,7 +486,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

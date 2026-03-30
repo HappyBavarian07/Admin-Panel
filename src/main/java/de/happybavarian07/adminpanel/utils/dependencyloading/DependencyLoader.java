@@ -61,7 +61,7 @@ public final class DependencyLoader {
         int maxPoolSize = corePoolSize * 2;
         this.dependencyResolverPool = new ThreadPoolExecutor(corePoolSize, maxPoolSize,
                 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        this.dynamicClassLoader = new DynamicClassLoader("DynamicDependencyClassLoader",
+        this.dynamicClassLoader = DynamicClassLoader.create("DynamicDependencyClassLoader",
                 AdminPanelMain.getPlugin().getClass().getClassLoader());
         this.failedDepsFile = new File(AdminPanelMain.getPlugin().getDataFolder(), ".m2/failed_dependencies.txt");
         this.dependencyCacheFile = new File(AdminPanelMain.getPlugin().getDataFolder(), ".m2/dependency_cache.properties");
@@ -643,17 +643,42 @@ public final class DependencyLoader {
 
         private final ClassAppender classAppender = new ClassAppender();
 
-        public DynamicClassLoader(String name, ClassLoader parent) {
-            super(name, new URL[0], parent);
+        private DynamicClassLoader(URL[] urls, ClassLoader parent) {
+            super(urls, parent);
+        }
+
+        public static DynamicClassLoader create(String name, ClassLoader parent) {
+            try {
+                try {
+                    java.lang.reflect.Constructor<URLClassLoader> constructor = URLClassLoader.class.getDeclaredConstructor(
+                            String.class, URL[].class, ClassLoader.class);
+                    constructor.setAccessible(true);
+                    URLClassLoader loader = constructor.newInstance(name, new URL[0], parent);
+                    return wrapLoader(loader);
+                } catch (NoSuchMethodException e) {
+                    return new DynamicClassLoader(new URL[0], parent);
+                }
+            } catch (Exception e) {
+                AdminPanelMain.getPlugin().getStartUpLogger().coloredMessage(
+                        ChatColor.YELLOW,
+                        "Failed to create named ClassLoader, using unnamed: " + e.getMessage()
+                );
+                return new DynamicClassLoader(new URL[0], parent);
+            }
+        }
+
+        private static DynamicClassLoader wrapLoader(URLClassLoader loader) {
+            DynamicClassLoader dynamicLoader = new DynamicClassLoader(new URL[0], loader.getParent());
+            for (URL url : loader.getURLs()) {
+                dynamicLoader.add(url);
+            }
+            return dynamicLoader;
         }
 
         public void add(URL url) {
             addURL(url);
         }
 
-        /**
-         * Appendet die JAR-URL zum Parent-ClassLoader.
-         */
         public void appendToParent(URL url, ClassLoader parent) {
             try {
                 classAppender.append(url, parent);

@@ -18,8 +18,8 @@ import java.util.concurrent.ExecutionException;
 /**
  * Manages the loading of dependencies for the Admin Panel.
  *
- * @Author HappyBavarian07
- * @Date April 8, 2025
+ * @author HappyBavarian07
+ * @since 2025-04-08
  */
 
 @Repositories(value = {

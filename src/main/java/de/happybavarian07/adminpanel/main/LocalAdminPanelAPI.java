@@ -64,20 +64,19 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     @Override
     public PlayerMenuUtility getPlayerMenuUtility(Player player) {
         PlayerMenuUtility playerMenuUtility;
-        if (!(playerMenuUtilityMap.containsKey(player.getUniqueId()))) { //See if the player has a playermenuutility "saved" for them
+        if (!(playerMenuUtilityMap.containsKey(player.getUniqueId()))) {
 
-            //This player doesn't. Make one for them add add it to the hashmap
             playerMenuUtility = new PlayerMenuUtility(player.getUniqueId());
             playerMenuUtilityMap.put(player.getUniqueId(), playerMenuUtility);
 
             return playerMenuUtility;
         } else {
-            return playerMenuUtilityMap.get(player.getUniqueId()); //Return the object by using the provided player
+            return playerMenuUtilityMap.get(player.getUniqueId());
         }
     }
 
     public ItemStack createSkull(String headTexture, String name) {
-        ItemStack head = new ItemStack(AdminPanelUtils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(Material.matchMaterial("SKULL_ITEM") != null ? Material.matchMaterial("SKULL_ITEM", true) : Material.PLAYER_HEAD, 1);
         if (headTexture.isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -96,7 +95,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
     }
 
     public ItemStack createSkull(Head headTexture, String name) {
-        ItemStack head = new ItemStack(AdminPanelUtils.legacyServer() ? Material.matchMaterial("SKULL_ITEM") : Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(Material.matchMaterial("SKULL_ITEM") != null ? Material.matchMaterial("SKULL_ITEM", true) : Material.PLAYER_HEAD, 1);
         if (headTexture.getTexture().isEmpty()) return head;
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();

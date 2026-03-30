@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.commands;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.utils.CardboardCommandGuard;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.Bukkit;
@@ -30,6 +31,10 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        return CardboardCommandGuard.executeGuarded(sender, command, label, args, this::executeCommand);
+    }
+
+    private boolean executeCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("update")) {
             if (!sender.hasPermission("AdminPanel.update")) {
                 if (sender instanceof Player) {

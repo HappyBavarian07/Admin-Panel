@@ -56,13 +56,28 @@ public class ClassAppender {
      * @throws Throwable If any error occurs on reflected method invoking.
      */
     public void append(URL url, ClassLoader loader) throws Throwable {
+        if (ServerPlatformDetector.isHybridServer()) {
+            appendForHybridServer(url, loader);
+        } else {
+            try {
+                append(url, loader, URLClassLoader.class);
+            } catch (Throwable t) {
+                Object ucp = getLoaderUcp(loader);
+                append(url, ucp, ucp.getClass());
+            }
+        }
+    }
+
+    private void appendForHybridServer(URL url, ClassLoader loader) throws Throwable {
         try {
-            // Try to use 'addURL' method inside URLClassLoader
-            append(url, loader, URLClassLoader.class);
-        } catch (Throwable t) {
-            // If any error occurs will be use the URLClassPath directly
             Object ucp = getLoaderUcp(loader);
             append(url, ucp, ucp.getClass());
+        } catch (Throwable t) {
+            try {
+                append(url, loader, URLClassLoader.class);
+            } catch (Throwable t2) {
+                throw new RuntimeException("Failed to append URL on hybrid server: " + ServerPlatformDetector.getPlatformName(), t2);
+            }
         }
     }
 

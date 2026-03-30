@@ -16,6 +16,7 @@ import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
 import de.happybavarian07.adminpanel.utils.*;
+import de.happybavarian07.adminpanel.utils.dependencyloading.ServerPlatformDetector;
 import de.happybavarian07.adminpanel.utils.managers.*;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
@@ -254,6 +255,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
         logger = StartUpLogger.create();
+
+        ServerPlatformDetector.isHybridServer();
+        logger.coloredMessage(ChatColor.YELLOW, "Detected server platform: " +
+                ServerPlatformDetector.getPlatformName());
+        if (ServerPlatformDetector.isHybridServer()) {
+            logger.coloredMessage(ChatColor.YELLOW, "Running on hybrid server - using alternative classloading");
+        }
 
         dependencyManager = new APDependencyManager(this);
         dependencyManager.loadCoreDependencies();

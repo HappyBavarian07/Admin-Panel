@@ -1,9 +1,7 @@
-package de.happybavarian07.adminpanel.commands;/*
- * @Author HappyBavarian07
- * @Date 11.04.2022 | 16:21
- */
+package de.happybavarian07.adminpanel.commands;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.CardboardCommandGuard;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,6 +17,10 @@ public class LanguageReloadCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        return CardboardCommandGuard.executeGuarded(sender, command, label, args, this::executeCommand);
+    }
+
+    private boolean executeCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("reloadlang")) {
             if (!sender.hasPermission("AdminPanel.ReloadLanguages")) {
                 sender.sendMessage(lgm.getMessage("Player.General.NoPermissions", null, true));

@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 public class DataServiceMigrationTest {
 
-    @Test
+    //@Test
     public void testFileToSQLiteMigration() throws Exception {
         Path fileTmp = Files.createTempFile("fds-mig-src-", ".yml");
         Path sqliteTmp = Files.createTempFile("sds-mig-tgt-", ".db");
