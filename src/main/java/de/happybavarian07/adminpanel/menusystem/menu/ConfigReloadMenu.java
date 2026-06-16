@@ -33,36 +33,7 @@ public class ConfigReloadMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        Player player = (Player) inventoryClickEvent.getWhoClicked();
-        ItemStack clickedItem = inventoryClickEvent.getCurrentItem();
-
-        if (clickedItem == null || clickedItem.getType().isAir()) {
-            return;
-        }
-
-        if (clickedItem.isSimilar(lgm.getItem("ConfigReloadMenu.ReloadConfig", player, false))) {
-            AdminPanelMain.getPlugin().reloadConfig();
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.ConfigReloaded", player, true));
-            super.open();
-        } else if (clickedItem.isSimilar(lgm.getItem("ConfigReloadMenu.ReloadLanguages", player, false))) {
-            lgm.reloadLanguages(player, true);
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.LanguagesReloaded", player, true));
-            super.open();
-        } else if (clickedItem.isSimilar(lgm.getItem("ConfigReloadMenu.ReloadData", player, false))) {
-            AdminPanelMain.getPlugin().getDataService().reload();
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.DataReloaded", player, true));
-            super.open();
-        } else if (clickedItem.isSimilar(lgm.getItem("ConfigReloadMenu.BackupAll", player, false))) {
-            player.closeInventory();
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.CreatingBackup", player, true));
-            AdminPanelMain.getPlugin().getBackupManager().backupAllFileBackups();
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.BackupCreated", player, true));
-        } else if (clickedItem.isSimilar(lgm.getItem("ConfigReloadMenu.ReloadPlugin", player, false))) {
-            player.closeInventory();
-            player.sendMessage(lgm.getMessage("ConfigReloadMenu.ReloadingPlugin", player, true));
-            AdminPanelMain.getPlugin().getServer().getPluginManager().disablePlugin(AdminPanelMain.getPlugin());
-            AdminPanelMain.getPlugin().getServer().getPluginManager().enablePlugin(AdminPanelMain.getPlugin());
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -77,11 +48,47 @@ public class ConfigReloadMenu extends Menu {
     public void setMenuItems() {
         Player player = playerMenuUtility.getOwner();
 
-        inventory.setItem(getSlot("ConfigReloadMenu.ReloadConfig", 10), lgm.getItem("ConfigReloadMenu.ReloadConfig", player, false));
-        inventory.setItem(getSlot("ConfigReloadMenu.ReloadLanguages", 11), lgm.getItem("ConfigReloadMenu.ReloadLanguages", player, false));
-        inventory.setItem(getSlot("ConfigReloadMenu.ReloadData", 12), lgm.getItem("ConfigReloadMenu.ReloadData", player, false));
-        inventory.setItem(getSlot("ConfigReloadMenu.BackupAll", 14), lgm.getItem("ConfigReloadMenu.BackupAll", player, false));
-        inventory.setItem(getSlot("ConfigReloadMenu.ReloadPlugin", 16), lgm.getItem("ConfigReloadMenu.ReloadPlugin", player, false));
+        registerButton(getSlot("ConfigReloadMenu.ReloadConfig", 10), 
+            lgm.getItem("ConfigReloadMenu.ReloadConfig", player, false), 
+            (p, e) -> {
+                AdminPanelMain.getPlugin().reloadConfig();
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.ConfigReloaded", p, true));
+                this.open();
+            }, null);
+
+        registerButton(getSlot("ConfigReloadMenu.ReloadLanguages", 11), 
+            lgm.getItem("ConfigReloadMenu.ReloadLanguages", player, false), 
+            (p, e) -> {
+                lgm.reloadLanguages(p, true);
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.LanguagesReloaded", p, true));
+                this.open();
+            }, null);
+
+        registerButton(getSlot("ConfigReloadMenu.ReloadData", 12), 
+            lgm.getItem("ConfigReloadMenu.ReloadData", player, false), 
+            (p, e) -> {
+                AdminPanelMain.getPlugin().getDataService().reload();
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.DataReloaded", p, true));
+                this.open();
+            }, null);
+
+        registerButton(getSlot("ConfigReloadMenu.BackupAll", 14), 
+            lgm.getItem("ConfigReloadMenu.BackupAll", player, false), 
+            (p, e) -> {
+                p.closeInventory();
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.CreatingBackup", p, true));
+                AdminPanelMain.getPlugin().getBackupManager().backupAllFileBackups();
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.BackupCreated", p, true));
+            }, null);
+
+        registerButton(getSlot("ConfigReloadMenu.ReloadPlugin", 16), 
+            lgm.getItem("ConfigReloadMenu.ReloadPlugin", player, false), 
+            (p, e) -> {
+                p.closeInventory();
+                p.sendMessage(lgm.getMessage("ConfigReloadMenu.ReloadingPlugin", p, true));
+                AdminPanelMain.getPlugin().getServer().getPluginManager().disablePlugin(AdminPanelMain.getPlugin());
+                AdminPanelMain.getPlugin().getServer().getPluginManager().enablePlugin(AdminPanelMain.getPlugin());
+            }, null);
 
         setFillerGlass();
     }

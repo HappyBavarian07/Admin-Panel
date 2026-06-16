@@ -6,6 +6,7 @@ import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,12 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 public class TempLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
+    private List<LanguageFile> getAvailableLanguages() {
+        List<LanguageFile> languages = new ArrayList<>(lgm.getRegisteredLanguages().values());
+        languages.removeIf(lang -> lang == lgm.getCurrentLang());
+        return languages;
+    }
+
     public TempLanguageSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.SwitchLanguage");
-        List<LanguageFile> languages = new ArrayList<>(lgm.getRegisteredLanguages().values());
-        languages.removeIf(lang -> lang == lgm.getCurrentLang());
-        setPaginatedData(languages, this::getPageItem);
+        setPaginatedData(getAvailableLanguages(), this::getPageItem);
     }
 
     @Override
@@ -52,22 +57,26 @@ public class TempLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
 
     public void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-        List<LanguageFile> languages = new ArrayList<>(lgm.getRegisteredLanguages().values());
-        languages.removeIf(lang -> lang == lgm.getCurrentLang());
+        List<LanguageFile> languages = getAvailableLanguages();
+        
         if (indexOnPage < 0 || indexOnPage >= languages.size()) return;
         LanguageFile langFile = languages.get(indexOnPage);
-        if (!player.hasPermission("AdminPanel.SwitchLanguage")) {
-            player.sendMessage(noPerms);
-            return;
-        }
-        lgm.setCurrentLang(langFile, true);
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN", false);
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN", false);
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%path%", langFile.getLangFile().getPath(), false);
-        player.sendMessage(lgm.getMessage("Player.General.SetCurrentLanguage", player, true));
-        new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+
+        new PermissionAction("AdminPanel.SwitchLanguage", (p, event) -> {
+            lgm.setCurrentLang(langFile, true);
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN", false);
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN", false);
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%path%", langFile.getLangFile().getPath(), false);
+            p.sendMessage(lgm.getMessage("Player.General.SetCurrentLanguage", p, true));
+            
+            // Return to start menu or use savedMenu
+            if (savedMenu != null) {
+                savedMenu.open();
+            } else {
+                new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }
+        }, lgm).execute(player, e);
     }
 
     @Override
