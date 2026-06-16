@@ -273,23 +273,26 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             logger.coloredSpacer(ChatColor.BLUE);
             loader = new AddonLoader(new File(this.getDataFolder() + "/addons"));
             FileConfiguration tempConfig = YamlConfiguration.loadConfiguration(file);
-            tempConfig.getConfigurationSection("OnLoad").getKeys(false).forEach(addon -> {
-                String path = "OnLoad." + addon + ".";
-                File addonFile = new File(this.getDataFolder() + "/addons/" + tempConfig.getString(path + "FileName"));
-                String addonName = tempConfig.getString(path + "Name");
-                try {
-                    loader.loadAddon(addonFile);
-                    logger.coloredMessage(ChatColor.GREEN, "Loaded Addon: " + addonName);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+            var onLoadSection = tempConfig.getConfigurationSection("OnLoad");
+            if (onLoadSection != null) {
+                onLoadSection.getKeys(false).forEach(addon -> {
+                    String path = "OnLoad." + addon + ".";
+                    File addonFile = new File(this.getDataFolder() + "/addons/" + tempConfig.getString(path + "FileName"));
+                    String addonName = tempConfig.getString(path + "Name");
+                    try {
+                        loader.loadAddon(addonFile);
+                        logger.coloredMessage(ChatColor.GREEN, "Loaded Addon: " + addonName);
+                    } catch (IOException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                try {
-                    loader.enableAddon(addonFile, new HashSet<>(), true);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+                    try {
+                        loader.enableAddon(addonFile, new HashSet<>(), true);
+                    } catch (IOException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
             logger.coloredSpacer(ChatColor.BLUE);
             logger.coloredMessage(ChatColor.GREEN, "Finished loading Addons on Startup/Load!");
             logger.coloredSpacer(ChatColor.BLUE);
@@ -614,7 +617,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupStaffChatHandler() {
         staffChatHandler = new StaffChatHandler();
-        Bukkit.getPluginManager().registerEvents(new StaffChatHandler(), plugin);
+        Bukkit.getPluginManager().registerEvents(staffChatHandler, plugin);
     }
 
     private void updateConfigFiles() {
@@ -720,7 +723,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         if (pluginStateManager != null) {
             pluginStateManager.saveAllState();
         }
-        if (pluginStateManager.checkIfBungee(false)) {
+        if (pluginStateManager != null && pluginStateManager.checkIfBungee(false)) {
             bungeeUtils.closeBungeeChannel();
             String path = "Plugin.BungeeSyncSystem.JavaSockets.";
             if (getConfig().getBoolean(path + "enabled")) {

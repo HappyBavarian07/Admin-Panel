@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.utils;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import de.happybavarian07.coolstufflib.menusystem.misc.ConfirmationMenu;
@@ -325,27 +326,25 @@ public class AdminPanelUtils {
     }
 
     public static boolean disableVanillaItem(ItemStack stack) {
-        boolean success = false;
+        if (stack == null) return false;
         FileConfiguration dataConfig = plugin.getDataYML();
         if (!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) {
             createDisabledItemsSection();
-            return false;
         }
 
-        if (!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) return false;
-
         List<String> disabledItems = dataConfig.getStringList("DisabledItems");
-        disabledItems.add(stack.getType().toString());
+        String materialName = stack.getType().toString();
+        if (disabledItems.contains(materialName)) return false;
+
+        disabledItems.add(materialName);
         dataConfig.set("DisabledItems", disabledItems);
         saveDataConfig();
 
-        if (!dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
-
-        return success;
+        return dataConfig.getStringList("DisabledItems").contains(materialName);
     }
 
     public static boolean enableVanillaItem(ItemStack stack) {
-        boolean success = false;
+        if (stack == null) return false;
         FileConfiguration dataConfig = plugin.getDataYML();
         if (!dataConfig.isList("DisabledItems") || !dataConfig.contains("DisabledItems")) {
             createDisabledItemsSection();
@@ -353,13 +352,14 @@ public class AdminPanelUtils {
         }
 
         List<String> disabledItems = dataConfig.getStringList("DisabledItems");
-        disabledItems.remove(stack.getType().toString());
+        String materialName = stack.getType().toString();
+        if (!disabledItems.contains(materialName)) return false;
+
+        disabledItems.remove(materialName);
         dataConfig.set("DisabledItems", disabledItems);
         saveDataConfig();
 
-        if (dataConfig.getStringList("DisabledItems").contains(stack.getType().toString())) success = true;
-
-        return success;
+        return !dataConfig.getStringList("DisabledItems").contains(materialName);
     }
 
     private static void createDisabledItemsSection() {
@@ -721,7 +721,7 @@ public class AdminPanelUtils {
         try {
             Class<?> clazz = Class.forName(fullClassName);
             if (Menu.class.isAssignableFrom(clazz)) {
-                return (Menu) clazz.getDeclaredConstructor(PlayerMenuUtility.class).newInstance(AdminPanelMain.getAPI().getPlayerMenuUtility(player));
+                return (Menu) clazz.getDeclaredConstructor(PlayerMenuUtility.class).newInstance(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()));
             } else {
                 System.err.println("The class does not extend Menu: " + fullClassName);
                 return null; // Or handle it as needed
@@ -741,26 +741,6 @@ public class AdminPanelUtils {
             plugin.getLogger().severe("Error invoking constructor: " + fullClassName);
             throw new RuntimeException("Error invoking constructor: " + fullClassName, e);
         }
-    }
-
-    public static void openConfirmationMenu(String reason,
-                                            String menuToOpenAfter,
-                                            Method methodToExecuteAfter,
-                                            Object objectToInvokeOn,
-                                            List<Object> methodArgs,
-                                            List<Class<? extends Exception>> exceptionsToCatch,
-                                            Player player) {
-        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
-        ConfirmationMenu confirmationMenu = new ConfirmationMenu(playerMenuUtility);
-        playerMenuUtility.setData("ConfirmationMenu_MenuToOpenAfter", menuToOpenAfter, true);
-        playerMenuUtility.setData("ConfirmationMenu_Reason", reason, true);
-        playerMenuUtility.setData("ConfirmationMenu_MethodToExecuteAfter", methodToExecuteAfter, true);
-        playerMenuUtility.setData("ConfirmationMenu_ObjectToInvokeMethodOn", objectToInvokeOn, true);
-        for(int i = 0; i < methodArgs.size(); i++) {
-            playerMenuUtility.setData("ConfirmationMenu_MethodArgs_" + i, methodArgs.get(i), true);
-        }
-        playerMenuUtility.setData("ConfirmationMenu_ExceptionsToCatch", exceptionsToCatch, true);
-        confirmationMenu.open();
     }
 
     public static void deleteMinecraftWorld(World world) {

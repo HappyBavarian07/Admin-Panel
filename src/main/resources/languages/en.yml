@@ -339,6 +339,9 @@ Messages:
     CreatingBackup: '%prefix% &9> &aCreating backups...'
     BackupCreated: '%prefix% &9> &aBackups created successfully!'
     ReloadingPlugin: '%prefix% &9> &cReloading plugin...'
+  DangerZoneMenu:
+    StopReason: '&cServer stop requested from Danger Zone menu.'
+    RestartReason: '&6Server restart requested from Danger Zone menu.'
   LanguageMigration:
     Error:
       NoLanguageFileSelected: '%prefix% &9> &cNo language file selected!'
@@ -1153,6 +1156,12 @@ Items:
       displayName: '&6Server Manager'
       lore:
         - '&aManages the Server!'
+    DangerZone:
+      material: BARRIER
+      displayName: '&cDanger Zone'
+      lore:
+        - '&cContains critical server actions.'
+        - '&eUse with caution!'
     ServerRestart:
       material: ACACIA_BOAT
       displayName: '&6Server restart'
@@ -1163,6 +1172,22 @@ Items:
       displayName: '&4Server Stop'
       lore:
         - '&aStops the Server!'
+  DangerZoneMenu:
+    ServerStop:
+      material: DIAMOND
+      displayName: '&4Server Stop'
+      lore:
+        - '&cStops the server after confirmation.'
+    ServerRestart:
+      material: ACACIA_BOAT
+      displayName: '&6Server Restart'
+      lore:
+        - '&eRestarts the server after confirmation.'
+    BackToMain:
+      material: ARROW
+      displayName: '&aBack'
+      lore:
+        - '&7Return to the start menu.'
     HintItem:
       material: PAPER
       displayName: '&aAdmin Panel Info'
@@ -1693,6 +1718,7 @@ Items:
           - '&eClick to confirm!'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
+  DangerZoneMenu: '&4Danger Zone'
   SwitchLanguageMenu: '&aLanguages'
   PlayerManager:
     PlayerSelector: '&aSelect a Player'

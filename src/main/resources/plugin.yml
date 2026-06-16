@@ -215,6 +215,8 @@ permissions:
         default: op
       AdminPanel.ServerRestart:
         default: op
+      AdminPanel.DangerZone.open:
+        default: op
       AdminPanel.WorldManager.*:
         default: op
         children:

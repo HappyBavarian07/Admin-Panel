@@ -5,6 +5,7 @@ import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
@@ -38,7 +39,6 @@ import java.util.logging.Level;
 
 class LocalAdminPanelAPI implements AdminPanelAPI {
 
-    private static final Map<UUID, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
     private final AdminPanelMain plugin;
     private final LanguageManager lgm;
     private final PluginUtils pluginUtils;
@@ -53,7 +53,8 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
     @Override
     public Map<UUID, PlayerMenuUtility> getPlayerMenuUtilityMap() {
-        return playerMenuUtilityMap;
+        assert CoolStuffLib.getLib() != null;
+        return CoolStuffLib.getLib().getPlayerMenuUtilityMap();
     }
 
     @Override
@@ -63,16 +64,8 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
     @Override
     public PlayerMenuUtility getPlayerMenuUtility(Player player) {
-        PlayerMenuUtility playerMenuUtility;
-        if (!(playerMenuUtilityMap.containsKey(player.getUniqueId()))) {
-
-            playerMenuUtility = new PlayerMenuUtility(player.getUniqueId());
-            playerMenuUtilityMap.put(player.getUniqueId(), playerMenuUtility);
-
-            return playerMenuUtility;
-        } else {
-            return playerMenuUtilityMap.get(player.getUniqueId());
-        }
+        assert CoolStuffLib.getLib() != null;
+        return CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId());
     }
 
     public ItemStack createSkull(String headTexture, String name) {
