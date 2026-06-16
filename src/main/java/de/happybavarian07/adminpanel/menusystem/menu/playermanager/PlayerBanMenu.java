@@ -5,6 +5,7 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -58,124 +59,7 @@ public class PlayerBanMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "PlayerManager.ActionsMenu.BanMenu.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(lgm.getItem(path + "Years", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Years", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (years == 1000) return;
-                years += 1;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (years == 0) return;
-                years -= 1;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Months", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Months", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (months == 1000) return;
-                months += 1;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (months == 0) return;
-                months -= 1;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Days", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Days", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (days == 1000) return;
-                days += 1;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (days == 0) return;
-                days -= 1;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Hours", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Hours", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (hours == 1000) return;
-                hours += 1;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (hours == 0) return;
-                hours -= 1;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Minutes", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Minutes", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (minutes == 1000) return;
-                minutes += 5;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (minutes == 0) return;
-                minutes -= 5;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Seconds", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Seconds", player, false).getItemMeta().getDisplayName()))) {
-            if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                if (seconds == 1000) return;
-                seconds += 10;
-            } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                if (seconds == 0) return;
-                seconds -= 10;
-            }
-            super.open();
-        } else if (item.getType().equals(lgm.getItem(path + "Reason", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Reason", player, false).getItemMeta().getDisplayName()))) {
-            playerMenuUtility.addData("BanPlayerSetNewReason", true);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-            lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reason, false);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.EnterNewReason", player, true));
-            player.closeInventory();
-        } else if (item.getType().equals(lgm.getItem(path + "Ban", player, false).getType()) &&
-                item.getItemMeta().getDisplayName().equals(format(player, lgm.getItem(path + "Ban", player, false).getItemMeta().getDisplayName()))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Ban")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-
-
-            Date banEnd = new Date();
-            long secondsMillis = TimeUnit.SECONDS.toMillis(seconds);
-            long minutesMillis = TimeUnit.MINUTES.toMillis(minutes);
-            long hoursMillis = TimeUnit.HOURS.toMillis(hours);
-            long daysMillis = TimeUnit.DAYS.toMillis(days);
-            long monthsMillis = months * 2628000000L;
-            long yearsMillis = years * 31556952000L;
-            banEnd.setTime(System.currentTimeMillis() + secondsMillis + minutesMillis + hoursMillis + daysMillis + monthsMillis + yearsMillis);
-            OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
-            if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.NotBannable", player, true));
-                return;
-            }
-            if (target.isBanned()) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.AlreadyBanned", player, true));
-                return;
-            }
-            if (target.isOnline()) {
-                target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.BanMenu.TargetKickMessage", target.getPlayer(), true)));
-            }
-            Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID()).getName()), reason, banEnd, player.getName());
-            years = 0;
-            months = 0;
-            days = 0;
-            hours = 0;
-            minutes = 0;
-            seconds = 0;
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.SuccessfullyBanned", player, true));
-            new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -208,115 +92,118 @@ public class PlayerBanMenu extends Menu implements Listener {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
         String path = "PlayerManager.ActionsMenu.BanMenu.";
-        ItemStack stack;
-        ItemMeta meta;
-        List<String> updatedLore = new ArrayList<>();
 
         // Reason
-        stack = lgm.getItem(path + "Reason", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Reason", 13), stack);
+        registerButton(getSlot(path + "Reason", 13),
+                lgm.getItem(path + "Reason", player, false),
+                (p, e) -> {
+                    playerMenuUtility.addData("BanPlayerSetNewReason", true);
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
+                    lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reason, false);
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.EnterNewReason", p, true));
+                    p.closeInventory();
+                }, null);
 
-        // Years
-        stack = lgm.getItem(path + "Years", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Years", 2), stack);
+        // Time Units (Right-click decrease, Left-click increase)
+        registerButton(getSlot(path + "Years", 2), lgm.getItem(path + "Years", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (years < 1000) years++;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (years > 0) years--;
+                    }
+                    this.open();
+                }, null);
 
-        // Months
-        stack = lgm.getItem(path + "Months", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Months", 3), stack);
+        registerButton(getSlot(path + "Months", 3), lgm.getItem(path + "Months", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (months < 1000) months++;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (months > 0) months--;
+                    }
+                    this.open();
+                }, null);
 
-        // Days
-        stack = lgm.getItem(path + "Days", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Days", 4), stack);
+        registerButton(getSlot(path + "Days", 4), lgm.getItem(path + "Days", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (days < 1000) days++;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (days > 0) days--;
+                    }
+                    this.open();
+                }, null);
 
-        // Hours
-        stack = lgm.getItem(path + "Hours", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Hours", 5), stack);
+        registerButton(getSlot(path + "Hours", 5), lgm.getItem(path + "Hours", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (hours < 1000) hours++;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (hours > 0) hours--;
+                    }
+                    this.open();
+                }, null);
 
-        // Minutes
-        stack = lgm.getItem(path + "Minutes", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Minutes", 6), stack);
+        registerButton(getSlot(path + "Minutes", 6), lgm.getItem(path + "Minutes", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (minutes < 1000) minutes += 5;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (minutes >= 5) minutes -= 5;
+                    }
+                    this.open();
+                }, null);
 
-        // Seconds
-        stack = lgm.getItem(path + "Seconds", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Seconds", 7), stack);
+        registerButton(getSlot(path + "Seconds", 7), lgm.getItem(path + "Seconds", player, false),
+                (p, e) -> {
+                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                        if (seconds < 1000) seconds += 10;
+                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                        if (seconds >= 10) seconds -= 10;
+                    }
+                    this.open();
+                }, null);
 
-        // Ban
-        stack = lgm.getItem(path + "Ban", player, false);
-        meta = stack.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(format(player, meta.getDisplayName()));
-        updatedLore.clear();
-        for (String s : Objects.requireNonNull(meta.getLore())) {
-            updatedLore.add(format(player, s));
-        }
-        meta.setLore(updatedLore);
-        stack.setItemMeta(meta);
-        inventory.setItem(getSlot(path + "Ban", 22), stack);
+        // Ban Execution
+        registerButton(getSlot(path + "Ban", 22), lgm.getItem(path + "Ban", player, false),
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Ban", (p, e) -> {
+                    Date banEnd = new Date();
+                    banEnd.setTime(System.currentTimeMillis() +
+                            TimeUnit.SECONDS.toMillis(seconds) +
+                            TimeUnit.MINUTES.toMillis(minutes) +
+                            TimeUnit.HOURS.toMillis(hours) +
+                            TimeUnit.DAYS.toMillis(days) +
+                            (months * 2628000000L) + (years * 31556952000L));
 
-        // General
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
+                    if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
+                        p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.NotBannable", p, true));
+                        return;
+                    }
+                    if (target.isBanned()) {
+                        p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.AlreadyBanned", p, true));
+                        return;
+                    }
+                    if (target.isOnline()) {
+                        target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.BanMenu.TargetKickMessage", target.getPlayer(), true)));
+                    }
+                    Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(target.getName()), reason, banEnd, p.getName());
+                    years = 0;
+                    months = 0;
+                    days = 0;
+                    hours = 0;
+                    minutes = 0;
+                    seconds = 0;
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.SuccessfullyBanned", p, true));
+                    new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+                }, lgm), null);
+
+        // Close
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+                }, lgm), null);
     }
 
     public String format(Player player, String message) {

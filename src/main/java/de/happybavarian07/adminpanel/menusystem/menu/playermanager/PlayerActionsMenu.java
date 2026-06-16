@@ -1,10 +1,12 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.FireworkGenerator;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -43,239 +45,173 @@ public class PlayerActionsMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        Player target = playerMenuUtility.getTarget();
-        ItemStack item = e.getCurrentItem();
-        String path = "PlayerManager.ActionsMenu.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if (item.isSimilar(lgm.getItem(path + "Heal", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Heal")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        } else if (item.isSimilar(lgm.getItem(path + "Kill", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Kill")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.setHealth(0.0);
-            target.spigot().respawn();
-        } else if (item.isSimilar(lgm.getItem(path + "Feed", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Feed")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.setFoodLevel(20);
-        } else if (item.isSimilar(lgm.getItem(path + "GameMode.Survival", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            inventory.setItem(e.getSlot(), lgm.getItem(path + "GameMode.Adventure", target, false));
-            target.setGameMode(GameMode.ADVENTURE);
-        } else if (item.isSimilar(lgm.getItem(path + "GameMode.Adventure", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            inventory.setItem(e.getSlot(), lgm.getItem(path + "GameMode.Creative", target, false));
-            target.setGameMode(GameMode.CREATIVE);
-        } else if (item.isSimilar(lgm.getItem(path + "GameMode.Creative", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            inventory.setItem(e.getSlot(), lgm.getItem(path + "GameMode.Spectator", target, false));
-            target.setGameMode(GameMode.SPECTATOR);
-        } else if (item.isSimilar(lgm.getItem(path + "GameMode.Spectator", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            inventory.setItem(e.getSlot(), lgm.getItem(path + "GameMode.Survival", target, false));
-            target.setGameMode(GameMode.SURVIVAL);
-        } else if (item.isSimilar(lgm.getItem(path + "Troll", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "Vanish.false", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            VanishAPI.hidePlayer(target);
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(path + "Vanish.true", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            VanishAPI.showPlayer(target);
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(path + "Potions", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PotionMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "Spawning", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new SpawningMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "PlayerSpawnLocation", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.setBedSpawnLocation(player.getLocation(), true);
-        } else if (item.isSimilar(lgm.getItem(path + "Burn", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Burn")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            int burnduration = plugin.getConfig().getInt("Pman.Actions.BurnDuration");
-            target.setFireTicks(burnduration * 20);
-        } else if (item.isSimilar(lgm.getItem(path + "Lightning", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Lightning")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.getWorld().strikeLightning(target.getLocation());
-        } else if (item.isSimilar(lgm.getItem(path + "Firework", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Firework")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            FireworkGenerator fwg = new FireworkGenerator(plugin);
-            fwg.setLocation(target.getLocation().add(0, 1.7, 0));
-            fwg.setPower(1);
-            fwg.setEffect(FireworkEffect.builder().withColor(Color.RED).withColor(Color.AQUA).withColor(Color.YELLOW).withColor(Color.BLUE).withColor(Color.GREEN).with(FireworkEffect.Type.BALL_LARGE).withFlicker().build());
-            fwg.setLifeTime(30);
-            fwg.spawn();
-        } else if (item.isSimilar(lgm.getItem(path + "TeleportYouToPlayer", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            player.teleport(target);
-        } else if (item.isSimilar(lgm.getItem(path + "TeleportPlayerToYou", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            target.teleport(player);
-        } else if (item.isSimilar(lgm.getItem(path + "Op", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Op")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
-            if (target.isOp()) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.AlreadyOp", player, true));
-                return;
-            }
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.OppedMessage", player, true));
-            target.setOp(true);
-        } else if (item.isSimilar(lgm.getItem(path + "Inventory", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            player.openInventory(target.getInventory());
-        } else if (item.isSimilar(lgm.getItem(path + "Deop", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Deop")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
-            if (!target.isOp()) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.NotOp", player, true));
-                return;
-            }
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.DeoppedMessage", player, true));
-            target.setOp(false);
-        } else if (item.isSimilar(lgm.getItem(path + "Armor", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new ArmorMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", target, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
     @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
     }
 
     @Override
     public void setMenuItems() {
-        for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, super.FILLER);
-        }
+        setFillerGlass();
         String path = "PlayerManager.ActionsMenu.";
         Player target = playerMenuUtility.getTarget();
+        Player player = playerMenuUtility.getOwner();
+
+        // Header
         inventory.setItem(getSlot("PlayerManager.PlayerHead", 4), lgm.getItem("PlayerManager.PlayerHead", target, false));
-        SkullMeta meta = (SkullMeta) inventory.getItem(4).getItemMeta();
-        meta.setOwningPlayer(target);
-        inventory.getItem(4).setItemMeta(meta);
+        if (inventory.getItem(4).getItemMeta() instanceof SkullMeta meta) {
+            meta.setOwningPlayer(target);
+            inventory.getItem(4).setItemMeta(meta);
+        }
+
         // First Row
-        inventory.setItem(getSlot(path + "Heal", 11), lgm.getItem(path + "Heal", target, false));
-        inventory.setItem(getSlot(path + "Kill", 13), lgm.getItem(path + "Kill", target, false));
-        inventory.setItem(getSlot(path + "Feed", 15), lgm.getItem(path + "Feed", target, false));
+        registerButton(getSlot(path + "Heal", 11), lgm.getItem(path + "Heal", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Heal", (p, e) -> {
+                target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            }, lgm), null);
+        
+        registerButton(getSlot(path + "Kill", 13), lgm.getItem(path + "Kill", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Kill", (p, e) -> {
+                target.setHealth(0.0);
+                target.spigot().respawn();
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Feed", 15), lgm.getItem(path + "Feed", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Feed", (p, e) -> {
+                target.setFoodLevel(20);
+            }, lgm), null);
+
         // Second Row
-        inventory.setItem(getSlot(path + "Potions", 19), lgm.getItem(path + "Potions", target, false));
-        inventory.setItem(getSlot(path + "Spawning", 21), lgm.getItem(path + "Spawning", target, false));
-        if (target.getGameMode().equals(GameMode.SURVIVAL)) {
-            inventory.setItem(getSlot(path + "GameMode.Survival", 23), lgm.getItem(path + "GameMode.Survival", target, false));
-        } else if (target.getGameMode().equals(GameMode.ADVENTURE)) {
-            inventory.setItem(getSlot(path + "GameMode.Adventure", 23), lgm.getItem(path + "GameMode.Adventure", target, false));
-        } else if (target.getGameMode().equals(GameMode.CREATIVE)) {
-            inventory.setItem(getSlot(path + "GameMode.Creative", 23), lgm.getItem(path + "GameMode.Creative", target, false));
-        } else if (target.getGameMode().equals(GameMode.SPECTATOR)) {
-            inventory.setItem(getSlot(path + "GameMode.Spectator", 23), lgm.getItem(path + "GameMode.Spectator", target, false));
+        registerButton(getSlot(path + "Potions", 19), lgm.getItem(path + "Potions", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Potions", (p, e) -> {
+                new PotionMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Spawning", 21), lgm.getItem(path + "Spawning", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Spawner", (p, e) -> {
+                new SpawningMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }, lgm), null);
+
+        // GameMode Cycling
+        GameMode currentMode = target.getGameMode();
+        String modePath;
+        GameMode nextMode;
+        if (currentMode == GameMode.SURVIVAL) {
+            modePath = path + "GameMode.Survival";
+            nextMode = GameMode.ADVENTURE;
+        } else if (currentMode == GameMode.ADVENTURE) {
+            modePath = path + "GameMode.Adventure";
+            nextMode = GameMode.CREATIVE;
+        } else if (currentMode == GameMode.CREATIVE) {
+            modePath = path + "GameMode.Creative";
+            nextMode = GameMode.SPECTATOR;
+        } else {
+            modePath = path + "GameMode.Spectator";
+            nextMode = GameMode.SURVIVAL;
         }
-        inventory.setItem(getSlot(path + "PlayerSpawnLocation", 25), lgm.getItem(path + "PlayerSpawnLocation", target, false));
+
+        registerButton(getSlot(modePath, 23), lgm.getItem(modePath, target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Gamemode", (p, e) -> {
+                target.setGameMode(nextMode);
+                this.open(); 
+            }, lgm), null);
+
+        registerButton(getSlot(path + "PlayerSpawnLocation", 25), lgm.getItem(path + "PlayerSpawnLocation", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation", (p, e) -> {
+                target.setBedSpawnLocation(p.getLocation(), true);
+            }, lgm), null);
+
         // Third Row
-        inventory.setItem(getSlot(path + "Burn", 29), lgm.getItem(path + "Burn", target, false));
-        inventory.setItem(getSlot(path + "Troll", 31), lgm.getItem(path + "Troll", target, false));
-        inventory.setItem(getSlot(path + "Lightning", 33), lgm.getItem(path + "Lightning", target, false));
+        registerButton(getSlot(path + "Burn", 29), lgm.getItem(path + "Burn", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Burn", (p, e) -> {
+                int burnduration = plugin.getConfig().getInt("Pman.Actions.BurnDuration");
+                target.setFireTicks(burnduration * 20);
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Troll", 31), lgm.getItem(path + "Troll", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll", (p, e) -> {
+                new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Lightning", 33), lgm.getItem(path + "Lightning", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Lightning", (p, e) -> {
+                target.getWorld().strikeLightning(target.getLocation());
+            }, lgm), null);
+
         if(Bukkit.getPluginManager().getPlugin("SuperVanish") != null) {
-            if (VanishAPI.isInvisible(target)) {
-                inventory.setItem(getSlot(path + "Vanish.true", 35), lgm.getItem(path + "Vanish.true", target, false));
-            } else {
-                inventory.setItem(getSlot(path + "Vanish.false", 35), lgm.getItem(path + "Vanish.false", target, false));
-            }
+            boolean invisible = VanishAPI.isInvisible(target);
+            String vanishPath = invisible ? path + "Vanish.true" : path + "Vanish.false";
+            registerButton(getSlot(vanishPath, 35), lgm.getItem(vanishPath, target, false), 
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Vanish", (p, e) -> {
+                    if (invisible) VanishAPI.showPlayer(target); else VanishAPI.hidePlayer(target);
+                    this.open();
+                }, lgm), null);
         }
+
         // Fourth Row
-        inventory.setItem(getSlot(path + "Firework", 37), lgm.getItem(path + "Firework", target, false));
-        inventory.setItem(getSlot(path + "TeleportYouToPlayer", 39), lgm.getItem(path + "TeleportYouToPlayer", target, false));
-        inventory.setItem(getSlot(path + "TeleportPlayerToYou", 41), lgm.getItem(path + "TeleportPlayerToYou", target, false));
-        inventory.setItem(getSlot(path + "Op", 43), lgm.getItem(path + "Op", target, false));
+        registerButton(getSlot(path + "Firework", 37), lgm.getItem(path + "Firework", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Firework", (p, e) -> {
+                FireworkGenerator fwg = new FireworkGenerator(plugin);
+                fwg.setLocation(target.getLocation().add(0, 1.7, 0));
+                fwg.setPower(1);
+                fwg.setEffect(FireworkEffect.builder().withColor(Color.RED).withColor(Color.AQUA).withColor(Color.YELLOW).withColor(Color.BLUE).withColor(Color.GREEN).with(FireworkEffect.Type.BALL_LARGE).withFlicker().build());
+                fwg.setLifeTime(30);
+                fwg.spawn();
+            }, lgm), null);
+
+        registerButton(getSlot(path + "TeleportYouToPlayer", 39), lgm.getItem(path + "TeleportYouToPlayer", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportYouToPlayer", (p, e) -> {
+                p.teleport(target);
+            }, lgm), null);
+
+        registerButton(getSlot(path + "TeleportPlayerToYou", 41), lgm.getItem(path + "TeleportPlayerToYou", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.TeleportPlayerToYou", (p, e) -> {
+                target.teleport(p);
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Op", 43), lgm.getItem(path + "Op", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Op", (p, e) -> {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                if (target.isOp()) {
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.AlreadyOp", p, true));
+                    return;
+                }
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.OppedMessage", p, true));
+                target.setOp(true);
+            }, lgm), null);
+
         // Fifth Row
-        inventory.setItem(getSlot(path + "Inventory", 47), lgm.getItem(path + "Inventory", target, false));
-        inventory.setItem(getSlot(path + "Deop", 49), lgm.getItem(path + "Deop", target, false));
-        inventory.setItem(getSlot(path + "Armor", 51), lgm.getItem(path + "Armor", target, false));
+        registerButton(getSlot(path + "Inventory", 47), lgm.getItem(path + "Inventory", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview", (p, e) -> {
+                p.openInventory(target.getInventory());
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Deop", 49), lgm.getItem(path + "Deop", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Deop", (p, e) -> {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                if (!target.isOp()) {
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.NotOp", p, true));
+                    return;
+                }
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.DeoppedMessage", p, true));
+                target.setOp(false);
+            }, lgm), null);
+
+        registerButton(getSlot(path + "Armor", 51), lgm.getItem(path + "Armor", target, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview", (p, e) -> {
+                new ArmorMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }, lgm), null);
+
         // Close
-        inventory.setItem(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false));
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false), 
+            new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+            }, lgm), null);
     }
 }

@@ -9,6 +9,7 @@ import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -20,7 +21,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -50,47 +50,7 @@ public class MoneyMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        Player target = playerMenuUtility.getTarget();
-        ItemStack item = e.getCurrentItem();
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Give", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Give")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            playerMenuUtility.addData("moneyGiveMenuMetaData", playerMenuUtility.getTargetUUID());
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Take", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Take")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            playerMenuUtility.addData("moneyTakeMenuMetaData", playerMenuUtility.getTargetUUID());
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.MoneyMenu.Set", target, false))) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Money.Set")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            playerMenuUtility.addData("moneySetMenuMetaData", playerMenuUtility.getTargetUUID());
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("General.Close", target, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -106,13 +66,34 @@ public class MoneyMenu extends Menu implements Listener {
     @Override
     public void setMenuItems() {
         Player target = Bukkit.getPlayer(playerMenuUtility.getTargetUUID());
-        for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, super.FILLER);
-        }
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target, false));
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Set", 13), lgm.getItem("PlayerManager.MoneyMenu.Set", target, false));
-        inventory.setItem(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target, false));
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false));
+        if (target == null || !target.isOnline()) return;
+        setFillerGlass();
+
+        registerButton(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target, false),
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Give", (p, e) -> {
+                    playerMenuUtility.addData("moneyGiveMenuMetaData", playerMenuUtility.getTargetUUID());
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
+                    p.closeInventory();
+                }, lgm), null);
+        registerButton(getSlot("PlayerManager.MoneyMenu.Set", 13), lgm.getItem("PlayerManager.MoneyMenu.Set", target, false),
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Set", (p, e) -> {
+                    playerMenuUtility.addData("moneySetMenuMetaData", playerMenuUtility.getTargetUUID());
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
+                    p.closeInventory();
+                }, lgm), null);
+        registerButton(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target, false),
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Take", (p, e) -> {
+                    playerMenuUtility.addData("moneyTakeMenuMetaData", playerMenuUtility.getTargetUUID());
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
+                    p.closeInventory();
+                }, lgm), null);
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+                }, lgm), null);
     }
 
     @EventHandler

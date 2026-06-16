@@ -8,12 +8,12 @@ import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.P
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class PlayerActionSelectMenu extends Menu {
 
@@ -39,32 +39,7 @@ public class PlayerActionSelectMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        Player target = Bukkit.getPlayer(playerMenuUtility.getTargetUUID());
-        ItemStack item = e.getCurrentItem();
-
-        if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.ActionsItem", target, false))) {
-            new PlayerActionsMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.MoneyItem", target, false))) {
-            new MoneyMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BanItem", target, false))) {
-            new PlayerBanMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.KickItem", target, false))) {
-            new PlayerKickMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.PermissionItem", target, false))) {
-            playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-            playerMenuUtility.addData("SortQuery", "");
-            new PermissionListMenu(playerMenuUtility, this).open();
-        } else if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenuItem", target, false))) {
-            //new PlayerWarningMenu(playerMenuUtility, targetUUID).open();
-            player.sendMessage(AdminPanelUtils.chat("!!!UNDER DEVELOPMENT!!!"));
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
-                return;
-            }
-            new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -79,20 +54,47 @@ public class PlayerActionSelectMenu extends Menu {
 
     @Override
     public void setMenuItems() {
-        for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, super.FILLER);
-        }
+        setFillerGlass();
         String path = "PlayerManager.ActionsMenu.";
         Player target = Bukkit.getPlayer(playerMenuUtility.getTargetUUID());
-        inventory.setItem(getSlot(path + "ActionsItem", 10), lgm.getItem(path + "ActionsItem", target, false));
+        Player player = playerMenuUtility.getOwner();
+
+        registerButton(getSlot(path + "ActionsItem", 10),
+                lgm.getItem(path + "ActionsItem", target, false),
+                (p, e) -> new PlayerActionsMenu(playerMenuUtility).open(), null);
+
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            inventory.setItem(getSlot(path + "MoneyItem", 12), lgm.getItem(path + "MoneyItem", target, false));
+            registerButton(getSlot(path + "MoneyItem", 12),
+                    lgm.getItem(path + "MoneyItem", target, false),
+                    (p, e) -> new MoneyMenu(playerMenuUtility).open(), null);
         }
-        inventory.setItem(getSlot(path + "BanItem", 14), lgm.getItem(path + "BanItem", target, false));
-        inventory.setItem(getSlot(path + "KickItem", 16), lgm.getItem(path + "KickItem", target, false));
-        if (AdminPanelMain.getPlugin().getWarningManager() != null)
-            inventory.setItem(getSlot("PlayerManager.WarningMenuItem", 24), lgm.getItem("PlayerManager.WarningMenuItem", target, false));
-        inventory.setItem(getSlot(path + "PermissionItem", 4), lgm.getItem(path + "PermissionItem", target, false));
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false));
+
+        registerButton(getSlot(path + "BanItem", 14),
+                lgm.getItem(path + "BanItem", target, false),
+                (p, e) -> new PlayerBanMenu(playerMenuUtility).open(), null);
+
+        registerButton(getSlot(path + "KickItem", 16),
+                lgm.getItem(path + "KickItem", target, false),
+                (p, e) -> new PlayerKickMenu(playerMenuUtility).open(), null);
+
+        if (AdminPanelMain.getPlugin().getWarningManager() != null) {
+            registerButton(getSlot("PlayerManager.WarningMenuItem", 24),
+                    lgm.getItem("PlayerManager.WarningMenuItem", target, false),
+                    (p, e) -> p.sendMessage(AdminPanelUtils.chat("!!!UNDER DEVELOPMENT!!!")), null);
+        }
+
+        registerButton(getSlot(path + "PermissionItem", 4),
+                lgm.getItem(path + "PermissionItem", target, false),
+                (p, e) -> {
+                    playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                    playerMenuUtility.addData("SortQuery", "");
+                    new PermissionListMenu(playerMenuUtility, this).open();
+                }, null);
+
+        registerButton(getSlot("General.Close", 26),
+                lgm.getItem("General.Close", target, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                    new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+                }, lgm), null);
     }
 }

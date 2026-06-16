@@ -6,6 +6,7 @@ import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -43,42 +44,7 @@ public class PlayerKickMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "PlayerManager.ActionsMenu.KickMenu.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.getType().equals(lgm.getItem(path + "Reason", player, false).getType())) {
-            playerMenuUtility.addData("KickPlayerSetNewReason", true);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.Reason.EnterNewReason", player, true));
-            player.closeInventory();
-        } else if (item.getType().equals(lgm.getItem(path + "Kick", player, false).getType())) {
-            if (!player.hasPermission("AdminPanel.PlayerManager.PlayerSettings.Kick")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-            OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
-            if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.NotKickable", player, true));
-                return;
-            }
-            if (target.isOnline()) {
-                target.getPlayer().kickPlayer(lgm.getMessage("Player.PlayerManager.KickMenu.TargetKickMessage", target.getPlayer(), false));
-            }
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.SuccessfullyKicked", player, true));
-            new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -110,14 +76,39 @@ public class PlayerKickMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "PlayerManager.ActionsMenu.KickMenu.";
         lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reason, false);
+
         // Reason
-        inventory.setItem(getSlot(path + "Reason", 0), lgm.getItem(path + "Reason", player, false));
+        registerButton(getSlot(path + "Reason", 0), 
+            lgm.getItem(path + "Reason", player, false), 
+            (p, e) -> {
+                playerMenuUtility.addData("KickPlayerSetNewReason", true);
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.Reason.EnterNewReason", p, true));
+                p.closeInventory();
+            }, null);
 
-        // Ban
-        inventory.setItem(getSlot(path + "Kick", 7), lgm.getItem(path + "Kick", player, false));
+        // Kick Execution
+        registerButton(getSlot(path + "Kick", 7), 
+            lgm.getItem(path + "Kick", player, false), 
+            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Kick", (p, e) -> {
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
+                OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
+                if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
+                    p.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.NotKickable", p, true));
+                    return;
+                }
+                if (target.isOnline()) {
+                    target.getPlayer().kickPlayer(lgm.getMessage("Player.PlayerManager.KickMenu.TargetKickMessage", target.getPlayer(), false));
+                }
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.SuccessfullyKicked", p, true));
+                new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+            }, lgm), null);
 
-        // General
-        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false));
+        // General Close
+        registerButton(getSlot("General.Close", 8), 
+            lgm.getItem("General.Close", player, false), 
+            new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }, lgm), null);
     }
 
     public String format(Player player, String message) {

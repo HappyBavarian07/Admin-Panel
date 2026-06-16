@@ -5,6 +5,7 @@ import de.happybavarian07.adminpanel.events.player.SelectPlayerEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -50,7 +51,10 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
     @Override
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
-        inventory.setItem(45, lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", player, false));
+        registerButton(45, lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", player, false), 
+            new PermissionAction("AdminPanel.PlayerManager.BannedPlayers.open", (p, e) -> {
+                new BannedPlayersMenu(playerMenuUtility, this).open();
+            }, lgm), null);
     }
 
     @Override
@@ -60,28 +64,29 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
         int indexOnPage = slot - 10;
         if (indexOnPage < 0 || indexOnPage >= players.size()) return;
         Player targetPlayer = players.get(indexOnPage);
-        SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(player, targetPlayer.getUniqueId());
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
-            if (!selectPlayerEvent.isCancelled()) {
-                if (player.getName().equals(targetPlayer.getName()) &&
-                        !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
-                    player.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", player, true));
-                    return;
+
+        new PermissionAction("AdminPanel.PlayerManager.open", (p, event) -> {
+            SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(p, targetPlayer.getUniqueId());
+            try {
+                AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
+                if (!selectPlayerEvent.isCancelled()) {
+                    if (p.getName().equals(targetPlayer.getName()) &&
+                            !plugin.getConfig().getBoolean("Pman.SelfSelect")) {
+                        p.sendMessage(lgm.getMessage("Player.PlayerManager.ChooseYourself", p, true));
+                        return;
+                    }
+                    playerMenuUtility.setTargetUUID(targetPlayer.getUniqueId());
+                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
                 }
-                playerMenuUtility.setTargetUUID(targetPlayer.getUniqueId());
-                new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            } catch (NotAPanelEventException notAPanelEventException) {
+                notAPanelEventException.printStackTrace();
             }
-        } catch (NotAPanelEventException notAPanelEventException) {
-            notAPanelEventException.printStackTrace();
-        }
+        }, lgm).execute(player, e);
     }
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        if (item.isSimilar(lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", playerMenuUtility.getOwner(), false))) {
-            new BannedPlayersMenu(playerMenuUtility, this).open();
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     public ItemStack getPageItem(Player targetPlayer) {

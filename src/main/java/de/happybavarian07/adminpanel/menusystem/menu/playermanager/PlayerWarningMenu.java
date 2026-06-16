@@ -9,6 +9,7 @@ import de.happybavarian07.adminpanel.utils.Warning;
 import de.happybavarian07.adminpanel.utils.WarningManager;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -55,6 +56,32 @@ public class PlayerWarningMenu extends PaginatedMenu<Warning> {
 
     @Override
     public void postSetMenuItems() {
+        registerButton(getSlot("PlayerManager.WarningMenu.AddWarning", 45),
+                lgm.getItem("PlayerManager.WarningMenu.AddWarning", Bukkit.getPlayer(targetUUID), false),
+                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Warn", (p, e) -> {
+                    warningManager.addWarning(targetUUID, new Warning(
+                            targetUUID,
+                            "TestReason#1",
+                            System.currentTimeMillis() + 60000,
+                            System.currentTimeMillis(),
+                            warningManager.getWarningCount(targetUUID, false)
+                    ), true);
+                    warningManager.addWarning(targetUUID, new Warning(
+                            targetUUID,
+                            "TestReason#2",
+                            System.currentTimeMillis() + 120000,
+                            System.currentTimeMillis(),
+                            warningManager.getWarningCount(targetUUID, false)
+                    ), true);
+                    warningManager.addWarning(targetUUID, new Warning(
+                            targetUUID,
+                            "TestReason#2",
+                            System.currentTimeMillis() + 180000,
+                            System.currentTimeMillis(),
+                            warningManager.getWarningCount(targetUUID, false)
+                    ), true);
+                    super.open();
+                }, lgm), null);
     }
 
     @Override
@@ -82,30 +109,7 @@ public class PlayerWarningMenu extends PaginatedMenu<Warning> {
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        if (item.isSimilar(lgm.getItem("PlayerManager.WarningMenu.AddWarning", Bukkit.getPlayer(targetUUID), false))) {
-            warningManager.addWarning(targetUUID, new Warning(
-                    targetUUID,
-                    "TestReason#1",
-                    System.currentTimeMillis() + 60000,
-                    System.currentTimeMillis(),
-                    warningManager.getWarningCount(targetUUID, false)
-            ), true);
-            warningManager.addWarning(targetUUID, new Warning(
-                    targetUUID,
-                    "TestReason#2",
-                    System.currentTimeMillis() + 120000,
-                    System.currentTimeMillis(),
-                    warningManager.getWarningCount(targetUUID, false)
-            ), true);
-            warningManager.addWarning(targetUUID, new Warning(
-                    targetUUID,
-                    "TestReason#2",
-                    System.currentTimeMillis() + 180000,
-                    System.currentTimeMillis(),
-                    warningManager.getWarningCount(targetUUID, false)
-            ), true);
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     public ItemStack getPageItem(Warning warning) {

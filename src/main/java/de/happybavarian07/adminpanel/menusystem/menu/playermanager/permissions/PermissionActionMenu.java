@@ -6,6 +6,7 @@ import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -76,52 +77,33 @@ public class PermissionActionMenu extends Menu {
         ItemStack closeButton = lgm.getItem("General.Close", player, false);
 
         inventory.setItem(getSlot(path + "InfoItem", 4), infoItem);
-        inventory.setItem(getSlot(path + "SetTrue", 10), trueButton);
-        inventory.setItem(getSlot(path + "SetFalse", 12), falseButton);
-        inventory.setItem(getSlot(path + "Remove", 14), removeButton);
-        inventory.setItem(getSlot(path + "Info", 16), infoButton);
-        inventory.setItem(getSlot("General.Close", 22), closeButton);
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack clickedItem = e.getCurrentItem();
-        String path = "PlayerManager.ActionsMenu.PermissionListMenu.PermissionActions.";
-        if (clickedItem == null) return;
-
-        // Back
-        if (clickedItem.isSimilar(lgm.getItem("General.Close", player, false))) {
-            new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();
-            return;
-        }
-
-        // Set TRUE
-        if (clickedItem.isSimilar(lgm.getItem(path + "SetTrue", player, false))) {
+        registerButton(getSlot(path + "SetTrue", 10), trueButton, (p, e) -> {
             permissionsManager.addPermission(targetUUID, permissionFullName, true, true);
             if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", true, false);
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", p, true));
             }
             open();
-        } else if (clickedItem.isSimilar(lgm.getItem(path + "SetFalse", player, false))) {
+        }, null);
+        registerButton(getSlot(path + "SetFalse", 12), falseButton, (p, e) -> {
             permissionsManager.addPermission(targetUUID, permissionFullName, false, true);
             if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", false, false);
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", player, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", p, true));
             }
             open();
-        } else if (clickedItem.isSimilar(lgm.getItem(path + "Remove", player, false))) {
+        }, null);
+        registerButton(getSlot(path + "Remove", 14), removeButton, (p, e) -> {
             permissionsManager.removePermission(targetUUID, permissionFullName, true);
-            // TODO When player is op then permissions dont get removed, because op permissions are always true
             if (!Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", player, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", p, true));
             }
             new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();
-        } else if (clickedItem.isSimilar(lgm.getItem(path + "Info", player, false))) {
+        }, null);
+        registerButton(getSlot(path + "Info", 16), infoButton, (p, e) -> {
             Permission perm = Bukkit.getPluginManager().getPermission(permissionFullName);
             if (perm != null) {
-                player.sendMessage(AdminPanelUtils.format(player,
+                p.sendMessage(AdminPanelUtils.format(p,
                         "Info about Permission:" + "\n" +
                                 "  - &aName: &6" + perm.getName() + "\n" +
                                 "  - &aDescription: &6" + (perm.getDescription().isEmpty() ? perm.getDescription() : "None") + "\n" +
@@ -130,9 +112,17 @@ public class PermissionActionMenu extends Menu {
                                 "  - &aTarget: &6" + Objects.requireNonNull(Bukkit.getPlayer(targetUUID)).getName() + "\n" +
                                 "  - &aChildren: &6" + (perm.getChildren().isEmpty() ? perm.getChildren().toString() : "None") + "\n", AdminPanelMain.getPrefix()));
             } else {
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.PermissionNotFound", player, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.PermissionNotFound", p, true));
             }
-        }
+        }, null);
+        registerButton(getSlot("General.Close", 22), closeButton,
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open(), lgm), null);
+    }
+
+    @Override
+    public void handleMenu(InventoryClickEvent e) {
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override

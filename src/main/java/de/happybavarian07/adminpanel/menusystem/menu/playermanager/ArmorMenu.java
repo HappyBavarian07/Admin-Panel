@@ -1,12 +1,13 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class ArmorMenu extends Menu {
 
@@ -32,26 +33,7 @@ public class ArmorMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        Player target = playerMenuUtility.getTarget();
-        ItemStack item = e.getCurrentItem();
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta() || target == null || !target.isOnline()) return;
-        if (item.isSimilar(lgm.getItem("General.Refresh", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.refresh")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            super.open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PlayerActionsMenu(playerMenuUtility).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -66,10 +48,9 @@ public class ArmorMenu extends Menu {
 
     @Override
     public void setMenuItems() {
-        for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, super.FILLER);
-        }
+        setFillerGlass();
         Player target = playerMenuUtility.getTarget();
+        if (target == null || !target.isOnline()) return;
         if (target.getInventory().getArmorContents()[0] != null) {
             inventory.setItem(0, target.getInventory().getArmorContents()[0]);
         } else {
@@ -90,7 +71,9 @@ public class ArmorMenu extends Menu {
         } else {
             inventory.setItem(3, lgm.getItem("General.EmptySlot", target, false));
         }
-        inventory.setItem(7, lgm.getItem("General.Refresh", target, false));
-        inventory.setItem(8, lgm.getItem("General.Close", target, false));
+        registerButton(7, lgm.getItem("General.Refresh", target, false),
+                new PermissionAction("AdminPanel.Button.refresh", (p, e) -> super.open(), lgm), null);
+        registerButton(8, lgm.getItem("General.Close", target, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 }
