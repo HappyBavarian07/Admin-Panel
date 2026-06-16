@@ -4,6 +4,7 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.CardboardCommandGuard;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.Bukkit;
@@ -33,7 +34,7 @@ public class AdminPanelOpenCommand implements CommandExecutor {
         if (command.getName().equalsIgnoreCase("adminpanel")) {
             if (args.length == 0) {
                 if (sender instanceof Player player) {
-                    new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                    new AdminPanelStartMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
                     plugin.getFileLogger().writeToLog(Level.INFO, "Opened Admin-Panel for " + player.getName() + "(UUID: " + player.getUniqueId() + ")", LogPrefixExtension.ACTIONSLOGGER_PLAYER.getLogPrefix(), false);
                 } else {
                     sender.sendMessage(lgm.getMessage("Console.ExecutesPlayerCommand", null, true));

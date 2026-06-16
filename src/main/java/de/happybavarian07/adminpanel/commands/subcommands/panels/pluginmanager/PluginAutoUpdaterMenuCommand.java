@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panels.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginAutoUpdaterMenu;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
@@ -25,7 +26,7 @@ public class PluginAutoUpdaterMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new PluginAutoUpdaterMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PluginAutoUpdaterMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }

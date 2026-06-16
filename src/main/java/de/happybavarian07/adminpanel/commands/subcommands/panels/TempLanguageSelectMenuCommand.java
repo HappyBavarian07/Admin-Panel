@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.subcommands.panels;/*
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.TempLanguageSelectMenu;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
@@ -25,7 +26,7 @@ public class TempLanguageSelectMenuCommand extends SubCommand {
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 0) {
-            new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), null).open();
+            new TempLanguageSelectMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()), null).open();
             player.sendMessage(lgm.getMessage("Player.General.OpeningMessageSelf", player, true));
             return true;
         }

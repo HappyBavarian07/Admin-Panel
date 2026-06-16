@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.listeners;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.MenuAddon;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
@@ -33,7 +34,7 @@ public class MenuListener implements Listener {
                 @Override
                 public void run() {
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
+                        PlayerMenuUtility playerMenuUtility = CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId());
                         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
                             if (playerMenuUtility.hasData("AdminPanelOpen")) {
                                 if (br.isCancelled()) return;
@@ -87,7 +88,7 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
+        PlayerMenuUtility playerMenuUtility = CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId());
         if (event.getInventory().getHolder() instanceof Menu holder) {
 
             holder.handleCloseMenu(event);
@@ -106,7 +107,7 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInvOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
-        PlayerMenuUtility playerMenuUtility = AdminPanelMain.getAPI().getPlayerMenuUtility(player);
+        PlayerMenuUtility playerMenuUtility = CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId());
         if (event.getInventory().getHolder() instanceof Menu holder) {
 
             holder.handleOpenMenu(event);
