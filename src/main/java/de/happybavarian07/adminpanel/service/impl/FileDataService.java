@@ -103,7 +103,7 @@ public class FileDataService implements DataService {
     public CompletableFuture<Set<String>> listKeys() {
         return CompletableFuture.supplyAsync(() -> {
             synchronized (this) {
-                return dataMap.keySet();
+                return new java.util.HashSet<>(dataMap.keySet());
             }
         });
     }

@@ -35,7 +35,8 @@ public class DataServiceConfig implements Config {
 
     @Override
     public int getInt(String s) {
-        return configMap.getOrDefault(s, 0) instanceof Integer ? (int) configMap.get(s) : 0;
+        Object value = configMap.get(s);
+        return value instanceof Integer ? (int) value : 0;
     }
 
     @Override

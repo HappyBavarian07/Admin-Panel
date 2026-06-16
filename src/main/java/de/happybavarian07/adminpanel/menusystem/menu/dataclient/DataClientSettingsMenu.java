@@ -6,6 +6,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.dataclient;/*
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.managers.SettingsManager;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class DataClientSettingsMenu extends Menu implements Listener {
     private final SettingsManager settingsManager;
@@ -42,65 +42,7 @@ public class DataClientSettingsMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        ItemStack item = e.getCurrentItem();
-        Player player = (Player) e.getWhoClicked();
-        String path = "DataClientMenu.MainMenu.Settings.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item != null) {
-            if (item.isSimilar(lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.AutoCheckConnection")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                settingsManager.setCheckConnection(!settingsManager.isCheckConnection());
-                super.open();
-            } else if (item.isSimilar(lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.Debug")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                settingsManager.setDebugEnabled(!settingsManager.isDebugEnabled());
-                super.open();
-            } else if (item.isSimilar(lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.OverwritePermissions")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                settingsManager.setOverwritePermissionsEnabled(!settingsManager.isOverwritePermissionsEnabled());
-                super.open();
-            } else if (item.isSimilar(lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.FileLogging")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                settingsManager.setFileLogging(!settingsManager.isFileLogging());
-                super.open();
-            } else if (item.isSimilar(lgm.getItem(path + ".AutoCheckConnectionTiming", player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                player.closeInventory();
-                player.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", player, true));
-                playerMenuUtility.addData("AutoCheckConnectionTiming", settingsManager.getCheckConnectionTiming());
-            } else if (item.isSimilar(lgm.getItem(path + ".FileLoggingPrefix", player, false))) {
-                if (!player.hasPermission("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                player.closeInventory();
-                player.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", player, true));
-                playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
-            } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-                if (!player.hasPermission("AdminPanel.Button.Close")) {
-                    player.sendMessage(noPerms);
-                    return;
-                }
-                new DataClientMainMenu(playerMenuUtility).open();
-            }
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -146,14 +88,41 @@ public class DataClientSettingsMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "DataClientMenu.MainMenu.Settings.";
 
-        inventory.setItem(10, lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false));
-        inventory.setItem(11, lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false));
-        inventory.setItem(12, lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false));
-        inventory.setItem(13, lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false));
+        registerButton(10, lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.AutoCheckConnection", (p, e) -> {
+                    settingsManager.setCheckConnection(!settingsManager.isCheckConnection());
+                    super.open();
+                }, lgm), null);
+        registerButton(11, lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.Debug", (p, e) -> {
+                    settingsManager.setDebugEnabled(!settingsManager.isDebugEnabled());
+                    super.open();
+                }, lgm), null);
+        registerButton(12, lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.OverwritePermissions", (p, e) -> {
+                    settingsManager.setOverwritePermissionsEnabled(!settingsManager.isOverwritePermissionsEnabled());
+                    super.open();
+                }, lgm), null);
+        registerButton(13, lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.FileLogging", (p, e) -> {
+                    settingsManager.setFileLogging(!settingsManager.isFileLogging());
+                    super.open();
+                }, lgm), null);
 
-        inventory.setItem(15, lgm.getItem(path + "AutoCheckConnectionTiming", player, false));
-        inventory.setItem(16, lgm.getItem(path + "FileLoggingPrefix", player, false));
+        registerButton(15, lgm.getItem(path + "AutoCheckConnectionTiming", player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming", (p, e) -> {
+                    p.closeInventory();
+                    p.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", p, true));
+                    playerMenuUtility.addData("AutoCheckConnectionTiming", settingsManager.getCheckConnectionTiming());
+                }, lgm), null);
+        registerButton(16, lgm.getItem(path + "FileLoggingPrefix", player, false),
+                new PermissionAction("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix", (p, e) -> {
+                    p.closeInventory();
+                    p.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", p, true));
+                    playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
+                }, lgm), null);
 
-        inventory.setItem(26, lgm.getItem("General.Close", player, false));
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new DataClientMainMenu(playerMenuUtility).open(), lgm), null);
     }
 }

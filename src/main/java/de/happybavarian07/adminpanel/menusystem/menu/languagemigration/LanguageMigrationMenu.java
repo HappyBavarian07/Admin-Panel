@@ -7,6 +7,7 @@ import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -77,63 +78,67 @@ public class LanguageMigrationMenu extends PaginatedMenu<LanguageFileMigrator.Mi
 
     @Override
     public void postSetMenuItems() {
+        Player player = playerMenuUtility.getOwner();
         lgm.addPlaceholder(PlaceholderType.ITEM, "%selected_all_filter% ", statusFilterMode == StatusFilterMode.ALL ? "&a > ALL" : "&7 ALL", false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%selected_changed_only_filter% ", statusFilterMode == StatusFilterMode.CHANGED_ONLY ? "&a > CHANGED ONLY" : "&7 CHANGED ONLY", false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%selected_unchanged_only_filter% ", statusFilterMode == StatusFilterMode.UNCHANGED_ONLY ? "&a > UNCHANGED ONLY" : "&7 UNCHANGED ONLY", false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%selected_missing_only_filter% ", statusFilterMode == StatusFilterMode.MISSING_ONLY ? "&a > MISSING ONLY" : "&7 MISSING ONLY", false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%status_filter_mode%", statusFilterMode.name(), false);
-        inventory.setItem(getSlot("LanguageMigration.Migration.FilterItem", getSlots() - 7), lgm.getItem("LanguageMigration.Migration.FilterItem", playerMenuUtility.getOwner(), true));
+
+        registerButton(getSlot("LanguageMigration.Migration.FilterItem", getSlots() - 7), 
+            lgm.getItem("LanguageMigration.Migration.FilterItem", player, true), 
+            (p, e) -> {
+                StatusFilterMode newMode = getNextFilterMode(statusFilterMode);
+                filterMigrationEntries(newMode);
+                this.open();
+            }, null);
+
         lgm.addPlaceholder(PlaceholderType.ITEM, "%total_migration_count%", String.valueOf(migrationEntries.size()), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%actually_applied_migration_count%", String.valueOf(actuallyAppliedMigrationEntries != null ? actuallyAppliedMigrationEntries.size() : 0), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%filtered_migration_count%", String.valueOf(filteredMigrationEntries != null ? filteredMigrationEntries.size() : 0), false);
-        inventory.setItem(getSlot("LanguageMigration.Migration.ApplyChanges", getSlots() - 8), lgm.getItem("LanguageMigration.Migration.ApplyChanges", playerMenuUtility.getOwner(), false));
+
+        registerButton(getSlot("LanguageMigration.Migration.ApplyChanges", getSlots() - 8), 
+            lgm.getItem("LanguageMigration.Migration.ApplyChanges", player, false), 
+            (p, e) -> {
+                List<LanguageFileMigrator.MigrationEntry> selected = migrationEntries.stream()
+                        .filter(LanguageFileMigrator.MigrationEntry::isSelectedForMigration)
+                        .toList();
+                if (selected.isEmpty()) {
+                    p.sendMessage(lgm.getMessage("LanguageMigration.Message.NoEntriesSelected", p, true));
+                    return;
+                }
+                try {
+                    migrator.migrateSelected();
+                } catch (Exception ex) {
+                    p.sendMessage(lgm.getMessage("LanguageMigration.Message.MigrationFailed", p, true));
+                    return;
+                }
+                actuallyAppliedMigrationEntries = new ArrayList<>(selected);
+                migrationEntries = migrator.getMigrationEntries();
+                filterMigrationEntries(statusFilterMode);
+                p.sendMessage(lgm.getMessage("LanguageMigration.Message.MigrationApplied", p, true));
+                this.open();
+            }, null);
     }
 
     @Override
     protected void handlePageItemClick(int slot, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
         if (itemStack == null || itemStack.getItemMeta() == null) return;
+        Player player = (Player) inventoryClickEvent.getWhoClicked();
         String migrationEntryString = itemStack.getItemMeta().getPersistentDataContainer().get(migrationItemKey, org.bukkit.persistence.PersistentDataType.STRING);
         if (migrationEntryString == null) return;
 
         LanguageFileMigrator.MigrationEntry migrationEntry = LanguageFileMigrator.MigrationEntry.fromString(migrationEntryString);
 
-        playerMenuUtility.setData("selected_migration_entry", migrationEntry, true);
-        new MigrationEntryEditMenu(playerMenuUtility, this).open();
+        new PermissionAction("AdminPanel.LanguageMigration.Open", (p, e) -> {
+            playerMenuUtility.setData("selected_migration_entry", migrationEntry, true);
+            new MigrationEntryEditMenu(playerMenuUtility, this).open();
+        }, lgm).execute(player, inventoryClickEvent);
     }
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
-        if (itemStack == null) return;
-        Player player = (Player) inventoryClickEvent.getWhoClicked();
-
-        ItemStack filterItem = lgm.getItem("LanguageMigration.Migration.FilterItem", playerMenuUtility.getOwner(), true);
-        if (filterItem != null && itemStack.isSimilar(filterItem)) {
-            StatusFilterMode newMode = getNextFilterMode(statusFilterMode);
-            filterMigrationEntries(newMode);
-            super.open();
-            return;
-        }
-
-        ItemStack applyItem = lgm.getItem("LanguageMigration.Migration.ApplyChanges", playerMenuUtility.getOwner(), false);
-        if (applyItem != null && itemStack.isSimilar(applyItem)) {
-            List<LanguageFileMigrator.MigrationEntry> selected = migrationEntries.stream()
-                    .filter(LanguageFileMigrator.MigrationEntry::isSelectedForMigration)
-                    .toList();
-            if (selected.isEmpty()) {
-                player.sendMessage(lgm.getMessage("LanguageMigration.Message.NoEntriesSelected", player, true));
-                return;
-            }
-            try {
-                migrator.migrateSelected();
-            } catch (Exception e) {
-                player.sendMessage(lgm.getMessage("LanguageMigration.Message.MigrationFailed", player, true));
-                return;
-            }
-            actuallyAppliedMigrationEntries = new ArrayList<>(selected);
-            migrationEntries = migrator.getMigrationEntries();
-            filterMigrationEntries(statusFilterMode);
-            player.sendMessage(lgm.getMessage("LanguageMigration.Message.MigrationApplied", player, true));
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     @Override

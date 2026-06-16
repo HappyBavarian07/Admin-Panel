@@ -158,9 +158,13 @@ public class SQLiteDataService implements DataService {
                         pstmt.addBatch();
                     }
                     pstmt.executeBatch();
+                    connection.commit();
+                } catch (SQLException e) {
+                    if (connection != null) connection.rollback();
+                    throw e;
+                } finally {
+                    if (connection != null) connection.setAutoCommit(true);
                 }
-                connection.commit();
-                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to batch save data", e);
             }
@@ -227,9 +231,13 @@ public class SQLiteDataService implements DataService {
                         pstmt.addBatch();
                     }
                     pstmt.executeBatch();
+                    connection.commit();
+                } catch (SQLException e) {
+                    if (connection != null) connection.rollback();
+                    throw e;
+                } finally {
+                    if (connection != null) connection.setAutoCommit(true);
                 }
-                connection.commit();
-                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to batch delete data", e);
             }

@@ -6,7 +6,9 @@ import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -63,13 +65,17 @@ public class NormalLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
     @Override
     protected void handlePageItemClick(int slot, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
         if (itemStack == null || itemStack.getItemMeta() == null) return;
+        Player player = (Player) inventoryClickEvent.getWhoClicked();
         String langName = itemStack.getItemMeta().getPersistentDataContainer().get(languageItemKey, PersistentDataType.STRING);
         if (langName == null) return;
         LanguageFile languageFile = languageFiles.get(langName);
+        
         if (languageFile != null) {
-            playerMenuUtility.setData("selected_language_file", languageFile, true);
-            playerMenuUtility.setData("selected_language_resource", "languages/" + languageFile.getLangName() + ".yml", true);
-            new LanguageMigrationMenu(playerMenuUtility, savedMenu).open();
+            new PermissionAction("AdminPanel.LanguageMigrator.NormalMigrate.Open", (p, e) -> {
+                playerMenuUtility.setData("selected_language_file", languageFile, true);
+                playerMenuUtility.setData("selected_language_resource", "languages/" + languageFile.getLangName() + ".yml", true);
+                new LanguageMigrationMenu(playerMenuUtility, savedMenu).open();
+            }, lgm).execute(player, inventoryClickEvent);
         }
     }
 

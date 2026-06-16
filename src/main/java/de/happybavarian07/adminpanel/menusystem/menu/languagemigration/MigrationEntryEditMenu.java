@@ -50,66 +50,7 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        Player player = (Player) inventoryClickEvent.getWhoClicked();
-        ItemStack clickedItem = inventoryClickEvent.getCurrentItem();
-        if (clickedItem == null || clickedItem.getType().isAir()) {
-            return;
-        }
-        if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.KeepUserValue", player, false))) {
-            finalValue = migrationEntry.getUserValue();
-
-            if (inventoryClickEvent.isShiftClick()) {
-                migrationEntry.setSelectedForMigration(true);
-                migrationEntry.setUserValue(finalValue);
-                languageMigrationMenu.openWithMigrationEntry(migrationEntry);
-                return;
-            }
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.KeepResourceValue", player, false))) {
-            finalValue = migrationEntry.getResourceValue();
-
-            if (inventoryClickEvent.isShiftClick()) {
-                migrationEntry.setSelectedForMigration(true);
-                migrationEntry.setUserValue(finalValue);
-                languageMigrationMenu.openWithMigrationEntry(migrationEntry);
-                return;
-            }
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.DeleteEntryFromFile", player, false))) {
-            finalValue = null;
-
-            if (inventoryClickEvent.isShiftClick()) {
-                migrationEntry.setSelectedForMigration(false);
-                migrationEntry.setUserValue(null);
-                languageMigrationMenu.openWithMigrationEntry(migrationEntry);
-                return;
-            }
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.KeepRemovedFromFile", player, false))) {
-            finalValue = null;
-
-            if (inventoryClickEvent.isShiftClick()) {
-                migrationEntry.setSelectedForMigration(true);
-                migrationEntry.setUserValue(null);
-                languageMigrationMenu.openWithMigrationEntry(migrationEntry);
-                return;
-            }
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.EditFinalValue", player, false))) {
-            player.closeInventory();
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%current_value%", String.valueOf(finalValue), false);
-            player.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValue", player, true));
-            player.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValueFormat", player, true));
-            playerMenuUtility.setData("final_value_input", true, true);
-            return;
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.EntryEditMenu.Close", player, false))) {
-            if (finalValue == null) {
-                migrationEntry.setSelectedForMigration(true);
-                migrationEntry.setUserValue(null);
-            } else {
-                migrationEntry.setUserValue(finalValue);
-                migrationEntry.setSelectedForMigration(true);
-            }
-            languageMigrationMenu.openWithMigrationEntry(migrationEntry);
-            return;
-        }
-        super.open();
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -135,25 +76,93 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
 
         inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.Name", 0), lgm.getItem("LanguageMigrator.EntryEditMenu.Name", player, false));
 
-        // items Keep User Val, Keep Resource Val when status is DIFFERENT_VALUE
-        // items Keep User Val, Delete Entry From File when status is MISSING_IN_RESOURCE
-        // items Keep Resource Val, Keep Removed From File when status is MISSING_IN_FILE
-        // default items for all statuses: edit final value, close (9th slot), final value display (8th slot)
         if (status == LanguageFileMigrator.MigrationStatus.DIFFERENT_VALUE) {
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.KeepUserValue", 1), lgm.getItem("LanguageMigrator.EntryEditMenu.KeepUserValue", player, false));
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.KeepResourceValue", 2), lgm.getItem("LanguageMigrator.EntryEditMenu.KeepResourceValue", player, false));
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.KeepUserValue", 1), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.KeepUserValue", player, false), 
+                (p, e) -> {
+                    finalValue = migrationEntry.getUserValue();
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(true);
+                        migrationEntry.setUserValue(finalValue);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.KeepResourceValue", 2), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.KeepResourceValue", player, false), 
+                (p, e) -> {
+                    finalValue = migrationEntry.getResourceValue();
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(true);
+                        migrationEntry.setUserValue(finalValue);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
         } else if (status == LanguageFileMigrator.MigrationStatus.MISSING_IN_RESOURCE) {
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.KeepUserValue", 1), lgm.getItem("LanguageMigrator.EntryEditMenu.KeepUserValue", player, false));
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.DeleteEntryFromFile", 2), lgm.getItem("LanguageMigrator.EntryEditMenu.DeleteEntryFromFile", player, false));
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.KeepUserValue", 1), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.KeepUserValue", player, false), 
+                (p, e) -> {
+                    finalValue = migrationEntry.getUserValue();
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(true);
+                        migrationEntry.setUserValue(finalValue);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.DeleteEntryFromFile", 2), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.DeleteEntryFromFile", player, false), 
+                (p, e) -> {
+                    finalValue = null;
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(false);
+                        migrationEntry.setUserValue(null);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
         } else if (status == LanguageFileMigrator.MigrationStatus.MISSING_IN_USER) {
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.KeepResourceValue", 1), lgm.getItem("LanguageMigrator.EntryEditMenu.KeepResourceValue", player, false));
-            inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.KeepRemovedFromFile", 2), lgm.getItem("LanguageMigrator.EntryEditMenu.KeepRemovedFromFile", player, false));
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.KeepResourceValue", 1), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.KeepResourceValue", player, false), 
+                (p, e) -> {
+                    finalValue = migrationEntry.getResourceValue();
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(true);
+                        migrationEntry.setUserValue(finalValue);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
+            registerButton(getSlot("LanguageMigrator.EntryEditMenu.KeepRemovedFromFile", 2), 
+                lgm.getItem("LanguageMigrator.EntryEditMenu.KeepRemovedFromFile", player, false), 
+                (p, e) -> {
+                    finalValue = null;
+                    if (e.isShiftClick()) {
+                        migrationEntry.setSelectedForMigration(true);
+                        migrationEntry.setUserValue(null);
+                        languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+                    }
+                }, null);
         }
-        inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.EditFinalValue", 3), lgm.getItem("LanguageMigrator.EntryEditMenu.EditFinalValue", player, false));
+        registerButton(getSlot("LanguageMigrator.EntryEditMenu.EditFinalValue", 3), 
+            lgm.getItem("LanguageMigrator.EntryEditMenu.EditFinalValue", player, false), 
+            (p, e) -> {
+                p.closeInventory();
+                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%current_value%", String.valueOf(finalValue), false);
+                p.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValue", p, true));
+                p.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValueFormat", p, true));
+                playerMenuUtility.setData("final_value_input", true, true);
+            }, null);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%migration_entry_final_value%", finalValue, false);
         inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.FinalValueDisplay", 7), lgm.getItem("LanguageMigrator.EntryEditMenu.FinalValueDisplay", player, true));
-        // with hint to close menu via Esc to not save changes
-        inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.Confirm", 8), lgm.getItem("LanguageMigrator.EntryEditMenu.Close", player, false));
+        registerButton(getSlot("LanguageMigrator.EntryEditMenu.Confirm", 8), 
+            lgm.getItem("LanguageMigrator.EntryEditMenu.Close", player, false), 
+            (p, e) -> {
+                if (finalValue == null) {
+                    migrationEntry.setSelectedForMigration(true);
+                    migrationEntry.setUserValue(null);
+                } else {
+                    migrationEntry.setUserValue(finalValue);
+                    migrationEntry.setSelectedForMigration(true);
+                }
+                languageMigrationMenu.openWithMigrationEntry(migrationEntry);
+            }, null);
     }
 
     @EventHandler

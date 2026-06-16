@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.languagemigration;
 
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -34,14 +35,7 @@ public class LanguageMigratorMainMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        Player player = (Player) inventoryClickEvent.getWhoClicked();
-        ItemStack clickedItem = inventoryClickEvent.getCurrentItem();
-
-        if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.NormalMigrate", player, false))) {
-            new NormalLanguageSelectMenu(playerMenuUtility, this).open();
-        } else if (clickedItem.isSimilar(lgm.getItem("LanguageMigrator.CustomMigrate", player, false))) {
-            //new CustomLanguageSelectMenu(playerMenuUtility, this).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -57,10 +51,18 @@ public class LanguageMigratorMainMenu extends Menu {
     @Override
     public void setMenuItems() {
         setFillerGlass();
-        // just for normal migrations where the player has to select a file which has a resource file
-        inventory.setItem(getSlot("LanguageMigrator.NormalMigrate", 11), lgm.getItem("LanguageMigrator.NormalMigrate", playerMenuUtility.getOwner(), false));
-        // the player can select both real and resource file thus creating custom matches.
-        inventory.setItem(getSlot("LanguageMigrator.CustomMigrate", 15), lgm.getItem("LanguageMigrator.CustomMigrate", playerMenuUtility.getOwner(), false));
-        // TODO might work on an option to create entirely new files using a translation service, but for that we would have to add an api key to the config, because i aint paying xd.
+        Player player = playerMenuUtility.getOwner();
+
+        registerButton(getSlot("LanguageMigrator.NormalMigrate", 11), 
+            lgm.getItem("LanguageMigrator.NormalMigrate", player, false), 
+            new PermissionAction("AdminPanel.LanguageMigrator.Open", (p, e) -> {
+                new NormalLanguageSelectMenu(playerMenuUtility, this).open();
+            }, lgm), null);
+
+        registerButton(getSlot("LanguageMigrator.CustomMigrate", 15), 
+            lgm.getItem("LanguageMigrator.CustomMigrate", player, false), 
+            new PermissionAction("AdminPanel.LanguageMigrator.Open", (p, e) -> {
+                // CustomLanguageSelectMenu not yet implemented
+            }, lgm), null);
     }
 }
