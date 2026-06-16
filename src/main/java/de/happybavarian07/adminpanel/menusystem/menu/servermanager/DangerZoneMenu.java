@@ -64,7 +64,7 @@ public class DangerZoneMenu extends Menu {
                     player1,
                     this
             );
-        }), null);
+        }, lgm), null);
         registerButton(getSlot(path + "ServerRestart", 15), lgm.getItem(path + "ServerRestart", player, false), new PermissionAction("AdminPanel.ServerRestart", (player1, event) -> {
             Utils.openConfirmationMenu(
                     lgm.getMessage("DangerZoneMenu.RestartReason", player1, true),
@@ -72,7 +72,7 @@ public class DangerZoneMenu extends Menu {
                     player1,
                     this
             );
-        }), null);
+        }, lgm), null);
         registerButton(getSlot(path + "BackToMain", 22), lgm.getItem(path + "BackToMain", player, false), (player1, event) -> {
             closeAndReturnOrClose();
         }, null);

@@ -8,6 +8,7 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,7 +21,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.ServerListPingEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,108 +50,7 @@ public class ServerManagerMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "ServerManager.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(path + "Broadcast", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.Broadcast")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            player.closeInventory();
-            playerMenuUtility.addData("serverManagerBroadcastMessage", true);
-            player.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player, true));
-        } else if (item.isSimilar(lgm.getItem(path + "ChatManagerItem", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Open")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "WhiteListMenuItem", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.Whitelist")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "KickAllPlayers", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.KickAllPlayers")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            List<Player> playersToKick = new ArrayList<>();
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                if (!online.hasPermission("AdminPanel.Bypass.KickAll")) {
-                    playersToKick.add(online);
-                }
-            }
-            playersToKick.remove(player);
-            KickAllPlayersEvent kickAllPlayersEvent = new KickAllPlayersEvent(player, playersToKick);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
-                if (!kickAllPlayersEvent.isCancelled()) {
-                    for (Player online : playersToKick) {
-                        AdminPanelUtils.kick(player, online.getName(),
-                                lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online, false),
-                                lgm.getMessage("Player.ServerManager.KickAllPlayersSource", player, false));
-                    }
-                    player.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", player, true));
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "MaintenanceMode.true", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
-                if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.getPluginStateManager().setInMaintenanceMode(false);
-                    if (!plugin.getPluginStateManager().isInMaintenanceMode()) {
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", player, true));
-                        super.open();
-                    }
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(path + "MaintenanceMode.false", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.MaintenanceMode")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            MaintenanceModeToggleEvent kickAllPlayersEvent = new MaintenanceModeToggleEvent(player);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(kickAllPlayersEvent);
-                if (!kickAllPlayersEvent.isCancelled()) {
-                    plugin.getPluginStateManager().setInMaintenanceMode(true);
-                    if (plugin.getPluginStateManager().isInMaintenanceMode()) {
-                        for (Player online : Bukkit.getOnlinePlayers()) {
-                            if (!online.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) {
-                                online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
-                            }
-                        }
-                        Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", player, true));
-                    }
-                    super.open();
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -171,16 +70,83 @@ public class ServerManagerMenu extends Menu implements Listener {
         String path = "ServerManager.";
 
         // Items
-        inventory.setItem(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player, false));
-        inventory.setItem(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false));
-        inventory.setItem(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player, false));
-        inventory.setItem(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player, false));
+        registerButton(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player, false),
+                new PermissionAction("AdminPanel.ServerManagment.Broadcast", (p, e) -> {
+                    p.closeInventory();
+                    playerMenuUtility.addData("serverManagerBroadcastMessage", true);
+                    p.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", p, true));
+                }, lgm), null);
+        registerButton(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false),
+                new PermissionAction("AdminPanel.ServerManagment.ChatManager.Open", (p, e) ->
+                        new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+        registerButton(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player, false),
+                new PermissionAction("AdminPanel.ServerManagment.Whitelist", (p, e) ->
+                        new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+        registerButton(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player, false),
+                new PermissionAction("AdminPanel.ServerManagment.KickAllPlayers", (p, e) -> {
+                    List<Player> playersToKick = new ArrayList<>();
+                    for (Player online : Bukkit.getOnlinePlayers()) {
+                        if (!online.hasPermission("AdminPanel.Bypass.KickAll")) playersToKick.add(online);
+                    }
+                    playersToKick.remove(p);
+                    KickAllPlayersEvent event = new KickAllPlayersEvent(p, playersToKick);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled()) {
+                            for (Player online : playersToKick) {
+                                AdminPanelUtils.kick(p, online.getName(),
+                                        lgm.getMessage("Player.ServerManager.KickAllPlayersReason", online, false),
+                                        lgm.getMessage("Player.ServerManager.KickAllPlayersSource", p, false));
+                            }
+                            p.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", p, true));
+                        }
+                    } catch (NotAPanelEventException ex) {
+                        ex.printStackTrace();
+                    }
+                }, lgm), null);
         if (plugin.getPluginStateManager().isInMaintenanceMode()) {
-            inventory.setItem(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player, false));
+            registerButton(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player, false),
+                    new PermissionAction("AdminPanel.ServerManagment.MaintenanceMode", (p, e) -> {
+                        MaintenanceModeToggleEvent event = new MaintenanceModeToggleEvent(p);
+                        try {
+                            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                            if (!event.isCancelled()) {
+                                plugin.getPluginStateManager().setInMaintenanceMode(false);
+                                if (!plugin.getPluginStateManager().isInMaintenanceMode()) {
+                                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOff", p, true));
+                                }
+                            }
+                        } catch (NotAPanelEventException ex) {
+                            ex.printStackTrace();
+                        }
+                        super.open();
+                    }, lgm), null);
         } else {
-            inventory.setItem(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player, false));
+            registerButton(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player, false),
+                    new PermissionAction("AdminPanel.ServerManagment.MaintenanceMode", (p, e) -> {
+                        MaintenanceModeToggleEvent event = new MaintenanceModeToggleEvent(p);
+                        try {
+                            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                            if (!event.isCancelled()) {
+                                plugin.getPluginStateManager().setInMaintenanceMode(true);
+                                if (plugin.getPluginStateManager().isInMaintenanceMode()) {
+                                    for (Player online : Bukkit.getOnlinePlayers()) {
+                                        if (!online.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode")) {
+                                            online.kickPlayer(lgm.getMessage("Player.ServerManager.MaintenanceMode", online, false));
+                                        }
+                                    }
+                                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.MaintenanceModeOn", p, true));
+                                }
+                            }
+                        } catch (NotAPanelEventException ex) {
+                            ex.printStackTrace();
+                        }
+                        super.open();
+                    }, lgm), null);
         }
-        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false));
+        registerButton(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 
     @EventHandler

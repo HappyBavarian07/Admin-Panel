@@ -10,6 +10,7 @@ import de.happybavarian07.adminpanel.events.server.MuteChatEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,7 +20,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class ChatManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -46,73 +46,7 @@ public class ChatManagerMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "ChatManager.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(path + "ClearChat", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Clear")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            ClearChatEvent clearChatEvent = new ClearChatEvent(player, 100);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
-                if (!clearChatEvent.isCancelled()) {
-                    AdminPanelUtils.clearChat(clearChatEvent.getLines(), false, player);
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", player, true));
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "UnMuteChat", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            MuteChatEvent muteChatEvent = new MuteChatEvent(player, false);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
-                if (!muteChatEvent.isCancelled()) {
-                    plugin.getPluginStateManager().setGlobalChatMuted(false);
-                    super.open();
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Header", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Message", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Footer", player, true));
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "MuteChat", player, false))) {
-            if (!player.hasPermission("AdminPanel.ServerManagment.ChatManager.Mute")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            MuteChatEvent muteChatEvent = new MuteChatEvent(player, true);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(muteChatEvent);
-                if (!muteChatEvent.isCancelled()) {
-                    plugin.getPluginStateManager().setGlobalChatMuted(true);
-                    super.open();
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Header", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Message", player, true));
-                    Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Footer", player, true));
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -131,13 +65,59 @@ public class ChatManagerMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "ChatManager.";
 
-        inventory.setItem(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player, false));
+        registerButton(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player, false),
+                new PermissionAction("AdminPanel.ServerManagment.ChatManager.Clear", (p, e) -> {
+                    ClearChatEvent clearChatEvent = new ClearChatEvent(p, 100);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
+                        if (!clearChatEvent.isCancelled()) {
+                            AdminPanelUtils.clearChat(clearChatEvent.getLines(), false, p);
+                            Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Header", p, true));
+                            Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Message", p, true));
+                            Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", p, true));
+                        }
+                    } catch (NotAPanelEventException ex) {
+                        ex.printStackTrace();
+                    }
+                }, lgm), null);
         if (plugin.getPluginStateManager().isGlobalChatMuted()) {
-            inventory.setItem(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player, false));
+            registerButton(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player, false),
+                    new PermissionAction("AdminPanel.ServerManagment.ChatManager.Mute", (p, e) -> {
+                        MuteChatEvent event = new MuteChatEvent(p, false);
+                        try {
+                            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                            if (!event.isCancelled()) {
+                                plugin.getPluginStateManager().setGlobalChatMuted(false);
+                                super.open();
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Header", p, true));
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Message", p, true));
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Footer", p, true));
+                            }
+                        } catch (NotAPanelEventException ex) {
+                            ex.printStackTrace();
+                        }
+                    }, lgm), null);
         } else {
-            inventory.setItem(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player, false));
+            registerButton(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player, false),
+                    new PermissionAction("AdminPanel.ServerManagment.ChatManager.Mute", (p, e) -> {
+                        MuteChatEvent event = new MuteChatEvent(p, true);
+                        try {
+                            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                            if (!event.isCancelled()) {
+                                plugin.getPluginStateManager().setGlobalChatMuted(true);
+                                super.open();
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Header", p, true));
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Message", p, true));
+                                Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Footer", p, true));
+                            }
+                        } catch (NotAPanelEventException ex) {
+                            ex.printStackTrace();
+                        }
+                    }, lgm), null);
         }
-        inventory.setItem(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false));
+        registerButton(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 
     @EventHandler

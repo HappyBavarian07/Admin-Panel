@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,7 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class WhitelistManagerMenu extends Menu implements Listener {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -40,32 +40,7 @@ public class WhitelistManagerMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "ServerManager.WhitelistMenu.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(path + "AddPlayer", player, false))) {
-            playerMenuUtility.addData("WhitelistManagerAddPlayer", true);
-            player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem(path + "RemovePlayer", player, false))) {
-            playerMenuUtility.addData("WhitelistManagerRemovePlayer", true);
-            player.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem(path + "ListPlayers", player, false))) {
-            new WhitelistedPlayersMenu(playerMenuUtility, this).open();
-        } else if (item.isSimilar(lgm.getItem(path + "TurnOn", player, false))) {
-            Bukkit.setWhitelist(true);
-        } else if (item.isSimilar(lgm.getItem(path + "TurnOff", player, false))) {
-            Bukkit.setWhitelist(false);
-        } else if (item.isSimilar(lgm.getItem(path + "Reload", player, false))) {
-            Bukkit.reloadWhitelist();
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            new ServerManagerMenu(playerMenuUtility).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -84,14 +59,23 @@ public class WhitelistManagerMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "ServerManager.WhitelistMenu.";
 
-        inventory.setItem(getSlot(path + "AddPlayer", 11), lgm.getItem(path + "AddPlayer", player, false));
-        inventory.setItem(getSlot(path + "AddPlayer", 13), lgm.getItem(path + "RemovePlayer", player, false));
-        inventory.setItem(getSlot(path + "AddPlayer", 15), lgm.getItem(path + "ListPlayers", player, false));
-        inventory.setItem(getSlot(path + "TurnOn", 3), lgm.getItem(path + "TurnOn", player, false));
-        inventory.setItem(getSlot(path + "TurnOff", 5), lgm.getItem(path + "TurnOff", player, false));
-        inventory.setItem(getSlot(path + "Reload", 4), lgm.getItem(path + "Reload", player, false));
-
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
+        registerButton(getSlot(path + "AddPlayer", 11), lgm.getItem(path + "AddPlayer", player, false), (p, e) -> {
+            playerMenuUtility.addData("WhitelistManagerAddPlayer", true);
+            p.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", p, true));
+            p.closeInventory();
+        }, null);
+        registerButton(getSlot(path + "AddPlayer", 13), lgm.getItem(path + "RemovePlayer", player, false), (p, e) -> {
+            playerMenuUtility.addData("WhitelistManagerRemovePlayer", true);
+            p.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager.PleaseEnterName", p, true));
+            p.closeInventory();
+        }, null);
+        registerButton(getSlot(path + "AddPlayer", 15), lgm.getItem(path + "ListPlayers", player, false),
+                (p, e) -> new WhitelistedPlayersMenu(playerMenuUtility, this).open(), null);
+        registerButton(getSlot(path + "TurnOn", 3), lgm.getItem(path + "TurnOn", player, false), (p, e) -> Bukkit.setWhitelist(true), null);
+        registerButton(getSlot(path + "TurnOff", 5), lgm.getItem(path + "TurnOff", player, false), (p, e) -> Bukkit.setWhitelist(false), null);
+        registerButton(getSlot(path + "Reload", 4), lgm.getItem(path + "Reload", player, false), (p, e) -> Bukkit.reloadWhitelist(), null);
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new ServerManagerMenu(playerMenuUtility).open(), lgm), null);
     }
 
     @EventHandler
