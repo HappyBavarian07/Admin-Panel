@@ -11,13 +11,13 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class PluginSettingsMenu extends Menu {
@@ -48,133 +48,7 @@ public class PluginSettingsMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "PluginManager.Settings.";
-        boolean enabled = currentPlugin.isEnabled();
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(path + "Enable", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Enable")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginEnableEvent enableEvent = new PluginEnableEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(enableEvent);
-                if (!enableEvent.isCancelled()) {
-                    if (!enabled)
-                        Bukkit.getPluginManager().enablePlugin(currentPlugin);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem("PluginManager.PluginDescription", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.PluginDescription")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            // Open Plugin Description Menu and put current plugin in the playerdata
-            playerMenuUtility.addData("CurrentSelectedPlugin", currentPlugin);
-            new PluginDescriptionMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem(path + "Disable", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Disable")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginDisableEvent disableEvent = new PluginDisableEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(disableEvent);
-                if (!disableEvent.isCancelled()) {
-                    if (enabled)
-                        Bukkit.getPluginManager().disablePlugin(currentPlugin);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Reload", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Reload")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginReloadEvent reloadEvent = new PluginReloadEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(reloadEvent);
-                if (!reloadEvent.isCancelled()) {
-                    if (enabled)
-                        pluginUtils.reload(currentPlugin);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Restart", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Restart")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginRestartEvent restartEvent = new PluginRestartEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(restartEvent);
-                if (!restartEvent.isCancelled()) {
-                    if (enabled) {
-                        Bukkit.getPluginManager().disablePlugin(currentPlugin);
-                        Bukkit.getPluginManager().enablePlugin(currentPlugin);
-                    }
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Unload", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Unload")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginUnloadEvent unloadEvent = new PluginUnloadEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(unloadEvent);
-                if (!unloadEvent.isCancelled()) {
-                    if (pluginUtils.getPluginByName(currentPlugin.getName()) != null)
-                        pluginUtils.unload(currentPlugin);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Load", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Load")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            PluginLoadEvent loadEvent = new PluginLoadEvent(player, currentPlugin);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(loadEvent);
-                if (!loadEvent.isCancelled()) {
-                    if (pluginUtils.getPluginByName(currentPlugin.getName()) == null)
-                        pluginUtils.load(currentPlugin);
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Commands.Item", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Permissions")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginCommandsListMenu(playerMenuUtility, new PluginSettingsMenu(playerMenuUtility)).open();
-        } else if (item.isSimilar(lgm.getItem(path + "Permissions.Item", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.PluginSettings.Commands")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginPermissionsListMenu(playerMenuUtility, this).open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), new AdminPanelStartMenu(playerMenuUtility)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -194,16 +68,70 @@ public class PluginSettingsMenu extends Menu {
         String path = "PluginManager.Settings.";
 
         // Items
-        inventory.setItem(getSlot("PluginManager.PluginDescription", 5), lgm.getItem("PluginManager.PluginDescription", player, false));
-        inventory.setItem(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player, false));
-        inventory.setItem(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player, false));
-        inventory.setItem(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player, false));
-        inventory.setItem(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player, false));
-        inventory.setItem(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player, false));
-        inventory.setItem(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player, false));
-        inventory.setItem(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player, false));
-        inventory.setItem(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player, false));
-
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
+        registerButton(getSlot("PluginManager.PluginDescription", 5), lgm.getItem("PluginManager.PluginDescription", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.PluginDescription", (p, e) -> {
+                    playerMenuUtility.addData("CurrentSelectedPlugin", currentPlugin);
+                    new PluginDescriptionMenu(playerMenuUtility).open();
+                }, lgm), null);
+        registerButton(getSlot(path + "Enable", 10), lgm.getItem(path + "Enable", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Enable", (p, e) -> {
+                    PluginEnableEvent event = new PluginEnableEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && !currentPlugin.isEnabled()) Bukkit.getPluginManager().enablePlugin(currentPlugin);
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Disable", (p, e) -> {
+                    PluginDisableEvent event = new PluginDisableEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && currentPlugin.isEnabled()) Bukkit.getPluginManager().disablePlugin(currentPlugin);
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Reload", (p, e) -> {
+                    PluginReloadEvent event = new PluginReloadEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && currentPlugin.isEnabled()) pluginUtils.reload(currentPlugin);
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Restart", (p, e) -> {
+                    PluginRestartEvent event = new PluginRestartEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && currentPlugin.isEnabled()) {
+                            Bukkit.getPluginManager().disablePlugin(currentPlugin);
+                            Bukkit.getPluginManager().enablePlugin(currentPlugin);
+                        }
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Unload", (p, e) -> {
+                    PluginUnloadEvent event = new PluginUnloadEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && pluginUtils.getPluginByName(currentPlugin.getName()) != null) pluginUtils.unload(currentPlugin);
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Load", (p, e) -> {
+                    PluginLoadEvent event = new PluginLoadEvent(p, currentPlugin);
+                    try {
+                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                        if (!event.isCancelled() && pluginUtils.getPluginByName(currentPlugin.getName()) == null) pluginUtils.load(currentPlugin);
+                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                }, lgm), null);
+        registerButton(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Permissions", (p, e) ->
+                        new PluginCommandsListMenu(playerMenuUtility, new PluginSettingsMenu(playerMenuUtility)).open(), lgm), null);
+        registerButton(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player, false),
+                new PermissionAction("AdminPanel.PluginManager.PluginSettings.Commands", (p, e) ->
+                        new PluginPermissionsListMenu(playerMenuUtility, this).open(), lgm), null);
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), new AdminPanelStartMenu(playerMenuUtility)).open(), lgm), null);
     }
 }

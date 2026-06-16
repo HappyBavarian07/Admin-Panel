@@ -7,9 +7,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -64,9 +66,23 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
     @Override
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
-        inventory.setItem(getSlots() - 9, lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false));
-        inventory.setItem(getSlots() - 8, lgm.getItem("PluginManager.Load", player, false));
-        inventory.setItem(getSlots() - 7, lgm.getItem("PluginManager.Install", player, false));
+        registerButton(getSlots() - 9, lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false),
+                new PermissionAction("AdminPanel.PluginManager.AutoUpdateMenu", (p, e) -> {
+                    if (plugin.getAutoUpdaterManager() == null) {
+                        p.sendMessage(lgm.getMessage("Player.General.NullMenu", p, true));
+                        plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefixExtension.ADMINPANEL_GUI, true);
+                        return;
+                    }
+                    new PluginAutoUpdaterMenu(playerMenuUtility).open();
+                }, lgm), null);
+        registerButton(getSlots() - 8, lgm.getItem("PluginManager.Load", player, false),
+                new PermissionAction("AdminPanel.PluginManager.LoadPlugins", (p, e) -> {
+                    playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
+                    p.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", p, true));
+                    p.closeInventory();
+                }, lgm), null);
+        registerButton(getSlots() - 7, lgm.getItem("PluginManager.Install", player, false),
+                new PermissionAction("AdminPanel.PluginManager.InstallPlugins", (p, e) -> new PluginInstallMenu(playerMenuUtility).open(), lgm), null);
     }
 
     @Override
@@ -77,41 +93,12 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
                         item.getItemMeta().getPersistentDataContainer().get(pluginItemNamespacedKey, PersistentDataType.STRING)))
                 : indexOnPage);
         playerMenuUtility.setData("CurrentSelectedPlugin", selectedPlugin, true);
-        new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+        new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
     }
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        String path = "PluginManager.";
-        ItemStack installItem = lgm.getItem(path + "Install", player, false);
-        if (item.getItemMeta().getDisplayName().equals(installItem.getItemMeta().getDisplayName()) &&
-                item.getType().equals(installItem.getType())) {
-            if (!player.hasPermission("AdminPanel.PluginManager.InstallPlugins")) {
-                player.sendMessage(lgm.getPermissionMessage(player, "AdminPanel.PluginManager.InstallPlugins"));
-                return;
-            }
-            new PluginInstallMenu(playerMenuUtility).open();
-        } else if (item.isSimilar(lgm.getItem(path + "Load", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.LoadPlugins")) {
-                player.sendMessage(lgm.getPermissionMessage(player, "AdminPanel.PluginManager.LoadPlugins"));
-                return;
-            }
-            playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false))) {
-            if (!player.hasPermission("AdminPanel.PluginManager.AutoUpdateMenu")) {
-                player.sendMessage(lgm.getPermissionMessage(player, "AdminPanel.PluginManager.AutoUpdateMenu"));
-                return;
-            }
-            if (plugin.getAutoUpdaterManager() == null) {
-                player.sendMessage(lgm.getMessage("Player.General.NullMenu", player, true));
-                plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefixExtension.ADMINPANEL_GUI, true);
-                return;
-            }
-            new PluginAutoUpdaterMenu(playerMenuUtility).open();
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     public ItemStack getPageItem(Plugin plugin) {

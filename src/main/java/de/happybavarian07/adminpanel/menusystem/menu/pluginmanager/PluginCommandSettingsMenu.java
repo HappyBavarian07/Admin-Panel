@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -13,7 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 
@@ -44,31 +44,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String path = "PluginManager.Settings.Commands.Settings.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(path + "Register", player, false))) {
-            if (!currentCommand.isRegistered()) {
-                currentCommand.register(getCommandMap());
-                plugin.getDisabledCommands().remove(currentCommand.getName());
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Unregister", player, false))) {
-            if (currentCommand.isRegistered()) {
-                currentCommand.unregister(getCommandMap());
-                plugin.getDisabledCommands().add(currentCommand.getName());
-            }
-        } else if (item.isSimilar(lgm.getItem(path + "Execute", player, false))) {
-            if (currentCommand.isRegistered()) {
-                currentCommand.execute(player, currentCommand.getLabel(), new String[]{});
-            }
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
-            new PluginCommandsListMenu(playerMenuUtility, this).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -86,10 +62,28 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
         String path = "PluginManager.Settings.Commands.Settings.";
-        inventory.setItem(getSlot(path + "Register", 0), lgm.getItem(path + "Register", player, false));
-        inventory.setItem(getSlot(path + "Unregister", 1), lgm.getItem(path + "Unregister", player, false));
-        inventory.setItem(getSlot(path + "Execute", 2), lgm.getItem(path + "Execute", player, false));
-        inventory.setItem(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false));
+        registerButton(getSlot(path + "Register", 0), lgm.getItem(path + "Register", player, false), (p, e) -> {
+            if (!currentCommand.isRegistered()) {
+                currentCommand.register(getCommandMap());
+                plugin.getDisabledCommands().remove(currentCommand.getName());
+            }
+        }, null);
+        registerButton(getSlot(path + "Unregister", 1), lgm.getItem(path + "Unregister", player, false), (p, e) -> {
+            if (currentCommand.isRegistered()) {
+                currentCommand.unregister(getCommandMap());
+                plugin.getDisabledCommands().add(currentCommand.getName());
+            }
+        }, null);
+        registerButton(getSlot(path + "Execute", 2), lgm.getItem(path + "Execute", player, false), (p, e) -> {
+            if (currentCommand.isRegistered()) {
+                currentCommand.execute(p, currentCommand.getLabel(), new String[]{});
+            }
+        }, null);
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                    playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
+                    new PluginCommandsListMenu(playerMenuUtility, this).open();
+                }, lgm), null);
     }
 
     public CommandMap getCommandMap() {

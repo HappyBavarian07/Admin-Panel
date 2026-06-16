@@ -1,8 +1,10 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 public class PluginDescriptionMenu extends Menu implements Listener {
@@ -40,39 +41,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String itemPath = "PluginManager.PluginDescriptionMenu.";
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(lgm.getItem(itemPath + "LoadFromResourceID", player, false))) {
-            // Try to read ResourceID from Description Manager and get description via that and set it to the plugin
-            // If not found send a message asking them to set it in chat
-            int resourceID = plugin.getPluginDescriptionManager().getResourceID(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class).getName());
-            if (resourceID != -1) {
-                // Get Description from ResourceID
-                String description = plugin.getPluginDescriptionManager().getDescriptionFromResourceID(resourceID);
-                plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), description);
-                player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.LoadedFromResourceID", player, true));
-                new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-            } else {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChat", player, true));
-                player.closeInventory();
-                playerMenuUtility.addData("SetResourceIDInChat", true);
-            }
-        } else if (item.isSimilar(lgm.getItem(itemPath + "SetWithChat", player, false))) {
-            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetDescriptionInChat", player, true));
-            player.closeInventory();
-            playerMenuUtility.addData("SetDescriptionInChat", true);
-        } else if (item.isSimilar(lgm.getItem("General.Close", null, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @EventHandler
@@ -84,7 +53,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
             e.setCancelled(true);
             plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), e.getMessage());
             player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetDescriptionInChat", player, true));
-            new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+            new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
             playerMenuUtility.removeData("SetDescriptionInChat");
         } else if (playerMenuUtility.getData("SetResourceIDInChat") != null) {
             e.setCancelled(true);
@@ -92,7 +61,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
                 int resourceID = Integer.parseInt(e.getMessage());
                 plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), plugin.getPluginDescriptionManager().getDescriptionFromResourceID(resourceID));
                 player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetResourceInChat", player, true));
-                new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
+                new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
                 playerMenuUtility.removeData("SetResourceIDInChat");
             } catch (NumberFormatException ex) {
                 player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChatError", player, true));
@@ -117,8 +86,26 @@ public class PluginDescriptionMenu extends Menu implements Listener {
         Player player = playerMenuUtility.getOwner();
         String path = "PluginManager.PluginDescriptionMenu.";
 
-        inventory.setItem(getSlot(path + "LoadFromResourceID", 3), lgm.getItem(path + "LoadFromResourceID", player, false));
-        inventory.setItem(getSlot(path + "SetWithChat", 5), lgm.getItem(path + "SetWithChat", player, false));
-        inventory.setItem(8, lgm.getItem("General.Close", player, false));
+        registerButton(getSlot(path + "LoadFromResourceID", 3), lgm.getItem(path + "LoadFromResourceID", player, false), (p, e) -> {
+            int resourceID = plugin.getPluginDescriptionManager().getResourceID(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class).getName());
+            if (resourceID != -1) {
+                String description = plugin.getPluginDescriptionManager().getDescriptionFromResourceID(resourceID);
+                plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), description);
+                p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.LoadedFromResourceID", p, true));
+                new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            } else {
+                p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChat", p, true));
+                p.closeInventory();
+                playerMenuUtility.addData("SetResourceIDInChat", true);
+            }
+        }, null);
+        registerButton(getSlot(path + "SetWithChat", 5), lgm.getItem(path + "SetWithChat", player, false), (p, e) -> {
+            p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetDescriptionInChat", p, true));
+            p.closeInventory();
+            playerMenuUtility.addData("SetDescriptionInChat", true);
+        }, null);
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 }

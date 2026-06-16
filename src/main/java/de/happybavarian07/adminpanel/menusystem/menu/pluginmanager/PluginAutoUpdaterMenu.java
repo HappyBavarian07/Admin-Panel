@@ -10,6 +10,7 @@ import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -67,8 +68,24 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
 
     @Override
     public void postSetMenuItems() {
-        inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.AddPlugin", 46), lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", playerMenuUtility.getOwner(), false));
-        inventory.setItem(getSlot("PluginManager.AutoUpdateMenu.RemovePlugin", 47), lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", playerMenuUtility.getOwner(), false));
+        Player player = playerMenuUtility.getOwner();
+        registerButton(getSlot("PluginManager.AutoUpdateMenu.AddPlugin", 46),
+                lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false),
+                (p, e) -> {
+                    playerMenuUtility.addData("AddPluginMetaData", true);
+                    p.closeInventory();
+                    p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", p, false));
+                }, null);
+        registerButton(getSlot("PluginManager.AutoUpdateMenu.RemovePlugin", 47),
+                lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false),
+                (p, e) -> {
+                    playerMenuUtility.addData("RemovePluginSelectMetaData", true);
+                    p.closeInventory();
+                    p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", p, false));
+                }, null);
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close",
+                        (p, e) -> new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 
     @Override
@@ -96,18 +113,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false))) {
-            playerMenuUtility.addData("AddPluginMetaData", true);
-            player.closeInventory();
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", player, false));
-        } else if (item.isSimilar(lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false))) {
-            playerMenuUtility.addData("RemovePluginSelectMetaData", true);
-            player.closeInventory();
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", player, false));
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     public ItemStack getPageItem(Plugin plugin) {
