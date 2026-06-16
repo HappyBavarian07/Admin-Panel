@@ -5,6 +5,7 @@ import de.happybavarian07.adminpanel.events.world.WorldCreateEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -51,101 +52,7 @@ public class WorldCreateMenu extends Menu implements Listener {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-        String itemPath = "WorldManager.CreateMenu.";
-        ItemStack nameItem = lgm.getItem(itemPath + "Name", player, false);
-        ItemMeta nameMeta = nameItem.getItemMeta();
-        List<String> nameLore = new ArrayList<>();
-        for (String string : nameItem.getItemMeta().getLore()) {
-            nameLore.add(string.replace("%name%", this.worldName));
-        }
-        nameMeta.setLore(nameLore);
-        nameItem.setItemMeta(nameMeta);
-
-        ItemStack typeItem = lgm.getItem(itemPath + "Type." + worldType.toString(), player, false);
-        ItemMeta typeMeta = typeItem.getItemMeta();
-        List<String> typeLore = new ArrayList<>();
-        for (String string : typeMeta.getLore()) {
-            typeLore.add(string.replace("%type%", this.worldType.toString()));
-        }
-        typeMeta.setLore(typeLore);
-        typeItem.setItemMeta(typeMeta);
-
-        ItemStack environmentItem = lgm.getItem(itemPath + "Environment." + worldEnvironment.toString(), player, false);
-        ItemMeta environmentMeta = environmentItem.getItemMeta();
-        List<String> environmentLore = new ArrayList<>();
-        for (String string : environmentMeta.getLore()) {
-            environmentLore.add(string.replace("%environment%", this.worldEnvironment.toString()));
-        }
-        environmentMeta.setLore(environmentLore);
-        environmentItem.setItemMeta(environmentMeta);
-
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-
-        if (item == null || !item.hasItemMeta()) return;
-        if (item.isSimilar(nameItem)) {
-            playerMenuUtility.addData("createWorldSetName", true);
-            player.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player, true));
-            player.closeInventory();
-        } else if (item.isSimilar(typeItem)) {
-            if (this.worldType == WorldType.NORMAL) {
-                this.worldType = WorldType.FLAT;
-            } else if (this.worldType == WorldType.FLAT) {
-                this.worldType = WorldType.AMPLIFIED;
-            } else if (this.worldType == WorldType.AMPLIFIED) {
-                this.worldType = WorldType.LARGE_BIOMES;
-            } else if (this.worldType == WorldType.LARGE_BIOMES) {
-                this.worldType = WorldType.NORMAL;
-            }
-            super.open();
-        } else if (item.isSimilar(environmentItem)) {
-            if (this.worldEnvironment == World.Environment.NORMAL) {
-                this.worldEnvironment = World.Environment.NETHER;
-            } else if (this.worldEnvironment == World.Environment.NETHER) {
-                this.worldEnvironment = World.Environment.THE_END;
-            } else if (this.worldEnvironment == World.Environment.THE_END) {
-                this.worldEnvironment = World.Environment.NORMAL;
-            }
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(itemPath + "GenerateStructures.true", player, false))) {
-            this.generateStructures = false;
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(itemPath + "GenerateStructures.false", player, false))) {
-            this.generateStructures = true;
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(itemPath + "Hardcore.true", player, false))) {
-            this.hardcore = false;
-            super.open();
-        } else if (item.isSimilar(lgm.getItem(itemPath + "Hardcore.false", player, false))) {
-            this.hardcore = true;
-            super.open();
-        } else if (item.isSimilar(lgm.getItem("General.Close", player, false))) {
-            if (!player.hasPermission("AdminPanel.Button.Close")) {
-                player.sendMessage(noPerms);
-                return;
-            }
-            new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-        } else if (item.isSimilar(lgm.getItem(itemPath + "CreateWorld", player, false))) {
-            WorldCreateEvent worldCreateEvent = new WorldCreateEvent(player, worldName, worldType, worldEnvironment, generateStructures, hardcore);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);
-                if (!worldCreateEvent.isCancelled()) {
-                    WorldCreator worldCreator = new WorldCreator(worldCreateEvent.getName());
-                    worldCreator.type(worldCreateEvent.getWorldType());
-                    worldCreator.environment(worldCreateEvent.getWorldEnvironment());
-                    worldCreator.generateStructures(worldCreateEvent.isGenerateStructures());
-                    worldCreator.hardcore(worldCreateEvent.isHardcore());
-                    World world = worldCreator.createWorld();
-                    player.closeInventory();
-                    assert world != null;
-                    player.teleport(world.getSpawnLocation());
-                }
-            } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
-            }
-
-        }
+        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -171,7 +78,11 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         nameMeta.setLore(nameLore);
         nameItem.setItemMeta(nameMeta);
-        inventory.setItem(getSlot(path + "Name", 10), nameItem);
+        registerButton(getSlot(path + "Name", 10), nameItem, (p, e) -> {
+            playerMenuUtility.addData("createWorldSetName", true);
+            p.sendMessage(lgm.getMessage("Player.WorldManager.CreateMenu.Name", p, true));
+            p.closeInventory();
+        }, null);
 
         ItemStack typeItem = lgm.getItem(path + "Type." + worldType.toString(), player, false);
         ItemMeta typeMeta = typeItem.getItemMeta();
@@ -181,7 +92,13 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         typeMeta.setLore(typeLore);
         typeItem.setItemMeta(typeMeta);
-        inventory.setItem(getSlot(path + "Type." + worldType.toString(), 12), typeItem);
+        registerButton(getSlot(path + "Type." + worldType.toString(), 12), typeItem, (p, e) -> {
+            if (this.worldType == WorldType.NORMAL) this.worldType = WorldType.FLAT;
+            else if (this.worldType == WorldType.FLAT) this.worldType = WorldType.AMPLIFIED;
+            else if (this.worldType == WorldType.AMPLIFIED) this.worldType = WorldType.LARGE_BIOMES;
+            else this.worldType = WorldType.NORMAL;
+            super.open();
+        }, null);
 
         ItemStack environmentItem = lgm.getItem(path + "Environment." + worldEnvironment.toString(), player, false);
         ItemMeta environmentMeta = environmentItem.getItemMeta();
@@ -191,22 +108,50 @@ public class WorldCreateMenu extends Menu implements Listener {
         }
         environmentMeta.setLore(environmentLore);
         environmentItem.setItemMeta(environmentMeta);
-        inventory.setItem(getSlot(path + "Environment." + worldEnvironment.toString(), 14), environmentItem);
+        registerButton(getSlot(path + "Environment." + worldEnvironment.toString(), 14), environmentItem, (p, e) -> {
+            if (this.worldEnvironment == World.Environment.NORMAL) this.worldEnvironment = World.Environment.NETHER;
+            else if (this.worldEnvironment == World.Environment.NETHER) this.worldEnvironment = World.Environment.THE_END;
+            else this.worldEnvironment = World.Environment.NORMAL;
+            super.open();
+        }, null);
 
         if (generateStructures) {
-            inventory.setItem(getSlot(path + "GenerateStructures.true", 16), lgm.getItem(path + "GenerateStructures.true", player, false));
+            registerButton(getSlot(path + "GenerateStructures.true", 16), lgm.getItem(path + "GenerateStructures.true", player, false),
+                    (p, e) -> { this.generateStructures = false; super.open(); }, null);
         } else {
-            inventory.setItem(getSlot(path + "GenerateStructures.false", 16), lgm.getItem(path + "GenerateStructures.false", player, false));
+            registerButton(getSlot(path + "GenerateStructures.false", 16), lgm.getItem(path + "GenerateStructures.false", player, false),
+                    (p, e) -> { this.generateStructures = true; super.open(); }, null);
         }
 
         if (hardcore) {
-            inventory.setItem(getSlot(path + "Hardcore.true", 22), lgm.getItem(path + "Hardcore.true", player, false));
+            registerButton(getSlot(path + "Hardcore.true", 22), lgm.getItem(path + "Hardcore.true", player, false),
+                    (p, e) -> { this.hardcore = false; super.open(); }, null);
         } else {
-            inventory.setItem(getSlot(path + "Hardcore.false", 22), lgm.getItem(path + "Hardcore.false", player, false));
+            registerButton(getSlot(path + "Hardcore.false", 22), lgm.getItem(path + "Hardcore.false", player, false),
+                    (p, e) -> { this.hardcore = true; super.open(); }, null);
         }
 
-        inventory.setItem(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false));
-        inventory.setItem(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player, false));
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
+                        new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open(), lgm), null);
+        registerButton(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player, false), (p, e) -> {
+            WorldCreateEvent worldCreateEvent = new WorldCreateEvent(p, worldName, worldType, worldEnvironment, generateStructures, hardcore);
+            try {
+                AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);
+                if (!worldCreateEvent.isCancelled()) {
+                    WorldCreator worldCreator = new WorldCreator(worldCreateEvent.getName());
+                    worldCreator.type(worldCreateEvent.getWorldType());
+                    worldCreator.environment(worldCreateEvent.getWorldEnvironment());
+                    worldCreator.generateStructures(worldCreateEvent.isGenerateStructures());
+                    worldCreator.hardcore(worldCreateEvent.isHardcore());
+                    World world = worldCreator.createWorld();
+                    p.closeInventory();
+                    if (world != null) p.teleport(world.getSpawnLocation());
+                }
+            } catch (NotAPanelEventException ex) {
+                ex.printStackTrace();
+            }
+        }, null);
 
 
     }

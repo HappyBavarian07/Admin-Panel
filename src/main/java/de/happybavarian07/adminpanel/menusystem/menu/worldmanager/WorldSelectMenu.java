@@ -5,8 +5,10 @@ import de.happybavarian07.adminpanel.events.world.WorldSelectEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
+import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -51,7 +53,9 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
     @Override
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
-        inventory.setItem(45, lgm.getItem("WorldManager.Create", player, false));
+        registerButton(45, lgm.getItem("WorldManager.Create", player, false),
+                new PermissionAction("AdminPanel.WorldManager.Create", (p, e) ->
+                        new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
     }
 
     @Override
@@ -65,7 +69,7 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
         try {
             AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);
             if (!worldSelectEvent.isCancelled()) {
-                new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player), world).open();
+                new WorldSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()), world).open();
             }
         } catch (NotAPanelEventException notAPanelEventException) {
             notAPanelEventException.printStackTrace();
@@ -74,11 +78,7 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
 
     @Override
     protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-        if (item.isSimilar(lgm.getItem("WorldManager.Create", player, false))) {
-            new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)).open();
-        }
+        // Logic is now handled by registered MenuActions in postSetMenuItems
     }
 
     public ItemStack getPageItem(World world) {
