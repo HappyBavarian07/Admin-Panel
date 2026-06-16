@@ -115,3 +115,7 @@ run/
 /node_modules/
 /package-lock.json
 /test.db
+.gitnexus
+/AGENTS.md
+/CLAUDE.md
+/ARCHITECT_AUDIT.md
