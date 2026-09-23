@@ -105,7 +105,7 @@ Example:
 ```java
 import de.happybavarian07.coolstufflib.jpa.repository.*;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends Repository<User, Integer> {
     User findByUsername(String username);
     List<User> findAllByActive(boolean active);
     // New direct field access methods:
@@ -117,7 +117,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 }
 ```
 
-- **JpaRepository<T, ID>**: Base interface for CRUD operations.
+- **Repository<T, ID>**: Base interface for CRUD operations.
 - Custom methods (e.g., `findByUsername`, `setUsername`, `getUsername`, `countColumnsByActive`, `insertUser`, `updateUser`) are detected and implemented at runtime.
 
 ### How RepositoryProxy Works
@@ -138,7 +138,7 @@ Supported patterns:
 #### Example: Dynamic Query Generation
 
 ```java
-UserRepository repo = RepositoryFactory.create(UserRepository.class);
+UserRepository repo = lib.getRepositoryManager().getRepository(UserRepository.class);
 User user = repo.findByUsername("alice");
 List<User> activeUsers = repo.findAllByActive(true);
 int count = repo.countByActive(true);
@@ -170,18 +170,61 @@ List<User> findInactiveSince(Date date);
 
 ## 5. Transactions and Lifecycle Events
 
-Use `@Transactional` to mark methods for transaction management:
+Mark repository methods with `@Transactional` to run everything they do on one connection that is committed
+at the end or rolled back on failure:
 
 ```java
-@Transactional
-void updateUser(User user) {
-    // ...
+public interface AccountRepository extends Repository<Account, UUID> {
+    @Transactional
+    void transfer(UUID from, UUID to, double amount);
+
+    @Transactional(readOnly = true)
+    List<Account> findAllByOwner(String owner);
 }
 ```
 
+How it behaves:
+
+- All statements executed while the method runs (also through other repositories) use the same
+  connection, so they succeed or fail together.
+- A `RuntimeException` or `Error` rolls back; checked exceptions commit unless listed in
+  `rollbackFor`. `noRollbackFor` excludes exceptions from rolling back.
+- A `@Transactional` method called from inside another one joins the outer transaction through a
+  savepoint; only the outermost method commits.
+- The connection goes back to the pool when the transaction ends.
+
+Transactions are bound to the thread that started them; work handed to another thread runs outside it.
+
 Lifecycle annotations:
-- `@PrePersist`, `@PostLoad`, `@PreUpdate`, `@PostInit`
+- `@PrePersist`, `@PostLoad`, `@PreUpdate`, `@PreInit`, `@PostInit`
 - Methods annotated are called at appropriate entity lifecycle stages.
+
+---
+
+## 5a. Direct SQL and Connections
+
+For queries a repository cannot express, go through the `RepositoryController`:
+
+```java
+int online = controller.query("SELECT COUNT(*) FROM players WHERE online = ?",
+        rs -> rs.next() ? rs.getInt(1) : 0, true);
+
+controller.executeUpdate("UPDATE players SET online = ? WHERE uuid = ?", false, uuid.toString());
+```
+
+`query(sql, mapper, params)` always closes the result set and returns the connection to the pool, even if
+your mapper throws. `executeQuery(...)` returns the raw `ResultSet`; only use it with try-with-resources,
+because the connection is released when the result set is closed.
+
+Connection pool notes:
+- Each pool is thread-safe and holds at most its configured number of connections; waiting for a free
+  connection times out after 5 seconds with "Connection pool exhausted".
+- Closed connections are replaced automatically.
+- SQLite connections get a 5 second `busy_timeout`, so concurrent writes wait instead of failing with
+  `SQLITE_BUSY`.
+
+`controller.getSqlExecutor()` exposes the executor for stores that manage their own table (for example
+command aliases, see the [Command Aliases Tutorial](command-aliases-tutorial.md)).
 
 ---
 
@@ -205,7 +248,7 @@ public class User {
 
 ### Repository
 ```java
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends Repository<User, Integer> {
     User findByUsername(String username);
     List<User> findAllByActive(boolean active);
     @Query("SELECT u FROM User u WHERE u.active = true")
@@ -223,7 +266,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 ```java
 import java.util.List;
 
-UserRepository repo = RepositoryFactory.create(UserRepository.class);
+UserRepository repo = lib.getRepositoryManager().getRepository(UserRepository.class);
 User user = repo.findByUsername("alice");
 List<User> activeUsers = repo.findAllActive();
 repo.setUsername(user.getId(), "newname");
@@ -238,10 +281,10 @@ User updated = repo.updateUser(user);
 ## 7. Implementation Steps
 
 1. Define your entity classes with JPA annotations.
-2. Create repository interfaces extending `JpaRepository`.
+2. Create repository interfaces extending `Repository<Entity, Id>`.
 3. Use method naming conventions for queries, or annotate with `@Query` for custom SQL.
 4. Use direct field access and column count methods as needed.
-5. Obtain repository instances via `RepositoryFactory.create()`.
+5. Obtain repository instances via `RepositoryManager.getRepository(...)` (or `RepositoryController.getRepository(...)`).
 6. Use repositories for CRUD and queries; transactions and lifecycle events are handled automatically.
 
 ---

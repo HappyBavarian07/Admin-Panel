@@ -20,9 +20,12 @@ This comprehensive tutorial covers everything you need to know about using the C
 
 Cool Stuff Lib is a comprehensive library that simplifies plugin development by providing:
 
-- **Command Manager System**: Structured command handling with subcommands and permissions
+- **Command Manager System**: Subcommands (also nested), typed arguments, tab completion, help pages,
+  cooldowns, confirmations, async commands and command aliases
 - **Language Manager**: Multi-language support with per-player language preferences
-- **Menu System**: Interactive GUI menus with easy-to-use API
+- **Menu System**: Inventory menus with click actions, chainable decorators, list menus and pagination
+- **Service Registry**: Lifecycle, health checks and lookup for your services
+- **JPA-style Persistence**: Repositories, transactions and connection pooling for SQLite and MySQL/MariaDB
 - **Plugin File Logger**: Centralized logging with file output
 - **PlaceholderAPI Integration**: Automatic detection and support
 - **Builder Pattern**: Simplified setup and configuration
@@ -142,7 +145,7 @@ public class MyPlugin extends JavaPlugin {
                 dataFile.getParentFile().mkdirs();
                 dataFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().log(Level.WARNING, "Could not create data.yml", e);
             }
         }
         
@@ -254,6 +257,10 @@ public class MainCommandManager extends CommandManager {
 ```
 
 ### Creating Subcommands
+
+The example below uses the classic style where every method is overridden. For new code the shorter
+annotated style (`@SubCommandInfo` plus `execute(sender, args)`) is recommended; see the
+[Basic Command Tutorial](command-system-basic.md).
 
 ```java
 @CommandData(
@@ -394,6 +401,8 @@ String playerLang = langManager.getPLHandler().getPlayerLanguageName(player.getU
 
 ### Creating a Menu
 
+Register each button together with what it does:
+
 ```java
 public class MainMenu extends Menu {
     public MainMenu(PlayerMenuUtility playerMenuUtility) {
@@ -401,60 +410,42 @@ public class MainMenu extends Menu {
     }
 
     @Override
-    public String getMenuName() {
-        return "Main Menu";
-    }
+    public String getMenuName() { return "Main Menu"; }
 
     @Override
-    public int getSlots() {
-        return 27; // 3 rows
-    }
+    public String getConfigMenuAddonFeatureName() { return "MainMenu"; }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        
-        switch (e.getCurrentItem().getType()) {
-            case DIAMOND:
-                // Handle diamond click
-                player.sendMessage("You clicked the diamond!");
-                break;
-            case EMERALD:
-                // Open another menu
-                new SettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
-                break;
-            case BARRIER:
-                // Close menu
-                player.closeInventory();
-                break;
-        }
-    }
+    public int getSlots() { return 27; }
 
     @Override
     public void setMenuItems() {
-        // Set menu items
-        ItemStack info = new ItemStack(Material.DIAMOND);
-        ItemMeta infoMeta = info.getItemMeta();
-        infoMeta.setDisplayName("§aPlugin Info");
-        infoMeta.setLore(Arrays.asList("§7Click to view plugin information"));
-        info.setItemMeta(infoMeta);
-        inventory.setItem(10, info);
-        
-        ItemStack settings = new ItemStack(Material.EMERALD);
-        ItemMeta settingsMeta = settings.getItemMeta();
-        settingsMeta.setDisplayName("§bSettings");
-        settingsMeta.setLore(Arrays.asList("§7Click to open settings"));
-        settings.setItemMeta(settingsMeta);
-        inventory.setItem(12, settings);
-        
-        ItemStack close = new ItemStack(Material.BARRIER);
-        ItemMeta closeMeta = close.getItemMeta();
-        closeMeta.setDisplayName("§cClose");
-        close.setItemMeta(closeMeta);
-        inventory.setItem(16, close);
+        registerButton(10, item(Material.DIAMOND, "§aPlugin Info"),
+                (player, event) -> player.sendMessage("You clicked the diamond!"));
+        registerButton(12, item(Material.EMERALD, "§bSettings"),
+                MenuAction.open(() -> new SettingsMenu(playerMenuUtility, this)));
+        registerButton(16, item(Material.BARRIER, "§cClose"), MenuAction.close());
+        setFillerGlass();
+    }
+
+    @Override
+    public void handleOpenMenu(InventoryOpenEvent e) {}
+
+    @Override
+    public void handleCloseMenu(InventoryCloseEvent e) {}
+
+    private static ItemStack item(Material material, String name) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+        return item;
     }
 }
 ```
+
+Actions can be chained, e.g. `MenuAction.of(...).requires("perm").confirm("Sure?")`. The
+[Menu Tutorial](menu-system-tutorial.md) covers decorators, language-driven buttons, list menus and more.
 
 ### Opening Menus
 
@@ -485,6 +476,22 @@ public class MyPlugin extends JavaPlugin {
     }
 }
 ```
+
+### Logging Errors
+
+`CoolStuffLib.logError(message, throwable)` writes to the plugin file log (if configured) and to the console
+with the stack trace. It is safe to call before the library is initialized:
+
+```java
+try {
+    loadWarps();
+} catch (IOException e) {
+    CoolStuffLib.logError("Could not load warps", e);
+}
+```
+
+Without a file logger, `writeToLog` only prints to the console when `sendToConsole` is `true` or the level is
+`WARNING` or higher.
 
 ### Using Log Prefixes
 
@@ -603,8 +610,7 @@ private void setupCoolStuffLib() {
         coolStuffLib.setup();
         
     } catch (Exception e) {
-        getLogger().severe("Failed to initialize Cool Stuff Lib: " + e.getMessage());
-        e.printStackTrace();
+        getLogger().log(Level.SEVERE, "Failed to initialize Cool Stuff Lib", e);
         Bukkit.getPluginManager().disablePlugin(this);
     }
 }

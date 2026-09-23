@@ -1,6 +1,7 @@
 # Command Manager System: Basic Tutorial
 
-This tutorial will guide you through the basics of using the Command Manager System to create and manage commands in your Bukkit/Spigot plugin using the **Cool Stuff Lib**.
+This tutorial walks you step by step through creating commands in your Bukkit/Spigot plugin with the
+Command Manager System of **Cool Stuff Lib**.
 
 ## Table of Contents
 
@@ -9,365 +10,296 @@ This tutorial will guide you through the basics of using the Command Manager Sys
 3. [Manual Setup (Alternative)](#manual-setup-alternative)
 4. [Creating Your First Command Manager](#creating-your-first-command-manager)
 5. [Creating a Simple Subcommand](#creating-a-simple-subcommand)
-6. [Registering Commands](#registering-commands)
-7. [Adding a Help Command](#adding-a-help-command)
-8. [Basic Tab Completion](#basic-tab-completion)
-9. [Testing Your Commands](#testing-your-commands)
+6. [Reading Arguments](#reading-arguments)
+7. [Declaring Arguments for Tab Completion](#declaring-arguments-for-tab-completion)
+8. [Registering Commands](#registering-commands)
+9. [Adding a Help Command](#adding-a-help-command)
+10. [The Quickest Way: Builder Commands](#the-quickest-way-builder-commands)
+11. [Testing Your Commands](#testing-your-commands)
 
 ## Introduction
 
-The Command Manager System is a framework that simplifies the creation and management of commands in Bukkit/Spigot plugins. It provides a structured approach to command handling with features like subcommands, permission management, and tab completion.
+The Command Manager System gives your commands a structure: one main command (`/example`) with
+subcommands (`/example info`), automatic permissions, argument checks, tab completion and a help page.
 
-Key benefits of using this system:
+Key benefits:
 
-- Organized command structure with main commands and subcommands
+- Organized command structure with main commands, subcommands and nested subcommands
 - Automatic permission handling
-- Built-in tab completion
-- Separation of player and console command handling
-- Reduced boilerplate code
+- Typed argument parsing with localized error messages
+- Tab completion and usage lines generated from declared arguments
+- Much less boilerplate: a subcommand can be one annotation and one method
 
 ## Required Imports
-
-For the examples in this tutorial, you'll need these imports:
 
 ```java
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
+import de.happybavarian07.coolstufflib.commandmanagement.HelpCommand;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
-import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 ```
 
 ## Setting Up with Cool Stuff Lib (Recommended)
 
-The **Cool Stuff Lib** provides a streamlined way to set up the Command Manager Registry using the Builder pattern. This is the preferred approach as it handles initialization automatically and provides additional features.
+The builder sets up the registry, language manager and data file in one place:
 
 ```java
 public class MyPlugin extends JavaPlugin {
     private CoolStuffLib coolStuffLib;
-    
+
     @Override
     public void onEnable() {
-        // Create data file for persistent storage
-        File dataFile = new File(getDataFolder(), "data.yml");
-        if (!dataFile.exists()) {
-            try {
-                dataFile.getParentFile().mkdirs();
-                dataFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        // Initialize Cool Stuff Lib using the Builder pattern
         File langFolder = new File(getDataFolder(), "lang");
         coolStuffLib = new CoolStuffLibBuilder(this)
                 .setCommandManagerRegistry(new CommandManagerRegistry(this))
                 .setLanguageManager(new LanguageManager(this, langFolder, "lang", "&7[MyPlugin] "))
-                .setDataFile(dataFile)
+                .setDataFile(new File(getDataFolder(), "data.yml"))
                 .setUsePlayerLangHandler(true)
                 .setSendSyntaxOnZeroArgs(true)
                 .createCoolStuffLib();
-        
-        // Setup the library (this initializes all components)
+
+        // Initializes all components. Throws with a list of failed services if something cannot start.
         coolStuffLib.setup();
-        
-        // Register your commands after setup
+
         registerCommands();
     }
-    
+
     @Override
     public void onDisable() {
-        // Unregister all commands when the plugin is disabled
         if (coolStuffLib != null && coolStuffLib.getCommandManagerRegistry() != null) {
             coolStuffLib.getCommandManagerRegistry().unregisterAll();
         }
     }
-    
+
     private void registerCommands() {
-        // We'll implement this method later
-        coolStuffLib.getCommandManagerRegistry().register(new ExampleCommandManager());
-    }
-    
-    public CoolStuffLib getCoolStuffLib() {
-        return coolStuffLib;
-    }
-    
-    public CommandManagerRegistry getCommandRegistry() {
-        return coolStuffLib.getCommandManagerRegistry();
+        coolStuffLib.getCommandManagerRegistry().register(new ExampleCommandManager(this));
     }
 }
 ```
 
 ## Manual Setup (Alternative)
 
-If you prefer not to use the Cool Stuff Lib Builder, you can still set up the Command Manager Registry manually:
+Without the builder you create the registry yourself:
 
 ```java
-public class MyPlugin extends JavaPlugin {
-    private CommandManagerRegistry commandRegistry;
-    
-    @Override
-    public void onEnable() {
-        // Initialize the CommandManagerRegistry
-        commandRegistry = new CommandManagerRegistry(this);
-        
-        // Set the language manager (if you're using one)
-        File langFolder = new File(getDataFolder(), "lang");
-        commandRegistry.setLanguageManager(new LanguageManager(this, langFolder, "lang", "&7[MyPlugin] "));
-        
-        // Mark the registry as ready
-        commandRegistry.setCommandManagerRegistryReady(true);
-        
-        // Register commands (we'll do this later)
-        
-        // Store the registry for later use
-        // You might want to create a getter method for this
-    }
-    
-    @Override
-    public void onDisable() {
-        // Unregister all commands when the plugin is disabled
-        if (commandRegistry != null) {
-            commandRegistry.unregisterAll();
-        }
-    }
-    
-    public CommandManagerRegistry getCommandRegistry() {
-        return commandRegistry;
-    }
-}
+commandRegistry = new CommandManagerRegistry(this);
+commandRegistry.setLanguageManager(new LanguageManager(this, new File(getDataFolder(), "lang"), "lang", "&7[MyPlugin] "));
+commandRegistry.setCommandManagerRegistryReady(true);
+commandRegistry.register(new ExampleCommandManager(this));
 ```
+
+Call `commandRegistry.unregisterAll()` in `onDisable()`.
 
 ## Creating Your First Command Manager
 
-Next, create a class that extends `CommandManager` to handle your main command:
+A `CommandManager` describes the main command and registers its subcommands in `setup()`:
 
 ```java
 public class ExampleCommandManager extends CommandManager {
-    @Override
-    public String getCommandName() {
-        return "example";  // The main command name
+    private final JavaPlugin plugin;
+
+    public ExampleCommandManager(JavaPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @Override
-    public String getCommandUsage() {
-        return "/example <subcommand> [args]";  // How to use the command
-    }
+    public String getCommandName() { return "example"; }
 
     @Override
-    public String getCommandInfo() {
-        return "Example command for demonstration";  // Description
-    }
+    public String getCommandUsage() { return "/example <subcommand> [args]"; }
 
     @Override
-    public JavaPlugin getJavaPlugin() {
-        return MyPlugin.getInstance();  // Your plugin instance
-    }
+    public String getCommandInfo() { return "Example command for demonstration"; }
 
     @Override
-    public List<String> getCommandAliases() {
-        return Arrays.asList("ex", "exmp");  // Command aliases
-    }
+    public JavaPlugin getJavaPlugin() { return plugin; }
 
     @Override
-    public String getCommandPermissionAsString() {
-        return "myplugin.command.example";  // Permission node
-    }
+    public List<String> getCommandAliases() { return List.of("ex", "exmp"); }
 
     @Override
-    public boolean autoRegisterPermission() {
-        return true;  // Automatically register the permission
-    }
+    public String getCommandPermissionAsString() { return "myplugin.command.example"; }
+
+    @Override
+    public boolean autoRegisterPermission() { return true; }
 
     @Override
     public void setup() {
-        // We'll register subcommands here later
+        // subcommands are registered here (step 8)
     }
 }
 ```
+
+The command does not need to be in `plugin.yml`; it is registered dynamically if it is missing there.
 
 ## Creating a Simple Subcommand
 
-Now, create a subcommand by extending the `SubCommand` class:
+Put the metadata into `@SubCommandInfo` and implement only the logic:
 
 ```java
-@CommandData(
-    playerRequired = false,  // Can be used by console
-    opRequired = false,      // Doesn't require op
-    minArgs = 0,             // Minimum arguments
-    maxArgs = 1              // Maximum arguments
-)
+@SubCommandInfo(name = "info", aliases = {"i", "about"}, info = "Shows information about the plugin")
 public class InfoSubCommand extends SubCommand {
     public InfoSubCommand(String mainCommandName) {
-        super(mainCommandName);  // Pass the main command name
+        super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        // Handle player command execution
-        player.sendMessage("This is an example command!");
-        
-        if (args.length > 0) {
-            player.sendMessage("You provided: " + args[0]);
-        }
-        
-        return true;  // Command executed successfully
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        // Handle console command execution
+    public boolean execute(CommandSender sender, CommandArgs args) {
         sender.sendMessage("This is an example command!");
-        
-        if (args.length > 0) {
-            sender.sendMessage("You provided: " + args[0]);
-        }
-        
-        return true;  // Command executed successfully
-    }
-
-    @Override
-    public String name() {
-        return "info";  // Subcommand name
-    }
-
-    @Override
-    public String info() {
-        return "Shows information about the plugin";  // Description
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[]{"i", "about"};  // Subcommand aliases
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        // Define valid arguments for tab completion
-        Map<Integer, String[]> map = new HashMap<>();
-        map.put(1, new String[]{"version", "author", "website"});
-        return map;
-    }
-
-    @Override
-    public String syntax() {
-        return "/" + mainCommandName + " info [type]";  // Command syntax
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "myplugin.command.example.info";  // Permission node
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return true;  // Automatically register the permission
+        return true; // false shows the usage message
     }
 }
 ```
 
+That is all. Everything you do not set is derived:
+
+| Property | Default |
+|---|---|
+| Permission | `<main>.<name>` in lower case, e.g. `example.info` (auto-registered) |
+| Description | `Messages.Commands.<main>.<name>.Info` from the language file, else empty |
+| Syntax | `Messages.Commands.<main>.<name>.Syntax`, else generated, e.g. `/example info` |
+
+Set `permission = "..."`, `syntax = "..."` or `autoRegisterPermission = false` in the annotation to
+override. Sender and argument rules still come from `@CommandData`:
+
+```java
+@SubCommandInfo(name = "heal")
+@CommandData(playerRequired = true)
+public class HealSubCommand extends SubCommand { ... }
+```
+
+Overriding the old methods (`name()`, `info()`, `syntax()`, `onPlayerCommand(...)`, `subArgs(...)`, ...)
+still works, so existing subcommands keep running unchanged.
+
+## Reading Arguments
+
+`CommandArgs` gives you typed access. Indexes start at 0 **after** the subcommand name:
+
+```java
+@Override
+public boolean execute(CommandSender sender, CommandArgs args) {
+    Player target = args.onlinePlayer(0);        // "Player Steve is not online!" if not found
+    int amount = args.integer(1, 1, 1, 64);      // optional, default 1, must be 1..64
+    GameMode mode = args.enumOf(2, GameMode.class);
+    target.getInventory().addItem(new ItemStack(Material.DIAMOND, amount));
+    return true;
+}
+```
+
+Wrong input stops the command and sends a localized message (`Messages.Player.Commands.MissingArgument`,
+`NotANumber`, `NumberOutOfRange`, `PlayerNotFound`, `WorldNotFound`, `InvalidChoice`). If your language
+file does not have a key yet, an English default is used. No `try/catch` needed.
+
+Other readers: `string(i)`, `string(i, default)`, `joined(from)`, `decimal(i)`, `bool(i)`, `world(i)`,
+`has(i)`, `size()`, and `player()` for the sender as a player.
+
+## Declaring Arguments for Tab Completion
+
+Declare the arguments once; tab completion, the usage line and the argument count follow:
+
+```java
+@SubCommandInfo(name = "give")
+public class GiveSubCommand extends SubCommand {
+    public GiveSubCommand(String main) { super(main); }
+
+    @Override
+    public List<Argument> arguments() {
+        return List.of(
+                Argument.player("target"),
+                Argument.choice("item", "diamond", "emerald"),
+                Argument.integer("amount").optional());
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) { ... }
+}
+```
+
+- `/example give <tab>` suggests online players, the next position `diamond`/`emerald`.
+- The generated syntax is `/example give <target> <diamond|emerald> [amount]`: `<...>` required,
+  `[...]` optional, short choice lists spelled out.
+- At least 2 and at most 3 arguments are accepted (unless `@CommandData` sets `minArgs`/`maxArgs`).
+
+Available argument types: `player`, `world`, `choice`, `enumOf`, `integer`, `decimal`, `word`,
+`text` (all remaining words) and `custom(name, sender -> suggestions)`.
+
 ## Registering Commands
 
-Now, update your `CommandManager` to register the subcommand:
+Register subcommands in the manager's `setup()`, then register the manager:
 
 ```java
 @Override
 public void setup() {
-    // Register the info subcommand
     registerSubCommand(new InfoSubCommand(getCommandName()));
+    registerSubCommand(new GiveSubCommand(getCommandName()));
 }
 ```
 
-And register the command manager in your plugin's `registerCommands` method (if using Cool Stuff Lib) or `onEnable` method (if using manual setup):
-
-**With Cool Stuff Lib:**
 ```java
-private void registerCommands() {
-    // Register command managers
-    coolStuffLib.getCommandManagerRegistry().register(new ExampleCommandManager());
-}
-```
-
-**With Manual Setup:**
-```java
-@Override
-public void onEnable() {
-    // ... previous code ...
-    
-    // Register command managers
-    commandRegistry.register(new ExampleCommandManager());
-}
+coolStuffLib.getCommandManagerRegistry().register(new ExampleCommandManager(this));
 ```
 
 ## Adding a Help Command
 
-The system includes a built-in `HelpCommand` that displays all available subcommands. Add it to your command manager:
-
 ```java
-@Override
-public void setup() {
-    // Register the info subcommand
-    registerSubCommand(new InfoSubCommand(getCommandName()));
-    
-    // Register the help command
-    registerSubCommand(new HelpCommand(getCommandName()));
-}
+registerSubCommand(new HelpCommand(getCommandName()));
 ```
 
-The `HelpCommand` will automatically list all subcommands that the user has permission to use, with pagination support.
+- `/example help [page]` lists every command the sender may use.
+- `/example help give` shows the details of one command: syntax, description, aliases, permission,
+  arguments, subcommands and notes (players only, cooldown, confirmation).
 
-## Basic Tab Completion
+## The Quickest Way: Builder Commands
 
-Tab completion is handled automatically based on the `subArgs` method in your subcommands. The system will suggest:
+Small commands do not need classes at all:
 
-1. Subcommand names when the user types the main command
-2. Arguments defined in the `subArgs` method when the user types a subcommand
+```java
+CommandManagerRegistry registry = coolStuffLib.getCommandManagerRegistry();
 
-For example, with our `InfoSubCommand`, typing `/example info <tab>` will suggest "version", "author", and "website".
+registry.command("heal")
+        .permission("myplugin.heal")
+        .arguments(Argument.player("target").optional())
+        .player((player, args) -> {
+            Player target = args.has(0) ? args.onlinePlayer(0) : player;
+            target.setHealth(20);
+        })
+        .register();
+```
+
+Inside a `CommandManager`, `subCommand("name")` starts a builder for a subcommand:
+
+```java
+registerSubCommand(subCommand("ping")
+        .executes((sender, args) -> { sender.sendMessage("Pong!"); return true; })
+        .build());
+```
 
 ## Testing Your Commands
 
-After implementing your commands, you can test them in-game:
+1. Build and deploy your plugin, start the server.
+2. Try:
+   - `/example` shows the usage message
+   - `/example help` lists the subcommands, `/example help info` shows details
+   - `/example info` runs the subcommand
+   - `/example give <your name> diamond abc` reports that `abc` is not a number
 
-1. Build and deploy your plugin
-2. Start your server
-3. Try your commands:
-   - `/example` should show a usage message
-   - `/example help` should list available subcommands
-   - `/example info` should show the info message
-   - `/example info version` should show the version info
+If something does not work:
 
-If you encounter issues:
-
-1. Check the console for error messages
-2. Verify that permissions are set correctly
-3. Ensure that the command registry is properly initialized
-4. Check that subcommands are registered in the `setup()` method
-
-## Benefits of Using Cool Stuff Lib
-
-By using the Cool Stuff Lib Builder approach, you get several additional benefits:
-
-- **Automatic Language Manager Integration**: Multi-language support out of the box
-- **Per-Player Language Handling**: Different languages for different players
-- **Integrated Logging**: Built-in file logging capabilities
-- **Menu System Integration**: Seamless integration with the menu system
-- **Simplified Setup**: Builder pattern reduces boilerplate code
-- **Centralized Configuration**: All components configured in one place
+1. Check the console for errors (command errors are logged with a stack trace).
+2. Verify the permissions (`/example help info` shows the required one).
+3. Make sure `coolStuffLib.setup()` ran before registering commands.
+4. Check that subcommands are registered in `setup()`.
 
 ## Next Steps
 
-Now that you've created a basic command with the Command Manager System, you can:
-
-1. Add more subcommands to expand functionality
-2. Customize the help command
-3. Implement more complex argument handling
-4. Add sender-specific behavior
-5. Explore the full Cool Stuff Lib features
-
-For advanced features, check out the [Advanced Tutorial](command-system-advanced.md).
-For a comprehensive guide to Cool Stuff Lib, see the [Cool Stuff Lib Tutorial](cool-stuff-lib-tutorial.md).
+- [Advanced Tutorial](command-system-advanced.md): nested subcommands, cooldowns, confirmations,
+  async commands and more.
+- [Command Aliases Tutorial](command-aliases-tutorial.md): command shortcuts, also created at runtime.
+- [Cool Stuff Lib Tutorial](cool-stuff-lib-tutorial.md): the complete library.

@@ -4,7 +4,7 @@ This guide provides a complete pattern for a production-grade admin menu using:
 - `MultiPaginatedMenu`
 - Three independent pagination zones (top/middle/bottom)
 - Mixed transition strategies per zone
-- Composed `MenuAction` wrappers (permission, cooldown, sound, open menu)
+- Chained `MenuAction` decorators (permission, cooldown, sound, lazy menu opening)
 - Smart filler (`setFillerGlass()`) without manual frame loops
 
 ## Goals
@@ -23,12 +23,7 @@ package your.plugin.menus;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.MultiPaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.CompositeAction;
-import de.happybavarian07.coolstufflib.menusystem.actions.CooldownAction;
 import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
-import de.happybavarian07.coolstufflib.menusystem.actions.OpenMenuAction;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
-import de.happybavarian07.coolstufflib.menusystem.actions.SoundAction;
 import de.happybavarian07.coolstufflib.menusystem.pagination.ClearThenInstantPageTransition;
 import de.happybavarian07.coolstufflib.menusystem.pagination.PageControlLayout;
 import de.happybavarian07.coolstufflib.menusystem.pagination.PageDirection;
@@ -133,7 +128,7 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
             case "flags-bottom" -> {
                 String flag = (String) data;
                 toggleFlag(flag);
-                open(); // refresh
+                refresh(); // redraw in place, cursor stays
             }
             default -> player.sendMessage("Unknown zone: " + zoneId);
         }
@@ -151,17 +146,12 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
     public void handleCloseMenu(InventoryCloseEvent e) {}
 
     private void registerGlobalButtons() {
-        MenuAction openAuditLog = new CompositeAction(
-                new PermissionAction("admin.panel.audit",
-                        new CooldownAction(750,
-                                new SoundAction(Sound.UI_BUTTON_CLICK, 1.0f, 1.0f,
-                                        new OpenMenuAction(new AuditLogMenu(playerMenuUtility, this))
-                                ),
-                                "§cPlease wait before clicking again."
-                        )
-                )
-        );
-        registerButton(4, named(Material.WRITABLE_BOOK, "§bAudit Log"), openAuditLog, null);
+        // The last decorator runs first: permission check, then cooldown, then sound + open.
+        registerButton(4, named(Material.WRITABLE_BOOK, "§bAudit Log"),
+                MenuAction.open(() -> new AuditLogMenu(playerMenuUtility, this))
+                        .withSound(Sound.UI_BUTTON_CLICK)
+                        .cooldown(750, "§cPlease wait before clicking again.")
+                        .requires("admin.panel.audit"));
     }
 
     private ItemStack renderPlayerItem(String playerId) {
@@ -206,7 +196,7 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
         // replace with your write/update logic
     }
 
-    // Example submenu target used by OpenMenuAction
+    // Example submenu target, built only when the button is clicked
     static class AuditLogMenu extends Menu {
         public AuditLogMenu(PlayerMenuUtility util, Menu previous) {
             super(util, previous);
@@ -214,10 +204,12 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
         @Override public String getMenuName() { return "Audit Log"; }
         @Override public String getConfigMenuAddonFeatureName() { return "AuditLog"; }
         @Override public int getSlots() { return 27; }
-        @Override public void handleMenu(InventoryClickEvent e) {}
         @Override public void handleOpenMenu(InventoryOpenEvent e) {}
         @Override public void handleCloseMenu(InventoryCloseEvent e) {}
-        @Override public void setMenuItems() { setFillerGlass(); }
+        @Override public void setMenuItems() {
+            registerButton(22, named(Material.ARROW, "§7Back"), MenuAction.back());
+            setFillerGlass();
+        }
     }
 }
 ```
@@ -228,7 +220,7 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
 
 - `MultiPaginatedMenu` keeps each zone independent, so paging one list does not affect others.
 - Per-zone transitions let you animate only where it helps.
-- Composed actions keep click behavior reusable and testable.
+- Chained actions keep click behavior reusable and testable; `MenuAction.open(...)` builds submenus only when needed.
 - Smart filler removes manual frame-loop boilerplate and keeps zone slots untouched automatically.
 
 ---
@@ -236,7 +228,7 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
 ## 3) Common Variations
 
 - Replace string datasets with typed DTOs.
-- Use `ConfirmationAction` before destructive admin operations.
+- Add `.confirm("...")` before destructive admin operations.
 - Give each zone different page-control slots depending on design.
 - Use `ClearThenInstantPageTransition` in high-frequency menus for predictable redraws.
 
@@ -249,6 +241,6 @@ public class AdminPanelMenu extends MultiPaginatedMenu {
 3. Assign controls per zone (`PageControlLayout`).
 4. Add transitions only where necessary.
 5. Route zone clicks by `zoneId` in one switch.
-6. Use composed actions for permission/cooldown/sound/open flows.
+6. Use chained decorators for permission/cooldown/sound/open flows, and `refresh()` for in-place updates.
 
 This is a strong baseline for `AdminPanel`, `PlayerSelect`, and `WorldSelect` style menus.

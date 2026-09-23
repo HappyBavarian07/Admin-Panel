@@ -2,6 +2,10 @@
 
 This document provides practical examples of implementing the Command Manager System in different scenarios.
 
+The examples use the classic style where every `SubCommand` method is overridden, which still works. New
+code can be much shorter with `@SubCommandInfo`, `execute(sender, args)`, typed `CommandArgs` and declared
+`arguments()`; see the [Basic Tutorial](command-system-basic.md).
+
 ## Table of Contents
 
 1. [Simple Plugin Command](#simple-plugin-command)
@@ -894,8 +898,7 @@ public class WorldCreateSubCommand extends SubCommand {
             } catch (Exception e) {
                 Bukkit.getScheduler().runTask(WorldManagerPlugin.getInstance(), () -> {
                     sender.sendMessage(ChatColor.RED + "Failed to create world: " + e.getMessage());
-                    WorldManagerPlugin.getInstance().getLogger().severe("Error creating world: " + e.getMessage());
-                    e.printStackTrace();
+                    CoolStuffLib.logError("Error creating world", e);
                 });
             }
         });
