@@ -176,22 +176,27 @@ at the end or rolled back on failure:
 ```java
 public interface AccountRepository extends Repository<Account, UUID> {
     @Transactional
-    void transfer(UUID from, UUID to, double amount);
+    void deleteByOwner(String owner);
 
-    @Transactional(readOnly = true)
-    List<Account> findAllByOwner(String owner);
+    @Override
+    @Transactional
+    <S extends Account> Iterable<S> saveAll(Iterable<S> accounts);
 }
 ```
 
 How it behaves:
 
-- All statements executed while the method runs (also through other repositories) use the same
-  connection, so they succeed or fail together.
+- All statements the method executes use the same connection, so they succeed or fail together.
 - A `RuntimeException` or `Error` rolls back; checked exceptions commit unless listed in
   `rollbackFor`. `noRollbackFor` excludes exceptions from rolling back.
-- A `@Transactional` method called from inside another one joins the outer transaction through a
-  savepoint; only the outermost method commits.
+- Statements that run while a transaction is active on the same thread (also through other repositories)
+  join it; nested `@Transactional` calls use a savepoint and only the outermost one commits.
 - The connection goes back to the pool when the transaction ends.
+
+`@Transactional` only applies to the methods the repository proxy generates (`save`, `saveAll`, `deleteBy...`,
+`update...`, ...). Default methods with your own code are not executed by the proxy, so a custom
+`transfer(from, to)` method cannot be written this way yet. For several plain SQL statements, use
+`controller.executeTransaction(List<String>)` (no parameters, never put player input into those statements).
 
 Transactions are bound to the thread that started them; work handed to another thread runs outside it.
 
