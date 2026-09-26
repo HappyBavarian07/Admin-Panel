@@ -4,6 +4,8 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  */
 
 import de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands.*;
+import de.happybavarian07.adminpanel.commands.subcommands.panels.MenuOpenCommand;
+import de.happybavarian07.adminpanel.menusystem.menu.dataclient.DataClientMainMenu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
@@ -68,7 +70,7 @@ public class DataClientCommandManager extends CommandManager {
 
         registerSubCommand(new PermissonsSyncCommand(getCommandName()));
         registerSubCommand(new TrollsSyncCommand(getCommandName()));
-        registerSubCommand(new MenuCommand(getCommandName()));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "menu", "AdminPanel.DataClient.Menu.Open", DataClientMainMenu::new));
         registerSubCommand(new ClientListListCommand(getCommandName()));
         registerSubCommand(new ClientListUpdateCommand(getCommandName()));
     }

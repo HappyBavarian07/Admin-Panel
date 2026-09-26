@@ -3,19 +3,20 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  * @Date 27.04.2022 | 17:07
  */
 
-import de.happybavarian07.adminpanel.commands.subcommands.panels.AdminPanelStartMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.TempLanguageSelectMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.playermanager.BannedPlayersMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.playermanager.PlayerSelectMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.pluginmanager.PluginAutoUpdaterMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.pluginmanager.PluginInstallMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.pluginmanager.PluginSelectMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.ChatManagerMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.ServerManagerMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.WhitelistManagerMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.servermanager.WhitelistedPlayersMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.worldmanager.WorldCreateMenuCommand;
-import de.happybavarian07.adminpanel.commands.subcommands.panels.worldmanager.WorldSelectMenuCommand;
+import de.happybavarian07.adminpanel.commands.subcommands.panels.MenuOpenCommand;
+import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.TempLanguageSelectMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.playermanager.BannedPlayersMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerSelectMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginAutoUpdaterMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginInstallMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginSelectMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ChatManagerMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ServerManagerMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.servermanager.WhitelistManagerMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.servermanager.WhitelistedPlayersMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldCreateMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
@@ -79,23 +80,18 @@ public class PanelOpenManager extends CommandManager {
     @Override
     public void setup() {
         registerSubCommand(new HelpCommand(getCommandName()));
-
-        // Panels without Args
-        registerSubCommand(new BannedPlayersMenuCommand(getCommandName()));
-        registerSubCommand(new PlayerSelectMenuCommand(getCommandName()));
-        registerSubCommand(new PluginAutoUpdaterMenuCommand(getCommandName()));
-        registerSubCommand(new PluginInstallMenuCommand(getCommandName()));
-        registerSubCommand(new PluginSelectMenuCommand(getCommandName()));
-        registerSubCommand(new ChatManagerMenuCommand(getCommandName()));
-        registerSubCommand(new ServerManagerMenuCommand(getCommandName()));
-        registerSubCommand(new WhitelistedPlayersMenuCommand(getCommandName()));
-        registerSubCommand(new WhitelistManagerMenuCommand(getCommandName()));
-        registerSubCommand(new WorldCreateMenuCommand(getCommandName()));
-        registerSubCommand(new WorldSelectMenuCommand(getCommandName()));
-        registerSubCommand(new AdminPanelStartMenuCommand(getCommandName()));
-        registerSubCommand(new TempLanguageSelectMenuCommand(getCommandName()));
-
-        // Panels with Args
-        // etc
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "BannedPlayersMenu", pmu -> new BannedPlayersMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PlayerSelectMenu", pmu -> new PlayerSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginAutoUpdaterMenu", PluginAutoUpdaterMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginInstallMenu", PluginInstallMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginSelectMenu", pmu -> new PluginSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "ChatManagerMenu", ChatManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "ServerManagerMenu", ServerManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistedPlayersMenu", pmu -> new WhitelistedPlayersMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistManagerMenu", WhitelistManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldCreateMenu", WorldCreateMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldSelectMenu", pmu -> new WorldSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "AdminPanelStartMenu", AdminPanelStartMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "TempLanguageSelectMenu", pmu -> new TempLanguageSelectMenu(pmu, null)));
     }
 }
