@@ -3,107 +3,51 @@ package de.happybavarian07.adminpanel.commands.subcommands.addoncommands;
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
 
 /*
  * @Author HappyBavarian07
  * @Date September 08, 2024 | 13:59
  */
-@CommandData
-public class AddonReloadCommand extends SubCommand {
+@SubCommandInfo(name = "reload", info = "Disables and enables an Addon again.", permission = "AdminPanel.AddonManageCMD.Reload")
+public class AddonReloadCommand extends AddonSubCommand {
     public AddonReloadCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
-        if(args.length != 1) {
-            return false;
-        }
-        String addonName = args[0];
-        if (AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName) == null) {
-            sender.sendMessage(lgm.getMessage("AddonCommand.Enable.AddonNotFound", playerOrNull, false).replace("%addon_name%", addonName));
-            return false;
-        }
-        Addon addon = AdminPanelMain.getPlugin().getAddonLoader().getAddonMainClassByName(addonName);
+    public List<Argument> arguments() {
+        return List.of(addonArgument(addon -> true));
+    }
 
-        AdminPanelMain.getPlugin().getAddonLoader().disableAddon(addon.getFile());
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        Addon addon = addon(args, 0, "Reload");
+        if (addon == null) return true;
+        AddonLoader loader = loader();
+        loader.disableAddon(addon.getFile());
+        AddonLoader.EnableResult result;
         try {
-            AddonLoader.EnableResult result = AdminPanelMain.getPlugin().getAddonLoader().enableAddon(addon.getFile(), new HashSet<>(), true);
-            switch (result) {
-                case SUCCESS:
-                    sender.sendMessage(replaceAddonPlaceholders(lgm.getMessage("AddonCommand.Reload.ReloadedMessage", playerOrNull, false), addon));
-                    break;
-                case ALREADY_ENABLED:
-                    sender.sendMessage(replaceAddonPlaceholders(lgm.getMessage("AddonCommand.Reload.AddonAlreadyEnabled", playerOrNull, false), addon));
-                    break;
-                case ERROR:
-                    sender.sendMessage(replaceAddonPlaceholders(lgm.getMessage("AddonCommand.Reload.ErrorReloadingAddon", playerOrNull, false), addon));
-                    break;
-                case NULL_ADDON:
-                    sender.sendMessage(lgm.getMessage("AddonCommand.Reload.AddonNotFound", playerOrNull, false).replace("%addon_name%", addonName));
-                    break;
-            }
+            result = loader.enableAddon(addon.getFile(), new HashSet<>(), true);
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "Could not reload addon " + addon.getName() + ": " + e, LogPrefixExtension.ADMINPANEL_MAIN, true);
+            result = AddonLoader.EnableResult.ERROR;
         }
+        send(sender, switch (result) {
+            case SUCCESS -> "AddonCommand.Reload.ReloadedMessage";
+            case ALREADY_ENABLED -> "AddonCommand.Reload.AddonAlreadyEnabled";
+            case NULL_ADDON -> "AddonCommand.Reload.AddonNotFound";
+            default -> "AddonCommand.Reload.ErrorReloadingAddon";
+        }, addon);
         return true;
-    }
-
-    @Override
-    public String name() {
-        return "enable";
-    }
-
-    @Override
-    public String info() {
-        return "Enables an Addon.";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap<>();
-        List<String> addonList = new ArrayList<>();
-        AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().forEach((addon) -> {
-            if (!addon.isEnabled()) {
-                addonList.add(addon.getName());
-            }
-        });
-        subArgs.put(1, addonList.toArray(new String[0]));
-        return subArgs;
-    }
-
-    @Override
-    public String syntax() {
-        return "/" + mainCommandName + " " + name() + " <Addon>";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.AddonManageCMD.Enable";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return true;
-    }
-
-    public String replaceAddonPlaceholders(String message, Addon addon) {
-        // %addon_name%, %addon_version%, %addon_description%, %addon_dependencies%
-        return message.replace("%addon_name%", addon.getName())
-                .replace("%addon_version%", addon.getVersion())
-                .replace("%addon_description%", addon.getDescription())
-                .replace("%addon_dependencies%", addon.getDependencies().toString());
     }
 }

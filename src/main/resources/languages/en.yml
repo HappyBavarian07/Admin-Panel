@@ -309,7 +309,7 @@ Messages:
       AddonAlreadyEnabled: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already enabled!'
       CircularDependencyError: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &chas a Circular Dependency!'
     Disable:
-      DisabledMessage: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already disabled!'
+      DisabledMessage: '%prefix% &9> &aThe Addon &7%addon_name% &a(&7%addon_version%&a) &ahas been disabled!'
       AddonNotFound: '%prefix% &9> &cThe Addon could not be found! (%addon_name%)'
       ErrorDisablingAddon: '%prefix% &9> &cAn Error occurred while disabling the Addon!'
       AddonAlreadyDisabled: '%prefix% &9> &cThe Addon &7%addon_name% &a(&7%addon_version%&a) &cis already disabled!'
@@ -329,6 +329,7 @@ Messages:
         - '&aAddon Dependencies: &7%addon_dependencies%'
         - '&aAddon Enabled: &7%addon_enabled%'
         - '+---------------------------------------------------+'
+    SystemDisabled: '%prefix% &9> &cThe Addon System is disabled!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
   ConfigReloadMenu:

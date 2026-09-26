@@ -1,102 +1,56 @@
 package de.happybavarian07.adminpanel.commands.subcommands.addoncommands;
 
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
 import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
+import java.util.List;
 
 /*
  * @Author HappyBavarian07
  * @Date September 07, 2024 | 23:59
  */
-public class AddonListCommand extends SubCommand {
-    private final int MAX_ITEM_PER_PAGE = 10;
+@SubCommandInfo(name = "listaddons", aliases = "list", info = "Lists all Addons that are installed on the Server.",
+        permission = "AdminPanel.AddonManageCMD.List")
+public class AddonListCommand extends AddonSubCommand {
+    private static final int MAX_ITEMS_PER_PAGE = 10;
 
     public AddonListCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
-        int page = 1;
-        if (args.length == 1) {
-            try {
-                page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                sender.sendMessage(lgm.getMessage("Player.Commands.NotANumber", playerOrNull, true));
-                return true;
-            }
-        }
+    public List<Argument> arguments() {
+        return List.of(Argument.integer("page").optional());
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        int page = args.integer(0, 1);
+        PaginatedList<Addon> addons = new PaginatedList<>(loader().getLoadedAddons());
+        addons.maxItemsPerPage(MAX_ITEMS_PER_PAGE).sort("bubble", false);
         try {
-            PaginatedList<Addon> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons());
-            messages.maxItemsPerPage(MAX_ITEM_PER_PAGE).sort("bubble", false);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-            if (!messages.containsPage(page)) {
-                sender.sendMessage(lgm.getMessage("AddonCommand.ListMessage.HelpPageDoesNotExist", playerOrNull, true));
-                return true;
-            }
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-            sender.sendMessage(lgm.getMessage("AddonCommand.ListMessage.Header", playerOrNull, false));
-            for (Addon a : messages.getPage(page)) {
-                sender.sendMessage(format(lgm.getMessage("AddonCommand.ListMessage.Format", playerOrNull, false), a));
-            }
-            sender.sendMessage(lgm.getMessage("AddonCommand.ListMessage.Footer", playerOrNull, true));
-        } catch (PaginatedList.ListNotSortedException e2) {
-            e2.printStackTrace();
+            return sendPage(sender, addons, page);
+        } catch (PaginatedList.ListNotSortedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private boolean sendPage(CommandSender sender, PaginatedList<Addon> addons, int page) throws PaginatedList.ListNotSortedException {
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
+        if (!addons.containsPage(page)) {
+            sender.sendMessage(message(sender, "AddonCommand.ListMessage.PageDoesNotExist"));
             return true;
         }
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", addons.getMaxPage(), false);
+        sender.sendMessage(message(sender, "AddonCommand.ListMessage.Header"));
+        for (Addon addon : addons.getPage(page)) send(sender, "AddonCommand.ListMessage.Format", addon);
+        sender.sendMessage(lgm.getMessage("AddonCommand.ListMessage.Footer", sender instanceof Player p ? p : null, true));
         return true;
-    }
-
-    @Override
-    public String name() {
-        return "listaddons";
-    }
-
-    @Override
-    public String info() {
-        return "Lists all Addons that are installed on the Server.";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[]{"list"};
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        int count = AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().size() / MAX_ITEM_PER_PAGE;
-        if (AdminPanelMain.getPlugin().getAddonLoader().getLoadedAddons().size() % MAX_ITEM_PER_PAGE != 0) {
-            count++;
-        }
-        return Map.of(1, new String[]{String.valueOf(count)});
-    }
-
-    @Override
-    public String syntax() {
-        return "/" + mainCommandName + " " + name() + " [Page]";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.AddonManageCMD.List";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return true;
-    }
-
-    public String format(String format, Addon addon) {
-        return format
-                .replace("%addon_name%", addon.getName())
-                .replace("%addon_version%", addon.getVersion())
-                .replace("%addon_description%", addon.getDescription())
-                .replace("%addon_dependencies%", addon.getDependencies().toString());
     }
 }
