@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.commands.managers;/*
 
 import de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManager;
 import de.happybavarian07.coolstufflib.commandmanagement.HelpCommand;
@@ -70,13 +71,30 @@ public class AdminPanelAdminManager extends CommandManager {
     public void setup() {
         registerSubCommand(new HelpCommand(getCommandName()));
 
-        registerSubCommand(new ReloadConfigCommand(getCommandName()));
-        registerSubCommand(new ReloadDataCommand(getCommandName()));
-        registerSubCommand(new ReloadLangCommand(getCommandName()));
-        registerSubCommand(new ReloadPluginCommand(getCommandName()));
-        registerSubCommand(new ReloadCommandManagersCommand(getCommandName()));
-        registerSubCommand(new UpdateConfigCommand(getCommandName()));
-        registerSubCommand(new UpdateLangFilesCommand(getCommandName()));
+        AdminPanelMain plugin = AdminPanelMain.getPlugin();
+        String perm = "AdminPanel.AdminPanelAdminCommands.";
+        registerSubCommand(new AdminActionCommand(getCommandName(), "reloadconfig", new String[0], perm + "ReloadConfig",
+                "ReloadConfig", false, sender -> plugin.reloadConfig()));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "reloaddata", new String[0], perm + "ReloadData",
+                "ReloadData", false, sender -> {
+                    if (!plugin.reloadDataYML()) throw new IllegalStateException("data.yml could not be read");
+                }));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "reloadlang", new String[0], perm + "ReloadLang",
+                "ReloadLang", false, sender -> lgm.reloadLanguages(sender, true)));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "reload", new String[]{"reloadplugin"}, perm + "ReloadPlugin",
+                "ReloadPlugin", true, sender -> new PluginUtils().reload(plugin)));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "reloadcommandmanagers", new String[]{"reloadcm"}, perm + "ReloadCommandManagers",
+                "ReloadCommandManagers", false, sender -> {
+                    plugin.getCommandManagerRegistry().unregisterAll();
+                    plugin.getInitMethods().initCommandManagers();
+                }));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "updateconfig", new String[0], perm + "UpdateConfig",
+                "UpdateConfig", false, sender -> plugin.updateConfig()));
+        registerSubCommand(new AdminActionCommand(getCommandName(), "updatelangfiles", new String[]{"updatelang"}, perm + "UpdateLangFiles",
+                "UpdateLangFiles", false, sender -> {
+                    lgm.updateLangFiles();
+                    lgm.reloadLanguages(sender, true);
+                }));
         registerSubCommand(new StartUpLoggerControlCommand(getCommandName()));
         registerSubCommand(new BugReportCommand(getCommandName()));
         registerSubCommand(new BackupManagerCommand(getCommandName()));

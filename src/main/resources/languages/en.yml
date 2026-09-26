@@ -359,6 +359,19 @@ Messages:
       InvalidInput: '%prefix% &9> &cInvalid input! Using as string instead.'
   ToManyArguments: '&4Too many Arguments!'
   TooFewArguments: '&4Too few Arguments!'
+  AdminPanelAdmin:
+    # %action% = what is being reloaded or updated (from Actions below), %error% = the error message
+    ActionStarted: '%prefix% &9> &7Starting: %action%'
+    ActionFinished: '%prefix% &9> &a%action%: done!'
+    ActionFailed: '%prefix% &9> &cCould not finish %action%: &6%error% &7(see the console)'
+    Actions:
+      ReloadConfig: 'Reload of the Config'
+      ReloadData: 'Reload of the Data File'
+      ReloadLang: 'Reload of the Language Files'
+      ReloadPlugin: 'Reload of Admin-Panel'
+      ReloadCommandManagers: 'Reload of the Command Managers'
+      UpdateConfig: 'Update of the Config'
+      UpdateLangFiles: 'Update of the Language Files'
 Items:
   General:
     ConfirmationMenu:

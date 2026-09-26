@@ -367,6 +367,19 @@ Messages:
     SystemDisabled: '%prefix% &9> &cDas Addon-System ist deaktiviert!'
   ToManyArguments: '&4Zu viele Argumente!'
   TooFewArguments: '&4Zu wenig Argumente!'
+  AdminPanelAdmin:
+    # %action% = was neu geladen oder aktualisiert wird (aus Actions unten), %error% = die Fehlermeldung
+    ActionStarted: '%prefix% &9> &7Starte: %action%'
+    ActionFinished: '%prefix% &9> &a%action%: fertig!'
+    ActionFailed: '%prefix% &9> &c%action% ist fehlgeschlagen: &6%error% &7(siehe Konsole)'
+    Actions:
+      ReloadConfig: 'Neuladen der Config'
+      ReloadData: 'Neuladen der Daten-Datei'
+      ReloadLang: 'Neuladen der Sprachdateien'
+      ReloadPlugin: 'Neuladen von Admin-Panel'
+      ReloadCommandManagers: 'Neuladen der Command Manager'
+      UpdateConfig: 'Aktualisieren der Config'
+      UpdateLangFiles: 'Aktualisieren der Sprachdateien'
 Items:
   General:
     ConfirmationMenu:
