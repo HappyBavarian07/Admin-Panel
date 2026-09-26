@@ -2,7 +2,7 @@ package de.happybavarian07.adminpanel.utils.dependencyloading;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.CustomPluginFileLogger;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import de.happybavarian07.adminpanel.utils.dependencyloading.annotations.*;
 import de.happybavarian07.coolstufflib.utils.PluginFileLogger;
 import io.github.classgraph.ClassGraph;

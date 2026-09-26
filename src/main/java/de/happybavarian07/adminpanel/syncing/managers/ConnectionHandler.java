@@ -13,7 +13,7 @@ import de.happybavarian07.adminpanel.syncing.events.JavaSocketPacketReceivedEven
 import de.happybavarian07.adminpanel.syncing.utils.EncryptionUtils;
 import de.happybavarian07.adminpanel.syncing.utils.Packet;
 import de.happybavarian07.adminpanel.utils.Result;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;

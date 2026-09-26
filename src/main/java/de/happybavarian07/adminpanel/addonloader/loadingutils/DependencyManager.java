@@ -3,7 +3,7 @@ package de.happybavarian07.adminpanel.addonloader.loadingutils;
 import de.happybavarian07.adminpanel.addonloader.api.Addon;
 import de.happybavarian07.adminpanel.addonloader.utils.PluginDependency;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import de.happybavarian07.adminpanel.utils.dependencyloading.annotations.Dependencies;
 import de.happybavarian07.adminpanel.utils.dependencyloading.annotations.Dependency;
 import de.happybavarian07.adminpanel.utils.dependencyloading.annotations.Repositories;

@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.main;
 
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
+
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.backupmanager.BackupManager;
 import de.happybavarian07.adminpanel.backupmanager.FileBackup;

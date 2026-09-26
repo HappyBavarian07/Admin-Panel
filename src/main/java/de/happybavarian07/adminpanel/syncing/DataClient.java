@@ -9,7 +9,7 @@ import de.happybavarian07.adminpanel.syncing.managers.StatsManager;
 import de.happybavarian07.adminpanel.syncing.utils.Action;
 import de.happybavarian07.adminpanel.syncing.utils.CheckConnectionRunnable;
 import de.happybavarian07.adminpanel.syncing.utils.Packet;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

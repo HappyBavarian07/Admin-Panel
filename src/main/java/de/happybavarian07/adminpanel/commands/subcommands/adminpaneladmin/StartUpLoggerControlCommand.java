@@ -1,4 +1,8 @@
-package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
+package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;
+
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
+
+/*
  * @Author HappyBavarian07
  * @Date 17.12.2022 | 20:43
  */

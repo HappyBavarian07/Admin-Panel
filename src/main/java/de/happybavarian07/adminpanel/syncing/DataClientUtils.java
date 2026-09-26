@@ -7,7 +7,7 @@ import de.happybavarian07.adminpanel.syncing.utils.Packet;
 import de.happybavarian07.adminpanel.syncing.utils.PermissionsMap;
 import de.happybavarian07.adminpanel.utils.Result;
 import de.happybavarian07.adminpanel.utils.Serialization;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 

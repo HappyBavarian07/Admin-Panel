@@ -4,7 +4,7 @@ package de.happybavarian07.adminpanel.syncing.utils;/*
  */
 
 import de.happybavarian07.adminpanel.syncing.managers.*;
-import de.happybavarian07.adminpanel.utils.StartUpLogger;
+import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
