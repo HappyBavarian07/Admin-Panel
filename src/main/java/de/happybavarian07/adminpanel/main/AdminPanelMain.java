@@ -34,7 +34,6 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
@@ -166,21 +165,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     public DataClient getDataClient() {
-        try {
-            return dataClient;
-        } catch (CommandException e) {
-            System.out.println("Data Client is not connected to Data Server from BungeeCord!");
-        }
-        return null;
+        return dataClient;
     }
 
     public DataClientUtils getDataClientUtils() {
-        try {
-            return dataClientUtils;
-        } catch (CommandException e) {
-            System.out.println("Data Client is not connected to Data Server from BungeeCord!");
-        }
-        return null;
+        return dataClientUtils;
     }
 
     public BungeeUtils getBungeeUtils() {
@@ -278,15 +267,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                     String addonName = tempConfig.getString(path + "Name");
                     try {
                         loader.loadAddon(addonFile);
-                        logger.coloredMessage(ChatColor.GREEN, "Loaded Addon: " + addonName);
-                    } catch (IOException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    try {
                         loader.enableAddon(addonFile, new HashSet<>(), true);
-                    } catch (IOException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
+                        logger.coloredMessage(ChatColor.GREEN, "Loaded Addon: " + addonName);
+                    } catch (IOException | ClassNotFoundException | RuntimeException e) {
+                        fileLogger.writeToLog(Level.SEVERE, "Could not load addon " + addonName + " (" + addonFile.getName() + "): " + e,
+                                LogPrefixExtension.ADMINPANEL_MAIN, true);
                     }
                 });
             }
@@ -674,9 +659,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             pluginStateManager.saveAllState();
         }
         if (pluginStateManager != null && pluginStateManager.checkIfBungee(false)) {
-            bungeeUtils.closeBungeeChannel();
-            String path = "Plugin.BungeeSyncSystem.JavaSockets.";
-            if (getConfig().getBoolean(path + "enabled")) {
+            if (bungeeUtils != null) bungeeUtils.closeBungeeChannel();
+            if (dataClient != null) {
                 dataClient.disconnect(true);
                 dataClient.getStatsManager().saveStatsToFile();
             }
