@@ -3,121 +3,49 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 29.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
 import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
-import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
-@CommandData
-public class ClientListListCommand extends SubCommand {
+@SubCommandInfo(name = "ListClients", info = "Lists all Clients that are connected to the Server",
+        permission = "AdminPanel.DataClient.SubCommands.ListClients", autoRegisterPermission = false)
+public class ClientListListCommand extends DataClientSubCommand {
+    private static final String KEY = "DataClient.ClientListMessages.";
+
     public ClientListListCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        if (args.length != 1) {
-            return false;
-        }
+    public List<Argument> arguments() {
+        return List.of(Argument.integer("page").optional());
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        int page = args.integer(0, 1);
+        List<String> clients = client().getConnectionHandler().getOtherConnectedClients();
+        PaginatedList<String> list = new PaginatedList<>(clients);
+        list.maxItemsPerPage(10).sort("bubble", false);
         try {
-            int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
-            messages.maxItemsPerPage(10).sort("bubble", false);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-            if (!messages.containsPage(page)) {
-                player.sendMessage(lgm.getMessage("DataClient.ClientListMessages.PageDoesNotExist", player, true));
+            if (!list.containsPage(page)) {
+                CommandText.send(lgm, sender, KEY + "PageDoesNotExist");
                 return true;
             }
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-            player.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Header", player, false));
-            for (String s : messages.getPage(page)) {
-                player.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Format", player, false)
-                        .replace("%count%", String.valueOf(messages.getListOfThings().indexOf(s)))
-                        .replace("%dataClientName%", s));
+            Object[] pages = {"%page%", page, "%max_page%", list.getMaxPage()};
+            CommandText.send(lgm, sender, KEY + "Header", pages);
+            for (String client : list.getPage(page)) {
+                CommandText.send(lgm, sender, KEY + "Format", "%count%", list.getListOfThings().indexOf(client), "%dataClientName%", client);
             }
-            player.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Footer", player, true));
-        } catch (NumberFormatException e) {
-            player.sendMessage(lgm.getMessage("Player.Commands.NotANumber", player, true));
-            return true;
-        } catch (PaginatedList.ListNotSortedException e2) {
-            e2.printStackTrace();
-            return true;
+            CommandText.send(lgm, sender, KEY + "Footer", pages);
+        } catch (PaginatedList.ListNotSortedException e) {
+            throw new IllegalStateException(e);
         }
         return true;
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        if (args.length != 1) {
-            return false;
-        }
-        try {
-            int page = Integer.parseInt(args[0]);
-            PaginatedList<String> messages = new PaginatedList<>(AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
-            System.out.println("Other Connected Clients: " + AdminPanelMain.getPlugin().getDataClient().getConnectionHandler().getOtherConnectedClients());
-            messages.maxItemsPerPage(10).sort("bubble", false);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-            if (!messages.containsPage(page)) {
-                sender.sendMessage(lgm.getMessage("DataClient.ClientListMessages.PageDoesNotExist", null, true));
-                return true;
-            }
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-            sender.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Header", null, false));
-            for (String s : messages.getPage(page)) {
-                sender.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Format", null, false)
-                        .replace("%count%", String.valueOf(messages.getListOfThings().indexOf(s)))
-                        .replace("%dataClientName%", s));
-            }
-            sender.sendMessage(lgm.getMessage("DataClient.ClientListMessages.Footer", null, true));
-        } catch (NumberFormatException e) {
-            sender.sendMessage(lgm.getMessage("Player.Commands.NotANumber", null, true));
-            return true;
-        } catch (PaginatedList.ListNotSortedException e2) {
-            e2.printStackTrace();
-            return true;
-        }
-        return true;
-    }
-
-    @Override
-    public String name() {
-        return "ListClients";
-    }
-
-    @Override
-    public String info() {
-        return "Lists all Clients that are connected to the Server";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public String syntax() {
-        return "/dataclient ListClients <Page>";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.DataClient.SubCommands.ListClients";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
     }
 }

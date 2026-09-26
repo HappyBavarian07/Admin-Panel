@@ -29,8 +29,11 @@ Messages:
       # Placeholders:
       # %target_player% = Target Player
       PermissionsSendForOnePlayer: '%prefix% &9> &aDie Permissions von ''%target_player%'' wurden an den Server geschickt.'
+      NoPermissionsStored: '%prefix% &9> &cFür ''%target_player%'' sind in Admin-Panel keine Permissions gespeichert.'
     TrollsSync:
       TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
+      TrollDataSendFailed: '%prefix% &9> &cDie Daten des Trolls ''%troll%'' konnten nicht gesendet werden.'
+    NotEnabled: '%prefix% &9> &cDer Data Client ist nicht aktiviert!'
   BackupSystem:
     SubCommands:
       # Placeholders: 

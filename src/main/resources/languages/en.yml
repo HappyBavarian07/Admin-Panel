@@ -24,17 +24,20 @@ Messages:
       Format: '  &bClient-%count% &7- &b%dataClientName%'
       Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
     PermissionsSync:
-      PermissionsSendForAllPlayers: '%prefix% &9> &aDie Permissions von allen Spielern wurden an den Server geschickt.'
+      PermissionsSendForAllPlayers: '%prefix% &9> &aSent the permissions of all players to the server.'
       # Placeholders:
       # %target_player% = Target Player
-      PermissionsSendForOnePlayer: '%prefix% &9> &aDie Permissions von ''%target_player%'' wurden an den Server geschickt.'
+      PermissionsSendForOnePlayer: '%prefix% &9> &aSent the permissions of ''%target_player%'' to the server.'
+      NoPermissionsStored: '%prefix% &9> &c''%target_player%'' has no permissions stored in Admin-Panel.'
     TrollsSync:
-      TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
+      TrollDataSendForAllPlayers: '%prefix% &9> &aSent the data of the troll ''%troll%'' to the server.'
+      TrollDataSendFailed: '%prefix% &9> &cCould not send the data of the troll ''%troll%''.'
     Menu:
       AutoCheckConnectionTimingChat: '%prefix% &9> &aEnter the Auto Check Connection Timing in the Chat! (Current: %apdataclient_auto_check_connection_timing%)'
       AutoCheckConnectingTimingChatSuccess: '%prefix% &9> &aThe Auto Check Connection Timing has been set to %apdataclient_auto_check_connection_timing%!'
       FileLoggingPrefixChat: '%prefix% &9> &aEnter the File Logging Prefix in the Chat! (Current: %apdataclient_file_logging_prefix%)'
       FileLoggingPrefixChatSuccess: '%prefix% &9> &aThe File Logging Prefix has been set to %apdataclient_file_logging_prefix%!'
+    NotEnabled: '%prefix% &9> &cThe Data Client is not enabled!'
   BackupSystem:
     SubCommands:
       # Placeholders:

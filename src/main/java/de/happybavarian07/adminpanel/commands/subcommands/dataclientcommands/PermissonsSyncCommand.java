@@ -1,127 +1,54 @@
 package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Author HappyBavarian07
- * @Date 26.11.2022 | 17:42
+ * @Date 23.11.2022 | 16:56
  */
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
-import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.adminpanel.permissions.PermissionsManager;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
-@CommandData
-public class PermissonsSyncCommand extends SubCommand {
+@SubCommandInfo(name = "SyncPermissions", aliases = "SyncPerms",
+        info = "Sync Permissions across Servers. Without a Player, all Players are sent.",
+        permission = "AdminPanel.DataClient.SubCommands.SyncPermissions", autoRegisterPermission = false)
+public class PermissonsSyncCommand extends DataClientSubCommand {
+    private static final String KEY = "DataClient.PermissionsSync.";
+
     public PermissonsSyncCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        if (args.length == 0) {
-            for (UUID permissionHolders : AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().keySet()) {
-                AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
-                        permissionHolders,
-                        AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
-                        "null"
-                );
+    public List<Argument> arguments() {
+        return List.of(Argument.player("player").optional());
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        PermissionsManager permissions = AdminPanelMain.getPlugin().getPermissionsManager();
+        if (!args.has(0)) {
+            for (UUID holder : permissions.getAllPlayerPermissions().keySet()) {
+                utils().sendPlayerPermissions(holder, permissions.getPlayerPermissions(holder), "null");
             }
-            player.sendMessage(lgm.getMessage("DataClient.PermissionsSync.PermissionsSendForAllPlayers", player, false));
-            return true;
-        } else if (args.length == 1) {
-            UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
-            //System.out.println("UUID: " + permissionHolder);
-            if (!AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().containsKey(permissionHolder))
-                return false;
-            AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
-                    permissionHolder,
-                    AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolder),
-                    "null"
-            );
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
-            player.sendMessage(lgm.getMessage("DataClient.PermissionsSync.PermissionsSendForOnePlayer", player, true));
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        if (args.length == 0) {
-            for (UUID permissionHolders : AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().keySet()) {
-                AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
-                        permissionHolders,
-                        AdminPanelMain.getPlugin().getPermissionsManager().getAllPlayerPermissions().get(permissionHolders),
-                        "null"
-                );
-            }
-            sender.sendMessage(lgm.getMessage("DataClient.PermissionsSync.PermissionsSendForAllPlayers", null, false));
+            CommandText.send(lgm, sender, KEY + "PermissionsSendForAllPlayers");
             return true;
         }
-        if (args.length == 1) {
-            UUID permissionHolder = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
-            //System.out.println("UUID: " + permissionHolder);
-            if (!AdminPanelMain.getPlugin().getPermissionsManager().hasPermissions(permissionHolder)) return false;
-            AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(
-                    permissionHolder,
-                    AdminPanelMain.getPlugin().getPermissionsManager().getPlayerPermissions(permissionHolder),
-                    "null"
-            );
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target_player%", Bukkit.getOfflinePlayer(permissionHolder).getName(), false);
-            sender.sendMessage(lgm.getMessage("DataClient.PermissionsSync.PermissionsSendForOnePlayer", null, true));
+        OfflinePlayer target = Bukkit.getOfflinePlayer(args.string(0));
+        if (!permissions.hasPermissions(target.getUniqueId())) {
+            CommandText.send(lgm, sender, KEY + "NoPermissionsStored", "%target_player%", args.string(0));
             return true;
-        } else {
-            return false;
         }
-    }
-
-    @Override
-    public String name() {
-        return "SyncPermissions";
-    }
-
-    @Override
-    public String info() {
-        return "Sync Permissions accross Servers. If [Player] = null, then All Players get selected.";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[]{"SyncPerms"};
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap<>();
-        String[] playerNames = new String[Bukkit.getOnlinePlayers().size()];
-        int count = 0;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            playerNames[count] = player.getName();
-            count++;
-        }
-        subArgs.put(1, playerNames);
-        return subArgs;
-    }
-
-    @Override
-    public String syntax() {
-        return "/dataclient SyncPerms [Player]";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.DataClient.SubCommands.SyncPermissions";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
+        utils().sendPlayerPermissions(target.getUniqueId(), permissions.getPlayerPermissions(target.getUniqueId()), "null");
+        CommandText.send(lgm, sender, KEY + "PermissionsSendForOnePlayer", "%target_player%", String.valueOf(target.getName()));
+        return true;
     }
 }

@@ -3,68 +3,22 @@ package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Date 29.11.2022 | 17:42
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.Map;
-
-@CommandData
-public class ClientListUpdateCommand extends SubCommand {
+@SubCommandInfo(name = "UpdateClientList", info = "Requests a Client List Update from the Server",
+        permission = "AdminPanel.DataClient.SubCommands.UpdateClients", autoRegisterPermission = false)
+public class ClientListUpdateCommand extends DataClientSubCommand {
     public ClientListUpdateCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        AdminPanelMain.getPlugin().getDataClient().getPacketHandler().requestClientListUpdate();
-        player.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", player, false));
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        client().getPacketHandler().requestClientListUpdate();
+        CommandText.send(lgm, sender, "DataClient.RequestedUpdateMessage");
         return true;
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        AdminPanelMain.getPlugin().getDataClient().getPacketHandler().requestClientListUpdate();
-        sender.sendMessage(lgm.getMessage("DataClient.RequestedUpdateMessage", null, false));
-        return true;
-    }
-
-    @Override
-    public String name() {
-        return "UpdateClientList";
-    }
-
-    @Override
-    public String info() {
-        return "Requests a Client List Update from the Server";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public String syntax() {
-        return "/dataclient UpdateClientList";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.DataClient.SubCommands.UpdateClients";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
     }
 }

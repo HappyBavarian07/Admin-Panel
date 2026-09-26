@@ -1,81 +1,37 @@
 package de.happybavarian07.adminpanel.commands.subcommands.dataclientcommands;/*
  * @Author HappyBavarian07
- * @Date 26.11.2022 | 17:42
+ * @Date 23.11.2022 | 16:56
  */
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
-import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
-import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@CommandData(allowOnlySubCommandArgsThatFitToSubArgs = true)
-public class TrollsSyncCommand extends SubCommand {
+@SubCommandInfo(name = "SyncTrolls", info = "Sync specific Trolls with other Servers",
+        permission = "AdminPanel.DataClient.SubCommands.SyncTrolls", autoRegisterPermission = false)
+public class TrollsSyncCommand extends DataClientSubCommand {
+    private static final List<String> TROLLS = List.of("HurtingWaterMap", "ChatMuteMap", "VillagerSoundsMap",
+            "BlockBreakPreventMap", "DupeMobsOnKillMap", "FreezePlayerMap");
+
     public TrollsSyncCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        if (args.length != 1) return false;
+    public List<Argument> arguments() {
+        return List.of(Argument.choice("troll", TROLLS.toArray(new String[0])));
+    }
 
-        // TODO Maybe Send Player Specific troll Data
-        boolean result = AdminPanelMain.getPlugin().getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%troll%", args[0], false);
-        player.sendMessage(lgm.getMessage("DataClient.TrollsSync.TrollDataSendForAllPlayers", player, true));
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        String troll = TROLLS.stream().filter(t -> t.equalsIgnoreCase(args.string(0))).findFirst().orElse(null);
+        if (troll == null) return false;
+        boolean sent = utils().sendCustomMap("null", troll).hasSucceeded();
+        CommandText.send(lgm, sender, sent ? "DataClient.TrollsSync.TrollDataSendForAllPlayers" : "DataClient.TrollsSync.TrollDataSendFailed", "%troll%", troll);
         return true;
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        if (args.length == 0) return false;
-
-        // TODO Maybe Send Player Specific troll Data
-        boolean result = AdminPanelMain.getPlugin().getDataClientUtils().sendCustomMap("null", args[0]).hasSucceeded();
-        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%troll%", args[0], false);
-        sender.sendMessage(lgm.getMessage("DataClient.TrollsSync.TrollDataSendForAllPlayers", null, true));
-        return true;
-    }
-
-    @Override
-    public String name() {
-        return "SyncTrolls";
-    }
-
-    @Override
-    public String info() {
-        return "Sync specific Trolls with other Servers";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[0];
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap<>();
-        subArgs.put(1, new String[]{"HurtingWaterMap", "ChatMuteMap", "VillagerSoundsMap", "BlockBreakPreventMap", "DupeMobsOnKillMap", "FreezePlayerMap"});
-        return subArgs;
-    }
-
-    @Override
-    public String syntax() {
-        return "/dataclient SyncTrolls <Troll>";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.DataClient.SubCommands.SyncTrolls";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
     }
 }
