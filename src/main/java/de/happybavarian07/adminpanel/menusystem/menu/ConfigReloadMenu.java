@@ -1,19 +1,13 @@
 package de.happybavarian07.adminpanel.menusystem.menu;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
 
 public class ConfigReloadMenu extends Menu {
 
@@ -73,12 +67,8 @@ public class ConfigReloadMenu extends Menu {
         registerButton(getSlot("ConfigReloadMenu.ReloadData", 12), 
             lgm.getItem("ConfigReloadMenu.ReloadData", player, false), 
             (p, e) -> {
-                AdminPanelMain plugin = AdminPanelMain.getPlugin();
-                try {
-                    plugin.getDataYML().load(new File(plugin.getDataFolder(), "data.yml"));
+                if (AdminPanelMain.getPlugin().reloadDataYML()) {
                     p.sendMessage(lgm.getMessage("ConfigReloadMenu.DataReloaded", p, true));
-                } catch (IOException | InvalidConfigurationException ex) {
-                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Could not reload data.yml: " + ex.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
                 }
                 this.open();
             }, null);

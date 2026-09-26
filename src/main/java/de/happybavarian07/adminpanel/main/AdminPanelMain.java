@@ -34,6 +34,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
@@ -688,6 +689,19 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public FileConfiguration getDataYML() {
         return dataYML;
+    }
+
+    /** Reloads data.yml into the same object, so everything holding {@link #getDataYML()} sees the new values. */
+    public boolean reloadDataYML() {
+        File dataFile = new File(getDataFolder(), "data.yml");
+        if (!dataFile.exists()) saveResource("data.yml", false);
+        try {
+            dataYML.load(dataFile);
+            return true;
+        } catch (IOException | InvalidConfigurationException e) {
+            fileLogger.writeToLog(Level.SEVERE, "Could not reload data.yml: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
+            return false;
+        }
     }
 
     public CustomPluginFileLogger getFileLogger() {

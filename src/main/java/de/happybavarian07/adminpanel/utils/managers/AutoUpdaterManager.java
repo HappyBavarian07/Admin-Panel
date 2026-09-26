@@ -8,7 +8,6 @@ import de.happybavarian07.adminpanel.utils.VersionComparator;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 
 /*
@@ -26,15 +24,11 @@ import java.util.logging.Level;
  */
 public class AutoUpdaterManager {
     private final Map<String, NewUpdater> autoUpdaterPlugins;
-    private final File dataFile;
     private final AdminPanelMain plugin;
-    private FileConfiguration dataYML;
 
     public AutoUpdaterManager(AdminPanelMain plugin) {
         this.plugin = plugin;
         this.autoUpdaterPlugins = new HashMap<>();
-        this.dataFile = new File(plugin.getDataFolder(), "data.yml");
-        this.dataYML = YamlConfiguration.loadConfiguration(dataFile);
     }
 
     public void setup(NewUpdater adminPanelUpdater) {
@@ -42,36 +36,29 @@ public class AutoUpdaterManager {
             plugin.getAutoUpdaterManager().getAutoUpdaterPlugins().clear();
             plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
             plugin.getStartUpLogger().message("&1&lAuto Plugin Updater initiated&r");
-            for (String sectionString : Objects.requireNonNull(dataYML.getConfigurationSection("PluginsToUpdate")).getKeys(false)) {
-                if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
-
-                ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                assert section != null;
-                if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").isEmpty())
-                    continue;
-
-                handleNewUpdater(sectionString, section, adminPanelUpdater);
-            }
+            checkAll(adminPanelUpdater);
             if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         plugin.getAutoUpdaterManager().getAutoUpdaterPlugins().clear();
-                        for (String sectionString : Objects.requireNonNull(dataYML.getConfigurationSection("PluginsToUpdate")).getKeys(false)) {
-                            if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
-
-                            ConfigurationSection section = dataYML.getConfigurationSection("PluginsToUpdate." + sectionString);
-                            assert section != null;
-                            if (section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").isEmpty())
-                                continue;
-
-                            handleNewUpdater(sectionString, section, adminPanelUpdater);
-                        }
+                        checkAll(adminPanelUpdater);
                     }
                 }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
             }
         }).start();
         plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
+    }
+
+    private void checkAll(NewUpdater adminPanelUpdater) {
+        ConfigurationSection plugins = plugin.getDataYML().getConfigurationSection("PluginsToUpdate");
+        if (plugins == null) return;
+        for (String name : plugins.getKeys(false)) {
+            ConfigurationSection section = plugins.getConfigurationSection(name);
+            if (section == null || section.getInt("spigotID", -1) == -1 || section.getString("fileName", "").isEmpty())
+                continue;
+            handleNewUpdater(name, section, adminPanelUpdater);
+        }
     }
 
     private void handleNewUpdater(String sectionString, ConfigurationSection section, NewUpdater updater) {
@@ -119,10 +106,10 @@ public class AutoUpdaterManager {
      * @param selectedPlugin The Plugin
      */
     public void removePluginFromUpdater(Plugin selectedPlugin) {
-        dataYML.set("PluginsToUpdate." + selectedPlugin.getName(), null);
+        plugin.getDataYML().set("PluginsToUpdate." + selectedPlugin.getName(), null);
 
         try {
-            dataYML.save(new File(plugin.getDataFolder() + "/data.yml"));
+            saveData();
         } catch (IOException e) {
             plugin.getStartUpLogger().message("Failed to save data.yml while removing plugin: " + e.getMessage());
         }
@@ -131,13 +118,14 @@ public class AutoUpdaterManager {
 
     public void addPluginToUpdater(Plugin pl, int spigotID, String fileName) {
         String path = "PluginsToUpdate." + pl.getName() + ".";
+        FileConfiguration dataYML = plugin.getDataYML();
         dataYML.set(path + "spigotID", spigotID);
         dataYML.set(path + "fileName", fileName);
         dataYML.set(path + "link", "");
         dataYML.set(path + "bypassExternalDownload", false);
 
         try {
-            dataYML.save(new File(AdminPanelMain.getPlugin().getDataFolder() + "/data.yml"));
+            saveData();
         } catch (IOException e) {
             AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.SEVERE, "Failed to save data.yml while adding plugin: " + e.getMessage(), LogPrefixExtension.UPDATER);
         }
@@ -165,12 +153,12 @@ public class AutoUpdaterManager {
         return autoUpdaterPlugins.get(pluginName);
     }
 
-    /**
-     * Saves the Permissions to the Permissions.yml File
-     */
     public void reloadData() {
-        plugin.saveResource("data.yml", false);
-        dataYML = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + "/data.yml"));
+        plugin.reloadDataYML();
+    }
+
+    private void saveData() throws IOException {
+        plugin.getDataYML().save(new File(plugin.getDataFolder(), "data.yml"));
     }
 
     public Map<String, NewUpdater> getAutoUpdaterPlugins() {
