@@ -5,6 +5,8 @@ import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.data.AdminPanelData;
+import de.happybavarian07.adminpanel.data.LegacyDataImporter;
+import de.happybavarian07.adminpanel.data.PluginDescriptionEntry;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
@@ -47,6 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -87,6 +90,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private PluginUtils globalPluginUtils;
     private CoolStuffLib coolStuffLib;
     private AdminPanelData data;
+    private LegacyDataImporter.LegacyData legacyData;
+    private File legacyFile;
     private ServiceRegistry serviceRegistry;
     private UUID dataServiceUUID;
 
@@ -329,6 +334,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
         data = new AdminPanelData(getRepositoryManager());
+        importLegacyTables();
         setupPluginStateManager();
         pluginDescriptionManager = new PluginDescriptionManager();
         menuAddonManager = coolStuffLib.getMenuAddonManager();
@@ -344,6 +350,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         initializePrefix();
         initEvents();
         setupLanguageHandler();
+        importLegacyLanguages();
         enableLanguageManager();
         setupStaffChatHandler();
         updateConfigFiles();
@@ -434,6 +441,43 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getDataService();
         } catch (Exception ignored) {
         }
+    }
+
+    private void importLegacyTables() {
+        legacyFile = LegacyDataImporter.findLegacyFile(getDataFolder());
+        if (legacyFile == null) return;
+        try {
+            legacyData = LegacyDataImporter.read(legacyFile);
+        } catch (SQLException e) {
+            fileLogger.writeToLog(Level.SEVERE, "Could not import " + legacyFile + ": " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
+            legacyFile = null;
+            return;
+        }
+        legacyData.pluginDescriptions().forEach((name, description) ->
+                data.descriptions().save(new PluginDescriptionEntry(name, description, -1)));
+        legacyData.flags().forEach(data::setFlag);
+    }
+
+    private void importLegacyLanguages() {
+        if (legacyData == null) return;
+        legacyData.playerLanguages().forEach((uuid, language) -> {
+            try {
+                if (languageManager.getLang(language, false) != null) {
+                    languageManager.getPLHandler().setPlayerLanguage(UUID.fromString(uuid), language);
+                }
+            } catch (IllegalArgumentException ignored) {
+                // not a UUID, skip the entry
+            }
+        });
+        File done = new File(legacyFile.getParentFile(), legacyFile.getName() + ".imported");
+        if (!legacyFile.renameTo(done)) {
+            fileLogger.writeToLog(Level.WARNING, "Imported " + legacyFile + " but could not rename it; it will be imported again next start",
+                    LogPrefixExtension.ADMINPANEL_MAIN, true);
+        }
+        fileLogger.writeToLog(Level.INFO, "Imported old data from " + legacyFile + ": " + legacyData.playerLanguages().size()
+                + " player languages, " + legacyData.pluginDescriptions().size() + " plugin descriptions, "
+                + legacyData.flags().size() + " flags", LogPrefixExtension.ADMINPANEL_MAIN, true);
+        legacyData = null;
     }
 
     private void setupAPI() {
