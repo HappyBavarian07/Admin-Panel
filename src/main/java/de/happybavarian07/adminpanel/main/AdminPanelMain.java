@@ -4,6 +4,7 @@ import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
+import de.happybavarian07.adminpanel.data.AdminPanelData;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
@@ -84,6 +85,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private APDependencyManager dependencyManager;
     private PluginUtils globalPluginUtils;
     private CoolStuffLib coolStuffLib;
+    private AdminPanelData data;
     private ServiceRegistry serviceRegistry;
     private UUID dataServiceUUID;
 
@@ -118,6 +120,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public FileCorruptionManager getFileCorruptionManager() {
         return fileCorruptionManager;
+    }
+
+    public AdminPanelData getData() {
+        return data;
     }
 
     public RepositoryManager getRepositoryManager() {
@@ -323,6 +329,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setupServiceRegistry();
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
+        data = new AdminPanelData(getRepositoryManager());
         menuAddonManager = coolStuffLib.getMenuAddonManager();
         languageManager = coolStuffLib.getLanguageManager();
         commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();
