@@ -80,18 +80,31 @@ public class PanelOpenManager extends CommandManager {
     @Override
     public void setup() {
         registerSubCommand(new HelpCommand(getCommandName()));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "BannedPlayersMenu", pmu -> new BannedPlayersMenu(pmu, null)));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "PlayerSelectMenu", pmu -> new PlayerSelectMenu(pmu, null)));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginAutoUpdaterMenu", PluginAutoUpdaterMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginInstallMenu", PluginInstallMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginSelectMenu", pmu -> new PluginSelectMenu(pmu, null)));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "ChatManagerMenu", ChatManagerMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "ServerManagerMenu", ServerManagerMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistedPlayersMenu", pmu -> new WhitelistedPlayersMenu(pmu, null)));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistManagerMenu", WhitelistManagerMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldCreateMenu", WorldCreateMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldSelectMenu", pmu -> new WorldSelectMenu(pmu, null)));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "AdminPanelStartMenu", AdminPanelStartMenu::new));
-        registerSubCommand(new MenuOpenCommand(getCommandName(), "TempLanguageSelectMenu", pmu -> new TempLanguageSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "BannedPlayersMenu", "AdminPanel.PlayerManager.BannedPlayers",
+                pmu -> new BannedPlayersMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PlayerSelectMenu", "AdminPanel.PlayerManager.open",
+                pmu -> new PlayerSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginAutoUpdaterMenu", "AdminPanel.PluginManager.AutoUpdateMenu",
+                PluginAutoUpdaterMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginInstallMenu", "AdminPanel.PluginManager.InstallPlugins",
+                PluginInstallMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "PluginSelectMenu", "AdminPanel.PluginManager.Open",
+                pmu -> new PluginSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "ChatManagerMenu", "AdminPanel.ServerManagment.ChatManager.Open",
+                ChatManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "ServerManagerMenu", "AdminPanel.ServerManagment.Open",
+                ServerManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistedPlayersMenu", "AdminPanel.ServerManagment.ManageWhitelist",
+                pmu -> new WhitelistedPlayersMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WhitelistManagerMenu", "AdminPanel.ServerManagment.ManageWhitelist",
+                WhitelistManagerMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldCreateMenu", "AdminPanel.WorldManager.Create",
+                WorldCreateMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "WorldSelectMenu", "AdminPanel.WorldManager.open",
+                pmu -> new WorldSelectMenu(pmu, null)));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "AdminPanelStartMenu", "AdminPanel.open",
+                AdminPanelStartMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "TempLanguageSelectMenu", "AdminPanel.SwitchLanguage",
+                pmu -> new TempLanguageSelectMenu(pmu, null)));
     }
 }

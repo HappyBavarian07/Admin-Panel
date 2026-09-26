@@ -18,12 +18,8 @@ public class MenuOpenCommand extends SubCommand {
     public static final String OPEN_OTHER_PERMISSION = "AdminPanel.open.other";
 
     private final String name;
+    private final String permission;
     private final Function<PlayerMenuUtility, ? extends Menu> factory;
-    private String permission;
-
-    public MenuOpenCommand(String mainCommandName, String name, Function<PlayerMenuUtility, ? extends Menu> factory) {
-        this(mainCommandName, name, null, factory);
-    }
 
     public MenuOpenCommand(String mainCommandName, String name, String permission, Function<PlayerMenuUtility, ? extends Menu> factory) {
         super(mainCommandName);
@@ -44,7 +40,6 @@ public class MenuOpenCommand extends SubCommand {
 
     @Override
     public String permissionAsString() {
-        if (permission == null) permission = factory.apply(null).getOpeningPermission();
         return permission;
     }
 
