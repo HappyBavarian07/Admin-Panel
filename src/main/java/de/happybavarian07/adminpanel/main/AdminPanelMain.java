@@ -240,7 +240,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         fileCorruptionManager.handleConfigBackupCheck();
 
         saveDefaultConfig();
-        logger = StartUpLogger.create();
+        logger = StartUpLogger.create(this);
 
         ServerPlatformDetector.isHybridServer();
         logger.coloredMessage(ChatColor.YELLOW, "Detected server platform: " +
