@@ -22,7 +22,7 @@ public class PermissionMenuHelpCommand extends SubCommand {
     @Override
     public boolean execute(CommandSender sender, CommandArgs args) {
         Player player = sender instanceof Player p ? p : null;
-        List<String> lines = lgm.getCustomObject("AdminPanelAdmin.PermissionMenuHelp", player, new ArrayList<>(), false);
+        List<String> lines = lgm.getCustomObject("Messages.AdminPanelAdmin.PermissionMenuHelp", player, new ArrayList<>(), false);
         for (String line : lines) sender.sendMessage(AdminPanelUtils.format(player, line, AdminPanelMain.getPrefix()));
         return true;
     }

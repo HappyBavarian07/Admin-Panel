@@ -33,7 +33,7 @@ public class AddonInfoCommand extends AddonSubCommand {
         Addon addon = addon(args, 0, "Info");
         if (addon == null) return true;
         Player player = sender instanceof Player p ? p : null;
-        List<String> lines = lgm.getCustomObject("AddonCommand.Info.AddonInfoMessage", player, new ArrayList<>(), false);
+        List<String> lines = lgm.getCustomObject("Messages.AddonCommand.Info.AddonInfoMessage", player, new ArrayList<>(), false);
         for (String line : lines) {
             String text = lgm.replacePlaceholders(PlaceholderType.MESSAGE, format(line, addon));
             sender.sendMessage(AdminPanelUtils.format(player, text, AdminPanelMain.getPrefix()));
