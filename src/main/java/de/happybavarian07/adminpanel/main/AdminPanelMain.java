@@ -743,6 +743,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             }
         } catch (Exception ignored) {
         }
+        if (coolStuffLib != null) {
+            coolStuffLib.shutdown();
+        }
     }
 
     /**
