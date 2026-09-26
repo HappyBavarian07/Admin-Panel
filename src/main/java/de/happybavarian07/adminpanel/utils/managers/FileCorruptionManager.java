@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.utils.managers;
 
-import de.happybavarian07.adminpanel.backupmanager.FileBackup;
+import de.happybavarian07.coolstufflib.backupmanager.FileBackup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

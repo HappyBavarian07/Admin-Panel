@@ -3,8 +3,6 @@ package de.happybavarian07.adminpanel.main;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.backupmanager.BackupManager;
-import de.happybavarian07.adminpanel.backupmanager.FileBackup;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
@@ -22,6 +20,9 @@ import de.happybavarian07.adminpanel.utils.dependencyloading.ServerPlatformDetec
 import de.happybavarian07.adminpanel.utils.managers.*;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
+import de.happybavarian07.coolstufflib.backupmanager.BackupManager;
+import de.happybavarian07.coolstufflib.backupmanager.FileBackup;
+import de.happybavarian07.coolstufflib.backupmanager.RegexFileFilter;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
 import de.happybavarian07.coolstufflib.jpa.RepositoryController;
 import de.happybavarian07.coolstufflib.jpa.utils.DatabaseProperties;
@@ -32,7 +33,6 @@ import de.happybavarian07.coolstufflib.service.api.ServiceRegistry;
 import de.happybavarian07.coolstufflib.service.impl.DefaultServiceRegistry;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandException;
@@ -308,6 +308,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         lastStartTimeMillis = System.currentTimeMillis();
         CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
                 .setDataFile(new File(getDataFolder(), "data.yml"))
+                .setBackupManager(backupManager)
                 .withLogging().create(fileLogger).build();
         tpsMeter = new TPSMeter();
         setPlugin(this);
@@ -483,55 +484,36 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupBackupManager() {
         new File(this.getDataFolder() + "/languages").mkdir();
-        String backupFolderConfig = getConfig().getString("Plugin.BackupManager.BackupFolder", "backups"); // Default "backups"
-        int numberOfBackupsBeforeDeleting = getConfig().getInt("Plugin.BackupManager.NumberOfBackupsAtOnce", 5); // Default 5
-        backupManager = new BackupManager(plugin, numberOfBackupsBeforeDeleting, getTimeInTicks(), backupFolderConfig + "/");
-        if (!new File(this.getDataFolder(), backupFolderConfig).exists()) {
-            new File(this.getDataFolder(), backupFolderConfig).mkdirs();
-        }
-        List<RegexFileFilter> filters = new ArrayList<>();
-        List<RegexFileFilter> excludeFilters = new ArrayList<>();
-        filters.add(new RegexFileFilter(".*\\.(yml|db|properties)"));
-        excludeFilters.add(new RegexFileFilter(".*\\.txt"));
-        excludeFilters.add(new RegexFileFilter("addons/.*\\.jar"));
-        backupManager.addFileBackup(new FileBackup(
-                "ConfigBackup",
-                filters,
-                excludeFilters,
-                backupManager.getBackupFolder() + "ConfigBackup"
-        ));
+        String backupFolderConfig = getConfig().getString("Plugin.BackupManager.BackupFolder", "backups");
+        int numberOfBackupsBeforeDeleting = getConfig().getInt("Plugin.BackupManager.NumberOfBackupsAtOnce", 5);
+        backupManager = new BackupManager(numberOfBackupsBeforeDeleting, getBackupIntervalSeconds());
+        List<RegexFileFilter> filters = List.of(new RegexFileFilter(".*\\.(yml|db|properties)"));
+        List<RegexFileFilter> excludeFilters = List.of(new RegexFileFilter(".*\\.txt"), new RegexFileFilter("addons/.*\\.jar"));
+        File destination = new File(new File(getDataFolder(), backupFolderConfig), "ConfigBackup");
+        destination.mkdirs();
+        backupManager.addFileBackup(new FileBackup("ConfigBackup", filters, excludeFilters, destination, getDataFolder()));
     }
 
-    private long getTimeInTicks() {
+    /** "24" = hours, or a number with s/m/h/d, from Plugin.BackupManager.BackupTime. */
+    private long getBackupIntervalSeconds() {
         String backupTime = getConfig().getString("Plugin.BackupManager.BackupTime", "24");
         if (backupTime.isEmpty()) {
             throw new IllegalArgumentException("Backup time is not configured properly.");
         }
-
-        char lastChar = backupTime.charAt(backupTime.length() - 1);
-        long timeValue;
-        long ticks;
-
-        if (Character.isDigit(lastChar)) {
-            timeValue = Long.parseLong(backupTime);
-            ticks = timeValue * 20 * 60 * 60;
-        } else {
-            String timeValueStr = backupTime.substring(0, backupTime.length() - 1);
-            try {
-                timeValue = Long.parseLong(timeValueStr);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid time value: " + timeValueStr);
-            }
-
-            ticks = switch (lastChar) {
-                case 's' -> timeValue * 20;
-                case 'm' -> timeValue * 20 * 60;
-                case 'd' -> timeValue * 20 * 60 * 60 * 24;
-                default -> timeValue * 20 * 60 * 60;
-            };
+        char unit = backupTime.charAt(backupTime.length() - 1);
+        String number = Character.isDigit(unit) ? backupTime : backupTime.substring(0, backupTime.length() - 1);
+        long value;
+        try {
+            value = Long.parseLong(number);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid time value: " + number);
         }
-
-        return ticks;
+        return switch (unit) {
+            case 's' -> value;
+            case 'm' -> value * 60;
+            case 'd' -> value * 60 * 60 * 24;
+            default -> value * 60 * 60;
+        };
     }
 
     private void registerBungeeChannels() {

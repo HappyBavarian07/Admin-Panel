@@ -3,8 +3,8 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 29.01.2023 | 12:14
  */
 
-import de.happybavarian07.adminpanel.backupmanager.BackupManager;
-import de.happybavarian07.adminpanel.backupmanager.FileBackup;
+import de.happybavarian07.coolstufflib.backupmanager.BackupManager;
+import de.happybavarian07.coolstufflib.backupmanager.FileBackup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
 import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
@@ -208,7 +208,7 @@ public class BackupManagerCommand extends SubCommand {
         placeholders.put("%backupsDone%", new Placeholder("%backupsDone%", fileBackup.getBackupsDone().toString(), PlaceholderType.ALL));
         placeholders.put("%backupsDoneSize%", new Placeholder("%backupsDoneSize%", "" + fileBackup.getBackupsDone().size(), PlaceholderType.ALL));
         placeholders.put("%identifier%", new Placeholder("%identifier%", fileBackup.getIdentifier(), PlaceholderType.ALL));
-        placeholders.put("%backupDest%", new Placeholder("%backupDest%", fileBackup.getDestinationPathToBackupToo(), PlaceholderType.ALL));
+        placeholders.put("%backupDest%", new Placeholder("%backupDest%", fileBackup.getDestinationPathToBackupToo().getPath(), PlaceholderType.ALL));
         placeholders.put("%newestBackupFile%", new Placeholder("%newestBackupFile%", fileBackup.getNewestBackupFile(), PlaceholderType.ALL));
 
         return lgm.replacePlaceholders(in, placeholders);
