@@ -28,6 +28,7 @@ import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
 import de.happybavarian07.coolstufflib.jpa.utils.DatabaseProperties;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
+import de.happybavarian07.coolstufflib.languagemanager.PerPlayerLanguageHandler;
 import de.happybavarian07.coolstufflib.menusystem.MenuAddonManager;
 import de.happybavarian07.coolstufflib.repository.RepositoryManager;
 import de.happybavarian07.coolstufflib.service.api.ServiceRegistry;
@@ -408,7 +409,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 .setLanguageFolder(new File(this.getDataFolder() + "/languages"))
                 .setResourceDirectory("languages")
                 .setPrefix("[Admin-Panel]")
-                .enablePlayerLanguageHandler()
                 .build();
     }
 
@@ -539,8 +539,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupLanguageHandler() {
-        dataYML = YamlConfiguration.loadConfiguration(new File(getDataFolder() + "/data.yml"));
-        languageManager.setPLHandler(new AdminPanelPerPlayerLanguageHandler(languageManager, new File(getDataFolder() + "/data.yml"), dataYML));
+        File dataFile = new File(getDataFolder(), "data.yml");
+        dataYML = YamlConfiguration.loadConfiguration(dataFile);
+        languageManager.setPLHandler(new PerPlayerLanguageHandler(languageManager, dataFile, dataYML));
     }
 
     private void enableLanguageManager() {
@@ -678,12 +679,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.DisablingMessage", null, true));
         } else {
             getServer().getConsoleSender().sendMessage("[Admin-Panel] disabled!");
-        }
-        try {
-            if (languageManager != null && languageManager.getPLHandler() instanceof AdminPanelPerPlayerLanguageHandler handler) {
-                handler.flushSync();
-            }
-        } catch (Exception ignored) {
         }
         if (coolStuffLib != null) {
             coolStuffLib.shutdown();
