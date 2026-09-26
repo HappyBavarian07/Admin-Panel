@@ -408,6 +408,20 @@ Messages:
       - '&75. Unscharfe Suche: ~ für eine ungenaue Suche, z.B. ''permissionDescription:chat~'''
       - '&76. Bereichs-Suche: [a TO f] sucht in einem Bereich, z.B. ''permissionDefault:[a TO f]'''
       - '&77. Kombinierte Suche: z.B. ''permissionChildren:spigot AND permissionDefault:OP'''
+  DisabledItems:
+    # %material% = das Item
+    InvalidMaterial: '%prefix% &9> &c''%material%'' ist kein Item!'
+    Disabled: '%prefix% &9> &aDas Item &e%material% &awurde deaktiviert.'
+    AlreadyDisabled: '%prefix% &9> &eDas Item &6%material% &eist schon deaktiviert.'
+    Enabled: '%prefix% &9> &aDas Item &e%material% &aist wieder erlaubt.'
+    NotDisabled: '%prefix% &9> &eDas Item &6%material% &eist nicht deaktiviert.'
+    List:
+      # %page%, %max_page%, %count% = Anzahl der deaktivierten Items
+      Empty: '%prefix% &9> &7Es sind keine Items deaktiviert.'
+      PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht! (1-%max_page%)'
+      Header: '&a------------ &bDeaktivierte Items: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
+      Format: '  &7- &e%material%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
 Items:
   General:
     ConfirmationMenu:

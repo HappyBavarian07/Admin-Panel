@@ -400,6 +400,20 @@ Messages:
       - '&75. Fuzzy Query: ~ for a fuzzy search, e.g. ''permissionDescription:chat~'''
       - '&76. Range Query: [a TO f] searches a range, e.g. ''permissionDefault:[a TO f]'''
       - '&77. Complex Query: e.g. ''permissionChildren:spigot AND permissionDefault:OP'''
+  DisabledItems:
+    # %material% = the item
+    InvalidMaterial: '%prefix% &9> &c''%material%'' is not an item!'
+    Disabled: '%prefix% &9> &aDisabled the item &e%material%&a.'
+    AlreadyDisabled: '%prefix% &9> &eThe item &6%material% &eis already disabled.'
+    Enabled: '%prefix% &9> &aEnabled the item &e%material% &aagain.'
+    NotDisabled: '%prefix% &9> &eThe item &6%material% &eis not disabled.'
+    List:
+      # %page%, %max_page%, %count% = number of disabled items
+      Empty: '%prefix% &9> &7No items are disabled.'
+      PageDoesNotExist: '%prefix% &9> &cThis Page does not exist! (1-%max_page%)'
+      Header: '&a------------ &bDisabled items: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
+      Format: '  &7- &e%material%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
 Items:
   General:
     ConfirmationMenu:

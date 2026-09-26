@@ -16,7 +16,9 @@ import de.happybavarian07.adminpanel.commands.UpdateCommand;
 import de.happybavarian07.adminpanel.commands.managers.AddonCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
+import de.happybavarian07.adminpanel.commands.managers.DisabledItemsManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
+import de.happybavarian07.adminpanel.listeners.DisabledItemsListener;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.listeners.PlayerEventHandler;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -281,6 +283,8 @@ public class InitMethods {
         pm.registerEvents(new PlayerEventHandler(AdminPanelMain.getPlugin().getPermissionsManager()), AdminPanelMain.getPlugin());
         logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), plugin);
+        logger.message("&3&lLoading Disabled Items Listener Events!&r");
+        new DisabledItemsListener();
         logger.message("&3&lLoading Main Class Listener Events!&r");
         pm.registerEvents(plugin, plugin);
         logger.message("&4&lEventregistration: Done!&r");
@@ -293,5 +297,6 @@ public class InitMethods {
         plugin.getCommandManagerRegistry().register(new AdminPanelAdminManager());
         plugin.getCommandManagerRegistry().register(new DataClientCommandManager());
         plugin.getCommandManagerRegistry().register(new AddonCommandManager());
+        plugin.getCommandManagerRegistry().register(new DisabledItemsManager());
     }
 }
