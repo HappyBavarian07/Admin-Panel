@@ -12,9 +12,6 @@ import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.permissions.PlayerPermission;
 import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
-import de.happybavarian07.adminpanel.service.api.DataService;
-import de.happybavarian07.adminpanel.service.api.DataServiceConfig;
-import de.happybavarian07.adminpanel.service.impl.DataServiceFactory;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
@@ -33,8 +30,6 @@ import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.languagemanager.PerPlayerLanguageHandler;
 import de.happybavarian07.coolstufflib.menusystem.MenuAddonManager;
 import de.happybavarian07.coolstufflib.repository.RepositoryManager;
-import de.happybavarian07.coolstufflib.service.api.ServiceRegistry;
-import de.happybavarian07.coolstufflib.service.impl.DefaultServiceRegistry;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -92,8 +87,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private AdminPanelData data;
     private LegacyDataImporter.LegacyData legacyData;
     private File legacyFile;
-    private ServiceRegistry serviceRegistry;
-    private UUID dataServiceUUID;
 
     /**
      * Returns the Prefix of the Plugin
@@ -158,15 +151,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public BackupManager getBackupManager() {
         return backupManager;
-    }
-
-    public DataService getDataService() {
-        return serviceRegistry.getAs(dataServiceUUID, DataService.class).orElseGet(
-                () -> {
-                    fileLogger.writeToLog(Level.SEVERE, "Data Service is not registered!", LogPrefixExtension.ADMINPANEL_MAIN);
-                    return null;
-                }
-        );
     }
 
     public boolean isLanguageManagerEnabled() {
@@ -330,7 +314,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         setupMenuAddonManager(coolStuffLibBuilder);
         setupLanguageManager(coolStuffLibBuilder);
         setupCommandManagerRegistry(coolStuffLibBuilder);
-        setupServiceRegistry();
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
         data = new AdminPanelData(getRepositoryManager());
@@ -421,26 +404,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupCommandManagerRegistry(CoolStuffLibBuilder builder) {
         builder.withCommandManager().enableSyntaxOnZeroArgs().build();
-    }
-
-    private void setupServiceRegistry() {
-        serviceRegistry = new DefaultServiceRegistry();
-        DataServiceFactory dataServiceFactory = new DataServiceFactory(new DataServiceConfig("sqlite", "plugin_data.db"));
-        UUID factoryId = dataServiceFactory.getServiceDescriptor().id();
-        serviceRegistry.registerFactory(dataServiceFactory.getServiceDescriptor(), dataServiceFactory, factoryId);
-        dataServiceUUID = factoryId;
-        try {
-            serviceRegistry.start(factoryId).exceptionally(ex -> {
-                fileLogger.writeToLog(Level.SEVERE, "Failed to create DataService: " + ex.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
-                return null;
-            }).join();
-        } catch (Exception e) {
-            fileLogger.writeToLog(Level.SEVERE, "Error while creating DataService: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
-        }
-        try {
-            getDataService();
-        } catch (Exception ignored) {
-        }
     }
 
     private void importLegacyTables() {
