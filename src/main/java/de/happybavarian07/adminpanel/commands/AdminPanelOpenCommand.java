@@ -46,12 +46,12 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     String targetPlayerIsNull = lgm.getMessage("Player.General.TargetedPlayerIsNull", player, false);
                     String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfForOther", player, true);
                     if (player.hasPermission("AdminPanel.open.other")) {
-                        try {
+                        if (target == null) {
+                            player.sendMessage(targetPlayerIsNull);
+                        } else {
                             new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                             player.sendMessage(openingMessageSelfOpenedForOther);
                             plugin.getFileLogger().writeToLog(Level.INFO, player.getName() + "(UUID: " + player.getUniqueId() + ")" + " opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", LogPrefixExtension.ACTIONSLOGGER_PLAYER.getLogPrefix(), false);
-                        } catch (NullPointerException e) {
-                            player.sendMessage(targetPlayerIsNull);
                         }
                     } else {
                         player.sendMessage(lgm.getMessage("Player.General.NoPermissions", player, true));
@@ -62,16 +62,16 @@ public class AdminPanelOpenCommand implements CommandExecutor {
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[0], true);
                     String targetplayerisnull = lgm.getMessage("Player.General.TargetedPlayerIsNull", null, false);
                     String openingMessageSelfOpenedForOther = lgm.getMessage("Player.General.OpeningMessageSelfForOther", target, true);
-                    try {
+                    if (target == null) {
+                        console.sendMessage(targetplayerisnull);
+                    } else {
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(target)).open();
                         console.sendMessage(openingMessageSelfOpenedForOther);
                         plugin.getFileLogger().writeToLog(Level.INFO, "Console opened Admin-Panel for " + target.getName() + "(UUID: " + target.getUniqueId() + ")", LogPrefixExtension.ACTIONSLOGGER_PLAYER.getLogPrefix(), false);
-                    } catch (NullPointerException e) {
-                        console.sendMessage(targetplayerisnull);
                     }
                 }
             } else {
-                sender.sendMessage(lgm.getMessage("Player.ToManyArguments", null, true));
+                sender.sendMessage(lgm.getMessage("Player.Commands.TooManyArguments", sender instanceof Player p ? p : null, true));
             }
         }
         return true;

@@ -62,7 +62,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%langname%", langName, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", args[1], false);
-            if (target == null) {
+            if (!target.isOnline() && !target.hasPlayedBefore()) {
                 player.sendMessage(lgm.getMessage("Player.General.TargetedPlayerIsNull", player, true));
                 return true;
             }
@@ -79,7 +79,7 @@ public class PerPlayerLanguageCommand implements CommandExecutor, TabCompleter {
             lgm.getPLHandler().setPlayerLanguage(playerUUID, langName);
             player.sendMessage(lgm.getMessage("Player.General.PerPlayerLangSetOther", player, true));
         } else {
-            AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage());
+            sender.sendMessage(AdminPanelUtils.chat(AdminPanelMain.getPrefix() + "&c Usage: &6" + command.getUsage()));
         }
         return true;
     }
