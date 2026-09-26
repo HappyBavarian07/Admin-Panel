@@ -26,6 +26,16 @@ wait_for() { # pattern, minimum count, timeout seconds
 
 status=0
 wait_for "Done (" 1 180 || status=1
+for cmd in "openpanel help" "openpanel ServerManagerMenu" "openpanel ServerManagerMenu Nobody" \
+           "addon listaddons" "addon info Nothing" "addon disable" \
+           "adminpaneladmin reloaddata" "adminpaneladmin reloadconfig" "adminpaneladmin SULControl Enable" \
+           "adminpaneladmin backup listBackups" "adminpaneladmin backup start Nothing" "adminpaneladmin permissionmenuhelp" \
+           "disableditems list" "disableditems disable NOT_AN_ITEM" "disableditems disable DIAMOND" "disableditems list" "disableditems enable DIAMOND" \
+           "dataclient ListClients" "dataclient SyncTrolls ChatMuteMap" "perplayerlang"; do
+    echo "$cmd" >> "$CMDS"
+    sleep 1
+done
+sleep 3
 echo "reload confirm" >> "$CMDS"
 wait_for "Enabling Admin-Panel" 2 180 || status=1
 sleep 8
@@ -42,6 +52,11 @@ fi
 if grep -B2 -E "^\s+at de\.happybavarian07\.adminpanel" "$LOG" | grep -q .; then
     echo "AdminPanel stack traces in the log:"
     grep -B3 -m5 -E "^\s+at de\.happybavarian07\.adminpanel" "$LOG"
+    status=1
+fi
+if grep -E "Config Path not found|null path:|An Error occurred!|Error performing sub command" "$LOG" | grep -q .; then
+    echo "Missing language keys or failing commands:"
+    grep -E "Config Path not found|null path:|An Error occurred!|Error performing sub command" "$LOG" | head -10
     status=1
 fi
 [ -f "$SERVER/plugin_data.db" ] && { echo "plugin_data.db still in the server root"; status=1; }
