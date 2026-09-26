@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.utils.managers;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.service.api.DataService;
+import de.happybavarian07.adminpanel.data.AdminPanelData;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -16,9 +16,10 @@ import java.util.UUID;
  */
 public class PluginStateManager {
     private final FileConfiguration config;
-    private final FileConfiguration dataYML;
     private final AdminPanelMain plugin;
-    private DataService dataService; // optional runtime DataService binding
+    static final String MAINTENANCE = "maintenance";
+    static final String GLOBAL_CHAT_MUTED = "globalChatMuted";
+    private final AdminPanelData data;
     private final Map<UUID, Boolean> hurtingWaterMap = new HashMap<>();
     private final Map<UUID, Boolean> chatMuteMap = new HashMap<>();
     private final Map<UUID, Boolean> villagerSoundsMap = new HashMap<>();
@@ -28,75 +29,17 @@ public class PluginStateManager {
     public boolean inMaintenanceMode = false;
     public boolean globalChatMuted = false;
 
-    /**
-     * Initializes the UtilityChecks module
-     *
-     * @param config Hopefully the Config of the Plugin
-     */
-    public PluginStateManager(FileConfiguration config, FileConfiguration dataYML, AdminPanelMain plugin) {
+    public PluginStateManager(FileConfiguration config, AdminPanelData data, AdminPanelMain plugin) {
         this.config = config;
-        this.dataYML = dataYML;
+        this.data = data;
         this.plugin = plugin;
-
-        loadConfigValues();
+        inMaintenanceMode = data.getFlag(MAINTENANCE, false);
+        globalChatMuted = data.getFlag(GLOBAL_CHAT_MUTED, false);
     }
 
-    public PluginStateManager(FileConfiguration config, DataService dataService, AdminPanelMain plugin) {
-        this.config = config;
-        this.dataYML = null;
-        this.plugin = plugin;
-        this.dataService = dataService;
-        if (dataService != null) {
-            loadFromDataService();
-        }
-    }
-
-    public void setDataService(DataService dataService) {
-        this.dataService = dataService;
-        if (this.dataService != null) {
-            loadFromDataService();
-        }
-    }
-
-    private void loadConfigValues() {
-        try {
-            if (dataYML == null) return;
-            if (dataYML.contains("plugin.state.maintenance")) {
-                inMaintenanceMode = dataYML.getBoolean("plugin.state.maintenance");
-            }
-            if (dataYML.contains("plugin.state.globalChatMuted")) {
-                globalChatMuted = dataYML.getBoolean("plugin.state.globalChatMuted");
-            }
-        } catch (Exception e) {
-            plugin.getLogger().warning("Failed to load plugin state from data.yml: " + e.getMessage());
-        }
-    }
-
-    private void loadFromDataService() {
-        try {
-            Boolean maintenance = dataService.load("plugin.state.maintenance", Boolean.class).join();
-            if (maintenance != null) inMaintenanceMode = maintenance;
-
-            Boolean chatMuted = dataService.load("plugin.state.globalChatMuted", Boolean.class).join();
-            if (chatMuted != null) globalChatMuted = chatMuted;
-
-        } catch (Exception e) {
-            plugin.getLogger().warning("Failed to load plugin state from DataService: " + e.getMessage());
-        }
-    }
-
-    private void persistFlags() {
-        if (dataService == null) return;
-        dataService.save("plugin.state.maintenance", inMaintenanceMode);
-        dataService.save("plugin.state.globalChatMuted", globalChatMuted);
-    }
-
+    /** Every change is written right away; kept for callers. */
     public void saveAllState() {
-        if (dataService == null) return;
-
-        persistFlags();
     }
-
 
     /**
      * Returns if the Plugin is in Maintenance Mode
@@ -109,7 +52,7 @@ public class PluginStateManager {
 
     public void setInMaintenanceMode(boolean inMaintenanceMode) {
         this.inMaintenanceMode = inMaintenanceMode;
-        persistFlags();
+        data.setFlag(MAINTENANCE, inMaintenanceMode);
     }
 
     /**
@@ -123,7 +66,7 @@ public class PluginStateManager {
 
     public void setGlobalChatMuted(boolean globalChatMuted) {
         this.globalChatMuted = globalChatMuted;
-        persistFlags();
+        data.setFlag(GLOBAL_CHAT_MUTED, globalChatMuted);
     }
 
     // These Methods are used to check for various conditions

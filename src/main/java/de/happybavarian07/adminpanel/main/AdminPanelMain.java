@@ -322,7 +322,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         getDependencyManager().useHookSystem();
         Metrics metrics = setupMetrics();
         sendStartupMessages();
-        setupPluginStateManager();
         setupMenuAddonManager(coolStuffLibBuilder);
         setupLanguageManager(coolStuffLibBuilder);
         setupCommandManagerRegistry(coolStuffLibBuilder);
@@ -330,6 +329,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
         data = new AdminPanelData(getRepositoryManager());
+        setupPluginStateManager();
         menuAddonManager = coolStuffLib.getMenuAddonManager();
         languageManager = coolStuffLib.getLanguageManager();
         commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();
@@ -431,10 +431,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             fileLogger.writeToLog(Level.SEVERE, "Error while creating DataService: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN);
         }
         try {
-            DataService ds = getDataService();
-            if (ds != null && pluginStateManager != null) {
-                pluginStateManager.setDataService(ds);
-            }
+            getDataService();
         } catch (Exception ignored) {
         }
     }
@@ -513,7 +510,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPluginStateManager() {
-        pluginStateManager = new PluginStateManager(getConfig(), getDataYML(), this);
+        pluginStateManager = new PluginStateManager(getConfig(), data, this);
     }
 
     private void initializeWarningManager() {
