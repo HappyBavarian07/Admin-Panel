@@ -1172,6 +1172,12 @@ Items:
       displayName: '&4Server Stop'
       lore:
         - '&aStops the Server!'
+    HintItem:
+      material: PAPER
+      displayName: '&aAdmin Panel Info'
+      lore:
+        - '&aIn this menu you can click on Items,'
+        - '&awhich then forward you to submenus!'
   DangerZoneMenu:
     ServerStop:
       material: DIAMOND
