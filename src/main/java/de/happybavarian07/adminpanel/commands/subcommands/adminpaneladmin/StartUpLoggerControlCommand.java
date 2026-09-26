@@ -1,92 +1,35 @@
 package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;
 
-import de.happybavarian07.coolstufflib.utils.StartUpLogger;
-
-/*
- * @Author HappyBavarian07
- * @Date 17.12.2022 | 20:43
- */
-
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@CommandData()
+@SubCommandInfo(name = "StartUpLoggerControl", aliases = "SULControl", info = "Controls the Start Up Logger",
+        permission = "AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl", autoRegisterPermission = false)
 public class StartUpLoggerControlCommand extends SubCommand {
     public StartUpLoggerControlCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        if (args.length != 1) return false;
-        if (args[0].equalsIgnoreCase("Enable")) {
-            AdminPanelMain.getPlugin().getStartUpLogger().enableMessageSystem();
-            player.sendMessage("StartUpLogger/ConsoleLogger System enabled!");
-        } else if (args[0].equalsIgnoreCase("Disable")) {
-            AdminPanelMain.getPlugin().getStartUpLogger().disableMessageSystem();
-            player.sendMessage("StartUpLogger/ConsoleLogger System disabled!");
-        } else {
-            return false;
-        }
+    public List<Argument> arguments() {
+        return List.of(Argument.choice("state", "Enable", "Disable"));
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        String state = args.string(0);
+        if (!state.equalsIgnoreCase("Enable") && !state.equalsIgnoreCase("Disable")) return false;
+        boolean enable = state.equalsIgnoreCase("Enable");
+        if (enable) AdminPanelMain.getPlugin().getStartUpLogger().enableMessageSystem();
+        else AdminPanelMain.getPlugin().getStartUpLogger().disableMessageSystem();
+        CommandText.send(lgm, sender, enable ? "AdminPanelAdmin.StartUpLogger.Enabled" : "AdminPanelAdmin.StartUpLogger.Disabled");
         return true;
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        if (args.length != 1) return false;
-        if (args[0].equalsIgnoreCase("Enable")) {
-            AdminPanelMain.getPlugin().getStartUpLogger().enableMessageSystem();
-            sender.sendMessage("StartUpLogger/ConsoleLogger System enabled!");
-        } else if (args[0].equalsIgnoreCase("Disable")) {
-            AdminPanelMain.getPlugin().getStartUpLogger().disableMessageSystem();
-            sender.sendMessage("StartUpLogger/ConsoleLogger System disabled!");
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String name() {
-        return "StartUpLoggerControl";
-    }
-
-    @Override
-    public String info() {
-        return "Controls the Start Up Logger";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[]{"SULControl"};
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap<>();
-        subArgs.put(1, new String[] {"Enable", "Disable"});
-        return subArgs;
-    }
-
-    @Override
-    public String syntax() {
-        return "/apadmin SULControl <Enable|Disable>";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
     }
 }

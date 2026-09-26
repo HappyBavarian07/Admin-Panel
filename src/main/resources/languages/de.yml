@@ -98,6 +98,8 @@ Messages:
         # %backupsDoneNumber% = The Number of the Backup in the List
         Format: '  &b%backupsDoneNumber%. %fileName% (%exists%) &7- &b%normalPath%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      BackupNotFound: '%prefix% &9> &cEs gibt kein Backup namens ''%backupName%''!'
+      NoBackupFile: '%prefix% &9> &cFür ''%backupName%'' gibt es noch keine Backup-Datei!'
   Player:
     StaffChat:
       ToggleOn: '%prefix% &9> &aDer Staff Chat wurde für Spieler ''%player_name%'' angeschaltet!'
@@ -380,6 +382,29 @@ Messages:
       ReloadCommandManagers: 'Neuladen der Command Manager'
       UpdateConfig: 'Aktualisieren der Config'
       UpdateLangFiles: 'Aktualisieren der Sprachdateien'
+    BugReport:
+      # %seconds% = seconds until the next report is possible
+      Cooldown: '%prefix% &9> &cDu kannst den nächsten Bericht in %seconds% Sekunden senden.'
+      Error: '%prefix% &9> &cDer Bericht konnte nicht gesendet werden. Bitte schau in die Konsole.'
+      Sent: '%prefix% &9> &aDer Bericht wurde an den Entwickler gesendet. &7Du kannst auf das Update warten oder meinem Discord beitreten.'
+    StartUpLogger:
+      Enabled: '%prefix% &9> &aStartUpLogger aktiviert!'
+      Disabled: '%prefix% &9> &cStartUpLogger deaktiviert!'
+    PermissionMenuHelp:
+      - '&aHilfe zum Permission Menü:'
+      - '&eFelder für die Permission-Suche:'
+      - '&7 - permissionName'
+      - '&7 - permissionDescription'
+      - '&7 - permissionDefault'
+      - '&7 - permissionChildren'
+      - '&eTF-IDF Suche für Permissions:'
+      - '&71. Einfache Suche: ein einzelner Begriff, z.B. ''adminpanel'''
+      - '&72. Boolesche Suche: Begriffe mit AND, OR und NOT verbinden, z.B. ''adminpanel OR vault'''
+      - '&73. Phrasen-Suche: doppelte Anführungszeichen für genaue Phrasen, z.B. ''"AdminPanel.open"'''
+      - '&74. Platzhalter-Suche: * oder ? für Muster, z.B. ''permissionName:admin*'''
+      - '&75. Unscharfe Suche: ~ für eine ungenaue Suche, z.B. ''permissionDescription:chat~'''
+      - '&76. Bereichs-Suche: [a TO f] sucht in einem Bereich, z.B. ''permissionDefault:[a TO f]'''
+      - '&77. Kombinierte Suche: z.B. ''permissionChildren:spigot AND permissionDefault:OP'''
 Items:
   General:
     ConfirmationMenu:

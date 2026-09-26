@@ -3,214 +3,149 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
  * @Date 29.01.2023 | 12:14
  */
 
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.backupmanager.BackupManager;
 import de.happybavarian07.coolstufflib.backupmanager.FileBackup;
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
 import de.happybavarian07.coolstufflib.commandmanagement.PaginatedList;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
-import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
-import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-@CommandData
+@SubCommandInfo(name = "backup", info = "The Command to control the Config Backup System",
+        syntax = "/apadmin backup <start|load|delete|listBackups|listFiles|listBackupsDone|getNewestBackupFile> [BackupName] [BackupFileNumber(0-Infinity)|Newest(-1)|Page]",
+        permission = "AdminPanel.AdminPanelAdminCommands.BackupManager", autoRegisterPermission = false)
 public class BackupManagerCommand extends SubCommand {
-    private final BackupManager backupManager;
+    private static final int PAGE_SIZE = 4;
+    private static final String KEY = "BackupSystem.SubCommands.";
 
     public BackupManagerCommand(String mainCommandName) {
         super(mainCommandName);
-        this.backupManager = AdminPanelMain.getPlugin().getBackupManager();
     }
 
     @Override
-    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
-        if (args.length == 2) {
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%backupName%", args[1], false);
-            // Handle Commands with one Arg
-            if (args[0].equalsIgnoreCase("start")) {
-                // Start Backup
-                int response = backupManager.startBackup(args[1]);
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%success%", response == 0 ? "&aSuccess" : "&cError (Code: " + response + ")", false);
-                sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.Start", playerOrNull, true));
-            } else if (args[0].equalsIgnoreCase("getNewestBackupFile")) {
-                // Get Newest Backup File
-                File newestBackupFile = backupManager.getFileBackup(args[1]).getNewestBackupFile();
-                sender.sendMessage(formatStringWithFile(lgm.getMessage("BackupSystem.SubCommands.GetNewestBackupFile", playerOrNull, false), newestBackupFile));
-            } else if (args[0].equalsIgnoreCase("listBackups")) {
-                // List Backup Classes
-                try {
-                    int page = Integer.parseInt(args[1]);
-                    List<FileBackup> listOfFiles = new ArrayList<>(backupManager.getFileBackupList().values());
-                    PaginatedList<FileBackup> messages = new PaginatedList<>(listOfFiles);
-                    messages.maxItemsPerPage(4).sort("bubble", false);
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-                    if (!messages.containsPage(page)) {
-                        sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackups.PageDoesNotExist", playerOrNull, true));
-                        return true;
-                    }
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackups.Header", playerOrNull, false));
-                    for (FileBackup f : messages.getPage(page)) {
-                        sender.sendMessage(formatStringWithFileBackup(lgm.getMessage("BackupSystem.SubCommands.ListBackups.Format", playerOrNull, false), f));
-                    }
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackups.Footer", playerOrNull, true));
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(lgm.getMessage("Player.Commands.NotANumber", playerOrNull, true));
-                    return true;
-                } catch (PaginatedList.ListNotSortedException e2) {
-                    e2.printStackTrace();
-                    return true;
-                }
-            } else return false;
-            return true;
-        } else if (args.length == 3) {
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%backupName%", args[1], false);
-            // Handle Commands with one Arg
-            if (args[0].equalsIgnoreCase("listFiles")) {
-                // List Files that get a backup
-                try {
-                    int page = Integer.parseInt(args[2]);
-                    List<File> listOfFiles = new ArrayList<>(Arrays.asList(backupManager.getFileBackup(args[1]).getFilesToBackup()));
-                    PaginatedList<File> messages = new PaginatedList<>(listOfFiles);
-                    messages.maxItemsPerPage(4).sort("bubble", false);
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-                    if (!messages.containsPage(page)) {
-                        sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListFilesToBackup.PageDoesNotExist", playerOrNull, true));
-                        return true;
-                    }
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListFilesToBackup.Header", playerOrNull, false));
-                    for (File f : messages.getPage(page)) {
-                        sender.sendMessage(formatStringWithFile(lgm.getMessage("BackupSystem.SubCommands.ListFilesToBackup.Format", playerOrNull, false), f));
-                    }
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListFilesToBackup.Footer", playerOrNull, true));
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(lgm.getMessage("Player.Commands.NotANumber", playerOrNull, true));
-                    return true;
-                } catch (PaginatedList.ListNotSortedException e2) {
-                    e2.printStackTrace();
+    public List<Argument> arguments() {
+        return List.of(
+                Argument.choice("action", "start", "load", "delete", "listBackups", "listFiles", "listBackupsDone", "getNewestBackupFile"),
+                Argument.custom("backup", sender -> manager().getFileBackupList().keySet()).optional(),
+                Argument.custom("number|page", sender -> List.of("-1", "0", "1")).optional());
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        switch (args.string(0).toLowerCase(Locale.ROOT)) {
+            case "start" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                int response = manager().startBackup(backup.getIdentifier());
+                CommandText.send(lgm, sender, KEY + "Start", "%backupName%", backup.getIdentifier(), "%success%", result(response));
+            }
+            case "load" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                int response = manager().loadBackup(backup.getIdentifier(), args.integer(2));
+                CommandText.send(lgm, sender, KEY + "Load", "%backupName%", backup.getIdentifier(), "%success%", result(response));
+            }
+            case "delete" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                String file = args.string(2);
+                int response = manager().deleteBackupFile(backup.getIdentifier(), file);
+                CommandText.send(lgm, sender, KEY + "DeleteBackup", "%backupName%", backup.getIdentifier(),
+                        "%backupFileNumberOrName%", file, "%success%", result(response));
+            }
+            case "getnewestbackupfile" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                File newest = backup.getNewestBackupFile();
+                if (newest == null) {
+                    CommandText.send(lgm, sender, KEY + "NoBackupFile", "%backupName%", backup.getIdentifier());
                     return true;
                 }
-            } else if (args[0].equalsIgnoreCase("listBackupsDone")) {
-                // List Backups Done
-                try {
-                    int page = Integer.parseInt(args[2]);
-                    List<File> listOfBackupsDone = new ArrayList<>(backupManager.getFileBackup(args[1]).getBackupsDone());
-                    PaginatedList<File> messages = new PaginatedList<>(listOfBackupsDone);
-                    messages.maxItemsPerPage(4).sort("bubble", false);
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%page%", page, false);
-                    if (!messages.containsPage(page)) {
-                        sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackupsDone.PageDoesNotExist", playerOrNull, true));
-                        return true;
-                    }
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%max_page%", messages.getMaxPage(), false);
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackupsDone.Header", playerOrNull, false));
-                    for (File f : messages.getPage(page)) {
-                        sender.sendMessage(formatStringWithFile(
-                                lgm.getMessage("BackupSystem.SubCommands.ListBackupsDone.Format", playerOrNull, false)
-                                        .replace("%backupsDoneNumber%", "" + listOfBackupsDone.indexOf(f)), f));
-                    }
-                    sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.ListBackupsDone.Footer", playerOrNull, true));
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(lgm.getMessage("Player.Commands.NotANumber", playerOrNull, true));
-                    return true;
-                } catch (PaginatedList.ListNotSortedException e2) {
-                    e2.printStackTrace();
-                    return true;
-                }
-            } else if (args[0].equalsIgnoreCase("load")) {
-                // Load Backup (First Arg = String, Second Arg = Int (-1 equals newest backup))
-                int response = backupManager.loadBackup(args[1], Integer.parseInt(args[2]));
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%success%", response == 0 ? "&aSuccess" : "&cError (Code: " + response + ")", false);
-                sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.Load", playerOrNull, true));
-            } else if (args[0].equalsIgnoreCase("delete")) {
-                // Delete Backup File
-                int response = backupManager.deleteBackupFile(args[1], args[2]);
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%backupFileNumberOrName%", args[2], false);
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%success%", response == 0 ? "&aSuccess" : "&cError (Code: " + response + ")", false);
-                sender.sendMessage(lgm.getMessage("BackupSystem.SubCommands.DeleteBackup", playerOrNull, true));
-            } else return false;
-            return true;
-        } else {
-            return false;
+                sender.sendMessage(withFile(CommandText.get(lgm, sender, KEY + "GetNewestBackupFile", "%backupName%", backup.getIdentifier()), newest));
+            }
+            case "listbackups" -> sendPage(sender, "ListBackups", new ArrayList<>(manager().getFileBackupList().values()),
+                    args.integer(1, 1), (backup, line) -> withFileBackup(line, backup));
+            case "listfiles" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                sendPage(sender, "ListFilesToBackup", Arrays.asList(backup.getFilesToBackup()), args.integer(2, 1), (file, line) -> withFile(line, file));
+            }
+            case "listbackupsdone" -> {
+                FileBackup backup = backup(args, 1);
+                if (backup == null) return true;
+                List<File> done = new ArrayList<>(backup.getBackupsDone());
+                sendPage(sender, "ListBackupsDone", done, args.integer(2, 1),
+                        (file, line) -> withFile(line.replace("%backupsDoneNumber%", String.valueOf(done.indexOf(file))), file));
+            }
+            default -> {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static BackupManager manager() {
+        return AdminPanelMain.getPlugin().getBackupManager();
+    }
+
+    private FileBackup backup(CommandArgs args, int index) {
+        String name = args.string(index);
+        FileBackup backup = manager().getFileBackup(name);
+        if (backup == null) CommandText.send(lgm, args.sender(), KEY + "BackupNotFound", "%backupName%", name);
+        return backup;
+    }
+
+    private static String result(int response) {
+        return response == 0 ? "&aSuccess" : "&cError (Code: " + response + ")";
+    }
+
+    private <T extends Comparable<T>> void sendPage(CommandSender sender, String section, List<T> items, int page, LineFormatter<T> formatter) {
+        PaginatedList<T> list = new PaginatedList<>(items);
+        list.maxItemsPerPage(PAGE_SIZE).sort("bubble", false);
+        try {
+            if (!list.containsPage(page)) {
+                CommandText.send(lgm, sender, KEY + section + ".PageDoesNotExist");
+                return;
+            }
+            Object[] pages = {"%page%", page, "%max_page%", list.getMaxPage()};
+            CommandText.send(lgm, sender, KEY + section + ".Header", pages);
+            String format = CommandText.get(lgm, sender, KEY + section + ".Format");
+            for (T item : list.getPage(page)) sender.sendMessage(formatter.format(item, format));
+            CommandText.send(lgm, sender, KEY + section + ".Footer", pages);
+        } catch (PaginatedList.ListNotSortedException e) {
+            throw new IllegalStateException(e);
         }
     }
 
-    @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        return handleCommand(player, player, args);
+    @FunctionalInterface
+    private interface LineFormatter<T> {
+        String format(T item, String line);
     }
 
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        return handleCommand(sender, null, args);
+    private static String withFile(String line, File file) {
+        return line.replace("%fileName%", file.getName())
+                .replace("%absolutePath%", file.getAbsolutePath())
+                .replace("%normalPath%", file.getPath())
+                .replace("%parentFile%", String.valueOf(file.getParent()))
+                .replace("%exists%", file.exists() ? "§aFile Exists" : "§cFile Doesn't Exist");
     }
 
-    @Override
-    public String name() {
-        return "backup";
-    }
-
-    @Override
-    public String info() {
-        return "The Command to control the Config Backup System";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[]{};
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap<>();
-        subArgs.put(1, new String[]{"start", "load", "delete", "listBackups", "listFiles", "listBackupsDone", "getNewestBackupFile"});
-        subArgs.put(2, AdminPanelMain.getPlugin().getBackupManager().getFileBackupList().keySet().toArray(new String[0]));
-        subArgs.put(3, new String[]{"BackupFileNumber(0-Infinity)", "Newest(-1)", "<Page>"});
-        return subArgs;
-    }
-
-    @Override
-    public String syntax() {
-        return "/apadmin backup <start|load|delete|listBackups|listFiles|listBackupsDone|getNewestBackupFile> [BackupName] [BackupFileNumber(0-Infinity)|Newest(-1)|Page]";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.AdminPanelAdminCommands.BackupManager";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
-    }
-
-    private String formatStringWithFile(String in, File f) {
-        Map<String, Placeholder> placeholders = new HashMap<>();
-        placeholders.put("%fileName%", new Placeholder("%fileName%", f.getName(), PlaceholderType.ALL));
-        placeholders.put("%absolutePath%", new Placeholder("%absolutePath%", f.getAbsolutePath(), PlaceholderType.ALL));
-        placeholders.put("%normalPath%", new Placeholder("%normalPath%", f.getPath(), PlaceholderType.ALL));
-        placeholders.put("%ParentFile%", new Placeholder("%parentFile%", f.getParent(), PlaceholderType.ALL));
-        placeholders.put("%exists%", new Placeholder("%exists%", f.exists() ? "&aFile Exists" : "&cFile Doesn't Exist", PlaceholderType.ALL));
-
-        return lgm.replacePlaceholders(in, placeholders);
-    }
-
-    private String formatStringWithFileBackup(String in, FileBackup fileBackup) {
-        Map<String, Placeholder> placeholders = new HashMap<>();
-        placeholders.put("%filesToBackup%", new Placeholder("%filesToBackup%", Arrays.toString(fileBackup.getFilesToBackup()), PlaceholderType.ALL));
-        placeholders.put("%filesToBackupSize%", new Placeholder("%filesToBackupSize%", "" + fileBackup.getFilesToBackup().length, PlaceholderType.ALL));
-        placeholders.put("%backupsDone%", new Placeholder("%backupsDone%", fileBackup.getBackupsDone().toString(), PlaceholderType.ALL));
-        placeholders.put("%backupsDoneSize%", new Placeholder("%backupsDoneSize%", "" + fileBackup.getBackupsDone().size(), PlaceholderType.ALL));
-        placeholders.put("%identifier%", new Placeholder("%identifier%", fileBackup.getIdentifier(), PlaceholderType.ALL));
-        placeholders.put("%backupDest%", new Placeholder("%backupDest%", fileBackup.getDestinationPathToBackupToo().getPath(), PlaceholderType.ALL));
-        placeholders.put("%newestBackupFile%", new Placeholder("%newestBackupFile%", fileBackup.getNewestBackupFile(), PlaceholderType.ALL));
-
-        return lgm.replacePlaceholders(in, placeholders);
+    private static String withFileBackup(String line, FileBackup backup) {
+        return line.replace("%filesToBackup%", Arrays.toString(backup.getFilesToBackup()))
+                .replace("%filesToBackupSize%", String.valueOf(backup.getFilesToBackup().length))
+                .replace("%backupsDone%", String.valueOf(backup.getBackupsDone()))
+                .replace("%backupsDoneSize%", String.valueOf(backup.getBackupsDone().size()))
+                .replace("%identifier%", backup.getIdentifier())
+                .replace("%backupDest%", backup.getDestinationPathToBackupToo().getPath())
+                .replace("%newestBackupFile%", String.valueOf(backup.getNewestBackupFile()));
     }
 }

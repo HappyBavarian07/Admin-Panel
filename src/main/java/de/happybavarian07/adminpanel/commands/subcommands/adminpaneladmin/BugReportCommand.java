@@ -1,79 +1,42 @@
-package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;/*
- * @Author HappyBavarian07
- * @Date 17.06.2022 | 22:05
- */
+package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
-@CommandData(playerRequired = true)
+@SubCommandInfo(name = "report", info = "The Command to report Bugs to the Developer.",
+        permission = "AdminPanel.AdminPanelAdminCommands.ReportBug", autoRegisterPermission = false)
+@CommandData(playerRequired = true, minArgs = 1)
 public class BugReportCommand extends SubCommand {
     public BugReportCommand(String mainCommandName) {
         super(mainCommandName);
     }
 
     @Override
-    public boolean onPlayerCommand(Player player, String[] args) {
-        int response = AdminPanelMain.getAPI().reportBugToDiscord(player.getUniqueId(), args);
+    public List<Argument> arguments() {
+        return List.of(Argument.text("message"));
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        Player player = args.player();
+        int response = AdminPanelMain.getAPI().reportBugToDiscord(player.getUniqueId(), args.joined(0));
         if (response == -2) {
-            long cooldownTimeInMillis = AdminPanelMain.getAPI().getCooldownTimeMap().get(player.getUniqueId()) - System.currentTimeMillis();
-            player.sendMessage(AdminPanelUtils.chat("&cYou are still on Cooldown for %cooldowntime% Seconds")
-                    .replace("%cooldowntime%", String.valueOf(TimeUnit.SECONDS.toSeconds(cooldownTimeInMillis))));
-            return true;
+            long remaining = AdminPanelMain.getAPI().getCooldownTimeMap().get(player.getUniqueId()) - System.currentTimeMillis();
+            CommandText.send(lgm, sender, "AdminPanelAdmin.BugReport.Cooldown", "%seconds%", (remaining + 999) / 1000);
         } else if (response == -1) {
-            player.sendMessage(AdminPanelUtils.chat("&cError! Please look into the Console for more Information!"));
+            CommandText.send(lgm, sender, "AdminPanelAdmin.BugReport.Error");
         } else {
-            player.sendMessage(AdminPanelUtils.chat("&aSuccessfully send Report to the Developer. &7You can wait for the Bug Fix Update or just join my Discord."));
+            CommandText.send(lgm, sender, "AdminPanelAdmin.BugReport.Sent");
         }
         return true;
-    }
-
-    @Override
-    public boolean onConsoleCommand(ConsoleCommandSender sender, String[] args) {
-        return false;
-    }
-
-    @Override
-    public String name() {
-        return "report";
-    }
-
-    @Override
-    public String info() {
-        return "The Command to report Bugs to the Developer.";
-    }
-
-    @Override
-    public String[] aliases() {
-        return new String[] {};
-    }
-
-    @Override
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        return new HashMap<>();
-    }
-
-    @Override
-    public String syntax() {
-        return "/apadmin report <Message>";
-    }
-
-    @Override
-    public String permissionAsString() {
-        return "AdminPanel.AdminPanelAdminCommands.ReportBug";
-    }
-
-    @Override
-    public boolean autoRegisterPermission() {
-        return false;
     }
 }

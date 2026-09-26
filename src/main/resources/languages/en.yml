@@ -52,7 +52,7 @@ Messages:
       # %backupFileNumberOrName% = The Specified Name or Number for the Backup File to delete
       DeleteBackup: '%prefix% &9> &aDeleting the Backup ''%backupFileNumberOrName%'' of ''%backupName%''!'
       ListBackups:
-        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        PageDoesNotExist: '%prefix% &9> &cThis Page does not exist!'
         # -------------------------------------------------
         # Header and Footer Placeholders (Command Manager system):
         # %page% = Current Page
@@ -70,7 +70,7 @@ Messages:
         Format: '  &b%identifier% &7- &bFiles To Backup: %filesToBackupSize%, Backups Done: %backupsDoneSize%, Backup Destination: %backupDest%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
       ListFilesToBackup:
-        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        PageDoesNotExist: '%prefix% &9> &cThis Page does not exist!'
         # -------------------------------------------------
         # Header and Footer Placeholders (Command Manager system):
         # %page% = Current Page
@@ -86,7 +86,7 @@ Messages:
         Format: '  &b%fileName% (%exists%) &7- &b%normalPath%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
       ListBackupsDone:
-        PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht!'
+        PageDoesNotExist: '%prefix% &9> &cThis Page does not exist!'
         # -------------------------------------------------
         # Header and Footer Placeholders (Command Manager system):
         # %page% = Current Page
@@ -102,6 +102,8 @@ Messages:
         # %backupsDoneNumber% = The Number of the Backup in the List
         Format: '  &b%backupsDoneNumber%. %fileName% (%exists%) &7- &b%normalPath%'
         Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+      BackupNotFound: '%prefix% &9> &cThere is no Backup called ''%backupName%''!'
+      NoBackupFile: '%prefix% &9> &cThere is no Backup File for ''%backupName%'' yet!'
   Player:
     Commands:
       #VanillaItems:
@@ -372,6 +374,29 @@ Messages:
       ReloadCommandManagers: 'Reload of the Command Managers'
       UpdateConfig: 'Update of the Config'
       UpdateLangFiles: 'Update of the Language Files'
+    BugReport:
+      # %seconds% = seconds until the next report is possible
+      Cooldown: '%prefix% &9> &cYou can send the next report in %seconds% seconds.'
+      Error: '%prefix% &9> &cCould not send the report. Please look into the console.'
+      Sent: '%prefix% &9> &aSent the report to the developer. &7You can wait for the fix or join my Discord.'
+    StartUpLogger:
+      Enabled: '%prefix% &9> &aStartUpLogger enabled!'
+      Disabled: '%prefix% &9> &cStartUpLogger disabled!'
+    PermissionMenuHelp:
+      - '&aPermission Menu Help:'
+      - '&eFields for Permission Search:'
+      - '&7 - permissionName'
+      - '&7 - permissionDescription'
+      - '&7 - permissionDefault'
+      - '&7 - permissionChildren'
+      - '&eTF-IDF Search Algorithm for Permissions:'
+      - '&71. Simple Term Query: use a single term, e.g. ''adminpanel'''
+      - '&72. Boolean Query: combine terms with AND, OR and NOT, e.g. ''adminpanel OR vault'''
+      - '&73. Phrase Query: double quotes for exact phrases, e.g. ''"AdminPanel.open"'''
+      - '&74. Wildcard Query: * or ? match a pattern, e.g. ''permissionName:admin*'''
+      - '&75. Fuzzy Query: ~ for a fuzzy search, e.g. ''permissionDescription:chat~'''
+      - '&76. Range Query: [a TO f] searches a range, e.g. ''permissionDefault:[a TO f]'''
+      - '&77. Complex Query: e.g. ''permissionChildren:spigot AND permissionDefault:OP'''
 Items:
   General:
     ConfirmationMenu:

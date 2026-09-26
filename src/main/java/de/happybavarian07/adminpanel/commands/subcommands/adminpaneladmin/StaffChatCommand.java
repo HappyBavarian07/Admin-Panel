@@ -2,102 +2,56 @@ package de.happybavarian07.adminpanel.commands.subcommands.adminpaneladmin;
 
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.coolstufflib.commandmanagement.Argument;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandArgs;
+import de.happybavarian07.coolstufflib.commandmanagement.CommandData;
+import de.happybavarian07.coolstufflib.commandmanagement.SubCommandInfo;
 import de.happybavarian07.coolstufflib.commandmanagement.SubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
+@SubCommandInfo(name = "staffchat", aliases = {"sc", "staffc"},
+        info = "This Command is used to toggle the StaffChat on or off and send messages.",
+        syntax = "/adminpaneladmin staffchat <toggle [Player]|disableSC|message...>",
+        permission = "AdminPanel.AdminPanelAdminCommands.StaffChat", autoRegisterPermission = false)
+@CommandData(minArgs = 1)
 public class StaffChatCommand extends SubCommand {
-    private final StaffChatHandler staffChatHandler;
-
     public StaffChatCommand(String mainCommandName) {
         super(mainCommandName);
-        this.staffChatHandler = AdminPanelMain.getPlugin().getStaffChatHandler();
     }
 
-    public boolean handleCommand(CommandSender sender, Player playerOrNull, String[] args) {
-        if (args.length == 0) {
-            return false;
-        } else if (args[0].equalsIgnoreCase("toggle")) {
-            if (args.length == 2) {
-                Player target = Bukkit.getPlayer(args[1]);
-                if (target == null) {
-                    sender.sendMessage(this.lgm.getMessage("Player.General.TargetedPlayerIsNull", playerOrNull, false));
-                    return false;
-                } else {
-                    if (this.staffChatHandler.toggleStaffChatForPlayer(target)) {
-                        sender.sendMessage(this.lgm.getMessage("Player.StaffChat.ToggleOn", target, false));
-                    } else {
-                        sender.sendMessage(this.lgm.getMessage("Player.StaffChat.ToggleOff", target, false));
-                    }
+    @Override
+    public List<Argument> arguments() {
+        return List.of(
+                Argument.custom("toggle|disableSC|message", sender -> List.of("toggle", "disableSC")),
+                Argument.custom("player|message", sender -> {
+                    List<String> names = new ArrayList<>();
+                    Bukkit.getOnlinePlayers().forEach(p -> names.add(p.getName()));
+                    return names;
+                }).optional());
+    }
 
-                    return true;
-                }
-            } else if (playerOrNull == null) {
-                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
-                return false;
-            } else {
-                if (this.staffChatHandler.toggleStaffChatForPlayer(playerOrNull)) {
-                    playerOrNull.sendMessage(this.lgm.getMessage("Player.StaffChat.ToggleOn", playerOrNull, false));
-                } else {
-                    playerOrNull.sendMessage(this.lgm.getMessage("Player.StaffChat.ToggleOff", playerOrNull, false));
-                }
-
-                return true;
-            }
-        } else if (args[0].equalsIgnoreCase("disableSC")) {
-            if (playerOrNull == null) {
-                sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
-                return false;
-            } else {
-                if (this.staffChatHandler.toggleDisableStaffChatForPlayer(playerOrNull)) {
-                    playerOrNull.sendMessage(this.lgm.getMessage("Player.StaffChat.Disabled", playerOrNull, false));
-                } else {
-                    playerOrNull.sendMessage(this.lgm.getMessage("Player.StaffChat.Enabled", playerOrNull, false));
-                }
-
-                return true;
-            }
-        } else if (playerOrNull == null) {
-            sender.sendMessage(this.lgm.getMessage("Console.ExecutesPlayerCommand", null, false));
-            return false;
-        } else {
-            String messageFromArgs = String.join(" ", args);
-            this.staffChatHandler.sendMessageInStaffChat(messageFromArgs, playerOrNull, true);
+    @Override
+    public boolean execute(CommandSender sender, CommandArgs args) {
+        StaffChatHandler staffChat = AdminPanelMain.getPlugin().getStaffChatHandler();
+        String first = args.string(0);
+        if (first.equalsIgnoreCase("toggle")) {
+            Player target = args.has(1) ? args.onlinePlayer(1) : args.player();
+            String key = staffChat.toggleStaffChatForPlayer(target) ? "Player.StaffChat.ToggleOn" : "Player.StaffChat.ToggleOff";
+            sender.sendMessage(lgm.getMessage(key, target, false));
             return true;
         }
-    }
-
-    public String name() {
-        return "staffchat";
-    }
-
-    public String info() {
-        return "This Command is used to toggle the StaffChat on or off and send messages.";
-    }
-
-    public String[] aliases() {
-        return new String[]{"sc", "staffc"};
-    }
-
-    public Map<Integer, String[]> subArgs(CommandSender sender, int isPlayer, String[] args) {
-        Map<Integer, String[]> subArgs = new HashMap();
-        subArgs.put(1, new String[]{"toggle", "disableSC", "[message...]"});
-        return subArgs;
-    }
-
-    public String syntax() {
-        return "/adminpaneladmin staffchat <toggle|[message...]>";
-    }
-
-    public String permissionAsString() {
-        return "AdminPanel.AdminPanelAdminCommands.StaffChat";
-    }
-
-    public boolean autoRegisterPermission() {
+        Player player = args.player();
+        if (first.equalsIgnoreCase("disableSC")) {
+            String key = staffChat.toggleDisableStaffChatForPlayer(player) ? "Player.StaffChat.Disabled" : "Player.StaffChat.Enabled";
+            player.sendMessage(lgm.getMessage(key, player, false));
+            return true;
+        }
+        staffChat.sendMessageInStaffChat(args.joined(0), player, true);
         return true;
     }
 }
