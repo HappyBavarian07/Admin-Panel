@@ -1,7 +1,6 @@
 package de.happybavarian07.adminpanel.utils.managers;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.service.api.DataService;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
@@ -43,11 +42,6 @@ public class AutoUpdaterManager {
             plugin.getAutoUpdaterManager().getAutoUpdaterPlugins().clear();
             plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
             plugin.getStartUpLogger().message("&1&lAuto Plugin Updater initiated&r");
-            DataService ds = null;
-            try {
-                ds = AdminPanelMain.getPlugin().getDataService();
-            } catch (Exception ignored) {
-            }
             for (String sectionString : Objects.requireNonNull(dataYML.getConfigurationSection("PluginsToUpdate")).getKeys(false)) {
                 if (!dataYML.isConfigurationSection("PluginsToUpdate." + sectionString)) continue;
 
@@ -57,22 +51,6 @@ public class AutoUpdaterManager {
                     continue;
 
                 handleNewUpdater(sectionString, section, adminPanelUpdater);
-
-                if (ds != null) {
-                    try {
-                        Map<String, Object> meta = ds.loadMap("updater.meta." + sectionString, Object.class).join();
-                        if (meta != null) {
-                            NewUpdater nu = autoUpdaterPlugins.get(sectionString);
-                            if (nu != null) {
-                                Object latest = meta.get("latestVersion");
-                                if (latest != null) {
-
-                                }
-                            }
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
             }
             if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.checkForUpdatesFrequently")) {
                 new BukkitRunnable() {
@@ -131,18 +109,6 @@ public class AutoUpdaterManager {
                         r -> {
                         }
                 );
-            }
-            // Persist small metadata about this plugin updater
-            try {
-                DataService ds = AdminPanelMain.getPlugin().getDataService();
-                if (ds != null) {
-                    Map<String, Object> meta = new HashMap<>();
-                    meta.put("lastCheckMillis", System.currentTimeMillis());
-                    meta.put("latestVersion", latest);
-                    meta.put("available", available);
-                    ds.save("updater.meta." + sectionString, meta);
-                }
-            } catch (Exception ignored) {
             }
         });
     }

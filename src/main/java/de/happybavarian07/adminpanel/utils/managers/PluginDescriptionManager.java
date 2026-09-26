@@ -4,7 +4,7 @@ package de.happybavarian07.adminpanel.utils.managers;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.service.api.DataService;
+import de.happybavarian07.adminpanel.data.PluginDescriptionEntry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -33,18 +33,8 @@ public class PluginDescriptionManager {
         this.config = YamlConfiguration.loadConfiguration(configFile);
         loadPluginDescriptions();
 
-        try {
-            DataService ds = plugin.getDataService();
-            if (ds != null) {
-                Map<String, String> saved = ds.loadMap("plugin.descriptions", String.class).join();
-                if (saved != null && !saved.isEmpty()) {
-                    pluginDescriptionMap.clear();
-                    pluginDescriptionMap.putAll(saved);
-                } else {
-                    if (!pluginDescriptionMap.isEmpty()) ds.save("plugin.descriptions", pluginDescriptionMap);
-                }
-            }
-        } catch (Exception ignored) {
+        for (PluginDescriptionEntry entry : plugin.getData().descriptions().findAll()) {
+            pluginDescriptionMap.put(entry.getPluginName(), entry.getDescription());
         }
     }
 
@@ -84,11 +74,7 @@ public class PluginDescriptionManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            DataService ds = AdminPanelMain.getPlugin().getDataService();
-            if (ds != null) ds.save("plugin.descriptions", pluginDescriptionMap);
-        } catch (Exception ignored) {
-        }
+        AdminPanelMain.getPlugin().getData().descriptions().deleteById(pluginName);
     }
 
     public void addPluginDescription(String pluginName, String description, int resourceID) {
@@ -110,11 +96,8 @@ public class PluginDescriptionManager {
                 e.printStackTrace();
             }
         }
-        try {
-            DataService ds = AdminPanelMain.getPlugin().getDataService();
-            if (ds != null) ds.save("plugin.descriptions", pluginDescriptionMap);
-        } catch (Exception ignored) {
-        }
+        AdminPanelMain.getPlugin().getData().descriptions()
+                .save(new PluginDescriptionEntry(pluginName, pluginDescriptionMap.get(pluginName), resourceID));
     }
 
     public void addPluginDescription(Plugin plugin, String description, int resourceID) {

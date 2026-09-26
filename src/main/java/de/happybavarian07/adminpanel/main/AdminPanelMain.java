@@ -308,7 +308,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        pluginDescriptionManager = new PluginDescriptionManager();
         globalPluginUtils = new PluginUtils();
         lastStartTimeMillis = System.currentTimeMillis();
         CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
@@ -330,6 +329,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         coolStuffLib.setup();
         data = new AdminPanelData(getRepositoryManager());
         setupPluginStateManager();
+        pluginDescriptionManager = new PluginDescriptionManager();
         menuAddonManager = coolStuffLib.getMenuAddonManager();
         languageManager = coolStuffLib.getLanguageManager();
         commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();

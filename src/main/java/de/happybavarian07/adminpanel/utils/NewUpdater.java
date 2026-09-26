@@ -1,7 +1,7 @@
 package de.happybavarian07.adminpanel.utils;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.service.api.DataService;
+import de.happybavarian07.adminpanel.data.UpdaterCacheEntry;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,6 +46,7 @@ public class NewUpdater implements Listener {
     private static final int CONNECT_TIMEOUT = 5000;
     private static final int READ_TIMEOUT = 10000;
     private volatile String cachedUpdateMessage;
+    private static final long CACHE_TTL_MILLIS = 60 * 60 * 1000L;
 
     public NewUpdater(AdminPanelMain plugin, int resourceID, String fileName, JavaPlugin pluginToUpdate, String linkToFile, boolean bypassExternalURL) {
         this.plugin = plugin;
@@ -59,22 +60,25 @@ public class NewUpdater implements Listener {
         this.bypassExternalURL = bypassExternalURL;
 
         try {
-            DataService ds = AdminPanelMain.getPlugin().getDataService();
-            if (ds != null) {
-                try {
-                    String savedLatest = ds.load("updater.cachedLatestVersionName", String.class).join();
-                    if (savedLatest != null) cachedLatestVersionName = savedLatest;
-                    Boolean savedAvailable = ds.load("updater.cachedUpdateAvailable", Boolean.class).join();
-                    if (savedAvailable != null) cachedUpdateAvailable = savedAvailable;
-                    Long savedLastCheck = ds.load("updater.lastUpdateCheckMillis", Long.class).join();
-                    if (savedLastCheck != null) lastUpdateCheckMillis = savedLastCheck;
-                    String savedMessage = ds.load("updater.cachedUpdateMessage", String.class).join();
-                    if (savedMessage != null) cachedUpdateMessage = savedMessage;
-                } catch (Exception ignored) {
-                    // Any failure to load cached values should not block startup
-                }
-            }
-        } catch (Throwable ignored) {
+            plugin.getData().updaterCache().findById(resourceID)
+                    .filter(entry -> System.currentTimeMillis() - entry.getLastCheckMillis() < CACHE_TTL_MILLIS)
+                    .ifPresent(entry -> {
+                        cachedLatestVersionName = entry.getLatestVersion();
+                        cachedUpdateAvailable = entry.isUpdateAvailable();
+                        lastUpdateCheckMillis = entry.getLastCheckMillis();
+                        cachedUpdateMessage = entry.getMessage();
+                    });
+        } catch (RuntimeException e) {
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Could not read the updater cache: " + e.getMessage(), LogPrefixExtension.UPDATER);
+        }
+    }
+
+    private void saveCache() {
+        try {
+            plugin.getData().updaterCache().save(new UpdaterCacheEntry(resourceID, cachedLatestVersionName,
+                    Boolean.TRUE.equals(cachedUpdateAvailable), lastUpdateCheckMillis, cachedUpdateMessage));
+        } catch (RuntimeException e) {
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Could not save the updater cache: " + e.getMessage(), LogPrefixExtension.UPDATER);
         }
     }
 
@@ -118,11 +122,7 @@ public class NewUpdater implements Listener {
             if (obj == null) return "NoVersionFound";
             String version = String.valueOf(obj.getString("name"));
             cachedLatestVersionName = version;
-            try {
-                DataService ds = AdminPanelMain.getPlugin().getDataService();
-                if (ds != null) ds.save("updater.cachedLatestVersionName", version);
-            } catch (Throwable ignored) {
-            }
+            saveCache();
             plugin.getFileLogger().writeToLog(Level.INFO, "Requested Latest Version Name for Plugin: " + getPluginName() + " -> " + version, LogPrefixExtension.UPDATER);
             return version;
         } catch (JSONException e) {
@@ -206,16 +206,8 @@ public class NewUpdater implements Listener {
             cachedLatestVersionName = latest;
             cachedUpdateAvailable = available;
             lastUpdateCheckMillis = System.currentTimeMillis();
-            try {
-                DataService ds = AdminPanelMain.getPlugin().getDataService();
-                if (ds != null) {
-                    ds.save("updater.cachedLatestVersionName", latest);
-                    ds.save("updater.cachedUpdateAvailable", available);
-                    ds.save("updater.lastUpdateCheckMillis", lastUpdateCheckMillis);
-                    if (finalMessageToCache != null) ds.save("updater.cachedUpdateMessage", finalMessageToCache);
-                }
-            } catch (Throwable ignored) {
-            }
+            cachedUpdateMessage = finalMessageToCache;
+            saveCache();
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if (finalAvailable) {
                     if (!listenerRegistered) {
