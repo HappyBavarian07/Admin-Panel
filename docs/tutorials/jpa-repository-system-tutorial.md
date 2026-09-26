@@ -193,9 +193,11 @@ How it behaves:
   join it; nested `@Transactional` calls use a savepoint and only the outermost one commits.
 - The connection goes back to the pool when the transaction ends.
 
-`@Transactional` only applies to the methods the repository proxy generates (`save`, `saveAll`, `deleteBy...`,
-`update...`, ...). Default methods with your own code are not executed by the proxy, so a custom
-`transfer(from, to)` method cannot be written this way yet. For several plain SQL statements, use
+`@Transactional` works on generated methods and on default methods with your own code, so a
+`transfer(from, to, amount)` default method that loads and saves both entities runs as one transaction.
+A method without a body must start with a supported name (`find`, `count`, `exists`, `get`, `set`,
+`update`, `insert`, `delete`, `save`, `saveAll`, `query`); any other name throws
+`UnsupportedOperationException`. `@Query` is not supported yet. For several plain SQL statements, use
 `controller.executeTransaction(List<String>)` (no parameters, never put player input into those statements).
 
 Transactions are bound to the thread that started them; work handed to another thread runs outside it.

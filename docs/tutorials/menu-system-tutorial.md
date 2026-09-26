@@ -350,6 +350,9 @@ dashboard.defineZone("bottom", new PaginationZone(28, 34), bottomData, bottomRen
 ```
 
 Each zone can have its own controls, direction, and transition strategy.
+Control slots are drawn with the `General.Left/Close/Right/Refresh` language items; override them in
+`postSetMenuItems()`. Redefining a zone with the same id (for example in `preSetMenuItems()` with fresh
+data) keeps its page, controls, direction and transition.
 
 ---
 

@@ -133,6 +133,7 @@ public class MyPlugin extends JavaPlugin {
             if (coolStuffLib.getCommandManagerRegistry() != null) {
                 coolStuffLib.getCommandManagerRegistry().unregisterAll();
             }
+            coolStuffLib.shutdown();
         }
         getLogger().info("Plugin disabled successfully!");
     }
@@ -629,8 +630,8 @@ public void onDisable() {
             coolStuffLib.getCommandManagerRegistry().unregisterAll();
         }
         
-        // Clear player menu utilities
-        coolStuffLib.getPlayerMenuUtilityMap().clear();
+        // Closes open library menus, saves persistent caches, stops the backup timer and all services
+        coolStuffLib.shutdown();
     }
 }
 ```
