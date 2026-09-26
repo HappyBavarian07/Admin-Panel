@@ -33,7 +33,7 @@ public class PermissionsManager {
         // TODO Add Player Groups to this to be like any other Permission system with groups and stuff.
         this.plugin = plugin;
         permissionSearcher = new TFIDFSearch(new String[]{"permissionName", "permissionDescription", "permissionDefault", "permissionChildren"});
-        this.permissionRepository = plugin.getRepositoryController().getRepository(PlayerPermissionRepository.class);
+        this.permissionRepository = plugin.getRepositoryManager().getRepository(PlayerPermissionRepository.class);
 
         new BukkitRunnable() {
             @Override

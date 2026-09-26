@@ -24,11 +24,11 @@ import de.happybavarian07.coolstufflib.backupmanager.BackupManager;
 import de.happybavarian07.coolstufflib.backupmanager.FileBackup;
 import de.happybavarian07.coolstufflib.backupmanager.RegexFileFilter;
 import de.happybavarian07.coolstufflib.commandmanagement.CommandManagerRegistry;
-import de.happybavarian07.coolstufflib.jpa.RepositoryController;
 import de.happybavarian07.coolstufflib.jpa.utils.DatabaseProperties;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.menusystem.MenuAddonManager;
+import de.happybavarian07.coolstufflib.repository.RepositoryManager;
 import de.happybavarian07.coolstufflib.service.api.ServiceRegistry;
 import de.happybavarian07.coolstufflib.service.impl.DefaultServiceRegistry;
 import net.milkbowl.vault.chat.Chat;
@@ -82,7 +82,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private PluginStateManager pluginStateManager;
     private FileCorruptionManager fileCorruptionManager;
     private APDependencyManager dependencyManager;
-    private RepositoryController repositoryController;
     private PluginUtils globalPluginUtils;
     private CoolStuffLib coolStuffLib;
     private ServiceRegistry serviceRegistry;
@@ -121,8 +120,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return fileCorruptionManager;
     }
 
-    public RepositoryController getRepositoryController() {
-        return repositoryController;
+    public RepositoryManager getRepositoryManager() {
+        return coolStuffLib.getRepositoryManager();
     }
 
     public PermissionsManager getPermissionsManager() {
@@ -313,7 +312,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         tpsMeter = new TPSMeter();
         setPlugin(this);
 
-        setupRepositoryController();
+        configureDatabase(coolStuffLibBuilder);
         getDependencyManager().useHookSystem();
         Metrics metrics = setupMetrics();
         sendStartupMessages();
@@ -351,63 +350,23 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         logStartupMessage();
     }
 
-    private void setupRepositoryController() {
-        Properties properties = new Properties();
-        File propertiesFile = new File(getDataFolder(), "database.properties");
-        saveResource("database.properties", false);
-        InputStream is = null;
-        try {
-            if (propertiesFile.exists()) {
-                is = new FileInputStream(propertiesFile);
-            } else {
-                is = getClass().getResourceAsStream("/database.properties");
-            }
-            properties.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                assert is != null;
-                is.close();
-            } catch (IOException e) {
-                fileLogger.writeToLog(Level.SEVERE, "Error closing InputStream: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
-            }
-        }
-        DatabaseProperties databaseProperties = new DatabaseProperties();
-        String host = properties.getProperty("host", "localhost");
-        int port = Integer.parseInt(properties.getProperty("port", "-1"));
-        String databaseFilePath = properties.getProperty("sqlite_file_path");
-        String username = properties.getProperty("username", "root");
-        String password = properties.getProperty("password", "password");
-        String driver = properties.getProperty("dbtype");
-        String databasePrefix = properties.getProperty("database_prefix", "");
-        if (driver == null || driver.isEmpty()) {
-            driver = "sqlite";
-            if (databaseFilePath.isEmpty()) {
-                databaseFilePath = "AdminPanelDatabase.db";
-            }
-            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
-                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
-            }
-            fileLogger.writeToLog(Level.WARNING, "Database type not specified. Defaulting to SQLite.", LogPrefixExtension.ADMINPANEL_MAIN.getLogPrefix(), true);
-            fileLogger.writeToLog(Level.WARNING, "You might experience issues if you switch to MySQL later.", LogPrefixExtension.ADMINPANEL_MAIN.getLogPrefix(), true);
-        } else if (driver.equalsIgnoreCase("sqlite")) {
-            if (!databaseFilePath.startsWith(getDataFolder().getAbsolutePath())) {
-                databaseFilePath = new File(getDataFolder(), databaseFilePath).getAbsolutePath();
-            }
-        }
-        databaseProperties.setDriver(driver);
-        databaseProperties.setHost(host);
-        databaseProperties.setPort(String.valueOf(port));
-        databaseProperties.setDatabase(databaseFilePath);
-        databaseProperties.setUsername(username);
-        databaseProperties.setPassword(password);
-        databaseProperties.setDatabasePrefix(databasePrefix);
-        fileLogger.writeToLog(Level.INFO, "Using Database: " + databaseProperties.getDriver() + " at " + databaseProperties.getHost() + ":" + databaseProperties.getPort() +
-                " with Database File: " + databaseProperties.getDatabase(), LogPrefixExtension.ADMINPANEL_MAIN, true);
+    public static final String DB_CONNECTION = "main";
 
-        repositoryController = new RepositoryController(this, new File(getDataFolder(), "repo_registration.json"), databaseProperties);
-        repositoryController.loadRepositoriesFromFile();
+    private void configureDatabase(CoolStuffLibBuilder builder) {
+        File propertiesFile = new File(getDataFolder(), "database.properties");
+        if (!propertiesFile.exists()) saveResource("database.properties", false);
+        Properties properties = new Properties();
+        try (InputStream in = new FileInputStream(propertiesFile)) {
+            properties.load(in);
+        } catch (IOException e) {
+            fileLogger.writeToLog(Level.SEVERE, "Could not read database.properties, using SQLite defaults: " + e.getMessage(), LogPrefixExtension.ADMINPANEL_MAIN, true);
+        }
+        DatabaseProperties databaseProperties = DatabaseSettings.parse(properties, getDataFolder());
+        fileLogger.writeToLog(Level.INFO, "Using Database: " + databaseProperties.getDriver() + " (" + databaseProperties.getDatabase() + ")", LogPrefixExtension.ADMINPANEL_MAIN, true);
+        builder.withRepositoryManager()
+                .setDatabasePrefix(databaseProperties.getDatabasePrefix())
+                .addConnection(DB_CONNECTION, databaseProperties)
+                .build();
     }
 
     private Metrics setupMetrics() {
@@ -560,6 +519,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPermissionsManager() {
+        getRepositoryManager().registerRepository(PlayerPermissionRepository.class, PlayerPermission.class);
         permissionsManager = new PermissionsManager(this, 5 * 60 * 20L);
     }
 
@@ -652,12 +612,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupPermissions() {
-        repositoryController.addRepositoryToRegistrationFile(
-                PlayerPermissionRepository.class,
-                PlayerPermission.class,
-                "Repository for PermissionEntry",
-                true
-        );
         permissionsManager.setup();
     }
 
