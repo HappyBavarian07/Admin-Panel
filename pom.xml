@@ -51,6 +51,18 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
                                 <filter>
+                                    <artifact>io.github.happybavarian07:CoolStuffLib</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>io.github.classgraph:classgraph</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.SF</exclude>
@@ -108,76 +120,6 @@
                     <reportFormat>plain</reportFormat>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-jar-to-server-1</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.20.2\plugins</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>Admin-Panel-*.*.*.jar</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-jar-to-server-2</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.1\plugins</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>Admin-Panel-*.*.*.jar</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-jar-to-server-3</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.5\plugins</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>Admin-Panel-*.*.*.jar</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 
@@ -304,12 +246,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.17.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.16.0</version>
@@ -419,6 +355,88 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>copy-to-test-servers</id>
+            <activation>
+                <file>
+                    <exists>F:\Weitere Minecraft Test Server</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>copy-jar-to-server-1</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.20.2\plugins</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.directory}</directory>
+                                        <includes>
+                                            <include>Admin-Panel-*.*.*.jar</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
+                                        </excludes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-jar-to-server-2</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.1\plugins</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.directory}</directory>
+                                        <includes>
+                                            <include>Admin-Panel-*.*.*.jar</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
+                                        </excludes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-jar-to-server-3</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>F:\Weitere Minecraft Test Server\Spigot 1.21.5\plugins</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.directory}</directory>
+                                        <includes>
+                                            <include>Admin-Panel-*.*.*.jar</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>Admin-Panel-*.*.*-shaded.jar</exclude>
+                                        </excludes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release-sign-artifacts</id>
             <activation>
