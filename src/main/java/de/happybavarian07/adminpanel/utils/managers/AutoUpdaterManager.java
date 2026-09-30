@@ -5,6 +5,7 @@ import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.adminpanel.utils.VersionComparator;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -32,7 +33,7 @@ public class AutoUpdaterManager {
     }
 
     public void setup(NewUpdater adminPanelUpdater) {
-        new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             plugin.getAutoUpdaterManager().getAutoUpdaterPlugins().clear();
             plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
             plugin.getStartUpLogger().message("&1&lAuto Plugin Updater initiated&r");
@@ -46,7 +47,7 @@ public class AutoUpdaterManager {
                     }
                 }.runTaskTimer(plugin, (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20), (plugin.getConfig().getLong("Plugin.Updater.PluginUpdater.UpdateCheckTime") * 60 * 20));
             }
-        }).start();
+        });
         plugin.getStartUpLogger().coloredSpacer(ChatColor.BLUE);
     }
 

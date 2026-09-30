@@ -206,7 +206,7 @@ public class InitMethods {
     }
 
     public void initAddonLoader(AddonLoader loader) {
-        new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             logger.emptySpacer();
             logger.coloredSpacer(ChatColor.BLUE);
             logger.coloredMessage(ChatColor.GREEN, "Adding Addons to the List!");
@@ -245,16 +245,10 @@ public class InitMethods {
             for (File addonFile : loader.getLoadedJarFiles().keySet()) {
                 try {
                     if (addonFile != null) {
-                        //System.out.println("Addon file is not null: " + addonFile.getName());
                         Addon mainClass = loader.getMainClassOfAddon(addonFile, false);
-                        //System.out.println("Addon Main Class: " + mainClass);
-                        //System.out.println("Before enabling addon: " + addonFile.getName());
-                        //System.out.println("Calling enableAddon method...");
                         AddonLoader.EnableResult result = loader.enableAddon(addonFile, new HashSet<>(), false);
                         this.plugin.getStartUpLogger().coloredMessage(ChatColor.GREEN, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "'!");
                         this.plugin.getFileLogger().writeToLog(Level.INFO, "Addon enabling status for '" + addonFile.getName() + "' is '" + result + "' (" + mainClass.getName() + ")!", LogPrefixExtension.ADDONLOADER.getLogPrefix(), false);
-                        //System.out.println("Result from enabling: " + result);
-                        //System.out.println("After enabling addon: " + addonFile.getName());
                     } else {
                         throw new NullPointerException("Addon file is null");
                     }
@@ -266,7 +260,7 @@ public class InitMethods {
 
             logger.coloredMessage(ChatColor.GREEN, "Done with Phase 3/3! (Enabling)");
             logger.coloredSpacer(ChatColor.BLUE);
-        }).start();
+        });
     }
 
     private boolean setupEconomy() {

@@ -49,13 +49,15 @@ public class PermissionsManager {
     public void setup() {
         migrateOldPermissions();
 
-        new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             // wait for the database to be ready
             while (!permissionRepository.isDatabaseReady()) {
+                if (!plugin.isEnabled()) return;
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for database to be ready: " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
 
@@ -69,12 +71,11 @@ public class PermissionsManager {
                 plugin.getFileLogger().writeToLog(Level.INFO, "- Unique players with permissions: " + uniquePlayers, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
                 plugin.getFileLogger().writeToLog(Level.INFO, "- Unique permissions defined: " + uniquePermissions, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             } catch (Exception e) {
-                e.printStackTrace();
-                plugin.getFileLogger().writeToLog(Level.WARNING, "Could not retrieve permission repository statistics: " + e, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                AdminPanelMain.logError("Could not retrieve permission repository statistics", e);
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "Database is ready starting Permission init code", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
             initPermissions();
-        }).start();
+        });
     }
 
     public void onServerLoad(ServerLoadEvent event) {
@@ -468,7 +469,7 @@ public class PermissionsManager {
             player.recalculatePermissions();
             plugin.getFileLogger().writeToLog(Level.INFO, "Loaded permissions for player: " + player.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
         } catch (Exception e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not load permissions for player " + player.getName(), e);
             plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for player " + player.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
         }
     }
