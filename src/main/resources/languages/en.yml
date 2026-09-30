@@ -377,11 +377,6 @@ Messages:
       ReloadCommandManagers: 'Reload of the Command Managers'
       UpdateConfig: 'Update of the Config'
       UpdateLangFiles: 'Update of the Language Files'
-    BugReport:
-      # %seconds% = seconds until the next report is possible
-      Cooldown: '%prefix% &9> &cYou can send the next report in %seconds% seconds.'
-      Error: '%prefix% &9> &cCould not send the report. Please look into the console.'
-      Sent: '%prefix% &9> &aSent the report to the developer. &7You can wait for the fix or join my Discord.'
     StartUpLogger:
       Enabled: '%prefix% &9> &aStartUpLogger enabled!'
       Disabled: '%prefix% &9> &cStartUpLogger disabled!'

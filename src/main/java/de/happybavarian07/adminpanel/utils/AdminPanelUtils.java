@@ -22,8 +22,6 @@ import org.bukkit.profile.PlayerProfile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -376,40 +374,6 @@ public class AdminPanelUtils {
             plugin.getLogger().severe("Could not save data.yml");
             plugin.getFileLogger().writeToLog(Level.SEVERE, "Could not save data.yml", LogPrefixExtension.ERROR);
         }
-    }
-
-    public static boolean sendMessageToWebhook(String message) {
-        if (message == null || message.isEmpty()) return false;
-        try {
-            URL url = new URL("https://discord.com/api/webhooks/1158431051492892763/ZOtRZf0BMDECMw9WQ8vijRhRHXAEYYGD39plafrgxT903gPWOysWfvTbOrQA23vGkhX6");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("Content-Type", "application/json");
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-
-            JSONObject json = new JSONObject();
-
-            json.put("content", message);
-            json.put("username", "Admin-Panel-Report-System");
-            connection.getOutputStream().write(json.toString().getBytes());
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != 204) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-                throw new IOException("Failed to send message to Discord webhook: " + response);
-            }
-        } catch (IOException | JSONException e) {
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "Failed to send message to Discord webhook", LogPrefixExtension.ERROR);
-            plugin.getLogger().severe("Failed to send message to Discord webhook");
-            return false;
-        }
-        return true;
     }
 
     /**

@@ -96,7 +96,6 @@ public class AdminPanelAdminManager extends CommandManager {
                     lgm.reloadLanguages(sender, true);
                 }));
         registerSubCommand(new StartUpLoggerControlCommand(getCommandName()));
-        registerSubCommand(new BugReportCommand(getCommandName()));
         registerSubCommand(new BackupManagerCommand(getCommandName()));
         registerSubCommand(new PermissionMenuHelpCommand(getCommandName()));
         registerSubCommand(new StaffChatCommand(getCommandName()));

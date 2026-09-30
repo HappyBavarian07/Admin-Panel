@@ -50,17 +50,6 @@ public class BungeeTestCommand implements CommandExecutor {
                     perms.put("second.permission.in.list", false);
                     perms.put("and.the.third.one", false);
                     AdminPanelMain.getPlugin().getDataClientUtils().sendPlayerPermissions(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), perms, "null");
-                case "testreportFeature":
-                    //AdminPanelMain.getAPI().reportBugToDiscord(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), "This is a test");
-                    //System.out.println("Args:" + Arrays.toString(args));
-                    List<String> message = new ArrayList<>(Arrays.asList(args));
-                    message.remove(0);
-                    //System.out.println("Args formatted: " + message);
-                    //System.out.println("Args joined: " + String.join(" ", message));
-                    int response = AdminPanelMain.getAPI().reportBugToDiscord(UUID.fromString("0c069d0e-5778-4d51-8929-6b2f69b475c0"), String.join(" ", message));
-                    if(response == -2) System.out.println("Cooldown!");
-                    else if (response == -1) System.out.println("Geht nicht!");
-                    else if (response == 0) System.out.println("Erfolgreich!");
                 case "backuptest":
                     AdminPanelMain.getPlugin().getBackupManager().startBackup("ConfigBackup");
                 case "loadbackup":
