@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils.pattern;
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class PatternTool {
     public static void main(String[] args) throws Exception {
@@ -36,7 +38,7 @@ public class PatternTool {
         }
 
         if (!Files.exists(dataDir)) {
-            System.out.println("No data directory found at " + dataDir.toAbsolutePath());
+            Logger.getLogger("Admin-Panel").warning("No data directory found at " + dataDir.toAbsolutePath());
             return;
         }
 
@@ -49,15 +51,15 @@ public class PatternTool {
                     File out = patternsDir.toPath().resolve(f.getName() + ".pattern").toFile();
                     if (name.endsWith(".yml") || name.endsWith(".yaml")) {
                         PatternFileGenerator.generateYamlPattern(f, out, overrides);
-                        System.out.println("Generated YAML pattern: " + out.getAbsolutePath());
+                        Logger.getLogger("Admin-Panel").info("Generated YAML pattern: " + out.getAbsolutePath());
                     } else if (name.endsWith(".properties")) {
                         PatternFileGenerator.generatePropertiesPattern(f, out, overrides);
-                        System.out.println("Generated properties pattern: " + out.getAbsolutePath());
+                        Logger.getLogger("Admin-Panel").info("Generated properties pattern: " + out.getAbsolutePath());
                     } else {
-                        System.out.println("Skipping unsupported file type: " + f.getName());
+                        Logger.getLogger("Admin-Panel").info("Skipping unsupported file type: " + f.getName());
                     }
                 } catch (IOException e) {
-                    System.err.println("Failed to generate pattern for " + p + ": " + e.getMessage());
+                    AdminPanelMain.logError("Failed to generate pattern for " + p, e);
                 }
             });
         }

@@ -59,7 +59,7 @@ public class PluginUtils {
         try {
             target = Bukkit.getPluginManager().loadPlugin(pluginFile);
         } catch (InvalidDescriptionException | InvalidPluginException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not load the plugin file " + pluginFile.getName(), e);
             return;
         }
         Bukkit.getPluginManager().enablePlugin(target);
@@ -133,7 +133,7 @@ public class PluginUtils {
             commands = (Map<String, Command>) knownCommandsField.get(commandMap);
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not access the known commands of the command map", e);
         }
 
         pluginManager.disablePlugin(plugin);
@@ -179,14 +179,14 @@ public class PluginUtils {
                 pluginInitField.set(cl, null);
 
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-                ex.printStackTrace();
+                AdminPanelMain.logError("Could not reset the plugin field of the class loader", ex);
             }
 
             try {
 
                 ((URLClassLoader) cl).close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                AdminPanelMain.logError("Could not close the plugin class loader", ex);
             }
 
         }
@@ -264,14 +264,14 @@ public class PluginUtils {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    AdminPanelMain.logError("Could not close the download input stream", e);
                 }
             }
             if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    AdminPanelMain.logError("Could not close the download output stream", e);
                 }
             }
             if (connection != null) {

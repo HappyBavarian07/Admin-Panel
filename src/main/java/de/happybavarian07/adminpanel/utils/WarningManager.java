@@ -26,7 +26,7 @@ public class WarningManager {
             try {
                 warningFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not create the warning file", e);
             }
         }
         this.warningConfig = YamlConfiguration.loadConfiguration(warningFile);
@@ -89,7 +89,7 @@ public class WarningManager {
         try {
             warningConfig.save(warningFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not save the warning of player " + player, e);
         }
     }
 
@@ -103,7 +103,7 @@ public class WarningManager {
             try {
                 warningConfig.save(warningFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not remove the warning of player " + player + " from the warning file", e);
             }
         }
     }
@@ -131,7 +131,7 @@ public class WarningManager {
         try {
             warningConfig.save(warningFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not save the warning file after loading", e);
         }
     }
 

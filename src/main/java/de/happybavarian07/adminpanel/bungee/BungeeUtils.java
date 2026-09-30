@@ -4,6 +4,7 @@ package de.happybavarian07.adminpanel.bungee;/*
  */
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.messaging.Messenger;
@@ -11,6 +12,7 @@ import org.bukkit.plugin.messaging.Messenger;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class BungeeUtils {
     private final AdminPanelMain plugin;
@@ -32,13 +34,13 @@ public class BungeeUtils {
     public void openBungeeChannel() {
         messenger.registerIncomingPluginChannel(plugin, incomingChannelName, channelListener);
         messenger.registerOutgoingPluginChannel(plugin, outgoingChannelName);
-        System.out.println("Incoming: " + messenger.getIncomingChannels(plugin));
-        System.out.println("Outgoing: " + messenger.getOutgoingChannels(plugin));
+        plugin.getFileLogger().writeToLog(Level.FINE, "Incoming: " + messenger.getIncomingChannels(plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
+        plugin.getFileLogger().writeToLog(Level.FINE, "Outgoing: " + messenger.getOutgoingChannels(plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
     }
 
     public void closeBungeeChannel() {
-        System.out.println("Incoming: " + messenger.getIncomingChannels(plugin));
-        System.out.println("Outgoing: " + messenger.getOutgoingChannels(plugin));
+        plugin.getFileLogger().writeToLog(Level.FINE, "Incoming: " + messenger.getIncomingChannels(plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
+        plugin.getFileLogger().writeToLog(Level.FINE, "Outgoing: " + messenger.getOutgoingChannels(plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
         messenger.unregisterIncomingPluginChannel(plugin, incomingChannelName, channelListener);
         messenger.unregisterOutgoingPluginChannel(plugin, outgoingChannelName);
     }
@@ -55,7 +57,7 @@ public class BungeeUtils {
         } catch (IOException e) {
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             plugin.getStartUpLogger().message("&cFehler beim Schreiben in den OutputStream: &4" + e);
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not write to the plugin message output stream", e);
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             return;
         }
@@ -66,7 +68,7 @@ public class BungeeUtils {
         } catch (Exception e) {
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             plugin.getStartUpLogger().message("&cEs trat ein Fehler beim Senden der Daten an den BungeeServer auf: &4" + e);
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not send the plugin message to the proxy", e);
             plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
         }
     }

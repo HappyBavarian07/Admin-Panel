@@ -379,7 +379,6 @@ public class AdminPanelUtils {
     }
 
     public static boolean sendMessageToWebhook(String message) {
-        //System.out.println("Message: " + message);
         if (message == null || message.isEmpty()) return false;
         try {
             URL url = new URL("https://discord.com/api/webhooks/1158431051492892763/ZOtRZf0BMDECMw9WQ8vijRhRHXAEYYGD39plafrgxT903gPWOysWfvTbOrQA23vGkhX6");
@@ -636,7 +635,6 @@ public class AdminPanelUtils {
                         }
                     }
                 }
-                //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 FileOutputStream fos = new FileOutputStream(newFile);
                 int len;
@@ -723,16 +721,14 @@ public class AdminPanelUtils {
             if (Menu.class.isAssignableFrom(clazz)) {
                 return (Menu) clazz.getDeclaredConstructor(PlayerMenuUtility.class).newInstance(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()));
             } else {
-                System.err.println("The class does not extend Menu: " + fullClassName);
+                plugin.getFileLogger().writeToLog(Level.SEVERE, "The class does not extend Menu: " + fullClassName, LogPrefixExtension.ERROR, true);
                 return null; // Or handle it as needed
             }
         } catch (ClassNotFoundException e) {
-            System.err.println("Class not found: " + fullClassName);
             plugin.getFileLogger().writeToLog(Level.SEVERE, "Class not found: " + fullClassName, LogPrefixExtension.ERROR);
             plugin.getLogger().severe("Class not found: " + fullClassName);
             return null; // You can modify the return value based on your needs
         } catch (IllegalAccessException | InstantiationException e) {
-            System.err.println("Error creating an instance: " + fullClassName);
             plugin.getFileLogger().writeToLog(Level.SEVERE, "Error creating an instance: " + fullClassName, LogPrefixExtension.ERROR);
             plugin.getLogger().severe("Error creating an instance: " + fullClassName);
             return null; // You can modify the return value based on your needs

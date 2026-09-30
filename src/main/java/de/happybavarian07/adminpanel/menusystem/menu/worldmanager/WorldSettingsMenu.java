@@ -107,7 +107,7 @@ public class WorldSettingsMenu extends Menu {
                 super.open();
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 
@@ -120,7 +120,7 @@ public class WorldSettingsMenu extends Menu {
                 super.open();
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 
@@ -139,13 +139,13 @@ public class WorldSettingsMenu extends Menu {
                         new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
                     }
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    AdminPanelMain.logError("Could not create the raids.dat files of the world", ex);
                 }
                 Bukkit.createWorld(new WorldCreator(world.getName()));
                 super.open();
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 
@@ -158,7 +158,7 @@ public class WorldSettingsMenu extends Menu {
                 super.open();
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 
@@ -182,7 +182,7 @@ public class WorldSettingsMenu extends Menu {
                 super.open();
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 
@@ -199,7 +199,7 @@ public class WorldSettingsMenu extends Menu {
                 );
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
         }
     }
 

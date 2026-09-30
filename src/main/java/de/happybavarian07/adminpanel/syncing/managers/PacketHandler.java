@@ -125,11 +125,9 @@ public class PacketHandler {
     }
 
     public void handleReceivedCustomPacket(CustomPacket customPacket) {
-        //System.out.println("Received customPacket: " + customPacket);
         if (customPacket.getRequestId() != null && !customPacket.getRequestId().isEmpty()) {
             if (customResponseHandlers.containsKey(UUID.fromString(customPacket.getRequestId()))) {
                 customResponseHandlers.get(UUID.fromString(customPacket.getRequestId())).complete(customPacket);
-                //System.out.println("Responded to Server Response Handler: " + customPacket.getRequestId());
             }
         }
         String clientName = customPacket.getSenderName();
@@ -194,11 +192,9 @@ public class PacketHandler {
     }
 
     public void handleReceivedPacket(Packet packet) {
-        //System.out.println("Received packet: " + packet);
         if (packet.getRequestId() != null && !packet.getRequestId().isEmpty()) {
             if (responseHandlers.containsKey(UUID.fromString(packet.getRequestId()))) {
                 responseHandlers.get(UUID.fromString(packet.getRequestId())).complete(packet);
-                //System.out.println("Responded to Server Response Handler: " + packet.getRequestId());
             }
         }
         String clientName = packet.getSenderName();
@@ -206,11 +202,6 @@ public class PacketHandler {
         String requestId = packet.getRequestId();
         Action action = packet.getAction();
         List<String> data = packet.getData();
-
-        //System.out.println("ClientName: " + clientName);
-        //System.out.println("Destination: " + destination);
-        //System.out.println("Action: " + action);
-        //System.out.println("Data: " + data);
 
         loggingManager.logIntoFile(Level.INFO, "Received Packet from Server: " + packet);
 
@@ -234,7 +225,7 @@ public class PacketHandler {
                     try {
                         send(pingPacket, false, true);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        AdminPanelMain.logError("Could not answer the ping of the server", e);
                         statsManager.addErrorsThisSession(1);
                     }
                 }
@@ -267,7 +258,7 @@ public class PacketHandler {
                         connectionHandler.setClientListUpdateRequested(false);
                     });
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not request the client list from the server", e);
             statsManager.addErrorsThisSession(1);
         }
     }

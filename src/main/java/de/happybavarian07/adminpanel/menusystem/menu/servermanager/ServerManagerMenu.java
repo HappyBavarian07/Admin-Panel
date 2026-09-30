@@ -101,7 +101,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                             p.sendMessage(lgm.getMessage("Player.ServerManager.AllPlayersKicked", p, true));
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         if (plugin.getPluginStateManager().isInMaintenanceMode()) {
@@ -117,7 +117,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                                 }
                             }
                         } catch (NotAPanelEventException ex) {
-                            ex.printStackTrace();
+                            AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                         }
                         super.open();
                     }, lgm), null);
@@ -139,7 +139,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                                 }
                             }
                         } catch (NotAPanelEventException ex) {
-                            ex.printStackTrace();
+                            AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                         }
                         super.open();
                     }, lgm), null);

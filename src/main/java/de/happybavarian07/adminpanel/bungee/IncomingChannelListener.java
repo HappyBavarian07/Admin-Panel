@@ -3,7 +3,9 @@ package de.happybavarian07.adminpanel.bungee;/*
  * @Date 02.09.2022 | 15:03
  */
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -13,6 +15,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public record IncomingChannelListener(String incomingChannelName) implements PluginMessageListener {
 
@@ -25,11 +28,11 @@ public record IncomingChannelListener(String incomingChannelName) implements Plu
         try {
             subchannel = input.readUTF();
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not read the subchannel of a plugin message", e);
             return;
         }
 
-        System.out.println("Received Plugin Message");
+        AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.FINE, "Received Plugin Message", LogPrefixExtension.ADMINPANEL_MAIN, false);
 
         if (subchannel.equals("BroadcastServerWide")) {
             List<String> args = new ArrayList<>();
@@ -39,12 +42,12 @@ public record IncomingChannelListener(String incomingChannelName) implements Plu
                     args.add(temp);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not read the arguments of a broadcast plugin message", e);
                 return;
             }
 
             String messageToSend = AdminPanelUtils.arrayToString(args.toArray(new String[0]));
-            System.out.println("Received Broadcast Command!" + " Message: " + messageToSend);
+            AdminPanelMain.getPlugin().getFileLogger().writeToLog(Level.INFO, "Received Broadcast Command! Message: " + messageToSend, LogPrefixExtension.ADMINPANEL_MAIN, true);
             Bukkit.broadcastMessage(AdminPanelUtils.chat("&f|&9BROADCAST&f| &r" + messageToSend));
         }
     }

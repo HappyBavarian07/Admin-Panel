@@ -72,7 +72,7 @@ public class PluginDescriptionManager {
         try {
             config.save(configFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not save the plugin descriptions after removing " + pluginName, e);
         }
         AdminPanelMain.getPlugin().getData().descriptions().deleteById(pluginName);
     }
@@ -85,7 +85,7 @@ public class PluginDescriptionManager {
             try {
                 config.save(configFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not save the fetched description of plugin " + pluginName, e);
             }
         } else {
             config.set("descriptions." + pluginName + ".description", description);
@@ -93,7 +93,7 @@ public class PluginDescriptionManager {
             try {
                 config.save(configFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not save the description of plugin " + pluginName, e);
             }
         }
         AdminPanelMain.getPlugin().getData().descriptions()
@@ -124,7 +124,7 @@ public class PluginDescriptionManager {
             description = String.valueOf(getObjectFromWebsite(
                     "https://api.spiget.org/v2/resources/" + resourceID).getString("tag"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not read the description tag of resource " + resourceID, e);
             description = "NoDescriptionTagFound";
         }
         return description;
@@ -140,7 +140,7 @@ public class PluginDescriptionManager {
             reader.close();
             return jsonObject;
         } catch (Exception e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not fetch the JSON object from the website", e);
         }
         return null;
     }

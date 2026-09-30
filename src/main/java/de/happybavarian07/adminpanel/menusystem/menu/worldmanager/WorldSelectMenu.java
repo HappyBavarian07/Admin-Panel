@@ -72,7 +72,7 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
                 new WorldSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()), world).open();
             }
         } catch (NotAPanelEventException notAPanelEventException) {
-            notAPanelEventException.printStackTrace();
+            AdminPanelMain.logError("The world select action was not a valid panel event", notAPanelEventException);
         }
     }
 

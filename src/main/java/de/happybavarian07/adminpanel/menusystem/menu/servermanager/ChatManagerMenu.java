@@ -77,7 +77,7 @@ public class ChatManagerMenu extends Menu implements Listener {
                             Bukkit.broadcastMessage(lgm.getMessage("Player.Chat.Footer", p, true));
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("The clear chat action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         if (plugin.getPluginStateManager().isGlobalChatMuted()) {
@@ -94,7 +94,7 @@ public class ChatManagerMenu extends Menu implements Listener {
                                 Bukkit.broadcastMessage(lgm.getMessage("Player.ChatUnMute.Footer", p, true));
                             }
                         } catch (NotAPanelEventException ex) {
-                            ex.printStackTrace();
+                            AdminPanelMain.logError("The chat unmute action was not a valid panel event", ex);
                         }
                     }, lgm), null);
         } else {
@@ -111,7 +111,7 @@ public class ChatManagerMenu extends Menu implements Listener {
                                 Bukkit.broadcastMessage(lgm.getMessage("Player.ChatMute.Footer", p, true));
                             }
                         } catch (NotAPanelEventException ex) {
-                            ex.printStackTrace();
+                            AdminPanelMain.logError("The chat mute action was not a valid panel event", ex);
                         }
                     }, lgm), null);
         }

@@ -79,7 +79,7 @@ public class TimeChangeMenu extends Menu {
                 world.setTime(time.getTime());
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("The time change action was not a valid panel event", ex);
         }
     }
 }

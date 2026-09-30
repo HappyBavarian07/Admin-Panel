@@ -79,7 +79,7 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
                     new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
+                AdminPanelMain.logError("The player select action was not a valid panel event", notAPanelEventException);
             }
         }, lgm).execute(player, e);
     }

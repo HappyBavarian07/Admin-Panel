@@ -123,7 +123,7 @@ public class MoneyMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
-                        notAPanelEventException.printStackTrace();
+                        AdminPanelMain.logError("A money action was not a valid panel event", notAPanelEventException);
                     }
                 } catch (NumberFormatException ex) {
                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
@@ -160,7 +160,7 @@ public class MoneyMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
-                        notAPanelEventException.printStackTrace();
+                        AdminPanelMain.logError("A money action was not a valid panel event", notAPanelEventException);
                     }
                 } catch (NumberFormatException ex) {
                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
@@ -195,7 +195,7 @@ public class MoneyMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException notAPanelEventException) {
-                        notAPanelEventException.printStackTrace();
+                        AdminPanelMain.logError("A money action was not a valid panel event", notAPanelEventException);
                     }
                 } catch (NumberFormatException ex) {
                     player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));

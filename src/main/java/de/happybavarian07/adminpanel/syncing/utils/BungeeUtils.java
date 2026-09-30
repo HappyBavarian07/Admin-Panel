@@ -2,6 +2,7 @@ package de.happybavarian07.adminpanel.syncing.utils;
 
 import de.happybavarian07.adminpanel.bungee.IncomingChannelListener;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.messaging.Messenger;
@@ -9,6 +10,7 @@ import org.bukkit.plugin.messaging.Messenger;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class BungeeUtils {
     private final AdminPanelMain plugin;
@@ -36,13 +38,13 @@ public class BungeeUtils {
     public void openBungeeChannel() {
         this.messenger.registerIncomingPluginChannel(this.plugin, this.incomingChannelName, this.channelListener);
         this.messenger.registerOutgoingPluginChannel(this.plugin, this.outgoingChannelName);
-        System.out.println("Incoming: " + this.messenger.getIncomingChannels(this.plugin));
-        System.out.println("Outgoing: " + this.messenger.getOutgoingChannels(this.plugin));
+        this.plugin.getFileLogger().writeToLog(Level.FINE, "Incoming: " + this.messenger.getIncomingChannels(this.plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
+        this.plugin.getFileLogger().writeToLog(Level.FINE, "Outgoing: " + this.messenger.getOutgoingChannels(this.plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
     }
 
     public void closeBungeeChannel() {
-        System.out.println("Incoming: " + this.messenger.getIncomingChannels(this.plugin));
-        System.out.println("Outgoing: " + this.messenger.getOutgoingChannels(this.plugin));
+        this.plugin.getFileLogger().writeToLog(Level.FINE, "Incoming: " + this.messenger.getIncomingChannels(this.plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
+        this.plugin.getFileLogger().writeToLog(Level.FINE, "Outgoing: " + this.messenger.getOutgoingChannels(this.plugin), LogPrefixExtension.ADMINPANEL_MAIN, false);
         this.messenger.unregisterIncomingPluginChannel(this.plugin, this.incomingChannelName, this.channelListener);
         this.messenger.unregisterOutgoingPluginChannel(this.plugin, this.outgoingChannelName);
     }
@@ -60,7 +62,7 @@ public class BungeeUtils {
         } catch (IOException e) {
             this.plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
             this.plugin.getStartUpLogger().message("&cThere was an Error while sending Data to the BungeeServer: &4" + e);
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not send data to the proxy", e);
             this.plugin.getStartUpLogger().coloredSpacer(ChatColor.RED);
         }
     }

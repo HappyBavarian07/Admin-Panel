@@ -101,7 +101,6 @@ public class TFIDFSearch {
     }
 
     public List<Item> search(String queryStr) throws Exception {
-        //System.out.println("Searching for " + queryStr);
         if (!isIndexInitialized()) {
             return new ArrayList<>();
         }
@@ -134,7 +133,6 @@ public class TFIDFSearch {
 
             List<Item> results = new ArrayList<>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-                //System.out.println("ScoreDoc" + scoreDoc.doc);
                 Document doc = searcher.storedFields().document(scoreDoc.doc);
                 Item item = new Item(new HashMap<>());
                 for (String field : fields) {

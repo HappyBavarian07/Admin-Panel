@@ -126,13 +126,13 @@ public class PluginInstallMenu extends Menu implements Listener {
                         Plugin installedPlugin = AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
                         plugin.getPluginDescriptionManager().addPluginDescription(installedPlugin, "", installEvent.getResourceID());
                     } catch (FileNotFoundException fileNotFoundException) {
-                        fileNotFoundException.printStackTrace();
+                        AdminPanelMain.logError("The plugin file to install was not found", fileNotFoundException);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", p, true));
                     } catch (IOException | InvalidPluginException | InvalidDescriptionException exception) {
-                        exception.printStackTrace();
+                        AdminPanelMain.logError("Could not install the plugin from Spiget", exception);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.ErrorInInstallProccess", p, true));
                     } catch (UnknownDependencyException unknownDependencyException) {
-                        unknownDependencyException.printStackTrace();
+                        AdminPanelMain.logError("The plugin to install has unknown dependencies", unknownDependencyException);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.MissingDependencies", p, true));
                     }
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", resourceID, true);
@@ -140,7 +140,7 @@ public class PluginInstallMenu extends Menu implements Listener {
                     p.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", p, true));
                 }
             } catch (NotAPanelEventException ex) {
-                ex.printStackTrace();
+                AdminPanelMain.logError("The plugin install action was not a valid panel event", ex);
             }
             p.closeInventory();
             this.resourceID = 0;
@@ -172,7 +172,7 @@ public class PluginInstallMenu extends Menu implements Listener {
             try {
                 this.resourceID = Integer.parseInt(message);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("The entered Spiget resource ID is not a number", e);
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
             }
             playerMenuUtility.removeData("typeResourceIDInChat");

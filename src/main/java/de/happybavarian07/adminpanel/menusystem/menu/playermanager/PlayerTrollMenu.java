@@ -100,7 +100,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
 
@@ -126,7 +126,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
 
@@ -163,7 +163,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
 
@@ -187,7 +187,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "Kick.ConnectionReset", 30), lgm.getItem(path + "Kick.ConnectionReset", target, false),
@@ -197,7 +197,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "Kick.Whitelist", 32), lgm.getItem(path + "Kick.Whitelist", target, false),
@@ -207,7 +207,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "Kick.ServerStoppedError", 33), lgm.getItem(path + "Kick.ServerStoppedError", target, false),
@@ -217,7 +217,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
 
@@ -239,7 +239,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                             }
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "FakeOp", 21), lgm.getItem(path + "FakeOp", target, false),
@@ -249,7 +249,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) target.sendMessage(event.getMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "FakeTNT", 22), lgm.getItem(path + "FakeTNT", target, false),
@@ -264,7 +264,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                             tnt.setYield(0);
                         }
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
         registerButton(getSlot(path + "FakeDeop", 23), lgm.getItem(path + "FakeDeop", target, false),
@@ -274,7 +274,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled()) target.sendMessage(event.getMessage());
                     } catch (NotAPanelEventException ex) {
-                        ex.printStackTrace();
+                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
                 }, lgm), null);
 

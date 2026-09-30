@@ -93,7 +93,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
             bukkitCommandMap.setAccessible(true);
             return (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
         } catch (Exception e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not access the server command map", e);
             return null;
         }
     }

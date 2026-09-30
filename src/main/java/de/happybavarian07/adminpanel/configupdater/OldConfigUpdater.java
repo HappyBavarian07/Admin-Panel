@@ -174,7 +174,6 @@ public class OldConfigUpdater {
         StringBuilder keyBuilder = new StringBuilder();
         int lastLineIndentCount = 0;
 
-        //System.out.println("Ignored sections: " + ignoredSections);
         outer: for (String line : lines) {
             if (line != null && line.trim().startsWith("-"))
                 continue;
@@ -185,14 +184,8 @@ public class OldConfigUpdater {
                 lastLineIndentCount = setFullKey(keyBuilder, line, lastLineIndentCount);
 
                 for (String ignoredSection : ignoredSections) {
-                    //System.out.println("Key Builder: " + keyBuilder);
-                    //System.out.println("Ignored section: " + ignoredSection);
-                    //System.out.println("Equals: " + (keyBuilder.toString().equals(ignoredSection)));
                     if (keyBuilder.toString().equals(ignoredSection)) {
                         Object value = oldConfig.get(keyBuilder.toString());
-
-                        //System.out.println("Value: " + value);
-                        //System.out.println("Is Config Section: " + (value instanceof ConfigurationSection));
 
                         if (value instanceof ConfigurationSection)
                             appendSection(builder, (ConfigurationSection) value, new StringBuilder(getPrefixSpaces(lastLineIndentCount)), yaml);

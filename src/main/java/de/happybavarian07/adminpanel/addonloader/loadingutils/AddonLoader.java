@@ -130,7 +130,7 @@ public class AddonLoader {
                 } catch (NullPointerException e) {
                     if (temp == null) {
                         plugin.getFileLogger().writeToLog(Level.SEVERE, "The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!", LogPrefixExtension.ADDONLOADER);
-                        e.printStackTrace();
+                        AdminPanelMain.logError("Addon " + addon.getName() + " has no valid addon values", e);
                         throw new NullPointerException("The Addon " + addon.getName() + " has no valid Addon Values or doesn't exist entirely!");
                     }
                 } catch (InvocationTargetException | NoSuchMethodException e) {
@@ -158,7 +158,7 @@ public class AddonLoader {
             }
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException |
                  NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not load the main class of addon " + addon.getName(), e);
         }
         return null;
     }
@@ -252,7 +252,7 @@ public class AddonLoader {
             initMethod.invoke(addon, this, addonDataFolder, addonFile, addonClassLoaders.get(addon.getFile()));
             initMethod.setAccessible(false);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not initialize addon " + addon.getName(), e);
         }*/
     }
 
@@ -270,14 +270,14 @@ public class AddonLoader {
             addonClassLoaders.clear();
         } catch (IOException e) {
             plugin.getFileLogger().writeToLog(Level.SEVERE, "generated an Exception: " + e + "(Messages: " + e.getMessage() + ")", LogPrefixExtension.ADDONLOADER);
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not close the addon class loaders", e);
         } finally {
             // Ensure all AddonClassLoaders are closed to prevent memory leaks
             for (AddonClassLoader classLoader : addonClassLoaders.values()) {
                 try {
                     classLoader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    AdminPanelMain.logError("Could not close an addon class loader", e);
                 }
             }
             addonClassLoaders.clear(); // Clear the map to allow garbage collection

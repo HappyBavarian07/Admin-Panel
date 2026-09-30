@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils.dependencyloading;
 
+import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
@@ -32,7 +33,7 @@ public class ClassAppender {
             Field lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
             l = (MethodHandles.Lookup) u.getObject(u.staticFieldBase(lookupField), u.staticFieldOffset(lookupField));
         } catch (Throwable t) {
-            t.printStackTrace();
+            AdminPanelMain.logError("Could not access Unsafe and the trusted lookup", t);
         }
         unsafe = u;
         lookup = l;

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class PatternRunner {
     public static void main(String[] args) throws Exception {
@@ -13,7 +14,7 @@ public class PatternRunner {
         Path patternsDir = dataDir.resolve("patterns");
 
         if (!Files.exists(dataDir)) {
-            System.out.println("No data directory found at " + dataDir.toAbsolutePath());
+            Logger.getLogger("Admin-Panel").warning("No data directory found at " + dataDir.toAbsolutePath());
             return;
         }
 
@@ -48,9 +49,9 @@ public class PatternRunner {
             });
         }
 
-        System.out.println("Pattern validation report:");
+        Logger.getLogger("Admin-Panel").info("Pattern validation report:");
         for (Map.Entry<String, String> e : report.entrySet()) {
-            System.out.println("- " + e.getKey() + ":\n" + e.getValue());
+            Logger.getLogger("Admin-Panel").info("- " + e.getKey() + ":\n" + e.getValue());
         }
     }
 }

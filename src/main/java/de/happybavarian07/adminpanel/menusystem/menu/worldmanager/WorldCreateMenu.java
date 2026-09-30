@@ -149,7 +149,7 @@ public class WorldCreateMenu extends Menu implements Listener {
                     if (world != null) p.teleport(world.getSpawnLocation());
                 }
             } catch (NotAPanelEventException ex) {
-                ex.printStackTrace();
+                AdminPanelMain.logError("The world create action was not a valid panel event", ex);
             }
         }, null);
 

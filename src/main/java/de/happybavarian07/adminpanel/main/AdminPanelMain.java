@@ -109,6 +109,25 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         return plugin;
     }
 
+    /**
+     * Writes an error with its stack trace to the plugin log file and the console.
+     *
+     * <p>Safe to call before {@link #onLoad()} has created the file logger, for example from static
+     * initializers: the error then goes to the server logger instead and nothing is lost.</p>
+     *
+     * @param context what was being done when the error happened, shown in front of the stack trace
+     * @param error   the failure to log
+     */
+    public static void logError(String context, Throwable error) {
+        if (fileLogger == null) {
+            java.util.logging.Logger.getLogger("Admin-Panel").log(Level.SEVERE, context, error);
+            return;
+        }
+        java.io.StringWriter trace = new java.io.StringWriter();
+        error.printStackTrace(new java.io.PrintWriter(trace));
+        fileLogger.writeToLog(Level.SEVERE, context + ": " + trace, LogPrefixExtension.ADMINPANEL_MAIN, true);
+    }
+
     private void setPlugin(AdminPanelMain plugin) {
         AdminPanelMain.plugin = plugin;
     }
@@ -217,7 +236,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             ConfigUpdater.update(this, "config.yml", new File(this.getDataFolder() + "/config.yml"), new ArrayList<>());
         } catch (IOException e) {
             fileLogger.writeToLog(Level.SEVERE, "Error updating Config File from AdminPanel", LogPrefixExtension.ADMINPANEL_MAIN);
-            e.printStackTrace();
+            logError("Could not update config.yml", e);
         }
         reloadConfig();
     }
@@ -566,12 +585,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         updateConfig();
         boolean autoLanguageFileUpdating = getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating");
         if (autoLanguageFileUpdating) {
-            System.out.println("Auto Language File Updating is enabled!");
+            fileLogger.writeToLog(Level.INFO, "Auto Language File Updating is enabled!", LogPrefixExtension.ADMINPANEL_MAIN, true);
             /*
 
             if (languageManager instanceof MySQLLanguageManager) {
-                System.out.println("Language IDs: " + ((MySQLLanguageManager) languageManager).getDatabaseController().getInnerLanguageManager().getLanguageIDs());
-                System.out.println("Language Converter Map: " + ((MySQLLanguageManager) languageManager).getDatabaseController().getInnerLanguageManager().getConverterManager().getLanguageConverterMap());
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -579,7 +596,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                logError("Interrupted while waiting for the language converters", e);
                             }
                         }
                         languageManager.reloadLanguages(null, true);

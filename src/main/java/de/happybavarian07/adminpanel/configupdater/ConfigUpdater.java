@@ -179,7 +179,6 @@ public class ConfigUpdater {
 	   /*     if (value == null) {
                 Map<Object, Object>  map= new HashMap<>();
                 map.put(key,"{}");
-                System.out.println("key " + key);
                 return  map;
             }*/
             throw new IllegalArgumentException("Ignored sections must be a ConfigurationSection not a value!");

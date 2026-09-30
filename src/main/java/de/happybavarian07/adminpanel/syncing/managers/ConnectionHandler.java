@@ -80,7 +80,7 @@ public class ConnectionHandler {
             server = new ConnectionToServer(socket);
             packets.clear();
         } catch (IOException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("Could not connect to the data server", e);
             loggingManager.logIntoFile(Level.SEVERE, "IO Exception while connecting to Server: " + e + ":" + e.getMessage());
             statsManager.addErrorsThisSession(1);
             return false;
@@ -92,7 +92,7 @@ public class ConnectionHandler {
             AdminPanelMain.getAPI().callAdminPanelEvent(connectedEvent);
             //if (connectedEvent.isCancelled()) return;
         } catch (NotAPanelEventException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("The socket connected event was not a valid panel event", e);
             statsManager.addErrorsThisSession(1);
             return false;
         }
@@ -116,7 +116,7 @@ public class ConnectionHandler {
             AdminPanelMain.getAPI().callAdminPanelEvent(disconnectedEvent);
             //if (disconnectedEvent.isCancelled()) return;
         } catch (NotAPanelEventException e) {
-            e.printStackTrace();
+            AdminPanelMain.logError("The socket disconnected event was not a valid panel event", e);
             statsManager.addErrorsThisSession(1);
         }
     }
@@ -136,7 +136,7 @@ public class ConnectionHandler {
                 }
                 server.write(((Packet) obj).toStringArray(), true);
             } catch (NotAPanelEventException e) {
-                e.printStackTrace();
+                AdminPanelMain.logError("The socket send event was not a valid panel event", e);
                 statsManager.addErrorsThisSession(1);
                 return Result.ERROR;
             }
@@ -309,7 +309,6 @@ public class ConnectionHandler {
 
         private void handleRegisteredClientName(String packetString) {
             String[] array = packetString.split(":");
-            //System.out.println("Registered Client: " + Arrays.toString(array));
 
             if (array.length >= 3) {
                 setClientName(array[1]);
@@ -329,7 +328,6 @@ public class ConnectionHandler {
             if (encryptedPacketArray.length != 3) return packetString;
             String decryptedString = serverEncryptionUtils.decrypt(encryptedPacketArray[0], encryptedPacketArray[1], encryptedPacketArray[2]);
 
-            //System.out.println("Decrypted String: " + decryptedString);
 
             statsManager.addBytesDecryptedThisSession(decryptedString.getBytes().length);
 
@@ -344,8 +342,6 @@ public class ConnectionHandler {
                 packetArray[i] = packetArray[i].trim();
             }
 
-            //System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
-            //System.out.println("Decrypted String: " + decryptedString);
 
             if (Packet.hasPacketArrayLength(packetArray)) {
                 return Packet.fromStringArray(packetArray);
@@ -362,7 +358,6 @@ public class ConnectionHandler {
             if (encryptedPacketArray.length != 3) return packetString;
             String decryptedString = serverEncryptionUtils.decrypt(encryptedPacketArray[0], encryptedPacketArray[1], encryptedPacketArray[2]);
 
-            //System.out.println("Decrypted String: " + decryptedString);
 
             statsManager.addBytesDecryptedThisSession(decryptedString.getBytes().length);
 
@@ -377,8 +372,6 @@ public class ConnectionHandler {
                 packetArray[i] = packetArray[i].trim();
             }
 
-            //System.out.println("Decrypted Packet: " + Arrays.toString(packetArray));
-            //System.out.println("Decrypted String: " + decryptedString);
 
             if (CustomPacket.hasPacketArrayLength(packetArray)) {
                 return CustomPacket.fromStringArray(packetArray);
@@ -400,7 +393,7 @@ public class ConnectionHandler {
                 socket.close();
             } catch (IOException e) {
                 loggingManager.logIntoFile(Level.INFO, "Error while disconnecting: " + e + ":" + e.getMessage());
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not disconnect from the data server", e);
                 statsManager.addErrorsThisSession(1);
             }
             pluginLogger.dataClientMessage(ChatColor.RED, "Client disconnected from Server!", true, true);
@@ -415,7 +408,6 @@ public class ConnectionHandler {
         }
 
         public void write(Object obj, boolean encryption) {
-            //System.out.println("Write Method got finally called: " + obj + " : " + encryption);
             try {
                 if (obj instanceof String) {
                     encryption = !((String) obj).startsWith("NameForClientIs:");
@@ -435,7 +427,7 @@ public class ConnectionHandler {
             } catch (IOException e) {
                 loggingManager.logIntoFile(Level.INFO, "Error while writing Packet: " + e + ":" + e.getMessage());
                 statsManager.addErrorsThisSession(1);
-                e.printStackTrace();
+                AdminPanelMain.logError("Could not write a packet to the data server", e);
             }
         }
 

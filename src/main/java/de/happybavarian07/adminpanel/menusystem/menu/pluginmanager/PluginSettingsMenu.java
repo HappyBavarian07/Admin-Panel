@@ -79,7 +79,7 @@ public class PluginSettingsMenu extends Menu {
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled() && !currentPlugin.isEnabled()) Bukkit.getPluginManager().enablePlugin(currentPlugin);
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Disable", 11), lgm.getItem(path + "Disable", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Disable", (p, e) -> {
@@ -87,7 +87,7 @@ public class PluginSettingsMenu extends Menu {
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled() && currentPlugin.isEnabled()) Bukkit.getPluginManager().disablePlugin(currentPlugin);
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Reload", 12), lgm.getItem(path + "Reload", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Reload", (p, e) -> {
@@ -95,7 +95,7 @@ public class PluginSettingsMenu extends Menu {
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled() && currentPlugin.isEnabled()) pluginUtils.reload(currentPlugin);
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Restart", 3), lgm.getItem(path + "Restart", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Restart", (p, e) -> {
@@ -106,7 +106,7 @@ public class PluginSettingsMenu extends Menu {
                             Bukkit.getPluginManager().disablePlugin(currentPlugin);
                             Bukkit.getPluginManager().enablePlugin(currentPlugin);
                         }
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Unload", 13), lgm.getItem(path + "Unload", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Unload", (p, e) -> {
@@ -114,7 +114,7 @@ public class PluginSettingsMenu extends Menu {
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled() && pluginUtils.getPluginByName(currentPlugin.getName()) != null) pluginUtils.unload(currentPlugin);
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Unload", 14), lgm.getItem(path + "Load", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Load", (p, e) -> {
@@ -122,7 +122,7 @@ public class PluginSettingsMenu extends Menu {
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
                         if (!event.isCancelled() && pluginUtils.getPluginByName(currentPlugin.getName()) == null) pluginUtils.load(currentPlugin);
-                    } catch (NotAPanelEventException ex) { ex.printStackTrace(); }
+                    } catch (NotAPanelEventException ex) { AdminPanelMain.logError("A plugin settings action was not a valid panel event", ex); }
                 }, lgm), null);
         registerButton(getSlot(path + "Commands.Item", 15), lgm.getItem(path + "Commands.Item", player, false),
                 new PermissionAction("AdminPanel.PluginManager.PluginSettings.Permissions", (p, e) ->

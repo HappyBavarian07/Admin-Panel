@@ -118,7 +118,7 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> implements Liste
                     }
                 }
             } catch (NotAPanelEventException notAPanelEventException) {
-                notAPanelEventException.printStackTrace();
+                AdminPanelMain.logError("The potion effect action was not a valid panel event", notAPanelEventException);
             }
         }
     }

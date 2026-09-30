@@ -81,7 +81,7 @@ public class WeatherChangeMenu extends Menu {
                 }
             }
         } catch (NotAPanelEventException ex) {
-            ex.printStackTrace();
+            AdminPanelMain.logError("The weather change action was not a valid panel event", ex);
         }
     }
 }

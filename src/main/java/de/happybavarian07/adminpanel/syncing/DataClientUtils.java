@@ -38,7 +38,7 @@ public class DataClientUtils {
             try {
                 return this.dataClient.getPacketHandler().send(packet, true, false);
             } catch (IOException var7) {
-                var7.printStackTrace();
+                AdminPanelMain.logError("Could not send the packet to the data server", var7);
                 return Result.ERROR;
             }
         }
@@ -85,7 +85,7 @@ public class DataClientUtils {
             try {
                 return this.dataClient.getPacketHandler().send(packet, true, false);
             } catch (IOException var7) {
-                var7.printStackTrace();
+                AdminPanelMain.logError("Could not send the packet to the data server", var7);
                 return Result.ERROR;
             }
         }

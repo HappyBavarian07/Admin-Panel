@@ -93,7 +93,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
                 super.open();
             }
         } catch (NotAPanelEventException notAPanelEventException) {
-            notAPanelEventException.printStackTrace();
+            AdminPanelMain.logError("The gamerule change action was not a valid panel event", notAPanelEventException);
         }
     }
 

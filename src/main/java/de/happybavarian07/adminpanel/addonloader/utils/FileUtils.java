@@ -47,13 +47,7 @@ public class FileUtils {
 
             for (final String match : matches) {
                 try {
-                    if (match.contains("Addon")) {
-                        System.out.println("Addon: " + match);
-                    }
                     final Class<?> loaded = Class.forName(match, false, loader);
-                    if (match.contains("Addon")) {
-                        System.out.println("Loaded: " + loaded);
-                    }
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add((Class<? extends T>) loaded);
                     }
