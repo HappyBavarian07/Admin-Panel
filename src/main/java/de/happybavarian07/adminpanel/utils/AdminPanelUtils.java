@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -414,7 +415,9 @@ public class AdminPanelUtils {
     public static ItemStack applyItemStackToProfile(String headValue, ItemStack head, SkullMeta meta) {
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
         try {
-            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headValue));
+            PlayerTextures textures = profile.getTextures();
+            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headValue));
+            profile.setTextures(textures);
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }

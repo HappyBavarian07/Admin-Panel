@@ -25,6 +25,7 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,9 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
-            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture));
+            PlayerTextures textures = profile.getTextures();
+            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture));
+            profile.setTextures(textures);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +96,9 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
 
         try {
-            profile.getTextures().setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture.getTexture()));
+            PlayerTextures textures = profile.getTextures();
+            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture.getTexture()));
+            profile.setTextures(textures);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
