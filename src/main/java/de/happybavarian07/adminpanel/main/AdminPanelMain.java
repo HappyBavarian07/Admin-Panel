@@ -6,6 +6,7 @@ import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
 import de.happybavarian07.adminpanel.data.AdminPanelData;
 import de.happybavarian07.adminpanel.data.LegacyDataImporter;
+import de.happybavarian07.adminpanel.data.LegacyWarningImporter;
 import de.happybavarian07.adminpanel.data.PluginDescriptionEntry;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
@@ -18,6 +19,9 @@ import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
 import de.happybavarian07.adminpanel.utils.*;
 import de.happybavarian07.adminpanel.utils.dependencyloading.ServerPlatformDetector;
 import de.happybavarian07.adminpanel.utils.managers.*;
+import de.happybavarian07.adminpanel.warnings.BukkitEscalationExecutor;
+import de.happybavarian07.adminpanel.warnings.WarningManager;
+import de.happybavarian07.adminpanel.warnings.WarningSettings;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.CoolStuffLibBuilder;
 import de.happybavarian07.coolstufflib.backupmanager.BackupManager;
@@ -48,6 +52,9 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class AdminPanelMain extends JavaPlugin implements Listener {
@@ -71,6 +78,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private DataClient dataClient;
     private boolean languageManagerEnabled;
     private WarningManager warningManager;
+    private ExecutorService warningIo;
     private InitMethods initMethods;
     private BackupManager backupManager;
     private MenuAddonManager menuAddonManager;
@@ -526,11 +534,41 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void initializeWarningManager() {
-        if (getConfig().getBoolean("Pman.Actions.WarningSystem")) {
-            warningManager = new WarningManager(
-                    plugin,
-                    new File(this.getDataFolder() + "/warnings.yml"));
-            warningManager.loadWarnings();
+        if (!getConfig().getBoolean("Pman.Actions.WarningSystem")) return;
+        importLegacyWarnings();
+        warningIo = Executors.newSingleThreadExecutor(task -> {
+            Thread thread = new Thread(task, "AdminPanel-Warnings");
+            thread.setDaemon(true);
+            return thread;
+        });
+        warningManager = new WarningManager(data.warnings(), this::readWarningSettings, new BukkitEscalationExecutor(this),
+                warningIo, task -> {
+                    if (isEnabled()) Bukkit.getScheduler().runTask(this, task);
+                    else task.run();
+                }, System::currentTimeMillis, AdminPanelMain::logError);
+        warningManager.sweep();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, warningManager::sweep, 20L * 60, 20L * 60);
+    }
+
+    private WarningSettings readWarningSettings() {
+        return WarningSettings.parse(getConfig().getString("Warnings.DefaultExpiry", "30d"), getConfig().getMapList("Warnings.Escalation"),
+                message -> fileLogger.writeToLog(Level.WARNING, message, LogPrefixExtension.ADMINPANEL_MAIN, true));
+    }
+
+    private void importLegacyWarnings() {
+        File legacyWarnings = new File(getDataFolder(), "warnings.yml");
+        if (!legacyWarnings.isFile()) return;
+        try {
+            var warnings = LegacyWarningImporter.read(legacyWarnings, System.currentTimeMillis());
+            data.warnings().saveAll(warnings);
+            File done = new File(getDataFolder(), "warnings.yml.imported");
+            if (!legacyWarnings.renameTo(done)) {
+                fileLogger.writeToLog(Level.WARNING, "Imported " + legacyWarnings + " but could not rename it; it will be imported again next start",
+                        LogPrefixExtension.ADMINPANEL_MAIN, true);
+            }
+            fileLogger.writeToLog(Level.INFO, "Imported " + warnings.size() + " warnings from " + legacyWarnings, LogPrefixExtension.ADMINPANEL_MAIN, true);
+        } catch (RuntimeException e) {
+            logError("Could not import " + legacyWarnings, e);
         }
     }
 
@@ -670,8 +708,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             loader.crashAddons();
         }
         loader = null;
-        if (warningManager != null) {
-            warningManager.saveWarnings();
+        if (warningIo != null) {
+            warningIo.shutdown();
+            try {
+                warningIo.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
         if (pluginStateManager != null) {
             pluginStateManager.saveAllState();

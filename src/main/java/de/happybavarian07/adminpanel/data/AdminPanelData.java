@@ -7,11 +7,13 @@ public final class AdminPanelData {
     private final PluginFlagRepository flags;
     private final PluginDescriptionRepository descriptions;
     private final UpdaterCacheRepository updaterCache;
+    private final PlayerWarningRepository warnings;
 
     public AdminPanelData(RepositoryManager repositories) {
         this.flags = repositories.registerRepository(PluginFlagRepository.class, PluginFlag.class);
         this.descriptions = repositories.registerRepository(PluginDescriptionRepository.class, PluginDescriptionEntry.class);
         this.updaterCache = repositories.registerRepository(UpdaterCacheRepository.class, UpdaterCacheEntry.class);
+        this.warnings = repositories.registerRepository(PlayerWarningRepository.class, PlayerWarning.class);
     }
 
     public PluginFlagRepository flags() {
@@ -24,6 +26,10 @@ public final class AdminPanelData {
 
     public UpdaterCacheRepository updaterCache() {
         return updaterCache;
+    }
+
+    public PlayerWarningRepository warnings() {
+        return warnings;
     }
 
     public boolean getFlag(String name, boolean fallback) {
