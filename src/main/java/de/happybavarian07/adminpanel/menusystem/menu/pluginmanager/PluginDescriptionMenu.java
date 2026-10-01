@@ -4,12 +4,11 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -37,11 +36,6 @@ public class PluginDescriptionMenu extends Menu implements Listener {
     @Override
     public int getSlots() {
         return 9;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @EventHandler
@@ -105,7 +99,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
             playerMenuUtility.addData("SetDescriptionInChat", true);
         }, null);
         registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
-                        new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 }

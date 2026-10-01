@@ -4,7 +4,6 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,11 +28,6 @@ public class ConfigReloadMenu extends Menu {
     @Override
     public int getSlots() {
         return 27;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override

@@ -8,10 +8,9 @@ import de.happybavarian07.adminpanel.menusystem.menu.servermanager.ServerManager
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSelectMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,11 +38,6 @@ public class AdminPanelStartMenu extends Menu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -61,46 +55,46 @@ public class AdminPanelStartMenu extends Menu {
 
         registerButton(getSlot(path + "ReloadConfig", 18), 
             lgm.getItem(path + "ReloadConfig", player, false), 
-            new PermissionAction("AdminPanel.ReloadConfig", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 AdminPanelMain.getAPI().reloadConfigurationFiles(p);
                 this.open();
-            }, lgm), null);
+            }).requires("AdminPanel.ReloadConfig"), null);
 
         registerButton(getSlot(path + "DangerZone", 4), 
             lgm.getItem(path + "DangerZone", player, false), 
-            new PermissionAction("AdminPanel.DangerZone.open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new DangerZoneMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.DangerZone.open"), null);
 
         registerButton(getSlot(path + "WorldManager", 10), 
             lgm.getItem(path + "WorldManager", player, false), 
-            new PermissionAction("AdminPanel.WorldManager.open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new WorldSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.WorldManager.open"), null);
 
         registerButton(getSlot(path + "PlayerManager", 12), 
             lgm.getItem(path + "PlayerManager", player, false), 
-            new PermissionAction("AdminPanel.PlayerManager.open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new PlayerSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.PlayerManager.open"), null);
 
         registerButton(getSlot(path + "PluginManager", 13), 
             lgm.getItem(path + "PluginManager", player, false), 
-            new PermissionAction("AdminPanel.PluginManager.open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.PluginManager.open"), null);
 
         registerButton(getSlot(path + "ServerManager", 16), 
             lgm.getItem(path + "ServerManager", player, false), 
-            new PermissionAction("AdminPanel.ServerManagment.Open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-            }, lgm), null);
+            }).requires("AdminPanel.ServerManagment.Open"), null);
 
         registerButton(getSlot(path + "SwitchLanguageMenuItem", 26), 
             lgm.getItem(path + "SwitchLanguageMenuItem", player, false), 
-            new PermissionAction("AdminPanel.SwitchLanguage", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new TempLanguageSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.SwitchLanguage"), null);
 
         inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player, false));
     }

@@ -5,7 +5,7 @@ import de.happybavarian07.adminpanel.events.player.GiveEffectToPlayerEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import de.happybavarian07.coolstufflib.utils.Utils;
 import org.bukkit.Material;
@@ -82,9 +82,9 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> implements Liste
                     p.closeInventory();
                 }, null);
         registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-                }, lgm), null);
+                }).requires("AdminPanel.Button.Close"), null);
     }
 
     @Override

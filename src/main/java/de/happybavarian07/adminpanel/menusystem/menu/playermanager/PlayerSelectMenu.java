@@ -5,7 +5,7 @@ import de.happybavarian07.adminpanel.events.player.SelectPlayerEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -52,9 +52,9 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
         registerButton(45, lgm.getItem("PlayerManager.ActionsMenu.BannedPlayers", player, false), 
-            new PermissionAction("AdminPanel.PlayerManager.BannedPlayers.open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new BannedPlayersMenu(playerMenuUtility, this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.PlayerManager.BannedPlayers.open"), null);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
         if (indexOnPage < 0 || indexOnPage >= players.size()) return;
         Player targetPlayer = players.get(indexOnPage);
 
-        new PermissionAction("AdminPanel.PlayerManager.open", (p, event) -> {
+        MenuAction.of((p, event) -> {
             SelectPlayerEvent selectPlayerEvent = new SelectPlayerEvent(p, targetPlayer.getUniqueId());
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(selectPlayerEvent);
@@ -81,7 +81,7 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
             } catch (NotAPanelEventException notAPanelEventException) {
                 AdminPanelMain.logError("The player select action was not a valid panel event", notAPanelEventException);
             }
-        }, lgm).execute(player, e);
+        }).requires("AdminPanel.PlayerManager.open").execute(player, e);
     }
 
     @Override

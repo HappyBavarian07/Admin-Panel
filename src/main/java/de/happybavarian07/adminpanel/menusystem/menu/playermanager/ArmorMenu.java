@@ -2,10 +2,9 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
@@ -29,11 +28,6 @@ public class ArmorMenu extends Menu {
     @Override
     public int getSlots() {
         return 9;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -72,8 +66,8 @@ public class ArmorMenu extends Menu {
             inventory.setItem(3, lgm.getItem("General.EmptySlot", target, false));
         }
         registerButton(7, lgm.getItem("General.Refresh", target, false),
-                new PermissionAction("AdminPanel.Button.refresh", (p, e) -> super.open(), lgm), null);
+                MenuAction.of((p, e) -> super.open()).requires("AdminPanel.Button.refresh"), null);
         registerButton(8, lgm.getItem("General.Close", target, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 }

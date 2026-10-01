@@ -7,10 +7,9 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
@@ -41,11 +40,6 @@ public class DataClientMainMenu extends Menu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -63,49 +57,49 @@ public class DataClientMainMenu extends Menu {
         // Controls (Second Row)
         if (dataClient.isEnabled()) {
             registerButton(10, lgm.getItem(path + "Controls.Disconnect", player, false),
-                    new PermissionAction("AdminPanel.DataClient.Menu.Button.Disconnect", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         dataClient.disconnect(true);
                         super.open();
-                    }, lgm), null);
+                    }).requires("AdminPanel.DataClient.Menu.Button.Disconnect"), null);
         } else {
             registerButton(10, lgm.getItem(path + "Controls.Connect", player, false),
-                    new PermissionAction("AdminPanel.DataClient.Menu.Button.Connect", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         try {
                             dataClient.connect();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
                         super.open();
-                    }, lgm), null);
+                    }).requires("AdminPanel.DataClient.Menu.Button.Connect"), null);
         }
         registerButton(11, lgm.getItem(path + "Controls.Reconnect", player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Button.Reconnect", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     try {
                         dataClient.reconnect(true);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Button.Reconnect"), null);
         registerButton(12, lgm.getItem(path + "Controls.PacketHandling." + dataClient.getPacketHandler().isPacketHandlingEnabled(), player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Button.PacketHandling", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     if (dataClient.getPacketHandler().isPacketHandlingEnabled()) {
                         dataClient.getPacketHandler().stopPacketHandlingThread();
                     } else {
                         dataClient.getPacketHandler().startPacketHandlingThread();
                     }
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Button.PacketHandling"), null);
 
         registerButton(36, lgm.getItem(path + "DataClientName", player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Button.DataClientName", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     p.sendMessage(AdminPanelUtils.chat("&7DataClientName: &e" + dataClient.getConnectionHandler().getClientName()));
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Button.DataClientName"), null);
         registerButton(39, lgm.getItem(path + "DataClientSettings", player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Button.DataClientSettings", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     new DataClientSettingsMenu(playerMenuUtility).open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Button.DataClientSettings"), null);
         registerButton(getSlot("General.Close", 44), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> p.closeInventory(), lgm), null);
+                MenuAction.of((p, e) -> p.closeInventory()).requires("AdminPanel.Button.Close"), null);
     }
 }

@@ -8,7 +8,7 @@ import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -54,8 +54,8 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
         registerButton(45, lgm.getItem("WorldManager.Create", player, false),
-                new PermissionAction("AdminPanel.WorldManager.Create", (p, e) ->
-                        new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.WorldManager.Create"), null);
     }
 
     @Override

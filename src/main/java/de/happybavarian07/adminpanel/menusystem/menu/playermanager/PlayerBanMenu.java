@@ -5,7 +5,7 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -55,11 +54,6 @@ public class PlayerBanMenu extends Menu implements Listener {
     @Override
     public int getSlots() {
         return 27;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -167,7 +161,7 @@ public class PlayerBanMenu extends Menu implements Listener {
 
         // Ban Execution
         registerButton(getSlot(path + "Ban", 22), lgm.getItem(path + "Ban", player, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Ban", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     Date banEnd = new Date();
                     banEnd.setTime(System.currentTimeMillis() +
                             TimeUnit.SECONDS.toMillis(seconds) +
@@ -197,13 +191,13 @@ public class PlayerBanMenu extends Menu implements Listener {
                     seconds = 0;
                     p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.SuccessfullyBanned", p, true));
                     new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Ban"), null);
 
         // Close
         registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-                }, lgm), null);
+                }).requires("AdminPanel.Button.Close"), null);
     }
 
     public String format(Player player, String message) {

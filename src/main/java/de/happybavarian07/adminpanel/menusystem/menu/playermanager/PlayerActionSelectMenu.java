@@ -8,10 +8,9 @@ import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.P
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
@@ -35,11 +34,6 @@ public class PlayerActionSelectMenu extends Menu {
     @Override
     public int getSlots() {
         return 27;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -93,8 +87,8 @@ public class PlayerActionSelectMenu extends Menu {
 
         registerButton(getSlot("General.Close", 26),
                 lgm.getItem("General.Close", target, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-                }, lgm), null);
+                }).requires("AdminPanel.Button.Close"), null);
     }
 }

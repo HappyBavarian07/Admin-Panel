@@ -9,7 +9,7 @@ import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -17,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -49,11 +48,6 @@ public class MoneyMenu extends Menu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -70,30 +64,30 @@ public class MoneyMenu extends Menu implements Listener {
         setFillerGlass();
 
         registerButton(getSlot("PlayerManager.MoneyMenu.Give", 11), lgm.getItem("PlayerManager.MoneyMenu.Give", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Give", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("moneyGiveMenuMetaData", playerMenuUtility.getTargetUUID());
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
                     p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
                     p.closeInventory();
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Money.Give"), null);
         registerButton(getSlot("PlayerManager.MoneyMenu.Set", 13), lgm.getItem("PlayerManager.MoneyMenu.Set", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Set", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("moneySetMenuMetaData", playerMenuUtility.getTargetUUID());
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
                     p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
                     p.closeInventory();
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Money.Set"), null);
         registerButton(getSlot("PlayerManager.MoneyMenu.Take", 15), lgm.getItem("PlayerManager.MoneyMenu.Take", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Money.Take", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("moneyTakeMenuMetaData", playerMenuUtility.getTargetUUID());
                     lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
                     p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
                     p.closeInventory();
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Money.Take"), null);
         registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-                }, lgm), null);
+                }).requires("AdminPanel.Button.Close"), null);
     }
 
     @EventHandler

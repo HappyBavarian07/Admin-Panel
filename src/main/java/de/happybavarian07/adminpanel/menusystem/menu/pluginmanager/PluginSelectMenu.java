@@ -11,7 +11,7 @@ import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -67,22 +67,22 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
     public void postSetMenuItems() {
         Player player = playerMenuUtility.getOwner();
         registerButton(getSlots() - 9, lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false),
-                new PermissionAction("AdminPanel.PluginManager.AutoUpdateMenu", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     if (plugin.getAutoUpdaterManager() == null) {
                         p.sendMessage(lgm.getMessage("Player.General.NullMenu", p, true));
                         plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefixExtension.ADMINPANEL_GUI, true);
                         return;
                     }
                     new PluginAutoUpdaterMenu(playerMenuUtility).open();
-                }, lgm), null);
+                }).requires("AdminPanel.PluginManager.AutoUpdateMenu"), null);
         registerButton(getSlots() - 8, lgm.getItem("PluginManager.Load", player, false),
-                new PermissionAction("AdminPanel.PluginManager.LoadPlugins", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
                     p.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", p, true));
                     p.closeInventory();
-                }, lgm), null);
+                }).requires("AdminPanel.PluginManager.LoadPlugins"), null);
         registerButton(getSlots() - 7, lgm.getItem("PluginManager.Install", player, false),
-                new PermissionAction("AdminPanel.PluginManager.InstallPlugins", (p, e) -> new PluginInstallMenu(playerMenuUtility).open(), lgm), null);
+                MenuAction.of((p, e) -> new PluginInstallMenu(playerMenuUtility).open()).requires("AdminPanel.PluginManager.InstallPlugins"), null);
     }
 
     @Override

@@ -6,13 +6,12 @@ import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -40,11 +39,6 @@ public class PlayerKickMenu extends Menu implements Listener {
     @Override
     public int getSlots() {
         return 9;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -89,7 +83,7 @@ public class PlayerKickMenu extends Menu implements Listener {
         // Kick Execution
         registerButton(getSlot(path + "Kick", 7), 
             lgm.getItem(path + "Kick", player, false), 
-            new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Kick", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
                 OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
                 if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
@@ -101,14 +95,14 @@ public class PlayerKickMenu extends Menu implements Listener {
                 }
                 p.sendMessage(lgm.getMessage("Player.PlayerManager.KickMenu.SuccessfullyKicked", p, true));
                 new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-            }, lgm), null);
+            }).requires("AdminPanel.PlayerManager.PlayerSettings.Kick"), null);
 
         // General Close
         registerButton(getSlot("General.Close", 8), 
             lgm.getItem("General.Close", player, false), 
-            new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-            }, lgm), null);
+            }).requires("AdminPanel.Button.Close"), null);
     }
 
     public String format(Player player, String message) {

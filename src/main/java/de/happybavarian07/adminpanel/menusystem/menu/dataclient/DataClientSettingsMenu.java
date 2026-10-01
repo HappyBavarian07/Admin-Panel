@@ -6,12 +6,11 @@ package de.happybavarian07.adminpanel.menusystem.menu.dataclient;/*
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.syncing.managers.SettingsManager;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -38,11 +37,6 @@ public class DataClientSettingsMenu extends Menu implements Listener {
     @Override
     public int getSlots() {
         return 27;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override
@@ -89,40 +83,40 @@ public class DataClientSettingsMenu extends Menu implements Listener {
         String path = "DataClientMenu.MainMenu.Settings.";
 
         registerButton(10, lgm.getItem(path + "AutoCheckConnection." + settingsManager.isCheckConnection(), player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.AutoCheckConnection", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     settingsManager.setCheckConnection(!settingsManager.isCheckConnection());
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.AutoCheckConnection"), null);
         registerButton(11, lgm.getItem(path + "Debug." + settingsManager.isDebugEnabled(), player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.Debug", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     settingsManager.setDebugEnabled(!settingsManager.isDebugEnabled());
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.Debug"), null);
         registerButton(12, lgm.getItem(path + "OverwritePermissions." + settingsManager.isOverwritePermissionsEnabled(), player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.OverwritePermissions", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     settingsManager.setOverwritePermissionsEnabled(!settingsManager.isOverwritePermissionsEnabled());
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.OverwritePermissions"), null);
         registerButton(13, lgm.getItem(path + "FileLogging." + settingsManager.isFileLogging(), player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.FileLogging", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     settingsManager.setFileLogging(!settingsManager.isFileLogging());
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.FileLogging"), null);
 
         registerButton(15, lgm.getItem(path + "AutoCheckConnectionTiming", player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     p.closeInventory();
                     p.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", p, true));
                     playerMenuUtility.addData("AutoCheckConnectionTiming", settingsManager.getCheckConnectionTiming());
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming"), null);
         registerButton(16, lgm.getItem(path + "FileLoggingPrefix", player, false),
-                new PermissionAction("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     p.closeInventory();
                     p.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", p, true));
                     playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
-                }, lgm), null);
+                }).requires("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix"), null);
 
         registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new DataClientMainMenu(playerMenuUtility).open(), lgm), null);
+                MenuAction.of((p, e) -> new DataClientMainMenu(playerMenuUtility).open()).requires("AdminPanel.Button.Close"), null);
     }
 }

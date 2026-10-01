@@ -8,14 +8,13 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -49,11 +48,6 @@ public class ServerManagerMenu extends Menu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -71,19 +65,19 @@ public class ServerManagerMenu extends Menu implements Listener {
 
         // Items
         registerButton(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player, false),
-                new PermissionAction("AdminPanel.ServerManagment.Broadcast", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     p.closeInventory();
                     playerMenuUtility.addData("serverManagerBroadcastMessage", true);
                     p.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", p, true));
-                }, lgm), null);
+                }).requires("AdminPanel.ServerManagment.Broadcast"), null);
         registerButton(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false),
-                new PermissionAction("AdminPanel.ServerManagment.ChatManager.Open", (p, e) ->
-                        new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new ChatManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.ServerManagment.ChatManager.Open"), null);
         registerButton(getSlot(path + "WhiteListMenuItem", 6), lgm.getItem(path + "WhiteListMenuItem", player, false),
-                new PermissionAction("AdminPanel.ServerManagment.Whitelist", (p, e) ->
-                        new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new WhitelistManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.ServerManagment.Whitelist"), null);
         registerButton(getSlot(path + "KickAllPlayers", 12), lgm.getItem(path + "KickAllPlayers", player, false),
-                new PermissionAction("AdminPanel.ServerManagment.KickAllPlayers", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     List<Player> playersToKick = new ArrayList<>();
                     for (Player online : Bukkit.getOnlinePlayers()) {
                         if (!online.hasPermission("AdminPanel.Bypass.KickAll")) playersToKick.add(online);
@@ -103,10 +97,10 @@ public class ServerManagerMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.ServerManagment.KickAllPlayers"), null);
         if (plugin.getPluginStateManager().isInMaintenanceMode()) {
             registerButton(getSlot(path + "MaintenanceMode.true", 14), lgm.getItem(path + "MaintenanceMode.true", player, false),
-                    new PermissionAction("AdminPanel.ServerManagment.MaintenanceMode", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         MaintenanceModeToggleEvent event = new MaintenanceModeToggleEvent(p);
                         try {
                             AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -120,10 +114,10 @@ public class ServerManagerMenu extends Menu implements Listener {
                             AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                         }
                         super.open();
-                    }, lgm), null);
+                    }).requires("AdminPanel.ServerManagment.MaintenanceMode"), null);
         } else {
             registerButton(getSlot(path + "MaintenanceMode.false", 14), lgm.getItem(path + "MaintenanceMode.false", player, false),
-                    new PermissionAction("AdminPanel.ServerManagment.MaintenanceMode", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         MaintenanceModeToggleEvent event = new MaintenanceModeToggleEvent(p);
                         try {
                             AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -142,11 +136,11 @@ public class ServerManagerMenu extends Menu implements Listener {
                             AdminPanelMain.logError("A server manager action was not a valid panel event", ex);
                         }
                         super.open();
-                    }, lgm), null);
+                    }).requires("AdminPanel.ServerManagment.MaintenanceMode"), null);
         }
         registerButton(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
-                        new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 
     @EventHandler

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -46,11 +45,6 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
     @Override
     public int getSlots() {
         return 9;
-    }
-
-    @Override
-    public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        // Logic is now handled by registered MenuActions in setMenuItems
     }
 
     @Override

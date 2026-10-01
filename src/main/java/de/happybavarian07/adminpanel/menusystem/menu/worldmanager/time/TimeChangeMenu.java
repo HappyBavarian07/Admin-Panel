@@ -5,11 +5,10 @@ import de.happybavarian07.adminpanel.events.world.TimeChangeEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.WorldSettingsMenu;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
@@ -39,11 +38,6 @@ public class TimeChangeMenu extends Menu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -68,7 +62,7 @@ public class TimeChangeMenu extends Menu {
         registerButton(getSlot(path + Time.SUNRISE, 6), lgm.getItem(path + Time.NIGHT, player, false), (p, e) -> setTimeWithEvent(p, Time.NIGHT), null);
         registerButton(getSlot(path + Time.SUNRISE, 7), lgm.getItem(path + Time.MIDNIGHT, player, false), (p, e) -> setTimeWithEvent(p, Time.MIDNIGHT), null);
         registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open(), lgm), null);
+                MenuAction.of((p, e) -> new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open()).requires("AdminPanel.Button.Close"), null);
     }
 
     private void setTimeWithEvent(Player player, Time time) {

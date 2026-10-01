@@ -2,9 +2,8 @@ package de.happybavarian07.adminpanel.menusystem.menu.languagemigration;
 
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -34,11 +33,6 @@ public class LanguageMigratorMainMenu extends Menu {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent inventoryClickEvent) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent inventoryOpenEvent) {
 
     }
@@ -55,14 +49,14 @@ public class LanguageMigratorMainMenu extends Menu {
 
         registerButton(getSlot("LanguageMigrator.NormalMigrate", 11), 
             lgm.getItem("LanguageMigrator.NormalMigrate", player, false), 
-            new PermissionAction("AdminPanel.LanguageMigrator.Open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 new NormalLanguageSelectMenu(playerMenuUtility, this).open();
-            }, lgm), null);
+            }).requires("AdminPanel.LanguageMigrator.Open"), null);
 
         registerButton(getSlot("LanguageMigrator.CustomMigrate", 15), 
             lgm.getItem("LanguageMigrator.CustomMigrate", player, false), 
-            new PermissionAction("AdminPanel.LanguageMigrator.Open", (p, e) -> {
+            MenuAction.of((p, e) -> {
                 // CustomLanguageSelectMenu not yet implemented
-            }, lgm), null);
+            }).requires("AdminPanel.LanguageMigrator.Open"), null);
     }
 }

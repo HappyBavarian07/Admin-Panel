@@ -10,7 +10,7 @@ import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.adminpanel.utils.PluginUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -84,8 +84,8 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
                     p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", p, false));
                 }, null);
         registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close",
-                        (p, e) -> new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of(
+                        (p, e) -> new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 
     @Override

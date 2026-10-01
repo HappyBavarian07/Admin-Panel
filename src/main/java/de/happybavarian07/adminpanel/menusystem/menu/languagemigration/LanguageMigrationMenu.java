@@ -7,7 +7,7 @@ import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -130,10 +130,10 @@ public class LanguageMigrationMenu extends PaginatedMenu<LanguageFileMigrator.Mi
 
         LanguageFileMigrator.MigrationEntry migrationEntry = LanguageFileMigrator.MigrationEntry.fromString(migrationEntryString);
 
-        new PermissionAction("AdminPanel.LanguageMigration.Open", (p, e) -> {
+        MenuAction.of((p, e) -> {
             playerMenuUtility.setData("selected_migration_entry", migrationEntry, true);
             new MigrationEntryEditMenu(playerMenuUtility, this).open();
-        }, lgm).execute(player, inventoryClickEvent);
+        }).requires("AdminPanel.LanguageMigration.Open").execute(player, inventoryClickEvent);
     }
 
     @Override

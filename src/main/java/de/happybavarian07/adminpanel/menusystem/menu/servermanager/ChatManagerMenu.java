@@ -10,13 +10,12 @@ import de.happybavarian07.adminpanel.events.server.MuteChatEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -45,11 +44,6 @@ public class ChatManagerMenu extends Menu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -66,7 +60,7 @@ public class ChatManagerMenu extends Menu implements Listener {
         String path = "ChatManager.";
 
         registerButton(getSlot(path + "ClearChat", 12), lgm.getItem(path + "ClearChat", player, false),
-                new PermissionAction("AdminPanel.ServerManagment.ChatManager.Clear", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     ClearChatEvent clearChatEvent = new ClearChatEvent(p, 100);
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(clearChatEvent);
@@ -79,10 +73,10 @@ public class ChatManagerMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("The clear chat action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.ServerManagment.ChatManager.Clear"), null);
         if (plugin.getPluginStateManager().isGlobalChatMuted()) {
             registerButton(getSlot(path + "UnMuteChat", 14), lgm.getItem(path + "UnMuteChat", player, false),
-                    new PermissionAction("AdminPanel.ServerManagment.ChatManager.Mute", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         MuteChatEvent event = new MuteChatEvent(p, false);
                         try {
                             AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -96,10 +90,10 @@ public class ChatManagerMenu extends Menu implements Listener {
                         } catch (NotAPanelEventException ex) {
                             AdminPanelMain.logError("The chat unmute action was not a valid panel event", ex);
                         }
-                    }, lgm), null);
+                    }).requires("AdminPanel.ServerManagment.ChatManager.Mute"), null);
         } else {
             registerButton(getSlot(path + "MuteChat", 14), lgm.getItem(path + "MuteChat", player, false),
-                    new PermissionAction("AdminPanel.ServerManagment.ChatManager.Mute", (p, e) -> {
+                    MenuAction.of((p, e) -> {
                         MuteChatEvent event = new MuteChatEvent(p, true);
                         try {
                             AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -113,11 +107,11 @@ public class ChatManagerMenu extends Menu implements Listener {
                         } catch (NotAPanelEventException ex) {
                             AdminPanelMain.logError("The chat mute action was not a valid panel event", ex);
                         }
-                    }, lgm), null);
+                    }).requires("AdminPanel.ServerManagment.ChatManager.Mute"), null);
         }
         registerButton(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
-                        new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open(), lgm), null);
+                MenuAction.of((p, e) ->
+                        new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 
     @EventHandler

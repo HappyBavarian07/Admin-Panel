@@ -9,7 +9,7 @@ import de.happybavarian07.adminpanel.utils.Warning;
 import de.happybavarian07.adminpanel.utils.WarningManager;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -58,7 +58,7 @@ public class PlayerWarningMenu extends PaginatedMenu<Warning> {
     public void postSetMenuItems() {
         registerButton(getSlot("PlayerManager.WarningMenu.AddWarning", 45),
                 lgm.getItem("PlayerManager.WarningMenu.AddWarning", Bukkit.getPlayer(targetUUID), false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Warn", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     warningManager.addWarning(targetUUID, new Warning(
                             targetUUID,
                             "TestReason#1",
@@ -81,7 +81,7 @@ public class PlayerWarningMenu extends PaginatedMenu<Warning> {
                             warningManager.getWarningCount(targetUUID, false)
                     ), true);
                     super.open();
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Warn"), null);
     }
 
     @Override
