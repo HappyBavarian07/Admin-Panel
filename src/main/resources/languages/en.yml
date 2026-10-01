@@ -193,17 +193,32 @@ Messages:
         TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
         NotKickable: '%prefix% &9> &cThis Player is not kickable!'
         SuccessfullyKicked: '%prefix% &9> &aYou kicked the Player successfully!'
+        NotOnline: '%prefix% &9> &cThis Player is not online!'
+        DefaultReason: 'Kicked by an operator'
+        # %staff% = Who kicked the Player, %target% = The kicked Player, %reason% = The Reason
+        Broadcast: '%prefix% &9> &e%staff% &7kicked &e%target%&7: &c%reason%'
+        ConfirmKick: '&cKick %target%? Reason: %reason%'
         Reason:
           EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
           NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
       BanMenu:
-        # %reason% = The Reason
-        TargetKickMessage: '%prefix% &9> &4You got banned from this Server! \r\n &4Time: &4Y: %years%, M: %months%, D: %days%, H: %hours%, M: %minutes%, S: %seconds% \r\n &4Reason: &4%reason%'
+        # %reason% = The Reason, %duration% = The Length of the Ban, %staff% = Who banned the Player
+        TargetKickMessage: '%prefix% &9> &4You got banned from this Server! \r\n &4Time: &4%duration% \r\n &4Reason: &4%reason%'
         SuccessfullyUnbanned: '%prefix% &9> &aYou unbanned the Player successfully!'
         SuccessfullyBanned: '%prefix% &9> &aYou banned the Player successfully!'
         AlreadyBanned: '%prefix% &9> &cThis Player is already banned!'
         NotBanned: '%prefix% &9> &cThis Player is not banned!'
         NotBannable: '%prefix% &9> &cThis Player is not bannable!'
+        UnknownPlayer: '%prefix% &9> &cThis Player is unknown to the server!'
+        IpUnknown: '%prefix% &9> &eThe IP was not banned because the Player is offline!'
+        DefaultReason: 'Banned by an operator'
+        # %staff% = Who banned the Player, %target% = The banned Player, %duration% = The Length of the Ban, %reason% = The Reason
+        Broadcast: '%prefix% &9> &e%staff% &7banned &e%target% &7(%duration%)&7: &c%reason%'
+        # %time% = The Length of the Ban
+        ConfirmBan: '&cBan %target% (%time%)? Reason: %reason%'
+        EnterDuration: '%prefix% &9> &aPlease enter the length of the ban in the Chat! (for example 30m, 12h, 7d or permanent)'
+        DurationSet: '%prefix% &9> &aThe length of the ban is now &e%duration%&a!'
+        NotADuration: '%prefix% &9> &cThat is not a valid length! (for example 30m, 12h, 7d or permanent, 100 years at most)'
         Reason:
           EnterNewReason: '%prefix% &9> &aPlease enter the new Reason in the Chat!'
           NewReasonSet: '%prefix% &9> &aThe new Reason got set!'
@@ -288,13 +303,48 @@ Messages:
         SuccessfullySetResourceInChat: '%prefix% &9> &aThe Resource ID was successfully set!'
         SetResourceInChatError: '%prefix% &9> &cThe Resource ID could not be set!'
   PotionMenu:
-    NotANumber: '%prefix% &9> &cThat''s not a Number!'
-    EnterDuration: '%prefix% &9> &aPlease enter an Duration!'
-    DurationSet: '%prefix% &9> &aThe new Duration has been set!'
-    EnterAmplifier: '%prefix% &9> &aPlease enter an Amplifier!'
-    AmplifierSet: '%prefix% &9> &aThe new Amplifier has been set!'
+    # %max% = The highest allowed Value, %duration% = The Duration, %amplifier% = The Level, %type% = The Effect, %target% = The Player
+    NotANumber: '%prefix% &9> &cThat''s not a valid level! (1-%max%)'
+    EnterDuration: '%prefix% &9> &aPlease enter the duration in the Chat! (for example 30s, 5m or 2h, a plain number is in seconds)'
+    DurationSet: '%prefix% &9> &aThe new Duration has been set! (%duration%)'
+    NotADuration: '%prefix% &9> &cThat''s not a valid duration! (for example 30s, 5m or 2h, %max% at most)'
+    EnterAmplifier: '%prefix% &9> &aPlease enter the level of the effect in the Chat! (1-255)'
+    AmplifierSet: '%prefix% &9> &aThe new level has been set! (%amplifier%)'
     EffectAdded: '%prefix% &9> &aThe Effect &7%type%&r (&aDuration: &7%duration%&r, &aAmplifier: &7%amplifier%&r)&a got added to &7%target%&a!'
     EffectRemoved: '%prefix% &9> &cThe Effect &7%type%&c got removed from &7%target%&c!'
+    EffectsCleared: '%prefix% &9> &aAll effects of &7%target% &awere removed!'
+    # %preset% = The Name of the Preset, %search% = The Search Text
+    PresetApplied: '%prefix% &9> &aApplied the preset &7%preset% &ato &7%target%&a!'
+    PresetFailed: '%prefix% &9> &cThe preset &7%preset% &ccould not be applied to &7%target%&c!'
+    EnterSearch: '%prefix% &9> &aPlease enter a part of the effect name in the Chat! (&f-&a clears the search)'
+    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
+    SearchCleared: '%prefix% &9> &aThe search was cleared!'
+    Category:
+      Beneficial: '&aBeneficial'
+      Harmful: '&cHarmful'
+      Neutral: '&7Neutral'
+    Preset:
+      SpeedRun: 'Speed run'
+      NightVision: 'Night vision'
+      Tank: 'Tank'
+      LevitationPrank: 'Levitation prank'
+      BlindnessPrank: 'Blindness prank'
+  SpawningMenu:
+    # %count% = How many Entities, %entity% = The Entity, %target% = The Player, %name% = The Name, %search% = The Search Text
+    Spawned: '%prefix% &9> &aSpawned &e%count%x %entity% &aat &e%target%&a!'
+    SpawnFailed: '%prefix% &9> &cThe server could not spawn %entity%!'
+    EnterName: '%prefix% &9> &aPlease enter the name of the entities in the Chat! (&f-&a removes the name)'
+    NameSet: '%prefix% &9> &aThe name is now &f%name%&a!'
+    NameCleared: '%prefix% &9> &aThe name was removed!'
+    EnterSearch: '%prefix% &9> &aPlease enter a part of the entity name in the Chat! (&f-&a clears the search)'
+    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
+    SearchCleared: '%prefix% &9> &aThe search was cleared!'
+    Category:
+      Hostile: '&cHostile'
+      Passive: '&aPassive'
+      Water: '&9Water'
+      Boss: '&5Boss'
+      Other: '&7Other'
   AddonCommand:
     # Format Placeholders:
     # %addon_name% = Addon Name
@@ -454,10 +504,18 @@ Messages:
       Console: 'Console'
       System: 'System'
       Unknown: 'Unknown'
+      Permanent: 'permanent'
     Status:
       ACTIVE: '&aActive'
       EXPIRED: '&7Expired'
       REMOVED: '&cRemoved'
+      RECORD: '&9[Record]'
+    # History entries of the ban and kick menus and of the TEMPBAN escalation
+    # %reason% = The Reason, %duration% = The Length of the Ban
+    Record:
+      Ban: 'Banned (%duration%): %reason%'
+      BanIp: 'IP banned (%duration%): %reason%'
+      Kick: 'Kicked: %reason%'
     Escalation:
       # Used when a rule in Warnings.Escalation of the config.yml has no reason
       DefaultReason: 'Too many warnings'
@@ -943,6 +1001,62 @@ Items:
             - '&cBan the Player:'
             - '&cTime: &6%time%'
             - '&cReason: &6%reason%'
+        Summary:
+          material: PLAYER_HEAD
+          displayName: '&c%target%'
+          # %target% = The Player, %reason% = The Reason, %time% = The Length of the Ban
+          lore:
+            - '&7Reason: &6%reason%'
+            - '&7Length: &6%time%'
+        # %marker% = Marks the selected Entry, %name% = The Name of the Preset, %reason% = The Reason of the Preset
+        Preset:
+          material: BOOK
+          displayName: '%marker%&e%name%'
+          lore:
+            - '&7Reason: &6%reason%'
+            - ''
+            - '&eClick to use this reason'
+        # %label% = The Length as written in the config.yml
+        Duration:
+          material: CLOCK
+          displayName: '%marker%&e%label%'
+          lore:
+            - '&eClick to use this length'
+        DurationCustom:
+          material: COMPASS
+          displayName: '&aCustom length'
+          # %time% = The selected Length
+          lore:
+            - '&7Selected: &6%time%'
+            - '&eClick to type a length in the chat'
+            - '&7(30s, 5m, 2h, 7d or permanent)'
+        IpBan:
+          Enabled:
+            material: LIME_DYE
+            displayName: '&aIP ban: &fon'
+            lore:
+              - '&7The IP address of the player is banned as well'
+              - '&7Only works while the player is online'
+              - '&eClick to switch off'
+          Disabled:
+            material: GRAY_DYE
+            displayName: '&aIP ban: &foff'
+            lore:
+              - '&7Only the name of the player is banned'
+              - '&eClick to switch on'
+        Silent:
+          Enabled:
+            material: LIME_DYE
+            displayName: '&aSilent: &fon'
+            lore:
+              - '&7Nobody gets a message in the chat'
+              - '&eClick to switch off'
+          Disabled:
+            material: GRAY_DYE
+            displayName: '&aSilent: &foff'
+            lore:
+              - '&7Everybody gets a message in the chat'
+              - '&eClick to switch on'
       KickMenu:
         Reason:
           material: PAPER
@@ -958,6 +1072,27 @@ Items:
           lore:
             - '&cKick the Player:'
             - '&cReason: &6%reason%'
+        # %marker% = Marks the selected Entry, %name% = The Name of the Preset, %reason% = The Reason of the Preset
+        Preset:
+          material: BOOK
+          displayName: '%marker%&e%name%'
+          lore:
+            - '&7Reason: &6%reason%'
+            - ''
+            - '&eClick to use this reason'
+        Silent:
+          Enabled:
+            material: LIME_DYE
+            displayName: '&aSilent: &fon'
+            lore:
+              - '&7Nobody gets a message in the chat'
+              - '&eClick to switch off'
+          Disabled:
+            material: GRAY_DYE
+            displayName: '&aSilent: &foff'
+            lore:
+              - '&7Everybody gets a message in the chat'
+              - '&eClick to switch on'
       KickItem:
         material: PISTON
         displayName: '&cKick the Player'
@@ -1094,7 +1229,7 @@ Items:
       Filter:
         Active:
           material: LIME_DYE
-          displayName: '&aShowing: &fActive warnings'
+          displayName: '&aShowing: &fActive warnings and records'
           lore:
             - '&7Click to also show expired and removed warnings'
         All:
@@ -1137,6 +1272,233 @@ Items:
             - '&5- &6Created: &7%created%'
             - '&5- &6Removed: &7%ended% &7(%ended_by%&7)'
             - '&5- &6Status: &7%status%'
+        Record:
+          material: WRITABLE_BOOK
+          displayName: '&9Record &6#%number%'
+          lore:
+            - '&5- &6Entry: &7%reason%'
+            - '&5- &6By: &7%issuer%'
+            - '&5- &6Date: &7%created%'
+            - '&5- &6Status: &7%status%'
+            - ''
+            - '&eLeft-Click: &7Edit the text'
+            - '&eShift-Right-Click: &7Remove'
+    PotionMenu:
+      # %effect% = The Effect, %category% = Its Category, %duration% = The selected Duration, %amplifier% = The selected Level
+      EffectItem:
+        Active:
+          material: POTION
+          displayName: '&a%effect%'
+          lore:
+            - '&7Category: &f%category%'
+            - '&aThe player has this effect'
+            - ''
+            - '&eLeft-Click: &7Give it for &f%duration% &7at level &f%amplifier%'
+            - '&eRight-Click: &7Remove it'
+        Inactive:
+          material: POTION
+          displayName: '&7%effect%'
+          lore:
+            - '&7Category: &f%category%'
+            - ''
+            - '&eLeft-Click: &7Give it for &f%duration% &7at level &f%amplifier%'
+            - '&eRight-Click: &7Remove it'
+      Presets:
+        SpeedRun:
+          material: SUGAR
+          displayName: '&bSpeed run'
+          lore:
+            - '&7Speed III and Jump Boost II for 5 minutes'
+            - '&eClick to give it to the player'
+        NightVision:
+          material: GOLDEN_CARROT
+          displayName: '&eNight vision'
+          lore:
+            - '&7Night Vision for 10 minutes'
+            - '&eClick to give it to the player'
+        Tank:
+          material: SHIELD
+          displayName: '&6Tank'
+          lore:
+            - '&7Resistance III, Regeneration II, Absorption III'
+            - '&7and Health Boost III for 5 minutes'
+            - '&eClick to give it to the player'
+        LevitationPrank:
+          material: FEATHER
+          displayName: '&dLevitation prank'
+          lore:
+            - '&7Levitation for 6 seconds, then Slow Falling'
+            - '&eClick to give it to the player'
+        BlindnessPrank:
+          material: INK_SAC
+          displayName: '&8Blindness prank'
+          lore:
+            - '&7Blindness and Nausea for 10 seconds'
+            - '&eClick to give it to the player'
+      Search:
+        material: OAK_SIGN
+        displayName: '&aSearch'
+        # %search% = The current Search Text
+        lore:
+          - '&7Current: &f%search%'
+          - '&eLeft-Click: &7Type a search in the chat'
+          - '&eRight-Click: &7Clear the search'
+      Filter:
+        All:
+          material: HOPPER
+          displayName: '&aShowing: &fAll effects'
+          lore:
+            - '&7Click to show only beneficial effects'
+        Beneficial:
+          material: LIME_DYE
+          displayName: '&aShowing: &fBeneficial effects'
+          lore:
+            - '&7Click to show only harmful effects'
+        Harmful:
+          material: RED_DYE
+          displayName: '&aShowing: &fHarmful effects'
+          lore:
+            - '&7Click to show only neutral effects'
+        Neutral:
+          material: GRAY_DYE
+          displayName: '&aShowing: &fNeutral effects'
+          lore:
+            - '&7Click to show all effects'
+    SpawningMenu:
+      # %count% = The selected Number, %max% = The highest allowed Number (Pman.Actions.Spawning.MaxCount)
+      Count:
+        material: PAPER
+        displayName: '&aAmount: &f%count%'
+        lore:
+          - '&7At most %max% entities per click'
+          - '&eLeft-Click: &7+1 &8(Shift: +5)'
+          - '&eRight-Click: &7-1 &8(Shift: -5)'
+      Baby:
+        Enabled:
+          material: EGG
+          displayName: '&aBaby: &fon'
+          lore:
+            - '&7Spawns the entities as babies'
+            - '&eClick to switch off'
+        Disabled:
+          material: EGG
+          displayName: '&aBaby: &foff'
+          lore:
+            - '&7Spawns the entities as adults'
+            - '&eClick to switch on'
+      # %name% = The selected Name
+      Name:
+        material: NAME_TAG
+        displayName: '&aName: &f%name%'
+        lore:
+          - '&eLeft-Click: &7Type a name in the chat'
+          - '&eRight-Click: &7Remove the name'
+          - '&7Color codes with & work'
+      Glowing:
+        Enabled:
+          material: GLOWSTONE_DUST
+          displayName: '&aGlowing: &fon'
+          lore:
+            - '&7The entities glow'
+            - '&eClick to switch off'
+        Disabled:
+          material: GLOWSTONE_DUST
+          displayName: '&aGlowing: &foff'
+          lore:
+            - '&7The entities do not glow'
+            - '&eClick to switch on'
+      Armor:
+        Enabled:
+          material: IRON_CHESTPLATE
+          displayName: '&aArmor: &fon'
+          lore:
+            - '&7Mobs wear an iron armor set that does not drop'
+            - '&eClick to switch off'
+        Disabled:
+          material: IRON_CHESTPLATE
+          displayName: '&aArmor: &foff'
+          lore:
+            - '&7Mobs spawn without armor'
+            - '&eClick to switch on'
+      Rider:
+        Enabled:
+          material: SADDLE
+          displayName: '&aRider: &fon'
+          lore:
+            - '&7A skeleton rides every entity'
+            - '&eClick to switch off'
+        Disabled:
+          material: SADDLE
+          displayName: '&aRider: &foff'
+          lore:
+            - '&7The entities spawn without a rider'
+            - '&eClick to switch on'
+      Search:
+        material: OAK_SIGN
+        displayName: '&aSearch'
+        # %search% = The current Search Text
+        lore:
+          - '&7Current: &f%search%'
+          - '&eLeft-Click: &7Type a search in the chat'
+          - '&eRight-Click: &7Clear the search'
+      Filter:
+        All:
+          material: HOPPER
+          displayName: '&aShowing: &fAll entities'
+          lore:
+            - '&7Click to show only hostile entities'
+        Hostile:
+          material: RED_DYE
+          displayName: '&aShowing: &fHostile entities'
+          lore:
+            - '&7Click to show only passive entities'
+        Passive:
+          material: LIME_DYE
+          displayName: '&aShowing: &fPassive entities'
+          lore:
+            - '&7Click to show only water entities'
+        Water:
+          material: BLUE_DYE
+          displayName: '&aShowing: &fWater entities'
+          lore:
+            - '&7Click to show only bosses'
+        Boss:
+          material: PURPLE_DYE
+          displayName: '&aShowing: &fBosses'
+          lore:
+            - '&7Click to show all entities'
+      # %entity% = The Entity, %category% = Its Category
+      EntityItem:
+        material: GHAST_SPAWN_EGG
+        displayName: '&a%entity%'
+        lore:
+          - '&7Category: &f%category%'
+          - ''
+          - '&eClick to spawn it at the player'
+    BannedPlayersMenu:
+      # %target% = The banned Player or IP, %reason% = The Reason, %source% = Who banned, %created% = When, %expires% = When it ends, %left% = The Time left
+      Entry:
+        material: PLAYER_HEAD
+        displayName: '&c%target%'
+        lore:
+          - '&5- &6Reason: &7%reason%'
+          - '&5- &6Banned by: &7%source%'
+          - '&5- &6Since: &7%created%'
+          - '&5- &6Until: &7%expires%'
+          - '&5- &6Time left: &7%left%'
+          - ''
+          - '&eClick to unban'
+      EntryIp:
+        material: RED_CONCRETE
+        displayName: '&cIP %target%'
+        lore:
+          - '&5- &6Reason: &7%reason%'
+          - '&5- &6Banned by: &7%source%'
+          - '&5- &6Since: &7%created%'
+          - '&5- &6Until: &7%expires%'
+          - '&5- &6Time left: &7%left%'
+          - ''
+          - '&eClick to unban'
   WorldManager:
     Settings:
       PVP:

@@ -274,6 +274,8 @@ permissions:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Unban:
                 default: op
+              AdminPanel.PlayerManager.PlayerSettings.BanIp:
+                default: op
               AdminPanel.PlayerManager.PlayerSettings.Kick:
                 default: op
               AdminPanel.PlayerManager.PlayerSettings.Warn:

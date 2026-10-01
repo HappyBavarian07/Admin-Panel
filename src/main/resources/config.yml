@@ -268,6 +268,45 @@ Pman:
       NoJump: true
       # The player moves at 30 percent of the normal speed
       SlowMotion: true
+    # Settings of the Ban menu and the Kick menu of the Player Manager
+    # Every ban and kick from these menus is also written to the warning history of the player
+    # when Pman.Actions.WarningSystem is true (as an entry that is never counted as an active warning)
+    Ban:
+      # The reason buttons of the Ban menu and the Kick menu
+      # name: The text of the button
+      # reason: The reason that is used when the button is clicked
+      # At most 7 are shown, a custom reason can always be typed into the chat
+      Presets:
+        - name: 'Hacking'
+          reason: 'Using a hacked client'
+        - name: 'Griefing'
+          reason: 'Griefing'
+        - name: 'Spam'
+          reason: 'Spamming the chat'
+        - name: 'Toxic behavior'
+          reason: 'Insulting other players'
+        - name: 'Advertising'
+          reason: 'Advertising other servers'
+      # The length buttons of the Ban menu
+      # Units: s (seconds), m (minutes), h (hours), d (days), permanent = the ban never ends
+      # At most 7 are shown, the first one is selected when the menu opens, a custom length can be typed into the chat
+      Durations:
+        - 1h
+        - 1d
+        - 7d
+        - 30d
+        - permanent
+      # Whether the IP address is banned as well when the Ban menu opens (only works while the player is online)
+      # The player can change it in the menu, banning an IP needs the permission AdminPanel.PlayerManager.PlayerSettings.BanIp
+      IpBan: false
+      # Whether the Ban menu opens with the silent switch on, a silent ban is not announced in the chat
+      Silent: false
+    Kick:
+      # Whether the Kick menu opens with the silent switch on, a silent kick is not announced in the chat
+      Silent: false
+    Spawning:
+      # How many entities one click in the Spawning menu can spawn at most
+      MaxCount: 10
   Money:
     # This is the currency used for the money part in the Pman
     currency: $

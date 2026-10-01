@@ -1,44 +1,52 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.sanctions.BanSettings;
+import de.happybavarian07.adminpanel.sanctions.Durations;
+import de.happybavarian07.adminpanel.sanctions.PlayerSanctions;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.BanList;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class PlayerBanMenu extends Menu implements Listener {
+/**
+ * Bans the selected player. The reason comes from a preset of the config or from the chat, the length from one of
+ * the configured durations or from the chat. An IP ban and a silent ban (no broadcast) can be switched on here, both
+ * default to the values of {@code Pman.Actions.Ban}.
+ */
+public class PlayerBanMenu extends Menu {
+    private static final String BAN_PERMISSION = "AdminPanel.PlayerManager.PlayerSettings.Ban";
+    private static final String IP_PERMISSION = "AdminPanel.PlayerManager.PlayerSettings.BanIp";
+    private static final String PATH = "PlayerManager.ActionsMenu.BanMenu.";
+    private static final String MESSAGE_PATH = "Player.PlayerManager.BanMenu.";
+    private static final long MAX_BAN_MILLIS = TimeUnit.DAYS.toMillis(36_500);
+    private static final int[] PRESET_SLOTS = {10, 11, 12, 13, 14, 15, 16};
+    private static final int[] DURATION_SLOTS = {19, 20, 21, 22, 23, 24, 25};
+
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
+    private final BanSettings settings = PlayerSanctions.settings();
     private String reason = "";
-    private int seconds = 0;
-    private int minutes = 0;
-    private int hours = 0;
-    private int days = 0;
-    private int months = 0;
-    private int years = 0;
+    private long durationMillis;
+    private boolean ipBan;
+    private boolean silent;
 
     public PlayerBanMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PlayerManager.PlayerSettings.OpenMenu.Ban");
+        this.ipBan = plugin.getConfig().getBoolean("Pman.Actions.Ban.IpBan", false);
+        this.silent = plugin.getConfig().getBoolean("Pman.Actions.Ban.Silent", false);
+        this.durationMillis = settings.lengths().isEmpty() ? 0 : settings.lengths().get(0).millis();
     }
 
     @Override
@@ -53,161 +61,119 @@ public class PlayerBanMenu extends Menu implements Listener {
 
     @Override
     public int getSlots() {
-        return 27;
+        return 45;
     }
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
     @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
-    }
-
-    @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.hasData("BanPlayerSetNewReason")) {
-            this.reason = format(player, event.getMessage());
-            playerMenuUtility.removeData("BanPlayerSetNewReason");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-            player.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.NewReasonSet", player, true));
-            super.open();
-            event.setCancelled(true);
-        }
     }
 
     @Override
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
-        String path = "PlayerManager.ActionsMenu.BanMenu.";
+        OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
+        String targetName = target.getName() != null ? target.getName() : playerMenuUtility.getTargetUUID().toString();
 
-        // Reason
-        registerButton(getSlot(path + "Reason", 13),
-                lgm.getItem(path + "Reason", player, false),
-                (p, e) -> {
-                    playerMenuUtility.addData("BanPlayerSetNewReason", true);
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%reason%", reason, true);
-                    lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reason, false);
-                    p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.Reason.EnterNewReason", p, true));
-                    p.closeInventory();
-                }, null);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%target%", targetName, false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reasonText(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%time%", durationText(player), false);
+        ItemStack summary = lgm.getItem(PATH + "Summary", player, false);
+        if (summary.getItemMeta() instanceof SkullMeta meta) {
+            meta.setOwningPlayer(target);
+            summary.setItemMeta(meta);
+        }
+        inventory.setItem(getSlot(PATH + "Summary", 4), summary);
 
-        // Time Units (Right-click decrease, Left-click increase)
-        registerButton(getSlot(path + "Years", 2), lgm.getItem(path + "Years", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (years < 1000) years++;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (years > 0) years--;
-                    }
-                    this.open();
-                }, null);
+        for (int i = 0; i < settings.presets().size() && i < PRESET_SLOTS.length; i++) {
+            BanSettings.Preset preset = settings.presets().get(i);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%name%", preset.name(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", preset.reason(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%marker%", marker(reason.equals(preset.reason())), false);
+            registerButton(PRESET_SLOTS[i], lgm.getItem(PATH + "Preset", player, false),
+                    MenuAction.of((p, e) -> reason = preset.reason()).then((p, e) -> refresh()));
+        }
+        for (int i = 0; i < settings.lengths().size() && i < DURATION_SLOTS.length; i++) {
+            BanSettings.Length length = settings.lengths().get(i);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%label%", length.millis() > 0 ? length.label() : permanentText(player), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%marker%", marker(durationMillis == length.millis()), false);
+            registerButton(DURATION_SLOTS[i], lgm.getItem(PATH + "Duration", player, false),
+                    MenuAction.of((p, e) -> durationMillis = length.millis()).then((p, e) -> refresh()));
+        }
 
-        registerButton(getSlot(path + "Months", 3), lgm.getItem(path + "Months", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (months < 1000) months++;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (months > 0) months--;
-                    }
-                    this.open();
-                }, null);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reasonText(), false);
+        registerButton(getSlot(PATH + "Reason", 28), lgm.getItem(PATH + "Reason", player, false),
+                MenuAction.prompt(CommandText.get(lgm, player, MESSAGE_PATH + "Reason.EnterNewReason"), (p, text) -> {
+                    reason = text.trim();
+                    CommandText.send(lgm, p, MESSAGE_PATH + "Reason.NewReasonSet", "%reason%", reason);
+                    open();
+                }));
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%time%", durationText(player), false);
+        registerButton(getSlot(PATH + "DurationCustom", 29), lgm.getItem(PATH + "DurationCustom", player, false),
+                MenuAction.prompt(CommandText.get(lgm, player, MESSAGE_PATH + "EnterDuration"), this::setDuration));
 
-        registerButton(getSlot(path + "Days", 4), lgm.getItem(path + "Days", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (days < 1000) days++;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (days > 0) days--;
-                    }
-                    this.open();
-                }, null);
+        registerButton(getSlot(PATH + "IpBan", 31), lgm.getItem(PATH + "IpBan." + (ipBan ? "Enabled" : "Disabled"), player, false),
+                MenuAction.of((p, e) -> ipBan = !ipBan).then((p, e) -> refresh()).requires(IP_PERMISSION));
+        registerButton(getSlot(PATH + "Silent", 32), lgm.getItem(PATH + "Silent." + (silent ? "Enabled" : "Disabled"), player, false),
+                MenuAction.of((p, e) -> silent = !silent).then((p, e) -> refresh()));
 
-        registerButton(getSlot(path + "Hours", 5), lgm.getItem(path + "Hours", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (hours < 1000) hours++;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (hours > 0) hours--;
-                    }
-                    this.open();
-                }, null);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%reason%", reasonText(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%time%", durationText(player), false);
+        registerButton(getSlot(PATH + "Ban", 40), lgm.getItem(PATH + "Ban", player, true),
+                MenuAction.of((p, e) -> ban(p, target))
+                        .confirm(CommandText.get(lgm, player, MESSAGE_PATH + "ConfirmBan", "%target%", targetName,
+                                "%time%", durationText(player), "%reason%", reasonText()))
+                        .requires(BAN_PERMISSION));
 
-        registerButton(getSlot(path + "Minutes", 6), lgm.getItem(path + "Minutes", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (minutes < 1000) minutes += 5;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (minutes >= 5) minutes -= 5;
-                    }
-                    this.open();
-                }, null);
-
-        registerButton(getSlot(path + "Seconds", 7), lgm.getItem(path + "Seconds", player, false),
-                (p, e) -> {
-                    if (e.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                        if (seconds < 1000) seconds += 10;
-                    } else if (e.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                        if (seconds >= 10) seconds -= 10;
-                    }
-                    this.open();
-                }, null);
-
-        // Ban Execution
-        registerButton(getSlot(path + "Ban", 22), lgm.getItem(path + "Ban", player, false),
-                MenuAction.of((p, e) -> {
-                    Date banEnd = new Date();
-                    banEnd.setTime(System.currentTimeMillis() +
-                            TimeUnit.SECONDS.toMillis(seconds) +
-                            TimeUnit.MINUTES.toMillis(minutes) +
-                            TimeUnit.HOURS.toMillis(hours) +
-                            TimeUnit.DAYS.toMillis(days) +
-                            (months * 2628000000L) + (years * 31556952000L));
-
-                    OfflinePlayer target = Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID());
-                    if (plugin.getConfig().getStringList("Pman.Actions.ExemptPlayers").contains(target.getName())) {
-                        p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.NotBannable", p, true));
-                        return;
-                    }
-                    if (target.isBanned()) {
-                        p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.AlreadyBanned", p, true));
-                        return;
-                    }
-                    if (target.isOnline()) {
-                        target.getPlayer().kickPlayer(format(target.getPlayer(), lgm.getMessage("Player.PlayerManager.BanMenu.TargetKickMessage", target.getPlayer(), true)));
-                    }
-                    Bukkit.getBanList(BanList.Type.NAME).addBan(Objects.requireNonNull(target.getName()), reason, banEnd, p.getName());
-                    years = 0;
-                    months = 0;
-                    days = 0;
-                    hours = 0;
-                    minutes = 0;
-                    seconds = 0;
-                    p.sendMessage(lgm.getMessage("Player.PlayerManager.BanMenu.SuccessfullyBanned", p, true));
-                    new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
-                }).requires("AdminPanel.PlayerManager.PlayerSettings.Ban"), null);
-
-        // Close
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
-                MenuAction.of((p, e) -> {
-                    new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-                }).requires("AdminPanel.Button.Close"), null);
+        registerButton(getSlot("General.Close", 44), lgm.getItem("General.Close", player, false),
+                MenuAction.of((p, e) -> new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
+                        .requires("AdminPanel.Button.Close"));
     }
 
-    public String format(Player player, String message) {
-        return AdminPanelUtils.format(player, message, AdminPanelMain.getPrefix()).replace("%reason%", reason)
-                .replace("%time%", years + ":" + months + ":" + days + ":" + hours + ":" + minutes + ":" + seconds)
-                .replace("%years%", String.valueOf(years))
-                .replace("%months%", String.valueOf(months))
-                .replace("%days%", String.valueOf(days))
-                .replace("%hours%", String.valueOf(hours))
-                .replace("%minutes%", String.valueOf(minutes))
-                .replace("%seconds%", String.valueOf(seconds));
+    private void setDuration(Player player, String text) {
+        try {
+            long millis = Durations.parse(text);
+            if (millis > MAX_BAN_MILLIS) throw new IllegalArgumentException("too long");
+            durationMillis = millis;
+            CommandText.send(lgm, player, MESSAGE_PATH + "DurationSet", "%duration%", durationText(player));
+        } catch (IllegalArgumentException invalid) {
+            CommandText.send(lgm, player, MESSAGE_PATH + "NotADuration");
+        }
+        open();
+    }
+
+    private void ban(Player staff, OfflinePlayer target) {
+        PlayerSanctions.BanResult result = PlayerSanctions.ban(staff, target, reason, durationMillis, ipBan, silent);
+        switch (result) {
+            case BANNED, BANNED_IP_UNKNOWN -> {
+                CommandText.send(lgm, staff, MESSAGE_PATH + "SuccessfullyBanned");
+                if (result == PlayerSanctions.BanResult.BANNED_IP_UNKNOWN) CommandText.send(lgm, staff, MESSAGE_PATH + "IpUnknown");
+                reason = "";
+                new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+            }
+            case EXEMPT -> CommandText.send(lgm, staff, MESSAGE_PATH + "NotBannable");
+            case ALREADY_BANNED -> CommandText.send(lgm, staff, MESSAGE_PATH + "AlreadyBanned");
+            case UNKNOWN_PLAYER -> CommandText.send(lgm, staff, MESSAGE_PATH + "UnknownPlayer");
+        }
+    }
+
+    private String reasonText() {
+        return reason.isBlank() ? "-" : reason;
+    }
+
+    private String durationText(Player viewer) {
+        return durationMillis > 0 ? Durations.format(durationMillis) : permanentText(viewer);
+    }
+
+    private String permanentText(Player viewer) {
+        return CommandText.get(lgm, viewer, "Warnings.Format.Permanent");
+    }
+
+    private static String marker(boolean selected) {
+        return selected ? "&a> " : "";
     }
 }

@@ -69,7 +69,7 @@ public class PlayerWarningMenu extends PaginatedMenu<PlayerWarning> {
 
     @Override
     public void preSetMenuItems() {
-        List<PlayerWarning> entries = showAll ? warningManager.all(targetUUID) : warningManager.active(targetUUID);
+        List<PlayerWarning> entries = showAll ? warningManager.all(targetUUID) : warningManager.current(targetUUID);
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
         if (perPage > 0) page = Math.min(page, Math.max(0, (entries.size() - 1) / perPage));
