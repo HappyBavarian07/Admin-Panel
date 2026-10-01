@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.main;
 
+import de.happybavarian07.coolstufflib.utils.ItemUtils;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
@@ -76,7 +77,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
         try {
             PlayerTextures textures = profile.getTextures();
-            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture));
+            textures.setSkin(ItemUtils.textureUrl(headTexture));
             profile.setTextures(textures);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -97,7 +98,7 @@ class LocalAdminPanelAPI implements AdminPanelAPI {
 
         try {
             PlayerTextures textures = profile.getTextures();
-            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headTexture.getTexture()));
+            textures.setSkin(ItemUtils.textureUrl(headTexture.getTexture()));
             profile.setTextures(textures);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);

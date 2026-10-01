@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
+import de.happybavarian07.coolstufflib.utils.ItemUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
@@ -416,7 +417,7 @@ public class AdminPanelUtils {
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
         try {
             PlayerTextures textures = profile.getTextures();
-            textures.setSkin(new URL("https://textures.minecraft.net/texture/" + headValue));
+            textures.setSkin(ItemUtils.textureUrl(headValue));
             profile.setTextures(textures);
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
