@@ -535,6 +535,78 @@ Messages:
     Jumpscare:
       Title: '&4&lBOO!'
       Subtitle: ''
+  WorldManager:
+    # %action% = What was done, %world% = The World
+    Result:
+      OK: '%prefix% &9> &a%action% done: &7%world%'
+      EXISTS: '%prefix% &9> &c%action% failed: a world called &7%world% &cexists already!'
+      MAIN_WORLD: '%prefix% &9> &c%action% failed: the main world cannot be changed that way!'
+      INVALID: '%prefix% &9> &c%action% failed: &7%world% &cis not a valid world name! (letters, numbers, - _ . and 64 characters at most)'
+      MISSING: '%prefix% &9> &c%action% failed: there is no world folder with a level.dat called &7%world%&c!'
+      FAILED: '%prefix% &9> &c%action% failed for &7%world%&c, see the console!'
+    Action:
+      Load: 'Loading'
+      Import: 'Import'
+      Create: 'Creating'
+      Save: 'Saving'
+      Unload: 'Unloading'
+      Duplicate: 'Duplicating'
+      Rename: 'Renaming'
+      Delete: 'Deleting'
+  WorldSelect:
+    # %search% = The Search Text, %world% = The World
+    EnterImport: '%prefix% &9> &aPlease enter the folder name of the world in the Chat!'
+    EnterSearch: '%prefix% &9> &aPlease enter a part of the world name in the Chat! (&f-&a clears the search)'
+    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
+    SearchCleared: '%prefix% &9> &aThe search was cleared!'
+    Teleported: '%prefix% &9> &aTeleported you to the spawn of &7%world%&a!'
+    MainWorld: ' &7(main world)'
+  WorldSettings:
+    # %world% = The World, %seed% = The Seed, %size% = The Border Size, %x% %y% %z% = The Spawn
+    Seed: '%prefix% &9> &aThe seed of &7%world% &ais &f%seed%'
+    SpawnSet: '%prefix% &9> &aThe spawn of &7%world% &ais now &f%x% %y% %z%&a!'
+    SpawnWrongWorld: '%prefix% &9> &cYou have to be in &7%world% &cto set its spawn to your position!'
+    EnterBorder: '%prefix% &9> &aPlease enter the border size in blocks in the Chat! (0 resets it)'
+    BorderSet: '%prefix% &9> &aThe border of &7%world% &ais now &f%size% &ablocks wide!'
+    NotASize: '%prefix% &9> &cThat is not a valid border size!'
+    EnterDuplicate: '%prefix% &9> &aPlease enter the name of the copy in the Chat!'
+    EnterRename: '%prefix% &9> &aPlease enter the new name of the world in the Chat!'
+  WorldCreate:
+    EnterName: '%prefix% &9> &aPlease enter a Name in the Chat!'
+    EnterSeed: '%prefix% &9> &aPlease enter a seed in the Chat! (a number or any text, &f-&a for a random one)'
+    Preset:
+      Normal: 'Normal'
+      Flat: 'Flat'
+      Void: 'Void'
+      Amplified: 'Amplified'
+      LargeBiomes: 'Large biomes'
+  WorldPlayers:
+    # %target% = The Player
+    Sent: '%prefix% &9> &aSent &7%target% &ato the main world!'
+    Teleported: '%prefix% &9> &aTeleported you to &7%target%&a!'
+  GameRuleMenu:
+    # %rule% = The Rule, %value% = The Value, %world% = The World, %search% = The Search Text
+    EnterSearch: '%prefix% &9> &aPlease enter a part of the rule name in the Chat! (&f-&a clears the search)'
+    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
+    SearchCleared: '%prefix% &9> &aThe search was cleared!'
+    EnterValue: '%prefix% &9> &aPlease enter the new value of &7%rule% &ain the Chat! (true or false, or a number)'
+    NotAValue: '%prefix% &9> &cThat is not a value &7%rule% &ccan have!'
+    ValueSet: '%prefix% &9> &a&7%rule% &ais now &f%value% &ain &7%world%&a!'
+    Category:
+      Mobs: '&cMobs'
+      Player: '&aPlayers'
+      World: '&9World'
+      Damage: '&6Damage'
+      Other: '&7Other'
+  TimeWeatherMenu:
+    # %time% = Ticks, %clock% = The Clock, %world% = The World, %weather% = The Weather, %duration% = The Duration, %max% = The Maximum
+    EnterTime: '%prefix% &9> &aPlease enter the time in the Chat! (ticks like 6000, an hour like 18h, or a clock time like 6:30)'
+    NotATime: '%prefix% &9> &cThat is not a valid time!'
+    TimeSet: '%prefix% &9> &aThe time of &7%world% &ais now &f%clock% &a(%time% ticks)!'
+    EnterDuration: '%prefix% &9> &aPlease enter how long the next weather should last! (for example 5m or 1h, &f-&a for a random duration)'
+    DurationSet: '%prefix% &9> &aThe weather duration is now &f%duration%&a!'
+    NotADuration: '%prefix% &9> &cThat is not a valid duration! (for example 5m or 1h, %max% at most)'
+    WeatherSet: '%prefix% &9> &aThe weather of &7%world% &ais now &f%weather%&a!'
 Items:
   General:
     ConfirmationMenu:
@@ -1523,11 +1595,6 @@ Items:
           displayName: '&cAuto Save'
           lore:
             - '&cTurn on Auto Save in the world!'
-      Load:
-        material: BEACON
-        displayName: '&aLoad'
-        lore:
-          - '&aLoad the World!'
       Unload:
         material: ANVIL
         displayName: '&cUnload'
@@ -1553,16 +1620,106 @@ Items:
         displayName: '&aTeleport to World Spawn'
         lore:
           - '&aTeleport you to the World Spawn!'
-      Weather:
-        material: WATER_BUCKET
-        displayName: '&aWeather'
+      SetSpawn:
+        material: RED_BED
+        displayName: '&aSet Spawn'
         lore:
-          - '&aChange the Weather!'
-      Time:
+          - '&7Sets the spawn of &f%world% &7to your position'
+      Players:
+        material: PLAYER_HEAD
+        displayName: '&aPlayers'
+        lore:
+          - '&7%players% in this world'
+          - '&eClick to list them'
+      Seed:
+        material: WHEAT_SEEDS
+        displayName: '&aSeed'
+        lore:
+          - '&7Shows the seed of the world in the chat'
+      Border:
+        material: IRON_BARS
+        displayName: '&aWorld Border'
+        lore:
+          - '&7Current size: &f%size%'
+          - '&eClick to type a new size (0 resets it)'
+      TimeWeather:
         material: CLOCK
-        displayName: '&aTime'
+        displayName: '&aTime and Weather'
         lore:
-          - '&aChange the Time!'
+          - '&7Change the time and the weather'
+      Info:
+        material: GRASS_BLOCK
+        displayName: '&6%world%'
+        lore:
+          - '&7Environment: &f%environment%'
+          - '&7Players: &f%players%'
+      Difficulty:
+        PEACEFUL:
+          material: OXEYE_DAISY
+          displayName: '&aDifficulty: &fPeaceful'
+          lore:
+            - '&eClick to change the difficulty'
+        EASY:
+          material: WOODEN_SWORD
+          displayName: '&aDifficulty: &fEasy'
+          lore:
+            - '&eClick to change the difficulty'
+        NORMAL:
+          material: IRON_SWORD
+          displayName: '&aDifficulty: &fNormal'
+          lore:
+            - '&eClick to change the difficulty'
+        HARD:
+          material: NETHERITE_SWORD
+          displayName: '&aDifficulty: &fHard'
+          lore:
+            - '&eClick to change the difficulty'
+      Monsters:
+        true:
+          material: ZOMBIE_HEAD
+          displayName: '&aMonster Spawning'
+          lore:
+            - '&eClick to stop monsters from spawning'
+        false:
+          material: ZOMBIE_HEAD
+          displayName: '&cMonster Spawning'
+          lore:
+            - '&eClick to let monsters spawn'
+      Animals:
+        true:
+          material: COW_SPAWN_EGG
+          displayName: '&aAnimal Spawning'
+          lore:
+            - '&eClick to stop animals from spawning'
+        false:
+          material: COW_SPAWN_EGG
+          displayName: '&cAnimal Spawning'
+          lore:
+            - '&eClick to let animals spawn'
+      KeepInventory:
+        true:
+          material: TOTEM_OF_UNDYING
+          displayName: '&aKeep Inventory'
+          lore:
+            - '&eClick to drop items on death again'
+        false:
+          material: TOTEM_OF_UNDYING
+          displayName: '&cKeep Inventory'
+          lore:
+            - '&eClick to keep items on death'
+      Duplicate:
+        material: CHEST_MINECART
+        displayName: '&aDuplicate'
+        lore:
+          - '&7Copies the world under a new name'
+          - '&eClick to type the name'
+      Rename:
+        material: NAME_TAG
+        displayName: '&aRename'
+        lore:
+          - '&7Gives the world a new name'
+          - '&7(players are moved to the main world)'
+          - '&eClick to type the name'
     Create:
       material: CHEST
       displayName: '&aCreate World'
@@ -1575,31 +1732,6 @@ Items:
         lore:
           - '&aSet the Name of the World!'
           - '&a%name%'
-      Type:
-        NORMAL:
-          material: BEACON
-          displayName: '&aWorld Type'
-          lore:
-            - '&aSet the type of the world!'
-            - '&c%type%'
-        AMPLIFIED:
-          material: BEACON
-          displayName: '&aWorld Type'
-          lore:
-            - '&aSet the type of the world!'
-            - '&c%type%'
-        FLAT:
-          material: BEACON
-          displayName: '&aWorld Type'
-          lore:
-            - '&aSet the type of the world!'
-            - '&c%type%'
-        LARGE_BIOMES:
-          material: BEACON
-          displayName: '&aWorld Type'
-          lore:
-            - '&aSet the type of the world!'
-            - '&c%type%'
       Environment:
         NORMAL:
           material: GRASS_BLOCK
@@ -1646,6 +1778,50 @@ Items:
           displayName: '&cHardcore'
           lore:
             - '&cPut the world in hardcore!'
+      Seed:
+        material: WHEAT_SEEDS
+        displayName: '&aSeed'
+        lore:
+          - '&7Seed: &f%seed%'
+          - '&eClick to type a seed (- for a random one)'
+      Preset:
+        material: BEACON
+        displayName: '&aWorld Preset'
+        lore:
+          - '&7Preset: &f%preset%'
+          - '&eClick to change'
+      Difficulty:
+        PEACEFUL:
+          material: OXEYE_DAISY
+          displayName: '&aDifficulty: &fPeaceful'
+          lore:
+            - '&eClick to change'
+        EASY:
+          material: WOODEN_SWORD
+          displayName: '&aDifficulty: &fEasy'
+          lore:
+            - '&eClick to change'
+        NORMAL:
+          material: IRON_SWORD
+          displayName: '&aDifficulty: &fNormal'
+          lore:
+            - '&eClick to change'
+        HARD:
+          material: NETHERITE_SWORD
+          displayName: '&aDifficulty: &fHard'
+          lore:
+            - '&eClick to change'
+      TeleportAfter:
+        true:
+          material: ENDER_PEARL
+          displayName: '&aTeleport After Creating'
+          lore:
+            - '&eClick to stay where you are'
+        false:
+          material: ENDER_PEARL
+          displayName: '&cTeleport After Creating'
+          lore:
+            - '&eClick to teleport to the new world'
     Weather:
       CLEAR:
         material: BUCKET
@@ -1703,6 +1879,176 @@ Items:
         displayName: '&aMidnight'
         lore:
           - '&cChange to Midnight!'
+    Import:
+      material: ENDER_EYE
+      displayName: '&aImport World'
+      lore:
+        - '&7Loads a world folder of the server folder'
+        - '&eClick to type the folder name'
+    Select:
+      Search:
+        material: COMPASS
+        displayName: '&aSearch'
+        lore:
+          - '&7Search: &f%search%'
+          - '&eLeft-Click: &7Type a search'
+          - '&eRight-Click: &7Clear the search'
+      Filter:
+        ALL:
+          material: HOPPER
+          displayName: '&aShowing: &fAll worlds'
+          lore:
+            - '&eClick to change the filter'
+        LOADED:
+          material: HOPPER
+          displayName: '&aShowing: &fLoaded worlds'
+          lore:
+            - '&eClick to change the filter'
+        UNLOADED:
+          material: HOPPER
+          displayName: '&aShowing: &fUnloaded worlds'
+          lore:
+            - '&eClick to change the filter'
+      Loaded:
+        material: GRASS_BLOCK
+        displayName: '&a%world%%main%'
+        lore:
+          - '&7Environment: &f%environment%'
+          - '&7Players: &f%players%'
+          - '&7Difficulty: &f%difficulty%'
+          - ''
+          - '&eClick: &7Open the settings'
+          - '&eRight-Click: &7Teleport to the spawn'
+      Unloaded:
+        material: GRAY_CONCRETE
+        displayName: '&7%world%'
+        lore:
+          - '&cNot loaded'
+          - '&7Environment: &f%environment%'
+          - ''
+          - '&eClick: &7Load this world'
+    GameRuleMenu:
+      Search:
+        material: COMPASS
+        displayName: '&aSearch'
+        lore:
+          - '&7Search: &f%search%'
+          - '&eLeft-Click: &7Type a search'
+          - '&eRight-Click: &7Clear the search'
+      Filter:
+        All:
+          material: HOPPER
+          displayName: '&aShowing: &fAll rules'
+          lore:
+            - '&eClick to change the filter'
+        Mobs:
+          material: HOPPER
+          displayName: '&aShowing: &fMobs'
+          lore:
+            - '&eClick to change the filter'
+        Player:
+          material: HOPPER
+          displayName: '&aShowing: &fPlayers'
+          lore:
+            - '&eClick to change the filter'
+        World:
+          material: HOPPER
+          displayName: '&aShowing: &fWorld'
+          lore:
+            - '&eClick to change the filter'
+        Damage:
+          material: HOPPER
+          displayName: '&aShowing: &fDamage'
+          lore:
+            - '&eClick to change the filter'
+        Other:
+          material: HOPPER
+          displayName: '&aShowing: &fOther'
+          lore:
+            - '&eClick to change the filter'
+      Rule:
+        Boolean:
+          Enabled:
+            material: LIME_DYE
+            displayName: '&a%rule%%mark%'
+            lore:
+              - '&7Value: &atrue'
+              - '&7Default: &f%default%'
+              - '&7Category: &f%category%'
+              - ''
+              - '&eClick: &7Switch it'
+              - '&eQ: &7Reset to the default'
+          Disabled:
+            material: GRAY_DYE
+            displayName: '&c%rule%%mark%'
+            lore:
+              - '&7Value: &cfalse'
+              - '&7Default: &f%default%'
+              - '&7Category: &f%category%'
+              - ''
+              - '&eClick: &7Switch it'
+              - '&eQ: &7Reset to the default'
+        Number:
+          material: REPEATER
+          displayName: '&6%rule%%mark%'
+          lore:
+            - '&7Value: &f%value%'
+            - '&7Default: &f%default%'
+            - '&7Category: &f%category%'
+            - ''
+            - '&eLeft/Right-Click: &7+1 / -1'
+            - '&eShift-Click: &7+10 / -10'
+            - '&eMiddle-Click: &7Type a value'
+            - '&eQ: &7Reset to the default'
+        Unknown:
+          material: BARRIER
+          displayName: '&7%rule%'
+          lore:
+            - '&cThis rule has a type the menu cannot change'
+    TimeWeather:
+      Info:
+        material: CLOCK
+        displayName: '&6Time of Day'
+        lore:
+          - '&7Ticks: &f%time%'
+          - '&7Clock: &f%clock%'
+      HourBack:
+        material: ARROW
+        displayName: '&aOne Hour Back'
+      HourForward:
+        material: ARROW
+        displayName: '&aOne Hour Forward'
+      SetExact:
+        material: PAPER
+        displayName: '&aSet Exact Time'
+        lore:
+          - '&7Type ticks (6000), an hour (18h) or a clock time (6:30)'
+          - '&eClick to type the time'
+      Freeze:
+        true:
+          material: ICE
+          displayName: '&bTime Is Frozen'
+          lore:
+            - '&eClick to let time run again'
+        false:
+          material: SUNFLOWER
+          displayName: '&aTime Is Running'
+          lore:
+            - '&eClick to freeze the time'
+      WeatherDuration:
+        material: GLASS_BOTTLE
+        displayName: '&aWeather Duration'
+        lore:
+          - '&7Duration: &f%duration%'
+          - '&7Used for the next weather you click'
+          - '&eClick to type a duration (- for a random one)'
+    Players:
+      Entry:
+        material: PLAYER_HEAD
+        displayName: '%player_name%'
+        lore:
+          - '&eClick: &7Teleport to the player'
+          - '&eRight-Click: &7Send to the main world'
   StartMenu:
     SwitchLanguageMenuItem:
       material: BLUE_WOOL
@@ -2345,6 +2691,8 @@ MenuTitles:
     GameRuleMenu: '&3Gamerules'
     TimeMenu: '&3Time'
     WeatherMenu: '&3Weather'
+    TimeWeatherMenu: '&3Time and Weather'
+    WorldPlayers: '&3World Players'
   ServerManager:
     Menu: '&5Server Manager'
     ChatManagerMenu: '&aChat Manager'

@@ -1,36 +1,47 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
-import de.happybavarian07.adminpanel.events.world.*;
+import de.happybavarian07.adminpanel.events.world.AutoSaveToggleEvent;
+import de.happybavarian07.adminpanel.events.world.PVPToggleEvent;
+import de.happybavarian07.adminpanel.events.world.WorldDeleteEvent;
+import de.happybavarian07.adminpanel.events.world.WorldSaveEvent;
+import de.happybavarian07.adminpanel.events.world.WorldUnloadEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
-import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.TimeChangeMenu;
-import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.WeatherChangeMenu;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.worlds.WorldNames;
+import de.happybavarian07.adminpanel.worlds.WorldOperations;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * The settings of one loaded world. Actions that take the world away (unload, rename, delete) move its players to the
+ * main world and refuse the main world itself.
+ */
 public class WorldSettingsMenu extends Menu {
-    private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
+    private static final String PATH = "WorldManager.Settings.";
+    private static final String SETTINGS = "AdminPanel.WorldManager.Settings";
+    private static final double DEFAULT_BORDER = 59_999_968;
+
     private final World world;
 
     public WorldSettingsMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
-        setOpeningPermission("AdminPanel.WorldManager.Settings");
+        setOpeningPermission(SETTINGS);
     }
 
     @Override
@@ -45,169 +56,181 @@ public class WorldSettingsMenu extends Menu {
 
     @Override
     public int getSlots() {
-        return 27;
+        return 54;
     }
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
     @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
     }
 
     @Override
     public void setMenuItems() {
         setFillerGlass();
-        Player player = playerMenuUtility.getOwner();
-        String path = "WorldManager.Settings.";
-        if (world.getPVP()) {
-            registerButton(getSlot(path + "PVP.true", 10), lgm.getItem(path + "PVP.true", player, false), (p, e) -> togglePvp(p, false), null);
-        } else {
-            registerButton(getSlot(path + "PVP.false", 10), lgm.getItem(path + "PVP.false", player, false), (p, e) -> togglePvp(p, true), null);
-        }
-        if (world.isAutoSave()) {
-            registerButton(getSlot(path + "AutoSave.true", 12), lgm.getItem(path + "AutoSave.true", player, false), (p, e) -> toggleAutoSave(p, false), null);
-        } else {
-            registerButton(getSlot(path + "AutoSave.false", 12), lgm.getItem(path + "AutoSave.false", player, false), (p, e) -> toggleAutoSave(p, true), null);
-        }
-        registerButton(getSlot(path + "Time", 14), lgm.getItem(path + "Time", player, false), (p, e) -> new TimeChangeMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open(), null);
-        registerButton(getSlot(path + "Weather", 16), lgm.getItem(path + "Weather", player, false), (p, e) -> new WeatherChangeMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open(), null);
-        registerButton(getSlot(path + "Load", 20), lgm.getItem(path + "Load", player, false), (p, e) -> loadWorld(p), null);
-        registerButton(getSlot(path + "Unload", 22), lgm.getItem(path + "Unload", player, false), (p, e) -> unloadWorld(p), null);
-        registerButton(getSlot(path + "Save", 24), lgm.getItem(path + "Save", player, false), (p, e) -> saveWorld(p), null);
-        registerButton(getSlot(path + "Delete", 8), lgm.getItem(path + "Delete", player, false), (p, e) -> deleteWorld(p), null);
-        registerButton(getSlot(path + "GameRule", 4), lgm.getItem(path + "GameRule", player, false), (p, e) -> new GameRuleMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open(), null);
-        registerButton(getSlot(path + "TPToSpawn", 0), lgm.getItem(path + "TPToSpawn", player, false), (p, e) -> {
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%world%", world.getName(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%size%", (long) world.getWorldBorder().getSize(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%players%", world.getPlayers().size(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", world.getEnvironment().name(), false);
+
+        button("Info", 8, MenuAction.of((p, e) -> {
+        }));
+        button("TPToSpawn", 0, MenuAction.of((p, e) -> {
             p.closeInventory();
             p.teleport(world.getSpawnLocation());
-            super.open();
-        }, null);
-        registerButton(getSlot("General.Refresh", 18), lgm.getItem("General.Refresh", player, false),
-                MenuAction.of((p, e) -> super.open()).requires("AdminPanel.Button.refresh"), null);
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
-                MenuAction.of((p, e) ->
-                        new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open()).requires("AdminPanel.Button.Close"), null);
+        }).requires("AdminPanel.WorldManager.Teleport"));
+        button("SetSpawn", 1, MenuAction.of((p, e) -> setSpawn(p)).requires(SETTINGS));
+        button("Players", 2, MenuAction.of((p, e) -> new WorldPlayersMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
+                .requires("AdminPanel.WorldManager.Players"));
+        button("Seed", 3, MenuAction.of((p, e) -> {
+            p.closeInventory();
+            CommandText.send(lgm, p, "WorldSettings.Seed", "%world%", world.getName(), "%seed%", world.getSeed());
+        }).requires(SETTINGS));
+        button("GameRule", 4, MenuAction.of((p, e) -> new GameRuleMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
+                .requires("AdminPanel.WorldManager.Gamerules"));
+        button("TimeWeather", 5, MenuAction.of((p, e) -> new WorldTimeWeatherMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
+                .requires("AdminPanel.WorldManager.Time"));
+        button("Border", 6, MenuAction.prompt(CommandText.get(lgm, playerMenuUtility.getOwner(), "WorldSettings.EnterBorder"), this::setBorder)
+                .requires(SETTINGS));
+
+        boolean pvp = world.getPVP();
+        button("PVP." + pvp, 19, MenuAction.of((p, e) -> togglePvp(p, !pvp)).requires("AdminPanel.WorldManager.PVP"));
+        boolean autoSave = world.isAutoSave();
+        button("AutoSave." + autoSave, 20, MenuAction.of((p, e) -> toggleAutoSave(p, !autoSave)).requires(SETTINGS));
+        button("Difficulty." + world.getDifficulty(), 21, MenuAction.of((p, e) -> {
+            Difficulty[] all = Difficulty.values();
+            world.setDifficulty(all[(world.getDifficulty().ordinal() + 1) % all.length]);
+        }).then((p, e) -> refresh()).requires(SETTINGS));
+        boolean monsters = world.getAllowMonsters();
+        button("Monsters." + monsters, 22, MenuAction.of((p, e) -> world.setSpawnFlags(!monsters, world.getAllowAnimals()))
+                .then((p, e) -> refresh()).requires(SETTINGS));
+        boolean animals = world.getAllowAnimals();
+        button("Animals." + animals, 23, MenuAction.of((p, e) -> world.setSpawnFlags(world.getAllowMonsters(), !animals))
+                .then((p, e) -> refresh()).requires(SETTINGS));
+        boolean keepInventory = Boolean.TRUE.equals(world.getGameRuleValue(GameRule.KEEP_INVENTORY));
+        button("KeepInventory." + keepInventory, 24, MenuAction.of((p, e) -> world.setGameRule(GameRule.KEEP_INVENTORY, !keepInventory))
+                .then((p, e) -> refresh()).requires(SETTINGS));
+
+        button("Save", 28, MenuAction.of((p, e) -> saveWorld(p)).requires(SETTINGS));
+        button("Unload", 29, MenuAction.of((p, e) -> unloadWorld(p)).requires("AdminPanel.WorldManager.Unload"));
+        button("Duplicate", 30, MenuAction.prompt(CommandText.get(lgm, playerMenuUtility.getOwner(), "WorldSettings.EnterDuplicate"),
+                this::duplicateWorld).requires("AdminPanel.WorldManager.Duplicate"));
+        button("Rename", 31, MenuAction.prompt(CommandText.get(lgm, playerMenuUtility.getOwner(), "WorldSettings.EnterRename"),
+                this::renameWorld).requires("AdminPanel.WorldManager.Rename"));
+        button("Delete", 32, MenuAction.of((p, e) -> deleteWorld(p)).requires("AdminPanel.WorldManager.Delete"));
+
+        registerButton(getSlot("General.Refresh", 45), lgm.getItem("General.Refresh", playerMenuUtility.getOwner(), false),
+                MenuAction.of((p, e) -> refresh()).requires("AdminPanel.Button.refresh"));
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", playerMenuUtility.getOwner(), false),
+                MenuAction.of((p, e) -> openSelect()).requires("AdminPanel.Button.Close"));
+    }
+
+    private void button(String key, int slot, MenuAction action) {
+        String path = PATH + key;
+        registerButton(getSlot(path, slot), lgm.getItem(path, playerMenuUtility.getOwner(), true), action);
+    }
+
+    private void openSelect() {
+        new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
+    }
+
+    private void setSpawn(Player staff) {
+        if (!staff.getWorld().equals(world)) {
+            CommandText.send(lgm, staff, "WorldSettings.SpawnWrongWorld", "%world%", world.getName());
+            return;
+        }
+        Location at = staff.getLocation();
+        world.setSpawnLocation(at.getBlockX(), at.getBlockY(), at.getBlockZ());
+        CommandText.send(lgm, staff, "WorldSettings.SpawnSet", "%world%", world.getName(),
+                "%x%", at.getBlockX(), "%y%", at.getBlockY(), "%z%", at.getBlockZ());
+    }
+
+    private void setBorder(Player staff, String text) {
+        try {
+            double size = Double.parseDouble(text.trim());
+            if (size < 0 || size > DEFAULT_BORDER) throw new NumberFormatException("out of range");
+            world.getWorldBorder().setSize(size == 0 ? DEFAULT_BORDER : size);
+            CommandText.send(lgm, staff, "WorldSettings.BorderSet", "%world%", world.getName(), "%size%", (long) world.getWorldBorder().getSize());
+        } catch (NumberFormatException invalid) {
+            CommandText.send(lgm, staff, "WorldSettings.NotASize");
+        }
+        open();
     }
 
     private void togglePvp(Player player, boolean enabled) {
         PVPToggleEvent event = new PVPToggleEvent(player, world, enabled);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(event);
-            if (!event.isCancelled()) {
-                world.setPVP(enabled);
-                super.open();
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
-        }
+        if (!fire(event)) return;
+        world.setPVP(enabled);
+        refresh();
     }
 
     private void toggleAutoSave(Player player, boolean enabled) {
         AutoSaveToggleEvent event = new AutoSaveToggleEvent(player, world, enabled);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(event);
-            if (!event.isCancelled()) {
-                world.setAutoSave(enabled);
-                super.open();
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
-        }
-    }
-
-    private void loadWorld(Player player) {
-        WorldLoadEvent loadEvent = new WorldLoadEvent(player, world);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(loadEvent);
-            if (!loadEvent.isCancelled()) {
-                try {
-                    if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
-                        new File(world.getWorldFolder() + "\\data\\").mkdir();
-                        new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
-                    }
-                    if (!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
-                        new File(world.getWorldFolder() + "\\DIM-1\\data\\").mkdir();
-                        new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
-                    }
-                } catch (IOException ex) {
-                    AdminPanelMain.logError("Could not create the raids.dat files of the world", ex);
-                }
-                Bukkit.createWorld(new WorldCreator(world.getName()));
-                super.open();
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
-        }
-    }
-
-    private void unloadWorld(Player player) {
-        WorldUnloadEvent unloadEvent = new WorldUnloadEvent(player, world);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(unloadEvent);
-            if (!unloadEvent.isCancelled()) {
-                Bukkit.unloadWorld(world, world.isAutoSave());
-                super.open();
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
-        }
+        if (!fire(event)) return;
+        world.setAutoSave(enabled);
+        refresh();
     }
 
     private void saveWorld(Player player) {
-        WorldSaveEvent saveEvent = new WorldSaveEvent(player, world);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(saveEvent);
-            if (!saveEvent.isCancelled()) {
-                try {
-                    if (!new File(world.getWorldFolder() + "\\data\\raids.dat").exists()) {
-                        new File(world.getWorldFolder() + "\\data\\raids.dat").mkdir();
-                        new File(world.getWorldFolder() + "\\data\\raids.dat").createNewFile();
-                    }
-                    if (!new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").exists()) {
-                        new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").mkdir();
-                        new File(world.getWorldFolder() + "\\DIM-1\\data\\raids.dat").createNewFile();
-                    }
-                    world.save();
-                } catch (Exception ignored) {
-                }
-                super.open();
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
+        if (!fire(new WorldSaveEvent(player, world))) return;
+        WorldResults.send(lgm, player, "Save", WorldOperations.save(world), world.getName());
+    }
+
+    private void unloadWorld(Player player) {
+        if (!fire(new WorldUnloadEvent(player, world))) return;
+        WorldOperations.Result result = WorldOperations.unload(world, world.isAutoSave());
+        WorldResults.send(lgm, player, "Unload", result, world.getName());
+        if (result == WorldOperations.Result.OK) {
+            openSelect();
+        } else {
+            refresh();
         }
+    }
+
+    private void duplicateWorld(Player staff, String text) {
+        String name = WorldNames.normalize(text);
+        WorldOperations.duplicate(world, name, result -> {
+            WorldResults.send(lgm, staff, "Duplicate", result, name);
+            if (staff.isOnline()) openSelect();
+        });
+    }
+
+    private void renameWorld(Player staff, String text) {
+        String name = WorldNames.normalize(text);
+        String oldName = world.getName();
+        WorldOperations.Result result = WorldOperations.rename(world, name);
+        WorldResults.send(lgm, staff, "Rename", result, result == WorldOperations.Result.OK ? name : oldName);
+        World renamed = result == WorldOperations.Result.OK ? Bukkit.getWorld(name) : world;
+        new WorldSettingsMenu(playerMenuUtility, renamed).open();
     }
 
     private void deleteWorld(Player player) {
-        WorldDeleteEvent deleteEvent = new WorldDeleteEvent(player, world);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(deleteEvent);
-            if (!deleteEvent.isCancelled()) {
-                Utils.openConfirmationMenu(
-                        "World Deletion of World: " + world.getName(),
-                        (p, e) -> AdminPanelUtils.deleteMinecraftWorld(world),
-                        player,
-                        this
-                );
-            }
-        } catch (NotAPanelEventException ex) {
-            AdminPanelMain.logError("A world settings action was not a valid panel event", ex);
+        if (WorldOperations.isMainWorld(world)) {
+            WorldResults.send(lgm, player, "Delete", WorldOperations.Result.MAIN_WORLD, world.getName());
+            return;
         }
+        if (!fire(new WorldDeleteEvent(player, world))) return;
+        String name = world.getName();
+        Utils.openConfirmationMenu(
+                "World Deletion of World: " + name,
+                (p, e) -> WorldOperations.delete(world, result -> {
+                    WorldResults.send(lgm, p, "Delete", result, name);
+                    if (p.isOnline()) openSelect();
+                }),
+                player,
+                this
+        );
     }
 
-    public void deleteWorldFolder(File path) {
-        if (path.exists() && path.isDirectory()) {
-            File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteWorldFolder(file);
-                } else {
-                    file.delete();
-                }
-            }
+    private boolean fire(AdminPanelEvent event) {
+        try {
+            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+        } catch (NotAPanelEventException invalid) {
+            AdminPanelMain.logError("A world settings action was not a valid panel event", invalid);
+            return false;
         }
-        path.delete();
+        return !(event instanceof Cancellable cancellable) || !cancellable.isCancelled();
     }
 }

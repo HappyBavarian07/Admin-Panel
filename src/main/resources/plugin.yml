@@ -234,6 +234,22 @@ permissions:
             default: op
           AdminPanel.WorldManager.Create:
             default: op
+          AdminPanel.WorldManager.Load:
+            default: op
+          AdminPanel.WorldManager.Unload:
+            default: op
+          AdminPanel.WorldManager.Delete:
+            default: op
+          AdminPanel.WorldManager.Duplicate:
+            default: op
+          AdminPanel.WorldManager.Rename:
+            default: op
+          AdminPanel.WorldManager.Import:
+            default: op
+          AdminPanel.WorldManager.Teleport:
+            default: op
+          AdminPanel.WorldManager.Players:
+            default: op
       AdminPanel.ServerManagment.*:
         default: op
         children:

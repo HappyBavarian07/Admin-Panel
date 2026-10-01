@@ -1,34 +1,46 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WorldCreateEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.worlds.WorldNames;
+import de.happybavarian07.adminpanel.worlds.WorldOperations;
+import de.happybavarian07.adminpanel.worlds.WorldPreset;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
+import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
+/**
+ * Collects the settings of a new world and creates it. Creating a world generates its spawn area on the main thread, so
+ * the server pauses for a moment.
+ */
 public class WorldCreateMenu extends Menu {
+    private static final String PERMISSION = "AdminPanel.WorldManager.Create";
+    private static final String PATH = "WorldManager.CreateMenu.";
+
     private String worldName = "Name";
-    private WorldType worldType = WorldType.NORMAL;
-    private World.Environment worldEnvironment = World.Environment.NORMAL;
+    private String seedText = "";
+    private WorldPreset preset = WorldPreset.NORMAL;
+    private World.Environment environment = World.Environment.NORMAL;
+    private Difficulty difficulty = Difficulty.NORMAL;
+    private boolean structures = true;
     private boolean hardcore = false;
-    private boolean generateStructures = false;
+    private boolean teleportAfter = true;
 
     public WorldCreateMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
-        setOpeningPermission("AdminPanel.WorldManager.Create");
+        setOpeningPermission(PERMISSION);
     }
 
     @Override
@@ -43,95 +55,76 @@ public class WorldCreateMenu extends Menu {
 
     @Override
     public int getSlots() {
-        return 27;
+        return 36;
     }
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
-
     }
 
     @Override
     public void handleCloseMenu(InventoryCloseEvent e) {
-
     }
 
     @Override
     public void setMenuItems() {
-        Player player = playerMenuUtility.getOwner();
-        String path = "WorldManager.CreateMenu.";
+        Player owner = playerMenuUtility.getOwner();
         setFillerGlass();
-        ItemStack nameItem = lgm.getItem(path + "Name", player, false);
-        ItemMeta nameMeta = nameItem.getItemMeta();
-        List<String> nameLore = new ArrayList<>();
-        for (String string : nameMeta.getLore()) {
-            nameLore.add(string.replace("%name%", this.worldName));
-        }
-        nameMeta.setLore(nameLore);
-        nameItem.setItemMeta(nameMeta);
-        registerButton(getSlot(path + "Name", 10), nameItem,
-                MenuAction.prompt(lgm.getMessage("Player.WorldManager.CreateMenu.Name", player, true), (p, input) -> {
-                    this.worldName = input.replace(" ", "-");
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%name%", worldName, false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%seed%", seedText.isEmpty() ? "-" : seedText, false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%preset%", CommandText.get(lgm, owner, "WorldCreate.Preset." + preset.languageKey()), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", environment.name(), false);
+
+        registerButton(getSlot(PATH + "Name", 10), lgm.getItem(PATH + "Name", owner, true),
+                MenuAction.prompt(CommandText.get(lgm, owner, "WorldCreate.EnterName"), (p, input) -> {
+                    worldName = WorldNames.normalize(input);
                     open();
                 }));
-
-        ItemStack typeItem = lgm.getItem(path + "Type." + worldType.toString(), player, false);
-        ItemMeta typeMeta = typeItem.getItemMeta();
-        List<String> typeLore = new ArrayList<>();
-        for (String string : typeMeta.getLore()) {
-            typeLore.add(string.replace("%type%", this.worldType.toString()));
-        }
-        typeMeta.setLore(typeLore);
-        typeItem.setItemMeta(typeMeta);
-        registerButton(getSlot(path + "Type." + worldType.toString(), 12), typeItem, MenuAction.of((p, e) -> {
-            if (this.worldType == WorldType.NORMAL) this.worldType = WorldType.FLAT;
-            else if (this.worldType == WorldType.FLAT) this.worldType = WorldType.AMPLIFIED;
-            else if (this.worldType == WorldType.AMPLIFIED) this.worldType = WorldType.LARGE_BIOMES;
-            else this.worldType = WorldType.NORMAL;
-        }).then((p, e) -> refresh()));
-
-        ItemStack environmentItem = lgm.getItem(path + "Environment." + worldEnvironment.toString(), player, false);
-        ItemMeta environmentMeta = environmentItem.getItemMeta();
-        List<String> environmentLore = new ArrayList<>();
-        for (String string : environmentMeta.getLore()) {
-            environmentLore.add(string.replace("%environment%", this.worldEnvironment.toString()));
-        }
-        environmentMeta.setLore(environmentLore);
-        environmentItem.setItemMeta(environmentMeta);
-        registerButton(getSlot(path + "Environment." + worldEnvironment.toString(), 14), environmentItem, MenuAction.of((p, e) -> {
-            if (this.worldEnvironment == World.Environment.NORMAL) this.worldEnvironment = World.Environment.NETHER;
-            else if (this.worldEnvironment == World.Environment.NETHER) this.worldEnvironment = World.Environment.THE_END;
-            else this.worldEnvironment = World.Environment.NORMAL;
-        }).then((p, e) -> refresh()));
-
-        registerButton(getSlot(path + "GenerateStructures." + generateStructures, 16), lgm.getItem(path + "GenerateStructures." + generateStructures, player, false),
-                MenuAction.of((p, e) -> this.generateStructures = !this.generateStructures).then((p, e) -> refresh()));
-
-        registerButton(getSlot(path + "Hardcore." + hardcore, 22), lgm.getItem(path + "Hardcore." + hardcore, player, false),
-                MenuAction.of((p, e) -> this.hardcore = !this.hardcore).then((p, e) -> refresh()));
-
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot(PATH + "Seed", 11), lgm.getItem(PATH + "Seed", owner, true),
+                MenuAction.prompt(CommandText.get(lgm, owner, "WorldCreate.EnterSeed"), (p, input) -> {
+                    seedText = input.trim().equals("-") ? "" : input.trim();
+                    open();
+                }));
+        registerButton(getSlot(PATH + "Preset", 12), lgm.getItem(PATH + "Preset", owner, true),
+                MenuAction.of((p, e) -> preset = preset.next()).then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "Environment." + environment, 13), lgm.getItem(PATH + "Environment." + environment, owner, true),
+                MenuAction.of((p, e) -> {
+                    World.Environment[] all = {World.Environment.NORMAL, World.Environment.NETHER, World.Environment.THE_END};
+                    environment = all[(Arrays.asList(all).indexOf(environment) + 1) % all.length];
+                }).then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "Difficulty." + difficulty, 14), lgm.getItem(PATH + "Difficulty." + difficulty, owner, false),
+                MenuAction.of((p, e) -> difficulty = Difficulty.values()[(difficulty.ordinal() + 1) % Difficulty.values().length])
+                        .then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "GenerateStructures." + structures, 15), lgm.getItem(PATH + "GenerateStructures." + structures, owner, false),
+                MenuAction.of((p, e) -> structures = !structures).then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "Hardcore." + hardcore, 16), lgm.getItem(PATH + "Hardcore." + hardcore, owner, false),
+                MenuAction.of((p, e) -> hardcore = !hardcore).then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "TeleportAfter." + teleportAfter, 24), lgm.getItem(PATH + "TeleportAfter." + teleportAfter, owner, false),
+                MenuAction.of((p, e) -> teleportAfter = !teleportAfter).then((p, e) -> refresh()));
+        registerButton(getSlot(PATH + "CreateWorld", 22), lgm.getItem(PATH + "CreateWorld", owner, true),
+                MenuAction.of((p, e) -> createWorld(p)).requires(PERMISSION));
+        registerButton(getSlot("General.Close", 35), lgm.getItem("General.Close", owner, false),
                 MenuAction.open(() -> new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
                         .requires("AdminPanel.Button.Close"));
-        registerButton(getSlot(path + "CreateWorld", 18), lgm.getItem(path + "CreateWorld", player, false), MenuAction.of((p, e) -> {
-            WorldCreateEvent worldCreateEvent = new WorldCreateEvent(p, worldName, worldType, worldEnvironment, generateStructures, hardcore);
-            try {
-                AdminPanelMain.getAPI().callAdminPanelEvent(worldCreateEvent);
-                if (!worldCreateEvent.isCancelled()) {
-                    WorldCreator worldCreator = new WorldCreator(worldCreateEvent.getName());
-                    worldCreator.type(worldCreateEvent.getWorldType());
-                    worldCreator.environment(worldCreateEvent.getWorldEnvironment());
-                    worldCreator.generateStructures(worldCreateEvent.isGenerateStructures());
-                    worldCreator.hardcore(worldCreateEvent.isHardcore());
-                    World world = worldCreator.createWorld();
-                    p.closeInventory();
-                    if (world != null) p.teleport(world.getSpawnLocation());
-                }
-            } catch (NotAPanelEventException ex) {
-                AdminPanelMain.logError("The world create action was not a valid panel event", ex);
-            }
-        }));
+    }
 
-
+    private void createWorld(Player staff) {
+        WorldCreateEvent event = new WorldCreateEvent(staff, worldName, preset.type(), environment, structures, hardcore,
+                WorldNames.seed(seedText));
+        try {
+            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+        } catch (NotAPanelEventException invalid) {
+            AdminPanelMain.logError("The world create action was not a valid panel event", invalid);
+            return;
+        }
+        if (event.isCancelled()) return;
+        staff.closeInventory();
+        WorldOperations.Result result = WorldOperations.create(new WorldOperations.CreateRequest(event.getName(), preset,
+                event.getWorldEnvironment(), event.getSeed(), difficulty, event.isGenerateStructures(), event.isHardcore()));
+        WorldResults.send(lgm, staff, "Create", result, event.getName());
+        if (result == WorldOperations.Result.OK && teleportAfter) {
+            World created = Bukkit.getWorld(event.getName());
+            if (created != null) staff.teleport(created.getSpawnLocation());
+        }
     }
 }

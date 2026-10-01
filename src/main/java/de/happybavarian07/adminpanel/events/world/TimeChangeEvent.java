@@ -15,11 +15,33 @@ public class TimeChangeEvent extends AdminPanelEvent implements Cancellable {
     private final Player player;
     private final World world;
     private Time time;
+    private long ticks;
 
     public TimeChangeEvent(Player player, World world, Time time) {
         this.player = player;
         this.world = world;
         this.time = time;
+        this.ticks = time.getTime();
+    }
+
+    /**
+     * For a time that is not one of the presets. {@link #getTime()} then returns the closest preset, the exact value is
+     * {@link #getTicks()}.
+     */
+    public TimeChangeEvent(Player player, World world, long ticks) {
+        this(player, world, Time.closest(ticks));
+        this.ticks = ticks;
+    }
+
+    /**
+     * @return the time of day the world is set to, 0 to 23999
+     */
+    public long getTicks() {
+        return ticks;
+    }
+
+    public void setTicks(long ticks) {
+        this.ticks = ticks;
     }
 
     public Time getTime() {
@@ -32,6 +54,7 @@ public class TimeChangeEvent extends AdminPanelEvent implements Cancellable {
 
     public void setTime(Time time) {
         this.time = time;
+        this.ticks = time.getTime();
     }
 
     public Player getPlayer() {

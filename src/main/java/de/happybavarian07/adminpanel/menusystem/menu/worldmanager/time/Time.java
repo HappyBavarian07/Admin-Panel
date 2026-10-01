@@ -24,6 +24,23 @@ public enum Time {
         this.nextTime = nextTime;
     }
 
+    /**
+     * @return the preset whose time of day is closest to {@code ticks}, counting around the end of the day
+     */
+    public static Time closest(long ticks) {
+        Time best = values()[0];
+        long bestDistance = Long.MAX_VALUE;
+        for (Time candidate : values()) {
+            long distance = Math.abs(candidate.time - Math.floorMod(ticks, 24000L));
+            distance = Math.min(distance, 24000L - distance);
+            if (distance < bestDistance) {
+                best = candidate;
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
     public Long getTime() {
         return time;
     }

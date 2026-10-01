@@ -1,34 +1,55 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.WorldSelectEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.main.Head;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
+import de.happybavarian07.adminpanel.worlds.WorldFolders;
+import de.happybavarian07.adminpanel.worlds.WorldNames;
+import de.happybavarian07.adminpanel.worlds.WorldOperations;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-import static org.bukkit.Bukkit.getServer;
+/**
+ * Lists the loaded worlds and the world folders that are not loaded. A loaded world opens its settings, a click with
+ * the right button teleports, an unloaded one is loaded.
+ */
+public class WorldSelectMenu extends PaginatedMenu<WorldSelectMenu.Entry> {
+    private static final String PERMISSION = "AdminPanel.WorldManager.Open";
+    private static final String PATH = "WorldManager.Select.";
 
-public class WorldSelectMenu extends PaginatedMenu<World> {
+    /**
+     * @param world the loaded world, {@code null} for a folder that is not loaded
+     */
+    public record Entry(String name, World world) {
+        boolean loaded() {
+            return world != null;
+        }
+    }
+
+    private enum Filter {ALL, LOADED, UNLOADED}
+
+    private Filter filter = Filter.ALL;
+    private String search = "";
+
     public WorldSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
-        setOpeningPermission("AdminPanel.WorldManager.open");
-        List<World> worlds = new ArrayList<>(getServer().getWorlds());
-        setPaginatedData(worlds, this::getPageItem);
+        setOpeningPermission(PERMISSION);
     }
 
     @Override
@@ -48,51 +69,112 @@ public class WorldSelectMenu extends PaginatedMenu<World> {
 
     @Override
     public void preSetMenuItems() {
+        List<Entry> entries = new ArrayList<>();
+        List<String> loadedNames = new ArrayList<>();
+        for (World world : Bukkit.getWorlds()) {
+            loadedNames.add(world.getName());
+            entries.add(new Entry(world.getName(), world));
+        }
+        for (String name : WorldFolders.unloaded(Bukkit.getWorldContainer(), loadedNames)) {
+            entries.add(new Entry(name, null));
+        }
+        String needle = search.toLowerCase(Locale.ROOT);
+        List<Entry> shown = entries.stream()
+                .filter(entry -> filter == Filter.ALL || (filter == Filter.LOADED) == entry.loaded())
+                .filter(entry -> needle.isEmpty() || entry.name().toLowerCase(Locale.ROOT).contains(needle))
+                .toList();
+        setPaginatedData(shown, this::getPageItem, this::handleEntryClick);
+        int perPage = getPaginatedItemSlots().length;
+        if (perPage > 0) page = Math.min(page, Math.max(0, (shown.size() - 1) / perPage));
     }
 
     @Override
     public void postSetMenuItems() {
-        Player player = playerMenuUtility.getOwner();
-        registerButton(45, lgm.getItem("WorldManager.Create", player, false),
-                MenuAction.of((p, e) ->
-                        new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.WorldManager.Create"), null);
+        Player owner = playerMenuUtility.getOwner();
+        registerButton(45, lgm.getItem("WorldManager.Create", owner, false),
+                MenuAction.of((p, e) -> new WorldCreateMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
+                        .requires("AdminPanel.WorldManager.Create"));
+        registerButton(getSlot("WorldManager.Import", 46), lgm.getItem("WorldManager.Import", owner, false),
+                MenuAction.prompt(CommandText.get(lgm, owner, "WorldSelect.EnterImport"), this::importWorld)
+                        .requires("AdminPanel.WorldManager.Import"));
+
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%search%", search.isEmpty() ? "-" : search, false);
+        MenuAction promptSearch = MenuAction.prompt(CommandText.get(lgm, owner, "WorldSelect.EnterSearch"), (p, text) -> {
+            search = text.trim().equals("-") ? "" : text.trim();
+            page = 0;
+            CommandText.send(lgm, p, search.isEmpty() ? "WorldSelect.SearchCleared" : "WorldSelect.SearchSet", "%search%", search);
+            open();
+        });
+        registerButton(getSlot(PATH + "Search", 6), lgm.getItem(PATH + "Search", owner, true), (p, e) -> {
+            if (e.isRightClick()) {
+                search = "";
+                page = 0;
+                refresh();
+            } else {
+                promptSearch.execute(p, e);
+            }
+        });
+        registerButton(getSlot(PATH + "Filter", 7), lgm.getItem(PATH + "Filter." + filter, owner, false),
+                MenuAction.of((p, e) -> {
+                    filter = Filter.values()[(filter.ordinal() + 1) % Filter.values().length];
+                    page = 0;
+                }).then((p, e) -> refresh()));
     }
 
-    @Override
-    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        List<World> worlds = new ArrayList<>(getServer().getWorlds());
-        String noPerms = lgm.getMessage("Player.General.NoPermissions", player, true);
-        if (indexOnPage < 0 || indexOnPage >= worlds.size()) return;
-        World world = worlds.get(indexOnPage);
-        WorldSelectEvent worldSelectEvent = new WorldSelectEvent(player, world);
-        try {
-            AdminPanelMain.getAPI().callAdminPanelEvent(worldSelectEvent);
-            if (!worldSelectEvent.isCancelled()) {
-                new WorldSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId()), world).open();
+    private void handleEntryClick(Player staff, Entry entry, InventoryClickEvent event) {
+        if (entry.loaded()) {
+            if (event.isRightClick()) {
+                MenuAction.of((p, e) -> {
+                    p.closeInventory();
+                    p.teleport(entry.world().getSpawnLocation());
+                    CommandText.send(lgm, p, "WorldSelect.Teleported", "%world%", entry.name());
+                }).requires("AdminPanel.WorldManager.Teleport").execute(staff, event);
+                return;
             }
-        } catch (NotAPanelEventException notAPanelEventException) {
-            AdminPanelMain.logError("The world select action was not a valid panel event", notAPanelEventException);
+            MenuAction.of((p, e) -> openSettings(p, entry.world())).requires("AdminPanel.WorldManager.Settings").execute(staff, event);
+        } else {
+            MenuAction.of((p, e) -> loadWorld(p, entry.name())).requires("AdminPanel.WorldManager.Load").execute(staff, event);
         }
     }
 
-    @Override
-    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in postSetMenuItems
+    private void openSettings(Player staff, World world) {
+        WorldSelectEvent event = new WorldSelectEvent(staff, world);
+        try {
+            AdminPanelMain.getAPI().callAdminPanelEvent(event);
+            if (!event.isCancelled()) {
+                new WorldSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(staff.getUniqueId()), world).open();
+            }
+        } catch (NotAPanelEventException invalid) {
+            AdminPanelMain.logError("The world select action was not a valid panel event", invalid);
+        }
     }
 
-    public ItemStack getPageItem(World world) {
-        ItemStack item = Head.WORLD.getAsItem();
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(world.getName());
-        List<String> lore = new ArrayList<>();
-        lore.add(AdminPanelUtils.chat("&6Players: &6" + world.getPlayers().size()));
-        lore.add(AdminPanelUtils.chat("&6Type: &6" + world.getWorldType().name()));
-        lore.add(AdminPanelUtils.chat("&6Environment: &6" + world.getEnvironment().name()));
-        lore.add(AdminPanelUtils.chat("&6GameTime: &6" + world.getGameTime()));
-        meta.setLore(lore);
-        item.setItemMeta(meta);
-        return item;
+    private void loadWorld(Player staff, String name) {
+        WorldResults.send(lgm, staff, "Load", WorldOperations.load(name), name);
+        refresh();
+    }
+
+    private void importWorld(Player staff, String text) {
+        String name = WorldNames.normalize(text);
+        WorldResults.send(lgm, staff, "Import", WorldOperations.load(name), name);
+        open();
+    }
+
+    public ItemStack getPageItem(Entry entry) {
+        Player viewer = playerMenuUtility.getOwner();
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%world%", entry.name(), false);
+        if (entry.loaded()) {
+            World world = entry.world();
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", world.getEnvironment().name(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%players%", world.getPlayers().size(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%difficulty%", world.getDifficulty().name(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%main%", WorldOperations.isMainWorld(world)
+                    ? CommandText.get(lgm, viewer, "WorldSelect.MainWorld") : "", false);
+            return lgm.getItem(PATH + "Loaded", viewer, true);
+        }
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%",
+                WorldFolders.guessEnvironment(WorldOperations.folder(entry.name())).name(), false);
+        return lgm.getItem(PATH + "Unloaded", viewer, true);
     }
 
     public void handleOpenMenu(InventoryOpenEvent e) {
