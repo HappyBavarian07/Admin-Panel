@@ -216,6 +216,11 @@ Messages:
         GiveMoney: '%prefix% &9> &cYou just gave %amount% to %player_name%!'
         SetMoney: '%prefix% &9> &cYou just set the Money of %player_name% to %amount%!'
         TakeMoney: '%prefix% &9> &cYou just took away %amount% from %player_name%!'
+      WarningMenu:
+        # %target% = The Player, %number% = The Number of the Warning
+        EnterReason: '%prefix% &9> &aPlease enter the reason for the warning of %target% in the Chat!'
+        EnterNewReason: '%prefix% &9> &aPlease enter the new reason for warning #%number% of %target% in the Chat!'
+        ConfirmRemove: '&cRemove warning #%number% of %target%?'
     ServerManager:
       MaintenanceModeOff: '%prefix% &9> &aThe server is no longer in maintenance mode, all players can rejoin!'
       MaintenanceModeOn: '%prefix% &9> &cThe server is now in maintenance mode. All players who have no rights have been kicked!'
@@ -409,6 +414,53 @@ Messages:
       Header: '&a------------ &bDisabled items: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
       Format: '  &7- &e%material%'
       Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+  Commands:
+    warn:
+      warn:
+        Info: 'Warns a player'
+    warnings:
+      warnings:
+        Info: 'Lists the warnings of a player'
+    unwarn:
+      unwarn:
+        Info: 'Ends a warning of a player now'
+  Warnings:
+    # %target% = The Player, %number% = The Number of the Warning, %count% = The Number of active Warnings, %reason% = The Reason
+    Disabled: '%prefix% &9> &cThe warning system is disabled! (Pman.Actions.WarningSystem in the config.yml)'
+    PlayerNotFound: '%prefix% &9> &cThe player ''%target%'' has never joined this server!'
+    Error: '%prefix% &9> &cSomething went wrong while working with the warnings! (see the console)'
+    Added: '%prefix% &9> &aYou warned &e%target% &a(warning &e#%number%&a, &e%count% &aactive): &7%reason%'
+    Edited: '%prefix% &9> &aThe reason of warning &e#%number% &aof &e%target% &awas changed!'
+    Expired: '%prefix% &9> &aWarning &e#%number% &aof &e%target% &aexpired now!'
+    ExpiredAll: '%prefix% &9> &aExpired &e%count% &aactive warnings of &e%target%&a!'
+    Removed: '%prefix% &9> &aWarning &e#%number% &aof &e%target% &awas removed!'
+    NoSuchWarning: '%prefix% &9> &c%target% has no warning #%number%!'
+    NotActive: '%prefix% &9> &eWarning &6#%number% &eof &6%target% &eis not active.'
+    NotPossible: '%prefix% &9> &cWarning #%number% of %target% can not be changed anymore!'
+    # %value% = The Input
+    InvalidNumber: '%prefix% &9> &c''%value%'' is neither a warning number nor ''all''!'
+    List:
+      # %page%, %max_page%, %count% = The Number of Warnings
+      Empty: '%prefix% &9> &7%target% has no warnings.'
+      PageDoesNotExist: '%prefix% &9> &cThis Page does not exist! (1-%max_page%)'
+      Header: '&a------------ &bWarnings of %target%: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
+      # %number%, %reason%, %issuer%, %created%, %expires%, %status%
+      Format: '  &e#%number% &7%reason% &8| &7by %issuer% &8| &7%created% &8- &7%expires% &8| %status%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+    Format:
+      # The pattern of the dates (Java SimpleDateFormat)
+      Date: 'yyyy/MM/dd HH:mm'
+      Never: 'never'
+      Console: 'Console'
+      System: 'System'
+      Unknown: 'Unknown'
+    Status:
+      ACTIVE: '&aActive'
+      EXPIRED: '&7Expired'
+      REMOVED: '&cRemoved'
+    Escalation:
+      # Used when a rule in Warnings.Escalation of the config.yml has no reason
+      DefaultReason: 'Too many warnings'
 Items:
   General:
     ConfirmationMenu:
@@ -946,16 +998,53 @@ Items:
         displayName: '&aGive the Player a Warning'
         lore:
           - '&5Give the Player a Warning!'
+          - '&7You enter the reason in the chat.'
+      Filter:
+        Active:
+          material: LIME_DYE
+          displayName: '&aShowing: &fActive warnings'
+          lore:
+            - '&7Click to also show expired and removed warnings'
+        All:
+          material: GRAY_DYE
+          displayName: '&aShowing: &fAll warnings'
+          lore:
+            - '&7Click to show only active warnings'
       WarningItem:
-        material: PAPER
-        displayName: '&aWarning &6#%count%'
-        lore:
-          - '&5- &6Left-Click: Info'
-          - '&5- &6Right-Click: Remove'
-          - '&5- &6Reason: &7%reason%'
-          - '&5- &6Creationdate: &7%creationDate%'
-          - '&5- &6Expirationdate: &7%expirationDate%'
-          - '&5- &6Warning Number: &7%count%'
+        Active:
+          material: PAPER
+          displayName: '&aWarning &6#%number%'
+          lore:
+            - '&5- &6Reason: &7%reason%'
+            - '&5- &6Issued by: &7%issuer%'
+            - '&5- &6Created: &7%created%'
+            - '&5- &6Expires: &7%expires%'
+            - '&5- &6Status: &7%status%'
+            - ''
+            - '&eLeft-Click: &7Edit the reason'
+            - '&eRight-Click: &7Expire now'
+            - '&eShift-Right-Click: &7Remove'
+        Expired:
+          material: CLOCK
+          displayName: '&7Warning &6#%number%'
+          lore:
+            - '&5- &6Reason: &7%reason%'
+            - '&5- &6Issued by: &7%issuer%'
+            - '&5- &6Created: &7%created%'
+            - '&5- &6Expired: &7%ended% &7(%ended_by%&7)'
+            - '&5- &6Status: &7%status%'
+            - ''
+            - '&eLeft-Click: &7Edit the reason'
+            - '&eShift-Right-Click: &7Remove'
+        Removed:
+          material: BARRIER
+          displayName: '&cWarning &6#%number%'
+          lore:
+            - '&5- &6Reason: &7%reason%'
+            - '&5- &6Issued by: &7%issuer%'
+            - '&5- &6Created: &7%created%'
+            - '&5- &6Removed: &7%ended% &7(%ended_by%&7)'
+            - '&5- &6Status: &7%status%'
   WorldManager:
     Settings:
       PVP:
@@ -1789,6 +1878,7 @@ MenuTitles:
     BannedPlayers: '&cBanned Players'
     BanMenu: '&cBan'
     KickMenu: '&cKick'
+    WarningMenu: '&aWarnings: %target%'
     Permissions:
       ListMenu: '&aPermission List: %action%'
       ActionSelectMenu: '&aActions'

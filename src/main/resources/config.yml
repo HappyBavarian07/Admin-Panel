@@ -240,9 +240,35 @@ Pman:
     # Here you can configure players who cannot be banned
     ExemptPlayers:
       - 'ExamplePlayer'
-    # Enables the Warning System in the Actions Menu
-    # UNDER DEVELOPMENT - NOT WORKING
+    # Enables the Warning System: the Warnings item in the Actions menu of a Player, /warn, /warnings and /unwarn
+    # Warnings are stored in the player_warnings table of the database (see Warnings below for the expiry and escalation)
     WarningSystem: false
   Money:
     # This is the currency used for the money part in the Pman
     currency: $
+
+# Settings of the Warning System (only used when Pman.Actions.WarningSystem is true)
+Warnings:
+  # How long a new warning counts as active before it expires on its own
+  # Units: m (minutes), h (hours), d (days), for example 30m, 12h or 30d
+  # 0 or never = the warning does not expire
+  DefaultExpiry: 30d
+  # What happens when a player reaches an exact number of active warnings (counted after the new warning)
+  # Every rule runs once when the number is reached. Invalid rules are logged and skipped
+  # count: The number of active warnings that triggers the rule
+  # action: KICK = kick the player, TEMPBAN = ban the player for 'duration', COMMAND = run 'command' as the console
+  # reason: The kick or ban reason (optional, there is a default text in the language file)
+  # duration: The ban length for TEMPBAN, same units as DefaultExpiry
+  # command: The console command for COMMAND, %player% is replaced with the name of the player
+  # KICK and TEMPBAN skip the players in Pman.Actions.ExemptPlayers
+  Escalation:
+    - count: 3
+      action: KICK
+      reason: "Too many warnings"
+    - count: 5
+      action: TEMPBAN
+      duration: 7d
+      reason: "Too many warnings"
+    - count: 7
+      action: COMMAND
+      command: "ban %player% Too many warnings"

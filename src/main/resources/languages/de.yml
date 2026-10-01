@@ -224,6 +224,11 @@ Messages:
         GiveMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% gegeben!'
         SetMoney: '%prefix% &9> &cDu hast gerade %player_name% auf %amount% gesetzt!'
         TakeMoney: '%prefix% &9> &cDu hast gerade %player_name% %amount% weggenommen!'
+      WarningMenu:
+        # %target% = Der Spieler, %number% = Die Nummer der Verwarnung
+        EnterReason: '%prefix% &9> &aBitte gib den Grund für die Verwarnung von %target% im Chat ein!'
+        EnterNewReason: '%prefix% &9> &aBitte gib den neuen Grund für Verwarnung #%number% von %target% im Chat ein!'
+        ConfirmRemove: '&cVerwarnung #%number% von %target% entfernen?'
     ServerManager:
       MaintenanceModeOff: '%prefix% &9> &aDer Server befindet sich nicht mehr im Wartungsmodus, alle Spieler können wieder beitreten!'
       MaintenanceModeOn: '%prefix% &9> &cDer Server befindet sich nun im Wartungsmodus alle Spieler die keine Rechte haben wurden gekickt!'
@@ -417,6 +422,53 @@ Messages:
       Header: '&a------------ &bDeaktivierte Items: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
       Format: '  &7- &e%material%'
       Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+  Commands:
+    warn:
+      warn:
+        Info: 'Verwarnt einen Spieler'
+    warnings:
+      warnings:
+        Info: 'Listet die Verwarnungen eines Spielers auf'
+    unwarn:
+      unwarn:
+        Info: 'Beendet eine Verwarnung eines Spielers sofort'
+  Warnings:
+    # %target% = Der Spieler, %number% = Die Nummer der Verwarnung, %count% = Die Anzahl der aktiven Verwarnungen, %reason% = Der Grund
+    Disabled: '%prefix% &9> &cDas Verwarnungssystem ist deaktiviert! (Pman.Actions.WarningSystem in der config.yml)'
+    PlayerNotFound: '%prefix% &9> &cDer Spieler ''%target%'' war noch nie auf diesem Server!'
+    Error: '%prefix% &9> &cBeim Bearbeiten der Verwarnungen ist etwas schiefgelaufen! (siehe Konsole)'
+    Added: '%prefix% &9> &aDu hast &e%target% &averwarnt (Verwarnung &e#%number%&a, &e%count% &aaktiv): &7%reason%'
+    Edited: '%prefix% &9> &aDer Grund von Verwarnung &e#%number% &avon &e%target% &awurde geändert!'
+    Expired: '%prefix% &9> &aVerwarnung &e#%number% &avon &e%target% &aist jetzt abgelaufen!'
+    ExpiredAll: '%prefix% &9> &e%count% &aaktive Verwarnungen von &e%target% &awurden beendet!'
+    Removed: '%prefix% &9> &aVerwarnung &e#%number% &avon &e%target% &awurde entfernt!'
+    NoSuchWarning: '%prefix% &9> &c%target% hat keine Verwarnung #%number%!'
+    NotActive: '%prefix% &9> &eVerwarnung &6#%number% &evon &6%target% &eist nicht aktiv.'
+    NotPossible: '%prefix% &9> &cVerwarnung #%number% von %target% kann nicht mehr geändert werden!'
+    # %value% = Die Eingabe
+    InvalidNumber: '%prefix% &9> &c''%value%'' ist weder eine Verwarnungsnummer noch ''all''!'
+    List:
+      # %page%, %max_page%, %count% = Anzahl der Verwarnungen
+      Empty: '%prefix% &9> &7%target% hat keine Verwarnungen.'
+      PageDoesNotExist: '%prefix% &9> &cDiese Seite existiert nicht! (1-%max_page%)'
+      Header: '&a------------ &bVerwarnungen von %target%: %count% &b(&5%page%&7/&5%max_page%&b) &a------------'
+      # %number%, %reason%, %issuer%, %created%, %expires%, %status%
+      Format: '  &e#%number% &7%reason% &8| &7von %issuer% &8| &7%created% &8- &7%expires% &8| %status%'
+      Footer: '&a------------ &b(&5%page%&7/&5%max_page%&b) &a------------'
+    Format:
+      # Das Muster der Datumsangaben (Java SimpleDateFormat)
+      Date: 'dd.MM.yyyy HH:mm'
+      Never: 'nie'
+      Console: 'Konsole'
+      System: 'System'
+      Unknown: 'Unbekannt'
+    Status:
+      ACTIVE: '&aAktiv'
+      EXPIRED: '&7Abgelaufen'
+      REMOVED: '&cEntfernt'
+    Escalation:
+      # Wird benutzt, wenn eine Regel in Warnings.Escalation der config.yml keinen Grund hat
+      DefaultReason: 'Zu viele Verwarnungen'
 Items:
   General:
     ConfirmationMenu:
@@ -953,16 +1005,53 @@ Items:
         displayName: '&aGebe dem Spieler eine Verwarnung'
         lore:
           - '&5Gebe dem Spieler eine Verwarnung!'
+          - '&7Den Grund gibst du im Chat ein.'
+      Filter:
+        Active:
+          material: LIME_DYE
+          displayName: '&aAnzeige: &fAktive Verwarnungen'
+          lore:
+            - '&7Klicke, um auch abgelaufene und entfernte Verwarnungen zu zeigen'
+        All:
+          material: GRAY_DYE
+          displayName: '&aAnzeige: &fAlle Verwarnungen'
+          lore:
+            - '&7Klicke, um nur aktive Verwarnungen zu zeigen'
       WarningItem:
-        material: PAPER
-        displayName: '&aVerwarnung &6#%count%'
-        lore:
-          - '&5- &6Left-Click: Info'
-          - '&5- &6Right-Click: Remove'
-          - '&5- &6Grund: &7%reason%'
-          - '&5- &6Erstellungsdatum: &7%creationDate%'
-          - '&5- &6Ablaufdatum: &7%expirationDate%'
-          - '&5- &6Warnungs Nummer: &7%count%'
+        Active:
+          material: PAPER
+          displayName: '&aVerwarnung &6#%number%'
+          lore:
+            - '&5- &6Grund: &7%reason%'
+            - '&5- &6Vergeben von: &7%issuer%'
+            - '&5- &6Erstellt: &7%created%'
+            - '&5- &6Läuft ab: &7%expires%'
+            - '&5- &6Status: &7%status%'
+            - ''
+            - '&eLinksklick: &7Grund ändern'
+            - '&eRechtsklick: &7Jetzt ablaufen lassen'
+            - '&eShift-Rechtsklick: &7Entfernen'
+        Expired:
+          material: CLOCK
+          displayName: '&7Verwarnung &6#%number%'
+          lore:
+            - '&5- &6Grund: &7%reason%'
+            - '&5- &6Vergeben von: &7%issuer%'
+            - '&5- &6Erstellt: &7%created%'
+            - '&5- &6Abgelaufen: &7%ended% &7(%ended_by%&7)'
+            - '&5- &6Status: &7%status%'
+            - ''
+            - '&eLinksklick: &7Grund ändern'
+            - '&eShift-Rechtsklick: &7Entfernen'
+        Removed:
+          material: BARRIER
+          displayName: '&cVerwarnung &6#%number%'
+          lore:
+            - '&5- &6Grund: &7%reason%'
+            - '&5- &6Vergeben von: &7%issuer%'
+            - '&5- &6Erstellt: &7%created%'
+            - '&5- &6Entfernt: &7%ended% &7(%ended_by%&7)'
+            - '&5- &6Status: &7%status%'
   WorldManager:
     Settings:
       PVP:
@@ -1675,6 +1764,7 @@ MenuTitles:
     BannedPlayers: '&cGebannte Spieler'
     BanMenu: '&cBan'
     KickMenu: '&cKick'
+    WarningMenu: '&aVerwarnungen: %target%'
     Permissions:
       ListMenu: '&aPermission Liste: %action%'
       ActionSelectMenu: '&aAktionen'

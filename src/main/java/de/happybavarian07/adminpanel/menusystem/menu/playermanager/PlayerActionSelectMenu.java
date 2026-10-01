@@ -5,7 +5,6 @@ import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMode;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
@@ -74,7 +73,7 @@ public class PlayerActionSelectMenu extends Menu {
         if (AdminPanelMain.getPlugin().getWarningManager() != null) {
             registerButton(getSlot("PlayerManager.WarningMenuItem", 24),
                     lgm.getItem("PlayerManager.WarningMenuItem", target, false),
-                    (p, e) -> p.sendMessage(AdminPanelUtils.chat("!!!UNDER DEVELOPMENT!!!")), null);
+                    (p, e) -> new PlayerWarningMenu(playerMenuUtility, this).open(), null);
         }
 
         registerButton(getSlot(path + "PermissionItem", 4),
