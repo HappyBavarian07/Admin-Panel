@@ -5,7 +5,7 @@ import de.happybavarian07.adminpanel.events.troll.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -14,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -49,11 +48,6 @@ public class PlayerTrollMenu extends Menu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -73,47 +67,44 @@ public class PlayerTrollMenu extends Menu implements Listener {
         // Toggles
         boolean hurtingWaterState = plugin.getPluginStateManager().getHurtingWaterMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "HurtingWater." + hurtingWaterState, 4), lgm.getItem(path + "HurtingWater." + hurtingWaterState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     if (plugin.getPluginStateManager().getHurtingWaterMap().containsKey(playerMenuUtility.getTargetUUID())) {
-                        inventory.setItem(getSlot(path + "HurtingWater.false", 4), lgm.getItem(path + "HurtingWater.false", target, false));
                         plugin.getPluginStateManager().getHurtingWaterMap().remove(playerMenuUtility.getTargetUUID());
                     } else {
-                        inventory.setItem(getSlot(path + "HurtingWater.true", 4), lgm.getItem(path + "HurtingWater.true", target, false));
                         plugin.getPluginStateManager().getHurtingWaterMap().put(playerMenuUtility.getTargetUUID(), true);
                     }
-                }, lgm), null);
+                }).then((p, e) -> refresh())
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.HurtingWater"));
 
         boolean blockPreventState = plugin.getPluginStateManager().getBlockBreakPreventMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "BreakPlacePrevent." + blockPreventState, 12), lgm.getItem(path + "BreakPlacePrevent." + blockPreventState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     boolean newState = !plugin.getPluginStateManager().getBlockBreakPreventMap().containsKey(playerMenuUtility.getTargetUUID());
                     BlockBreakPreventEvent preventEvent = new BlockBreakPreventEvent(p, target, newState);
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(preventEvent);
                         if (!preventEvent.isCancelled()) {
                             if (newState) {
-                                inventory.setItem(getSlot(path + "BreakPlacePrevent.true", 12), lgm.getItem(path + "BreakPlacePrevent.true", target, false));
                                 plugin.getPluginStateManager().getBlockBreakPreventMap().put(playerMenuUtility.getTargetUUID(), true);
                             } else {
-                                inventory.setItem(getSlot(path + "BreakPlacePrevent.false", 12), lgm.getItem(path + "BreakPlacePrevent.false", target, false));
                                 plugin.getPluginStateManager().getBlockBreakPreventMap().remove(playerMenuUtility.getTargetUUID());
                             }
+                            refresh();
                         }
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.BlockPrevent"));
 
         boolean villagerSoundsState = plugin.getPluginStateManager().getVillagerSoundsMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "VillagerSounds." + villagerSoundsState, 13), lgm.getItem(path + "VillagerSounds." + villagerSoundsState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     boolean newState = !plugin.getPluginStateManager().getVillagerSoundsMap().containsKey(playerMenuUtility.getTargetUUID());
                     VillagerSoundsToggleEvent soundsToggleEvent = new VillagerSoundsToggleEvent(p, target, newState);
                     try {
                         AdminPanelMain.getAPI().callAdminPanelEvent(soundsToggleEvent);
                         if (!soundsToggleEvent.isCancelled()) {
                             if (newState) {
-                                inventory.setItem(getSlot(path + "VillagerSounds.true", 13), lgm.getItem(path + "VillagerSounds.true", target, false));
                                 plugin.getPluginStateManager().getVillagerSoundsMap().put(playerMenuUtility.getTargetUUID(), true);
                                 Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
                                     if (plugin.getPluginStateManager().getVillagerSoundsMap().containsKey(playerMenuUtility.getTargetUUID())) {
@@ -121,109 +112,79 @@ public class PlayerTrollMenu extends Menu implements Listener {
                                     }
                                 }, 0L, 10L);
                             } else {
-                                inventory.setItem(getSlot(path + "VillagerSounds.false", 13), lgm.getItem(path + "VillagerSounds.false", target, false));
                                 plugin.getPluginStateManager().getVillagerSoundsMap().remove(playerMenuUtility.getTargetUUID());
                             }
+                            refresh();
                         }
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.VillagerSounds"));
 
         boolean dupeMobsState = plugin.getPluginStateManager().getDupeMobsOnKillMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "DupeMobsOnKill." + dupeMobsState, 20), lgm.getItem(path + "DupeMobsOnKill." + dupeMobsState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     if (plugin.getPluginStateManager().getDupeMobsOnKillMap().containsKey(playerMenuUtility.getTargetUUID())) {
-                        inventory.setItem(getSlot(path + "DupeMobsOnKill.false", 20), lgm.getItem(path + "DupeMobsOnKill.false", target, false));
                         plugin.getPluginStateManager().getDupeMobsOnKillMap().remove(playerMenuUtility.getTargetUUID());
                     } else {
-                        inventory.setItem(getSlot(path + "DupeMobsOnKill.true", 20), lgm.getItem(path + "DupeMobsOnKill.true", target, false));
                         plugin.getPluginStateManager().getDupeMobsOnKillMap().put(playerMenuUtility.getTargetUUID(), true);
                     }
-                }, lgm), null);
+                }).then((p, e) -> refresh())
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DupeMobs"));
 
         boolean chatMuteState = plugin.getPluginStateManager().getChatMuteMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "ChatMute." + chatMuteState, 24), lgm.getItem(path + "ChatMute." + chatMuteState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     boolean newState = !plugin.getPluginStateManager().getChatMuteMap().containsKey(playerMenuUtility.getTargetUUID());
                     try {
                         if (newState) {
                             PlayerChatMuteEvent muteEvent = new PlayerChatMuteEvent(p, target);
                             AdminPanelMain.getAPI().callAdminPanelEvent(muteEvent);
                             if (!muteEvent.isCancelled()) {
-                                inventory.setItem(getSlot(path + "ChatMute.true", 24), lgm.getItem(path + "ChatMute.true", target, false));
                                 plugin.getPluginStateManager().getChatMuteMap().put(playerMenuUtility.getTargetUUID(), true);
+                                refresh();
                             }
                         } else {
                             PlayerChatUnMuteEvent unMuteEvent = new PlayerChatUnMuteEvent(p, target);
                             AdminPanelMain.getAPI().callAdminPanelEvent(unMuteEvent);
                             if (!unMuteEvent.isCancelled()) {
-                                inventory.setItem(getSlot(path + "ChatMute.false", 24), lgm.getItem(path + "ChatMute.false", target, false));
                                 plugin.getPluginStateManager().getChatMuteMap().remove(playerMenuUtility.getTargetUUID());
+                                refresh();
                             }
                         }
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.MuteChat"));
 
         boolean freezeState = plugin.getPluginStateManager().getFreezePlayersMap().containsKey(playerMenuUtility.getTargetUUID());
         registerButton(getSlot(path + "FreezePlayer." + freezeState, 31), lgm.getItem(path + "FreezePlayer." + freezeState, target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FreezePlayer", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     if (plugin.getPluginStateManager().getFreezePlayersMap().containsKey(playerMenuUtility.getTargetUUID())) {
-                        inventory.setItem(getSlot(path + "FreezePlayer.false", 31), lgm.getItem(path + "FreezePlayer.false", target, false));
                         plugin.getPluginStateManager().getFreezePlayersMap().remove(playerMenuUtility.getTargetUUID());
                     } else {
-                        inventory.setItem(getSlot(path + "FreezePlayer.true", 31), lgm.getItem(path + "FreezePlayer.true", target, false));
                         plugin.getPluginStateManager().getFreezePlayersMap().put(playerMenuUtility.getTargetUUID(), true);
                     }
-                }, lgm), null);
+                }).then((p, e) -> refresh())
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FreezePlayer"));
 
         // Kicks
         registerButton(getSlot(path + "Kick.Serverstop", 29), lgm.getItem(path + "Kick.Serverstop", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop", (p, e) -> {
-                    try {
-                        PlayerKickBecauseErrorEvent event = new PlayerKickBecauseErrorEvent(p, target, "Server closed");
-                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
-                        if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
-                    } catch (NotAPanelEventException ex) {
-                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
-                    }
-                }, lgm), null);
+                kickAction(target, "Server closed")
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop"));
         registerButton(getSlot(path + "Kick.ConnectionReset", 30), lgm.getItem(path + "Kick.ConnectionReset", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset", (p, e) -> {
-                    try {
-                        PlayerKickBecauseErrorEvent event = new PlayerKickBecauseErrorEvent(p, target, "Internal exception: java.net.SocketException: Connection reset.");
-                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
-                        if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
-                    } catch (NotAPanelEventException ex) {
-                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
-                    }
-                }, lgm), null);
+                kickAction(target, "Internal exception: java.net.SocketException: Connection reset.")
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset"));
         registerButton(getSlot(path + "Kick.Whitelist", 32), lgm.getItem(path + "Kick.Whitelist", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist", (p, e) -> {
-                    try {
-                        PlayerKickBecauseErrorEvent event = new PlayerKickBecauseErrorEvent(p, target, "You are not whitelisted on this server!");
-                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
-                        if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
-                    } catch (NotAPanelEventException ex) {
-                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
-                    }
-                }, lgm), null);
+                kickAction(target, "You are not whitelisted on this server!")
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForWhitelist"));
         registerButton(getSlot(path + "Kick.ServerStoppedError", 33), lgm.getItem(path + "Kick.ServerStoppedError", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError", (p, e) -> {
-                    try {
-                        PlayerKickBecauseErrorEvent event = new PlayerKickBecauseErrorEvent(p, target, "io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:");
-                        AdminPanelMain.getAPI().callAdminPanelEvent(event);
-                        if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
-                    } catch (NotAPanelEventException ex) {
-                        AdminPanelMain.logError("A troll action was not a valid panel event", ex);
-                    }
-                }, lgm), null);
+                kickAction(target, "io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further informations:")
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError"));
 
         // Action items
         registerButton(getSlot(path + "DropPlayerInv", 14), lgm.getItem(path + "DropPlayerInv", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DropPlayersInv", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     try {
                         PlayerDropInvEvent dropInvEvent = new PlayerDropInvEvent(p, target);
                         AdminPanelMain.getAPI().callAdminPanelEvent(dropInvEvent);
@@ -241,9 +202,9 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DropPlayersInv"));
         registerButton(getSlot(path + "FakeOp", 21), lgm.getItem(path + "FakeOp", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     try {
                         PlayerFakeOpEvent event = new PlayerFakeOpEvent(p, target, ChatColor.GRAY + "[Server: Made " + target.getName() + " a server operator]");
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -251,9 +212,9 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeOp"));
         registerButton(getSlot(path + "FakeTNT", 22), lgm.getItem(path + "FakeTNT", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     try {
                         TrollTNTSpawnEvent event = new TrollTNTSpawnEvent(p, target);
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -266,9 +227,9 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeTNT"));
         registerButton(getSlot(path + "FakeDeop", 23), lgm.getItem(path + "FakeDeop", target, false),
-                new PermissionAction("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop", (p, e) -> {
+                MenuAction.of((p, e) -> {
                     try {
                         PlayerFakeDeopEvent event = new PlayerFakeDeopEvent(p, target, ChatColor.GRAY + "[Server: Made " + target.getName() + " no longer a server operator]");
                         AdminPanelMain.getAPI().callAdminPanelEvent(event);
@@ -276,12 +237,23 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     } catch (NotAPanelEventException ex) {
                         AdminPanelMain.logError("A troll action was not a valid panel event", ex);
                     }
-                }, lgm), null);
+                }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop"));
 
         registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) -> {
-                    new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-                }, lgm), null);
+                MenuAction.open(() -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
+                        .requires("AdminPanel.Button.Close"));
+    }
+
+    private MenuAction kickAction(Player target, String message) {
+        return (p, e) -> {
+            try {
+                PlayerKickBecauseErrorEvent event = new PlayerKickBecauseErrorEvent(p, target, message);
+                AdminPanelMain.getAPI().callAdminPanelEvent(event);
+                if (!event.isCancelled()) event.getTarget().kickPlayer(event.getErrorMessage());
+            } catch (NotAPanelEventException ex) {
+                AdminPanelMain.logError("A troll action was not a valid panel event", ex);
+            }
+        };
     }
 
     @EventHandler
