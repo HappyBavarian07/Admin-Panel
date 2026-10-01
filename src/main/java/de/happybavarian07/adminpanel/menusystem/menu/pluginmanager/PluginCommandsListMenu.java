@@ -6,8 +6,6 @@ import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +26,8 @@ public class PluginCommandsListMenu extends PaginatedMenu<String> {
         this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Commands");
         commandNames = new ArrayList<>(currentPlugin.getDescription().getCommands().keySet());
-        setPaginatedData(commandNames, this::getPageItem);
+        setPaginatedData(commandNames, this::getPageItem, (player, commandName, event) ->
+                new PluginCommandSettingsMenu(playerMenuUtility, ((JavaPlugin) currentPlugin).getCommand(commandName)).open());
     }
 
     @Override
@@ -44,26 +43,6 @@ public class PluginCommandsListMenu extends PaginatedMenu<String> {
     @Override
     public int getSlots() {
         return 54;
-    }
-
-    @Override
-    public void preSetMenuItems() {
-    }
-
-    @Override
-    public void postSetMenuItems() {
-    }
-
-    @Override
-    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        if (indexOnPage < 0 || indexOnPage >= commandNames.size()) return;
-        String commandName = commandNames.get(indexOnPage);
-        new PluginCommandSettingsMenu(playerMenuUtility, ((JavaPlugin) currentPlugin).getCommand(commandName)).open();
-    }
-
-    @Override
-    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
     }
 
     public ItemStack getPageItem(String commandName) {

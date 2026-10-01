@@ -1,20 +1,13 @@
 package de.happybavarian07.adminpanel.menusystem.menu.languagemigration;
 
-import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageFile;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +18,6 @@ import java.util.Map;
  */
 public class NormalLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
     private final Map<String, LanguageFile> languageFiles; // only lang files with a resource file
-    private final NamespacedKey languageItemKey = new NamespacedKey(AdminPanelMain.getPlugin(), "languageItem");
 
     public NormalLanguageSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
@@ -42,46 +34,12 @@ public class NormalLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
             lgm.addPlaceholder(PlaceholderType.ITEM, "%language_path%", languageFile.getLangFile().getPath(), false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%language_file_name%", languageFile.getLangFile().getName(), false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%language_version%", languageFile.getFileVersion(), false);
-            ItemStack item = lgm.getItem("LanguageMigrator.NormalMigrate.LanguageItem", playerMenuUtility.getOwner(), true);
-            if (item.getItemMeta() != null) {
-                ItemMeta meta = item.getItemMeta();
-                meta.getPersistentDataContainer().set(languageItemKey, PersistentDataType.STRING, languageFile.getLangName());
-                item.setItemMeta(meta);
-            }
-            return item;
-        });
-    }
-
-    @Override
-    public void preSetMenuItems() {
-
-    }
-
-    @Override
-    public void postSetMenuItems() {
-
-    }
-
-    @Override
-    protected void handlePageItemClick(int slot, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
-        if (itemStack == null || itemStack.getItemMeta() == null) return;
-        Player player = (Player) inventoryClickEvent.getWhoClicked();
-        String langName = itemStack.getItemMeta().getPersistentDataContainer().get(languageItemKey, PersistentDataType.STRING);
-        if (langName == null) return;
-        LanguageFile languageFile = languageFiles.get(langName);
-        
-        if (languageFile != null) {
-            new PermissionAction("AdminPanel.LanguageMigrator.NormalMigrate.Open", (p, e) -> {
-                playerMenuUtility.setData("selected_language_file", languageFile, true);
-                playerMenuUtility.setData("selected_language_resource", "languages/" + languageFile.getLangName() + ".yml", true);
-                new LanguageMigrationMenu(playerMenuUtility, savedMenu).open();
-            }, lgm).execute(player, inventoryClickEvent);
-        }
-    }
-
-    @Override
-    protected void handleCustomItemClick(int i, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
-
+            return lgm.getItem("LanguageMigrator.NormalMigrate.LanguageItem", playerMenuUtility.getOwner(), true);
+        }, (player, languageFile, event) -> MenuAction.of((p, e) -> {
+            playerMenuUtility.setData("selected_language_file", languageFile, true);
+            playerMenuUtility.setData("selected_language_resource", "languages/" + languageFile.getLangName() + ".yml", true);
+            new LanguageMigrationMenu(playerMenuUtility, savedMenu).open();
+        }).requires("AdminPanel.LanguageMigrator.NormalMigrate.Open").execute(player, event));
     }
 
     @Override

@@ -6,15 +6,11 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.InvalidDescriptionException;
@@ -28,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PluginInstallMenu extends Menu implements Listener {
+public class PluginInstallMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
     private int resourceID = 0;
@@ -56,11 +52,6 @@ public class PluginInstallMenu extends Menu implements Listener {
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent e) {
-        // Logic is now handled by registered MenuActions in setMenuItems
-    }
-
-    @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
 
     }
@@ -85,11 +76,18 @@ public class PluginInstallMenu extends Menu implements Listener {
         }
         resourceIDMeta.setLore(updatedResourceIDLore);
         resourceIDItem.setItemMeta(resourceIDMeta);
-        registerButton(0, resourceIDItem, (p, e) -> {
-            playerMenuUtility.addData("typeResourceIDInChat", true);
-            p.sendMessage(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", p, true));
-            p.closeInventory();
-        }, null);
+        registerButton(getSlot(path + "ResourceID", 0), resourceIDItem,
+                MenuAction.prompt(lgm.getMessage("Player.PluginManager.TypeResourceIDInChat", player, true), (p, input) -> {
+                    try {
+                        this.resourceID = Integer.parseInt(input);
+                    } catch (NumberFormatException ex) {
+                        AdminPanelMain.logError("The entered Spiget resource ID is not a number", ex);
+                        p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", p, true));
+                    }
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", input, true);
+                    p.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIDSelected", p, true));
+                    open();
+                }));
 
         ItemStack nameItem = lgm.getItem(path + "Name", player, false);
         ItemMeta nameMeta = nameItem.getItemMeta();
@@ -100,24 +98,17 @@ public class PluginInstallMenu extends Menu implements Listener {
         }
         nameMeta.setLore(updatedNameLore);
         nameItem.setItemMeta(nameMeta);
-        registerButton(1, nameItem, (p, e) -> {
-            playerMenuUtility.addData("typeFileNameInChat", true);
-            p.sendMessage(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", p, true));
-            p.closeInventory();
-        }, null);
+        registerButton(getSlot(path + "Name", 1), nameItem,
+                MenuAction.prompt(lgm.getMessage("Player.PluginManager.TypeFileNameInChat", player, true), (p, input) -> {
+                    this.fileName = input.replace(" ", "-");
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", this.fileName, true);
+                    p.sendMessage(lgm.getMessage("Player.PluginManager.FileNameSelected", p, true));
+                    open();
+                }));
 
-        if (enableAfterInstall) {
-            registerButton(2, lgm.getItem(path + "EnableAfterInstall.true", player, false), (p, e) -> {
-                enableAfterInstall = false;
-                super.open();
-            }, null);
-        } else {
-            registerButton(2, lgm.getItem(path + "EnableAfterInstall.false", player, false), (p, e) -> {
-                enableAfterInstall = true;
-                super.open();
-            }, null);
-        }
-        registerButton(7, lgm.getItem(path + "InstallButton", player, false), (p, e) -> {
+        registerButton(getSlot(path + "EnableAfterInstall." + enableAfterInstall, 2), lgm.getItem(path + "EnableAfterInstall." + enableAfterInstall, player, false),
+                MenuAction.of((p, e) -> enableAfterInstall = !enableAfterInstall).then((p, e) -> refresh()));
+        registerButton(getSlot(path + "InstallButton", 7), lgm.getItem(path + "InstallButton", player, false), MenuAction.of((p, e) -> {
             PluginInstallEvent installEvent = new PluginInstallEvent(p, resourceID, fileName, enableAfterInstall);
             try {
                 AdminPanelMain.getAPI().callAdminPanelEvent(installEvent);
@@ -142,43 +133,12 @@ public class PluginInstallMenu extends Menu implements Listener {
             } catch (NotAPanelEventException ex) {
                 AdminPanelMain.logError("The plugin install action was not a valid panel event", ex);
             }
-            p.closeInventory();
             this.resourceID = 0;
             this.fileName = null;
             enableAfterInstall = false;
-        }, null);
-        registerButton(8, lgm.getItem("General.Close", player, false),
-                new PermissionAction("AdminPanel.Button.Close", (p, e) ->
-                        new PluginSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open(), lgm), null);
-    }
-
-    @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.hasData("typeFileNameInChat")) {
-            event.setCancelled(true);
-            String message = event.getMessage().replace(" ", "-");
-            this.fileName = message;
-            playerMenuUtility.removeData("typeFileNameInChat");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message, true);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.FileNameSelected", player, true));
-            super.open();
-        }
-        if (playerMenuUtility.hasData("typeResourceIDInChat")) {
-            event.setCancelled(true);
-            String message = event.getMessage();
-            try {
-                this.resourceID = Integer.parseInt(message);
-            } catch (NumberFormatException e) {
-                AdminPanelMain.logError("The entered Spiget resource ID is not a number", e);
-                player.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", player, true));
-            }
-            playerMenuUtility.removeData("typeResourceIDInChat");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", message, true);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.ResourceIDSelected", player, true));
-            super.open();
-        }
+        }).thenClose());
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+                MenuAction.open(() -> new PluginSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
+                        .requires("AdminPanel.Button.Close"));
     }
 }

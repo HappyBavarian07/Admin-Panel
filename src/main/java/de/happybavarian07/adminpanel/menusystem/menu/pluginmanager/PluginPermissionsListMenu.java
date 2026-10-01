@@ -5,8 +5,6 @@ import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +23,13 @@ public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
         Plugin currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Permissions");
         permissions = currentPlugin.getDescription().getPermissions();
-        setPaginatedData(permissions, this::getPageItem);
+        setPaginatedData(permissions, this::getPageItem, (player, current, event) -> {
+            player.sendMessage(AdminPanelUtils.chat("&6Name: &a" + current.getName()));
+            player.sendMessage(AdminPanelUtils.chat("&6Default: &a" + current.getDefault()));
+            player.sendMessage(AdminPanelUtils.chat("&6Description: &a" + current.getDescription()));
+            player.sendMessage(AdminPanelUtils.chat("&6Childrens: &a" + current.getChildren()));
+            player.sendMessage(AdminPanelUtils.chat("&6Permissibles: &a" + current.getPermissibles()));
+        });
     }
 
     @Override
@@ -41,30 +45,6 @@ public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
     @Override
     public int getSlots() {
         return 54;
-    }
-
-    @Override
-    public void preSetMenuItems() {
-    }
-
-    @Override
-    public void postSetMenuItems() {
-    }
-
-    @Override
-    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        if (indexOnPage < 0 || indexOnPage >= permissions.size()) return;
-        Permission current = permissions.get(indexOnPage);
-        player.sendMessage(AdminPanelUtils.chat("&6Name: &a" + current.getName()));
-        player.sendMessage(AdminPanelUtils.chat("&6Default: &a" + current.getDefault()));
-        player.sendMessage(AdminPanelUtils.chat("&6Description: &a" + current.getDescription()));
-        player.sendMessage(AdminPanelUtils.chat("&6Childrens: &a" + current.getChildren()));
-        player.sendMessage(AdminPanelUtils.chat("&6Permissibles: &a" + current.getPermissibles()));
-    }
-
-    @Override
-    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
     }
 
     public ItemStack getPageItem(Permission permission) {

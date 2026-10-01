@@ -6,10 +6,9 @@ import de.happybavarian07.coolstufflib.languagemanager.Placeholder;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
-import de.happybavarian07.coolstufflib.menusystem.actions.PermissionAction;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +28,8 @@ public class TempLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
     public TempLanguageSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.SwitchLanguage");
-        setPaginatedData(getAvailableLanguages(), this::getPageItem);
+        setPaginatedData(getAvailableLanguages(), this::getPageItem, (player, langFile, event) ->
+                MenuAction.of((p, e) -> switchLanguage(p, langFile)).requires("AdminPanel.SwitchLanguage").execute(player, event));
     }
 
     @Override
@@ -47,41 +47,19 @@ public class TempLanguageSelectMenu extends PaginatedMenu<LanguageFile> {
         return 54;
     }
 
-    @Override
-    public void preSetMenuItems() {
-    }
+    private void switchLanguage(Player p, LanguageFile langFile) {
+        lgm.setCurrentLang(langFile, true);
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN", false);
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN", false);
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%path%", langFile.getLangFile().getPath(), false);
+        p.sendMessage(lgm.getMessage("Player.General.SetCurrentLanguage", p, true));
 
-    @Override
-    public void postSetMenuItems() {
-    }
-
-    public void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        List<LanguageFile> languages = getAvailableLanguages();
-        
-        if (indexOnPage < 0 || indexOnPage >= languages.size()) return;
-        LanguageFile langFile = languages.get(indexOnPage);
-
-        new PermissionAction("AdminPanel.SwitchLanguage", (p, event) -> {
-            lgm.setCurrentLang(langFile, true);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fullname%", langFile.getFullName() != null ? langFile.getFullName() : "NaN", true);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%shortname%", langFile.getLangName() != null ? langFile.getLangName() : "NaN", false);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%version%", langFile.getFileVersion() != null ? langFile.getFileVersion() : "NaN", false);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%path%", langFile.getLangFile().getPath(), false);
-            p.sendMessage(lgm.getMessage("Player.General.SetCurrentLanguage", p, true));
-            
-            // Return to start menu or use savedMenu
-            if (savedMenu != null) {
-                savedMenu.open();
-            } else {
-                new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
-            }
-        }, lgm).execute(player, e);
-    }
-
-    @Override
-    protected void handleCustomItemClick(int i, ItemStack itemStack, InventoryClickEvent inventoryClickEvent) {
-
+        if (savedMenu != null) {
+            savedMenu.open();
+        } else {
+            new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+        }
     }
 
     public ItemStack getPageItem(LanguageFile langFile) {

@@ -34,7 +34,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
             GameRule<?> rule = GameRule.getByName(name);
             if (rule != null) gamerules.add(rule);
         }
-        setPaginatedData(gamerules, this::getPageItem);
+        setPaginatedData(gamerules, this::getPageItem, this::changeGameRule);
     }
 
     @Override
@@ -52,19 +52,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         return 54;
     }
 
-    @Override
-    public void preSetMenuItems() {
-    }
-
-    @Override
-    public void postSetMenuItems() {
-    }
-
-    @Override
-    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        if (indexOnPage < 0 || indexOnPage >= gamerules.size()) return;
-        GameRule<?> gameRule = gamerules.get(indexOnPage);
+    private void changeGameRule(Player player, GameRule<?> gameRule, InventoryClickEvent event) {
         MenuGameruleChangeEvent gameruleChangeEvent = new MenuGameruleChangeEvent(
                 player, world, gameRule, world.getGameRuleValue(gameRule));
         try {
@@ -95,10 +83,6 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         } catch (NotAPanelEventException notAPanelEventException) {
             AdminPanelMain.logError("The gamerule change action was not a valid panel event", notAPanelEventException);
         }
-    }
-
-    @Override
-    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent event) {
     }
 
     public ItemStack getPageItem(GameRule<?> gameRule) {

@@ -6,7 +6,6 @@ import de.happybavarian07.coolstufflib.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +29,13 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
                 entity.equals(EntityType.AREA_EFFECT_CLOUD) ||
                 entity.equals(EntityType.ENDER_SIGNAL) ||
                 entity.equals(EntityType.UNKNOWN));
-        setPaginatedData(entityTypes, this::getPageItem);
+        setPaginatedData(entityTypes, this::getPageItem, (player, type, event) -> {
+            try {
+                Location loc = playerMenuUtility.getTarget().getLocation().add(0, 2, 0);
+                playerMenuUtility.getTarget().getWorld().spawnEntity(loc, type);
+            } catch (NullPointerException | IllegalArgumentException ignored) {
+            }
+        });
     }
 
     @Override
@@ -46,29 +51,6 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
     @Override
     public int getSlots() {
         return 54;
-    }
-
-    @Override
-    public void preSetMenuItems() {
-    }
-
-    @Override
-    public void postSetMenuItems() {
-    }
-
-    @Override
-    protected void handlePageItemClick(int indexOnPage, ItemStack item, InventoryClickEvent e) {
-        if (indexOnPage < 0 || indexOnPage >= entityTypes.size()) return;
-        EntityType type = entityTypes.get(indexOnPage);
-        try {
-            Location loc = playerMenuUtility.getTarget().getLocation().add(0, 2, 0);
-            playerMenuUtility.getTarget().getWorld().spawnEntity(loc, type);
-        } catch (NullPointerException | IllegalArgumentException ignored) {
-        }
-    }
-
-    @Override
-    protected void handleCustomItemClick(int slot, ItemStack item, InventoryClickEvent e) {
     }
 
     public ItemStack getPageItem(EntityType type) {
