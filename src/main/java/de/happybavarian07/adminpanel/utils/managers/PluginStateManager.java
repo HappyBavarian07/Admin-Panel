@@ -162,4 +162,18 @@ public class PluginStateManager {
     public Map<UUID, Boolean> getFreezePlayersMap() {
         return freezePlayersMap;
     }
+
+    /**
+     * Switches off every toggle troll that lives in these maps for a player.
+     *
+     * @param player the trolled player
+     */
+    public void clearTrollState(UUID player) {
+        hurtingWaterMap.remove(player);
+        chatMuteMap.remove(player);
+        villagerSoundsMap.remove(player);
+        blockBreakPreventMap.remove(player);
+        dupeMobsOnKillMap.remove(player);
+        freezePlayersMap.remove(player);
+    }
 }

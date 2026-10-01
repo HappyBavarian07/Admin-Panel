@@ -8,6 +8,8 @@ import de.happybavarian07.adminpanel.data.AdminPanelData;
 import de.happybavarian07.adminpanel.data.LegacyDataImporter;
 import de.happybavarian07.adminpanel.data.LegacyWarningImporter;
 import de.happybavarian07.adminpanel.data.PluginDescriptionEntry;
+import de.happybavarian07.adminpanel.events.NotAPanelEventException;
+import de.happybavarian07.adminpanel.events.troll.TrollToggleEvent;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
@@ -16,6 +18,9 @@ import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
 import de.happybavarian07.adminpanel.syncing.DataClient;
 import de.happybavarian07.adminpanel.syncing.DataClientUtils;
 import de.happybavarian07.adminpanel.syncing.utils.BungeeUtils;
+import de.happybavarian07.adminpanel.trolls.TrollCatalog;
+import de.happybavarian07.adminpanel.trolls.TrollListener;
+import de.happybavarian07.adminpanel.trolls.TrollRegistry;
 import de.happybavarian07.adminpanel.utils.*;
 import de.happybavarian07.adminpanel.utils.dependencyloading.ServerPlatformDetector;
 import de.happybavarian07.adminpanel.utils.managers.*;
@@ -42,6 +47,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -79,6 +85,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private boolean languageManagerEnabled;
     private WarningManager warningManager;
     private ExecutorService warningIo;
+    private TrollRegistry trollRegistry;
     private InitMethods initMethods;
     private BackupManager backupManager;
     private MenuAddonManager menuAddonManager;
@@ -342,6 +349,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         initPluginChecks();
         initializeConfigFiles();
         initializeWarningManager();
+        initializeTrollRegistry();
         setupPermissionsManager();
         initializePrefix();
         initEvents();
@@ -550,6 +558,28 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, warningManager::sweep, 20L * 60, 20L * 60);
     }
 
+    private void initializeTrollRegistry() {
+        trollRegistry = new TrollRegistry(
+                id -> getConfig().getBoolean("Pman.Actions.Trolls." + id, true),
+                (troll, staff, target, starting) -> {
+                    try {
+                        TrollToggleEvent event = new TrollToggleEvent(staff, target, troll.id(), starting);
+                        getAPI().callAdminPanelEvent(event);
+                        return !event.isCancelled();
+                    } catch (NotAPanelEventException e) {
+                        logError("A troll action was not a valid panel event", e);
+                        return true;
+                    }
+                },
+                Bukkit::getOnlinePlayers, AdminPanelMain::logError);
+        TrollCatalog.registerAll(trollRegistry, this, getLanguageManager());
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new TrollListener(trollRegistry), this);
+        for (var troll : trollRegistry.all()) {
+            if (troll instanceof Listener listener) pluginManager.registerEvents(listener, this);
+        }
+    }
+
     private WarningSettings readWarningSettings() {
         return WarningSettings.parse(getConfig().getString("Warnings.DefaultExpiry", "30d"), getConfig().getMapList("Warnings.Escalation"),
                 message -> fileLogger.writeToLog(Level.WARNING, message, LogPrefixExtension.ADMINPANEL_MAIN, true));
@@ -708,6 +738,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
             loader.crashAddons();
         }
         loader = null;
+        if (trollRegistry != null) {
+            trollRegistry.stopEverything();
+        }
         if (warningIo != null) {
             warningIo.shutdown();
             try {
@@ -782,6 +815,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public WarningManager getWarningManager() {
         return warningManager;
+    }
+
+    public TrollRegistry getTrollRegistry() {
+        return trollRegistry;
     }
 
     public AddonLoader getAddonLoader() {
