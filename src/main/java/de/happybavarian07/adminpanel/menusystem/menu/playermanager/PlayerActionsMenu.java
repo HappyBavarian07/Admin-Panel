@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.utils.AttributeLookup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.FireworkGenerator;
@@ -12,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -66,7 +66,7 @@ public class PlayerActionsMenu extends Menu {
 
         // First Row
         registerButton(getSlot(path + "Heal", 11), lgm.getItem(path + "Heal", target, false),
-            MenuAction.of((p, e) -> target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()))
+            MenuAction.of((p, e) -> target.setHealth(target.getAttribute(AttributeLookup.maxHealth()).getValue()))
                 .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Heal"));
 
         registerButton(getSlot(path + "Kill", 13), lgm.getItem(path + "Kill", target, false),

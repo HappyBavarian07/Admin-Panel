@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.trolls;
 
+import de.happybavarian07.adminpanel.utils.AttributeLookup;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -33,13 +34,7 @@ final class TrollSupport {
      * @return the attribute, or {@code null} if no name matches
      */
     static Attribute attribute(String... names) {
-        for (String name : names) {
-            try {
-                return (Attribute) Attribute.class.getField(name).get(null);
-            } catch (ReflectiveOperationException ignored) {
-            }
-        }
-        return null;
+        return AttributeLookup.find(names);
     }
 
     /** A point in the horizontal looking direction of {@code from}, or {@code from} itself when looking straight up or down. */
