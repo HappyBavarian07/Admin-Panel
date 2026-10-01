@@ -243,6 +243,31 @@ Pman:
     # Enables the Warning System: the Warnings item in the Actions menu of a Player, /warn, /warnings and /unwarn
     # Warnings are stored in the player_warnings table of the database (see Warnings below for the expiry and escalation)
     WarningSystem: false
+    # Switches for the extra trolls in the More Trolls menu (Troll menu of the Player Manager)
+    # true = the troll is listed and can be started, false = it is hidden and refused
+    # A troll that is switched off while it runs can still be stopped
+    # Every troll also needs its own permission: AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.<Name>
+    Trolls:
+      # Plays a creeper fuse sound behind the player
+      CreeperHiss: true
+      # Plays an explosion sound and particles next to the player, nothing is damaged
+      FakeExplosion: true
+      # Shows the player the elder guardian curse with a sound and the title of the language file
+      Jumpscare: true
+      # Shows the player the welcome screen of the demo mode
+      DemoScreen: true
+      # Spawns primed TNT next to the player that disappears before it explodes (no damage, no knockback)
+      SafeTnt: true
+      # Throws the player up and a little forward, the fall damage is cancelled
+      Launch: true
+      # Teleports the player to a safe spot within 5 blocks
+      RandomHop: true
+      # Turns the view of the player for 5 seconds
+      SpinCamera: true
+      # The player cannot jump, needs a server with the jump strength attribute (1.20.5 or newer)
+      NoJump: true
+      # The player moves at 30 percent of the normal speed
+      SlowMotion: true
   Money:
     # This is the currency used for the money part in the Pman
     currency: $

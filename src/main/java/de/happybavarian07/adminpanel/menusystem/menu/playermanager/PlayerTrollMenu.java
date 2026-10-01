@@ -239,6 +239,14 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     }
                 }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop"));
 
+        registerButton(getSlot(path + "MoreTrolls", 40), lgm.getItem(path + "MoreTrolls", target, false),
+                MenuAction.open(() -> new PlayerTrollMoreMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
+        registerButton(getSlot(path + "StopAll", 49), lgm.getItem(path + "StopAll", target, false),
+                MenuAction.of((p, e) -> PlayerTrollMoreMenu.stopAllTrolls(p, target, target.getName()))
+                        .then((p, e) -> refresh())
+                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
+
         registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false),
                 MenuAction.open(() -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
                         .requires("AdminPanel.Button.Close"));

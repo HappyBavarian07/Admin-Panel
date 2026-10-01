@@ -469,6 +469,22 @@ Messages:
     Escalation:
       # Wird benutzt, wenn eine Regel in Warnings.Escalation der config.yml keinen Grund hat
       DefaultReason: 'Zu viele Verwarnungen'
+  Trolls:
+    # %target% = Der Spieler, %troll% = Der Name des Trolls
+    Result:
+      STARTED: '%prefix% &9> &e%troll% &agestartet bei &e%target%&a!'
+      STOPPED: '%prefix% &9> &e%troll% &abei &e%target% &agestoppt!'
+      UNKNOWN: '%prefix% &9> &cEs gibt keinen Troll namens ''%troll%''!'
+      DISABLED: '%prefix% &9> &c%troll% ist in der Config ausgeschaltet! (Pman.Actions.Trolls.%troll%)'
+      ALREADY_ACTIVE: '%prefix% &9> &e%troll% &eläuft bereits bei &6%target%&e.'
+      NOT_ACTIVE: '%prefix% &9> &e%troll% &eläuft nicht bei &6%target%&e.'
+      CANCELLED: '%prefix% &9> &cEin anderes Plugin hat %troll% für %target% abgebrochen!'
+    StoppedAll: '%prefix% &9> &aAlle Trolle bei &e%target% &agestoppt!'
+    NoSafeSpot: '%prefix% &9> &cEs gibt keinen sicheren Ort in der Nähe von %target%!'
+    # Wird dem getrollten Spieler angezeigt, beide leer lassen für keinen Titel
+    Jumpscare:
+      Title: '&4&lBUH!'
+      Subtitle: ''
 Items:
   General:
     ConfirmationMenu:
@@ -650,6 +666,82 @@ Items:
         displayName: '&a&lDrop Inventar'
         lore:
           - '&6Lass den Spieler sein komplettes Inventar droppen!'
+      MoreTrolls:
+        material: CHEST
+        displayName: '&6Weitere Trolle'
+        lore:
+          - '&6Öffnet die Liste der weiteren Trolle!'
+      StopAll:
+        material: MILK_BUCKET
+        displayName: '&aAlle Trolle stoppen'
+        lore:
+          - '&6Stoppt jeden Troll, der auf dem Spieler läuft!'
+      More:
+        CreeperHiss:
+          material: CREEPER_HEAD
+          displayName: '&aCreeper-Zischen'
+          lore:
+            - '&6Spielt ein Creeper-Zischen hinter dem Spieler ab!'
+        FakeExplosion:
+          material: GUNPOWDER
+          displayName: '&aFalsche Explosion'
+          lore:
+            - '&6Ein Explosionsgeräusch mit Partikeln neben dem Spieler,'
+            - '&6nichts wird beschädigt!'
+        Jumpscare:
+          material: ELDER_GUARDIAN_SPAWN_EGG
+          displayName: '&aJumpscare'
+          lore:
+            - '&6Zeigt dem Spieler den Fluch des Ältesten Wächters!'
+        DemoScreen:
+          material: WRITABLE_BOOK
+          displayName: '&aDemo-Bildschirm'
+          lore:
+            - '&6Zeigt dem Spieler den Willkommensbildschirm des Demo-Modus!'
+        SafeTnt:
+          material: TNT
+          displayName: '&aSichere TNT'
+          lore:
+            - '&6Gezündetes TNT neben dem Spieler, das verschwindet,'
+            - '&6bevor es explodiert, kein Schaden!'
+        Launch:
+          material: SLIME_BLOCK
+          displayName: '&aKatapultieren'
+          lore:
+            - '&6Wirft den Spieler nach oben und ein Stück nach vorne,'
+            - '&6der Fallschaden wird verhindert!'
+        RandomHop:
+          material: ENDER_PEARL
+          displayName: '&aZufallssprung'
+          lore:
+            - '&6Teleportiert den Spieler an einen sicheren Ort im Umkreis von 5 Blöcken!'
+        SpinCamera:
+          material: COMPASS
+          displayName: '&aKamera drehen'
+          lore:
+            - '&6Dreht die Sicht des Spielers für 5 Sekunden!'
+        NoJump:
+          true:
+            material: ANVIL
+            displayName: '&aNicht springen'
+            lore:
+              - '&6Der Spieler kann nicht springen!'
+          false:
+            material: ANVIL
+            displayName: '&cNicht springen'
+            lore:
+              - '&6Der Spieler kann nicht springen!'
+        SlowMotion:
+          true:
+            material: SOUL_SAND
+            displayName: '&aZeitlupe'
+            lore:
+              - '&6Der Spieler bewegt sich mit 30 Prozent der normalen Geschwindigkeit!'
+          false:
+            material: SOUL_SAND
+            displayName: '&cZeitlupe'
+            lore:
+              - '&6Der Spieler bewegt sich mit 30 Prozent der normalen Geschwindigkeit!'
     ActionsMenu:
       Kill:
         material: DIAMOND_SWORD
@@ -1759,6 +1851,7 @@ MenuTitles:
     SpawningMenu: '&Entitäten spawnen'
     PotionMenu: '&aTränke geben'
     TrollMenu: '&1T&2r&3o&4l&5l &6M&7e&8n&9ü'
+    TrollMoreMenu: '&4Trolle: %target%'
     ArmorView: '&4Rüstung'
     MoneyMenu: '&a&lGeld'
     BannedPlayers: '&cGebannte Spieler'

@@ -461,6 +461,22 @@ Messages:
     Escalation:
       # Used when a rule in Warnings.Escalation of the config.yml has no reason
       DefaultReason: 'Too many warnings'
+  Trolls:
+    # %target% = The Player, %troll% = The Name of the Troll
+    Result:
+      STARTED: '%prefix% &9> &aStarted &e%troll% &aon &e%target%&a!'
+      STOPPED: '%prefix% &9> &aStopped &e%troll% &aon &e%target%&a!'
+      UNKNOWN: '%prefix% &9> &cThere is no troll called ''%troll%''!'
+      DISABLED: '%prefix% &9> &c%troll% is switched off in the config! (Pman.Actions.Trolls.%troll%)'
+      ALREADY_ACTIVE: '%prefix% &9> &e%troll% &ealready runs on &6%target%&e.'
+      NOT_ACTIVE: '%prefix% &9> &e%troll% &edoes not run on &6%target%&e.'
+      CANCELLED: '%prefix% &9> &cAnother plugin cancelled %troll% for %target%!'
+    StoppedAll: '%prefix% &9> &aStopped all trolls on &e%target%&a!'
+    NoSafeSpot: '%prefix% &9> &cThere is no safe spot near %target% to hop to!'
+    # Shown to the trolled player, leave both empty to show no title
+    Jumpscare:
+      Title: '&4&lBOO!'
+      Subtitle: ''
 Items:
   General:
     ConfirmationMenu:
@@ -644,6 +660,82 @@ Items:
         displayName: '&a&lDrop Inventory'
         lore:
           - '&6Let the player drop their entire inventory!'
+      MoreTrolls:
+        material: CHEST
+        displayName: '&6More trolls'
+        lore:
+          - '&6Opens the list of the extra trolls!'
+      StopAll:
+        material: MILK_BUCKET
+        displayName: '&aStop all trolls'
+        lore:
+          - '&6Stops every troll that runs on the player!'
+      More:
+        CreeperHiss:
+          material: CREEPER_HEAD
+          displayName: '&aCreeper hiss'
+          lore:
+            - '&6Plays a creeper fuse sound behind the player!'
+        FakeExplosion:
+          material: GUNPOWDER
+          displayName: '&aFake explosion'
+          lore:
+            - '&6An explosion sound and particles next to the player,'
+            - '&6nothing gets damaged!'
+        Jumpscare:
+          material: ELDER_GUARDIAN_SPAWN_EGG
+          displayName: '&aJumpscare'
+          lore:
+            - '&6Shows the player the elder guardian curse!'
+        DemoScreen:
+          material: WRITABLE_BOOK
+          displayName: '&aDemo screen'
+          lore:
+            - '&6Shows the player the welcome screen of the demo mode!'
+        SafeTnt:
+          material: TNT
+          displayName: '&aSafe TNT'
+          lore:
+            - '&6Primed TNT next to the player that vanishes'
+            - '&6before it explodes, no damage!'
+        Launch:
+          material: SLIME_BLOCK
+          displayName: '&aLaunch'
+          lore:
+            - '&6Throws the player up and a little forward,'
+            - '&6the fall damage is cancelled!'
+        RandomHop:
+          material: ENDER_PEARL
+          displayName: '&aRandom hop'
+          lore:
+            - '&6Teleports the player to a safe spot within 5 blocks!'
+        SpinCamera:
+          material: COMPASS
+          displayName: '&aSpin camera'
+          lore:
+            - '&6Turns the view of the player for 5 seconds!'
+        NoJump:
+          true:
+            material: ANVIL
+            displayName: '&aNo jumping'
+            lore:
+              - '&6The player cannot jump!'
+          false:
+            material: ANVIL
+            displayName: '&cNo jumping'
+            lore:
+              - '&6The player cannot jump!'
+        SlowMotion:
+          true:
+            material: SOUL_SAND
+            displayName: '&aSlow motion'
+            lore:
+              - '&6The player moves at 30 percent of the normal speed!'
+          false:
+            material: SOUL_SAND
+            displayName: '&cSlow motion'
+            lore:
+              - '&6The player moves at 30 percent of the normal speed!'
     ActionsMenu:
       Kill:
         material: DIAMOND_SWORD
@@ -1873,6 +1965,7 @@ MenuTitles:
     SpawningMenu: '&aEntity spawning'
     PotionMenu: '&aPotions'
     TrollMenu: '&1T&2r&3o&4l&5l &6M&7e&8n&9u'
+    TrollMoreMenu: '&4Trolls: %target%'
     ArmorView: '&4Armor'
     MoneyMenu: '&a&lMoney'
     BannedPlayers: '&cBanned Players'

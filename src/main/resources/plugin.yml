@@ -326,6 +326,16 @@ permissions:
                       AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForServerstop: true
                       AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForError: true
                       AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.KickForConnectionReset: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.CreeperHiss: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeExplosion: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Jumpscare: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.DemoScreen: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.SafeTnt: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Launch: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.RandomHop: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.SpinCamera: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.NoJump: true
+                      AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.SlowMotion: true
                   AdminPanel.PlayerManager.PlayerSettings.Actions.Potions:
                     default: op
                   AdminPanel.PlayerManager.PlayerSettings.Actions.Ban:
