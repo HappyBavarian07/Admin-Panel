@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.worlds;
 
+import org.bukkit.World;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -42,6 +44,17 @@ public final class WorldFolders {
 
     public static boolean isWorldFolder(File folder) {
         return new File(folder, "level.dat").isFile();
+    }
+
+    /**
+     * Worlds that Bukkit created for the nether or the end keep their dimension folder ({@code DIM-1}, {@code DIM1})
+     * instead of a {@code region} folder, which is the only hint about the environment in the folder.
+     */
+    public static World.Environment guessEnvironment(File folder) {
+        if (new File(folder, "region").isDirectory()) return World.Environment.NORMAL;
+        if (new File(folder, "DIM-1").isDirectory()) return World.Environment.NETHER;
+        if (new File(folder, "DIM1").isDirectory()) return World.Environment.THE_END;
+        return World.Environment.NORMAL;
     }
 
     /**

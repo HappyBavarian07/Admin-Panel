@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.worlds;
 
+import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,6 +29,28 @@ class WorldLogicTest {
         assertFalse(WorldNames.isValid("nul.txt"));
         assertFalse(WorldNames.isValid("x".repeat(65)));
         assertEquals("my-new-world", WorldNames.normalize("  my new  world "));
+    }
+
+    @Test
+    void seedsAreNumbersOrHashedText() {
+        assertNull(WorldNames.seed("  "));
+        assertEquals(-42L, WorldNames.seed("-42"));
+        assertEquals((long) "glacier".hashCode(), WorldNames.seed("glacier"));
+    }
+
+    @Test
+    void environmentIsGuessedFromTheDimensionFolder(@TempDir File container) {
+        File nether = new File(container, "n");
+        assertTrue(new File(nether, "DIM-1").mkdirs());
+        File end = new File(container, "e");
+        assertTrue(new File(end, "DIM1").mkdirs());
+        File normal = new File(container, "w");
+        assertTrue(new File(normal, "region").mkdirs());
+        assertTrue(new File(normal, "DIM-1").mkdirs());
+        assertEquals(World.Environment.NETHER, WorldFolders.guessEnvironment(nether));
+        assertEquals(World.Environment.THE_END, WorldFolders.guessEnvironment(end));
+        assertEquals(World.Environment.NORMAL, WorldFolders.guessEnvironment(normal));
+        assertEquals(World.Environment.NORMAL, WorldFolders.guessEnvironment(new File(container, "missing")));
     }
 
     @Test

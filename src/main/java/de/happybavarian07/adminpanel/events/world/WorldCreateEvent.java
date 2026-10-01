@@ -18,6 +18,12 @@ public class WorldCreateEvent extends AdminPanelEvent implements Cancellable {
     private World.Environment worldEnvironment;
     private boolean generateStructures;
     private boolean hardcore;
+    private Long seed;
+
+    public WorldCreateEvent(Player player, String name, WorldType worldType, World.Environment worldEnvironment, boolean generateStructures, boolean hardcore, Long seed) {
+        this(player, name, worldType, worldEnvironment, generateStructures, hardcore);
+        this.seed = seed;
+    }
 
     public WorldCreateEvent(Player player, String name, WorldType worldType, World.Environment worldEnvironment, boolean generateStructures, boolean hardcore) {
         this.player = player;
@@ -70,6 +76,17 @@ public class WorldCreateEvent extends AdminPanelEvent implements Cancellable {
 
     public boolean isHardcore() {
         return hardcore;
+    }
+
+    /**
+     * @return the seed of the new world, {@code null} for a random one
+     */
+    public Long getSeed() {
+        return seed;
+    }
+
+    public void setSeed(Long seed) {
+        this.seed = seed;
     }
 
     @Override
