@@ -24,7 +24,8 @@ import java.util.function.Supplier;
  * <p>Methods that change data run their database access on the {@code io} executor and complete their future on the
  * {@code main} executor, so the callbacks of the returned futures run on the main thread. Reads answer from the
  * cache; a player whose warnings are not cached yet is loaded on the calling thread, call {@link #load(UUID)} first
- * to avoid that. Warnings are never deleted, only moved to the status {@code EXPIRED} or {@code REMOVED}.</p>
+ * to avoid that. Warnings are never deleted, only moved to the status {@code EXPIRED} or {@code REMOVED}. Entries
+ * with the status {@code RECORD} are history only: they are listed with the warnings but are never active.</p>
  */
 public final class WarningManager {
     private static final int MAX_REASON_LENGTH = 255;
@@ -86,6 +87,26 @@ public final class WarningManager {
             list.add(warning);
             escalate(player, countActive(list, now));
             return warning;
+        });
+    }
+
+    /**
+     * Writes a history entry, for example for a ban or a kick, without counting it as an active warning and without
+     * running any escalation rule.
+     *
+     * @param player the player the entry is about
+     * @param reason the text of the entry
+     * @param issuer who caused it: a UUID text, {@link PlayerWarning#CONSOLE} or {@link PlayerWarning#SYSTEM}
+     * @return the new entry once it is stored
+     */
+    public CompletableFuture<PlayerWarning> record(UUID player, String reason, String issuer) {
+        return onIo(() -> {
+            List<PlayerWarning> list = cached(player);
+            PlayerWarning entry = new PlayerWarning(player.toString(), clip(reason), issuer, clock.getAsLong(), 0,
+                    WarningStatus.RECORD, 0, "");
+            repository.save(entry);
+            list.add(entry);
+            return entry;
         });
     }
 
@@ -165,6 +186,15 @@ public final class WarningManager {
     public List<PlayerWarning> active(UUID player) {
         long now = clock.getAsLong();
         return cached(player).stream().filter(warning -> warning.isActiveAt(now)).toList();
+    }
+
+    /**
+     * The entries that matter now: the active warnings and the history records.
+     */
+    public List<PlayerWarning> current(UUID player) {
+        long now = clock.getAsLong();
+        return cached(player).stream()
+                .filter(warning -> warning.isActiveAt(now) || warning.getStatus() == WarningStatus.RECORD).toList();
     }
 
     public int activeCount(UUID player) {

@@ -1,6 +1,8 @@
 package de.happybavarian07.adminpanel.warnings;
 
+import de.happybavarian07.adminpanel.data.PlayerWarning;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.sanctions.PlayerSanctions;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -47,6 +49,7 @@ public final class BukkitEscalationExecutor implements EscalationExecutor {
                         new Date(System.currentTimeMillis() + rule.durationMillis()), plugin.getName());
                 Player online = target.getPlayer();
                 if (online != null) online.kickPlayer(reason);
+                PlayerSanctions.recordBan(player, reason, rule.durationMillis(), false, PlayerWarning.SYSTEM);
             }
             case COMMAND -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), rule.command().replace("%player%", name));
         }

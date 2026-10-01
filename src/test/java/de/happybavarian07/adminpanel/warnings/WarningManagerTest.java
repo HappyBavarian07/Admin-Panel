@@ -236,6 +236,69 @@ class WarningManagerTest {
     }
 
     @Test
+    void recordStoresAHistoryEntryThatIsNeverActive() {
+        PlayerWarning entry = manager.record(player, "Banned (7d): Hacking", moderator.toString()).join();
+
+        assertEquals(WarningStatus.RECORD, entry.getStatus());
+        assertEquals(moderator.toString(), entry.getIssuer());
+        assertEquals(0, entry.getExpiresAt());
+        assertFalse(entry.isActiveAt(now.get()));
+        assertFalse(entry.isActiveAt(now.get() + 1000 * DAY));
+        assertEquals(0, manager.activeCount(player));
+        assertTrue(manager.active(player).isEmpty());
+        assertSame(entry, repository.rows.get(entry.getId()));
+    }
+
+    @Test
+    void recordNeverRunsAnEscalationRuleAndDoesNotCountTowardsOne() {
+        EscalationRule rule = new EscalationRule(1, EscalationRule.Action.KICK, "", 0, "");
+        settings = new WarningSettings(30 * DAY, List.of(rule));
+
+        manager.record(player, "Kicked: Spam", PlayerWarning.CONSOLE).join();
+        assertTrue(escalated.isEmpty());
+
+        manager.add(player, "one", null).join();
+        assertEquals(List.of(rule), escalated);
+        assertEquals(1, manager.activeCount(player));
+    }
+
+    @Test
+    void recordsAreListedAndIgnoredByEndingAndTheSweep() {
+        PlayerWarning entry = manager.record(player, "Kicked: Spam", PlayerWarning.SYSTEM).join();
+        manager.add(player, "short", null, DAY).join();
+        now.addAndGet(100 * DAY);
+
+        assertEquals(1, manager.sweepNow());
+        assertEquals(WarningStatus.RECORD, entry.getStatus());
+        assertFalse(manager.expireNow(entry.getId(), moderator).join());
+        assertEquals(0, manager.expireAll(player, moderator).join());
+        assertEquals(2, manager.all(player).size());
+        assertEquals(List.of(entry), manager.current(player));
+        assertEquals(1, manager.number(entry));
+    }
+
+    @Test
+    void recordsAreLoadedFromTheDatabase() {
+        repository.save(new PlayerWarning(player.toString(), "Banned: Hacking", PlayerWarning.CONSOLE, 5, 0,
+                WarningStatus.RECORD, 0, ""));
+
+        List<PlayerWarning> loaded = manager.load(player).join();
+
+        assertEquals(1, loaded.size());
+        assertEquals(WarningStatus.RECORD, loaded.get(0).getStatus());
+        assertEquals(0, manager.activeCount(player));
+    }
+
+    @Test
+    void aRecordCanBeRemovedLikeAWarning() {
+        PlayerWarning entry = manager.record(player, "Kicked: Spam", PlayerWarning.CONSOLE).join();
+
+        assertTrue(manager.remove(entry.getId(), moderator).join());
+        assertEquals(WarningStatus.REMOVED, entry.getStatus());
+        assertTrue(manager.current(player).isEmpty());
+    }
+
+    @Test
     void theDefaultExpiryComesFromTheCurrentSettings() {
         settings = new WarningSettings(DAY, List.of());
         PlayerWarning warning = manager.add(player, "one", null).join();
