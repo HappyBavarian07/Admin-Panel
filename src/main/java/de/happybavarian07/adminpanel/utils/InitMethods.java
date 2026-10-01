@@ -18,6 +18,9 @@ import de.happybavarian07.adminpanel.commands.managers.AdminPanelAdminManager;
 import de.happybavarian07.adminpanel.commands.managers.DataClientCommandManager;
 import de.happybavarian07.adminpanel.commands.managers.DisabledItemsManager;
 import de.happybavarian07.adminpanel.commands.managers.PanelOpenManager;
+import de.happybavarian07.adminpanel.commands.managers.UnwarnManager;
+import de.happybavarian07.adminpanel.commands.managers.WarnManager;
+import de.happybavarian07.adminpanel.commands.managers.WarningsManager;
 import de.happybavarian07.adminpanel.listeners.DisabledItemsListener;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.listeners.PlayerEventHandler;
@@ -292,5 +295,8 @@ public class InitMethods {
         plugin.getCommandManagerRegistry().register(new DataClientCommandManager());
         plugin.getCommandManagerRegistry().register(new AddonCommandManager());
         plugin.getCommandManagerRegistry().register(new DisabledItemsManager());
+        plugin.getCommandManagerRegistry().register(new WarnManager());
+        plugin.getCommandManagerRegistry().register(new WarningsManager());
+        plugin.getCommandManagerRegistry().register(new UnwarnManager());
     }
 }

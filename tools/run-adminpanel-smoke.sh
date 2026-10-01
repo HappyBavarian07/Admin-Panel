@@ -31,6 +31,7 @@ for cmd in "openpanel help" "openpanel ServerManagerMenu" "openpanel ServerManag
            "adminpaneladmin reloaddata" "adminpaneladmin reloadconfig" "adminpaneladmin SULControl Enable" \
            "adminpaneladmin backup listBackups" "adminpaneladmin backup start Nothing" "adminpaneladmin permissionmenuhelp" \
            "disableditems list" "disableditems disable NOT_AN_ITEM" "disableditems disable DIAMOND" "disableditems list" "disableditems enable DIAMOND" \
+           "warn Nobody Test reason" "warn HappyBavarian07 Smoke reason" "warnings HappyBavarian07" "unwarn HappyBavarian07 all" "warnings HappyBavarian07" \
            "dataclient ListClients" "dataclient SyncTrolls ChatMuteMap" "perplayerlang"; do
     echo "$cmd" >> "$CMDS"
     sleep 1
