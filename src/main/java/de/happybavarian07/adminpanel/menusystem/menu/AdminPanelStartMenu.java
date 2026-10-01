@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu;
 
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
+import de.happybavarian07.adminpanel.startup.Startup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginSelectMenu;
@@ -97,5 +99,14 @@ public class AdminPanelStartMenu extends Menu {
             }).requires("AdminPanel.SwitchLanguage"), null);
 
         inventory.setItem(getSlot(path + "HintItem", 22), lgm.getItem(path + "HintItem", player, false));
+
+        long broken = AdminPanelMain.getPlugin().getStartup().results().stream()
+                .filter(r -> r.status() == Startup.Status.FAILED || r.status() == Startup.Status.SKIPPED).count();
+        if (broken > 0 && player.hasPermission(StartupStatusMenu.PERMISSION)) {
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%count%", broken, false);
+            registerButton(getSlot(path + "StartupProblems", 8), lgm.getItem(path + "StartupProblems", player, true),
+                    MenuAction.of((p, e) -> new StartupStatusMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
+                            .requires(StartupStatusMenu.PERMISSION));
+        }
     }
 }

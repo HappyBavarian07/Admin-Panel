@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
+import de.happybavarian07.adminpanel.startup.Startup;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
 /*
@@ -143,38 +144,32 @@ public class InitMethods {
                 Map.Entry.comparingByValue()).getKey();
     }
 
-    public void initPluginCheck() {
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlayerExpansion().register();
-            new PluginExpansion().register();
-            new PanelExpansion().register();
-            new DataClientExpansion().register();
-            logger.message("&a&lInitialized PlaceHolderAPI with Placeholders!&r");
-        } else {
-            logger.spacer()
-                    .coloredMessage(ChatColor.RED, "")
-                    .coloredMessage(ChatColor.RED, "No PlaceholderAPI found please install PlaceholderAPI before starting again!")
-                    .coloredMessage(ChatColor.RED, "The Plugin cannot work without this Plugin!")
-                    .coloredMessage(ChatColor.RED, "");
-            pluginManager.disablePlugin(plugin);
-            return;
+    /**
+     * @throws IllegalStateException if PlaceholderAPI is not installed; the panel cannot work without it
+     */
+    public void initPlaceholderApi() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
+            throw new IllegalStateException("PlaceholderAPI is not installed, please install it and start again");
         }
+        new PlayerExpansion().register();
+        new PluginExpansion().register();
+        new PanelExpansion().register();
+        new DataClientExpansion().register();
+        logger.message("&a&lInitialized PlaceHolderAPI with Placeholders!&r");
+    }
+
+    public void initSuperVanish() {
         if (Bukkit.getPluginManager().getPlugin("SuperVanish") == null) {
-            logger.spacer()
-                    .coloredMessage(ChatColor.RED, "")
-                    .coloredMessage(ChatColor.RED, "No SuperVanish found please install SuperVanish,")
-                    .coloredMessage(ChatColor.RED, "if you want to use the Vanish Feature!")
-                    .coloredMessage(ChatColor.RED, "");
+            throw new Startup.DisabledException("SuperVanish is not installed, the vanish feature is off");
         }
-        logger.coloredSpacer(ChatColor.DARK_RED).messages("&c&lStarting Vault initialization!&r");
+    }
+
+    public void initVault() {
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-            logger.spacer()
-                    .coloredMessage(ChatColor.RED, "")
-                    .coloredMessage(ChatColor.RED, "No Vault found please install Vault and an Economy Plugin,")
-                    .coloredMessage(ChatColor.RED, "if you want to use the Money Features!")
-                    .coloredMessage(ChatColor.RED, "");
-        } else {
-            setupEconomy();
+            throw new Startup.DisabledException("Vault is not installed, the money features are off");
+        }
+        if (!setupEconomy()) {
+            throw new Startup.DisabledException("Vault has no economy plugin registered, the money features are off");
         }
     }
 

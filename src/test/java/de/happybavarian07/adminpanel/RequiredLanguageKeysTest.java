@@ -1,6 +1,10 @@
-package de.happybavarian07.adminpanel.worlds;
+package de.happybavarian07.adminpanel;
 
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.time.Time;
+import de.happybavarian07.adminpanel.startup.Startup;
+import de.happybavarian07.adminpanel.worlds.GameRuleCategory;
+import de.happybavarian07.adminpanel.worlds.WorldOperations;
+import de.happybavarian07.adminpanel.worlds.WorldPreset;
 import de.happybavarian07.adminpanel.menusystem.menu.worldmanager.weather.Weather;
 import org.bukkit.Difficulty;
 import org.junit.jupiter.api.Test;
@@ -17,10 +21,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The world menus cannot be opened without a server, so a wrong language key would only show up in game. This lists
- * every key the menus read and checks both language files have it.
+ * The menus cannot be opened without a server, so a wrong language key would only show up in game. This lists
+ * the keys the world menus and the startup status read and checks both language files have them.
  */
-class WorldLanguageKeysTest {
+class RequiredLanguageKeysTest {
     private static final List<String> BOOLEAN_ITEMS = List.of("PVP", "AutoSave", "Monsters", "Animals", "KeepInventory");
 
     @Test
@@ -31,6 +35,37 @@ class WorldLanguageKeysTest {
     @Test
     void germanHasEveryKeyTheWorldMenusRead() throws IOException {
         checkLanguage("de");
+    }
+
+    @Test
+    void englishHasEveryKeyTheStartupStatusReads() throws IOException {
+        checkStartup("en");
+    }
+
+    @Test
+    void germanHasEveryKeyTheStartupStatusReads() throws IOException {
+        checkStartup("de");
+    }
+
+    private static void checkStartup(String language) throws IOException {
+        Map<String, Object> root = load(language);
+        List<String> missing = new ArrayList<>();
+        for (Startup.Status status : Startup.Status.values()) {
+            item(root, missing, "Items.StartupStatus.Entry." + status);
+            text(root, missing, "Messages.StartupStatus.Status." + status);
+        }
+        for (String stage : List.of("libraries", "data", "api", "bungee", "placeholderapi", "supervanish", "vault", "config",
+                "warnings", "trolls", "permissions", "prefix", "events", "language", "configupdate", "bstats", "updater",
+                "autoupdater", "permissionsetup", "commands", "addons", "backup")) {
+            text(root, missing, "Messages.StartupStatus.Stage." + stage);
+        }
+        item(root, missing, "Items.StartupStatus.Unavailable");
+        item(root, missing, "Items.StartMenu.StartupProblems");
+        for (String key : List.of("Unavailable", "Header", "Line", "Kind.Required", "Kind.Optional")) {
+            text(root, missing, "Messages.StartupStatus." + key);
+        }
+        text(root, missing, "MenuTitles.StartupStatus");
+        assertTrue(missing.isEmpty(), language + " is missing: " + missing);
     }
 
     private static void checkLanguage(String language) throws IOException {
@@ -125,7 +160,7 @@ class WorldLanguageKeysTest {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> load(String language) throws IOException {
-        try (InputStream in = WorldLanguageKeysTest.class.getResourceAsStream("/languages/" + language + ".yml")) {
+        try (InputStream in = RequiredLanguageKeysTest.class.getResourceAsStream("/languages/" + language + ".yml")) {
             return new Yaml().load(new String(in.readAllBytes(), StandardCharsets.UTF_8));
         }
     }

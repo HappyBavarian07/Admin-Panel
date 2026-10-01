@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.troll.*;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -239,13 +240,17 @@ public class PlayerTrollMenu extends Menu implements Listener {
                     }
                 }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.FakeDeop"));
 
-        registerButton(getSlot(path + "MoreTrolls", 40), lgm.getItem(path + "MoreTrolls", target, false),
-                MenuAction.open(() -> new PlayerTrollMoreMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
-                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
-        registerButton(getSlot(path + "StopAll", 49), lgm.getItem(path + "StopAll", target, false),
-                MenuAction.of((p, e) -> PlayerTrollMoreMenu.stopAllTrolls(p, target, target.getName()))
-                        .then((p, e) -> refresh())
-                        .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
+        if (AdminPanelMain.getPlugin().getStartup().isOk("trolls")) {
+            registerButton(getSlot(path + "MoreTrolls", 40), lgm.getItem(path + "MoreTrolls", target, false),
+                    MenuAction.open(() -> new PlayerTrollMoreMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
+                            .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
+            registerButton(getSlot(path + "StopAll", 49), lgm.getItem(path + "StopAll", target, false),
+                    MenuAction.of((p, e) -> PlayerTrollMoreMenu.stopAllTrolls(p, target, target.getName()))
+                            .then((p, e) -> refresh())
+                            .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll.Open"));
+        } else {
+            FeatureGate.placeUnavailable(this, getSlot(path + "MoreTrolls", 40), "trolls", playerMenuUtility.getOwner());
+        }
 
         registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false),
                 MenuAction.open(() -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))

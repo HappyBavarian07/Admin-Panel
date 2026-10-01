@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.main;
 
+import de.happybavarian07.adminpanel.startup.Startup;
+import de.happybavarian07.adminpanel.startup.StartupAbortedException;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
@@ -74,6 +76,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     public Chat chat = null;
     private long lastStartTimeMillis;
     private StartUpLogger logger;
+    private final Startup startup = new Startup(AdminPanelMain::logError);
     private NewUpdater updater;
     private LanguageManager languageManager;
     private AddonLoader loader;
@@ -318,55 +321,86 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        try {
+            runStartupStages();
+        } catch (StartupAbortedException aborted) {
+            getLogger().severe(aborted.getMessage());
+            getLogger().severe("Admin-Panel cannot run without it and is disabling itself. " + startup.summary());
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        getLogger().info(startup.summary());
+        logStartupMessage();
+    }
+
+    private void runStartupStages() {
         globalPluginUtils = new PluginUtils();
         lastStartTimeMillis = System.currentTimeMillis();
+        tpsMeter = new TPSMeter();
+        setPlugin(this);
+
+        startup.run("libraries", true, this::setupLibraries);
+        startup.run("data", true, () -> {
+            data = new AdminPanelData(getRepositoryManager());
+            importLegacyTables();
+            setupPluginStateManager();
+            pluginDescriptionManager = new PluginDescriptionManager();
+            menuAddonManager = coolStuffLib.getMenuAddonManager();
+            languageManager = coolStuffLib.getLanguageManager();
+            commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();
+        }, "libraries");
+        startup.run("api", true, () -> {
+            setupAPI();
+            initializeUtils();
+        }, "data");
+        startup.run("bungee", false, this::registerBungeeChannels, "data");
+        startup.run("placeholderapi", true, initMethods::initPlaceholderApi, "api");
+        startup.run("supervanish", false, initMethods::initSuperVanish, "api");
+        startup.run("vault", false, initMethods::initVault, "api");
+        startup.run("config", true, this::initializeConfigFiles, "api");
+        startup.run("warnings", false, this::initializeWarningManager, "data", "config");
+        startup.run("trolls", false, this::initializeTrollRegistry, "data", "config");
+        startup.run("permissions", true, this::setupPermissionsManager, "data");
+        startup.run("prefix", true, this::initializePrefix, "config");
+        startup.run("events", true, () -> {
+            initEvents();
+            setupStaffChatHandler();
+        }, "permissions");
+        startup.run("language", true, () -> {
+            setupLanguageHandler();
+            importLegacyLanguages();
+            enableLanguageManager();
+        }, "config");
+        startup.run("configupdate", true, this::updateConfigFiles, "language");
+        startup.run("bstats", false, () -> initializebStats(setupMetrics()), "language");
+        startup.run("updater", false, this::initializeUpdater, "language");
+        startup.run("autoupdater", false, this::setupAutoUpdaterManager, "updater");
+        startup.run("permissionsetup", true, this::setupPermissions, "permissions", "language");
+        startup.run("commands", true, () -> {
+            initializeCommands();
+            initializeCommandManagers();
+        }, "language");
+        startup.run("addons", false, this::setupAddonLoader, "commands");
+        startup.run("backup", false, this::executeBackupManager, "config");
+    }
+
+    private void setupLibraries() {
         CoolStuffLibBuilder coolStuffLibBuilder = new CoolStuffLibBuilder(this)
                 .setDataFile(new File(getDataFolder(), "data.yml"))
                 .setBackupManager(backupManager)
                 .withLogging().create(fileLogger).build();
-        tpsMeter = new TPSMeter();
-        setPlugin(this);
-
         configureDatabase(coolStuffLibBuilder);
         getDependencyManager().useHookSystem();
-        Metrics metrics = setupMetrics();
         sendStartupMessages();
         setupMenuAddonManager(coolStuffLibBuilder);
         setupLanguageManager(coolStuffLibBuilder);
         setupCommandManagerRegistry(coolStuffLibBuilder);
         coolStuffLib = coolStuffLibBuilder.createCoolStuffLib();
         coolStuffLib.setup();
-        data = new AdminPanelData(getRepositoryManager());
-        importLegacyTables();
-        setupPluginStateManager();
-        pluginDescriptionManager = new PluginDescriptionManager();
-        menuAddonManager = coolStuffLib.getMenuAddonManager();
-        languageManager = coolStuffLib.getLanguageManager();
-        commandManagerRegistry = coolStuffLib.getCommandManagerRegistry();
-        setupAPI();
-        initializeUtils();
-        registerBungeeChannels();
-        initPluginChecks();
-        initializeConfigFiles();
-        initializeWarningManager();
-        initializeTrollRegistry();
-        setupPermissionsManager();
-        initializePrefix();
-        initEvents();
-        setupLanguageHandler();
-        importLegacyLanguages();
-        enableLanguageManager();
-        setupStaffChatHandler();
-        updateConfigFiles();
-        initializebStats(metrics);
-        initializeUpdater();
-        setupAutoUpdaterManager();
-        setupPermissions();
-        initializeCommands();
-        initializeCommandManagers();
-        setupAddonLoader();
-        executeBackupManager();
-        logStartupMessage();
+    }
+
+    public Startup getStartup() {
+        return startup;
     }
 
     public static final String DB_CONNECTION = "main";
@@ -509,28 +543,24 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void registerBungeeChannels() {
         logger.message("&e&lStarting Bungee Registration");
-        if (pluginStateManager.checkIfBungee(true)) {
-            String path = "Plugin.BungeeSyncSystem.ChannelNames.";
-            bungeeUtils = new BungeeUtils(getConfig().getString(path + "In", ""), getConfig().getString(path + "Out", ""));
-            bungeeUtils.openBungeeChannel();
-            path = "Plugin.BungeeSyncSystem.JavaSockets.";
-            if (getConfig().getBoolean(path + "enabled")) {
-                try {
-                    dataClient = new DataClient(getConfig().getString(path + "hostName"),
-                            getConfig().getInt(path + "port"),
-                            getConfig().getString(path + "ClientName"));
-                    dataClientUtils = new DataClientUtils(dataClient);
-                } catch (IOException e) {
-                    fileLogger.writeToLog(Level.SEVERE, "Error while initializing DataClient (" + e + ": " + e.getMessage() + ")", LogPrefixExtension.ADMINPANEL_MAIN);
-                }
+        if (!pluginStateManager.checkIfBungee(true)) {
+            throw new Startup.DisabledException("not running behind BungeeCord, or Plugin.BungeeSyncSystem.enabled is false");
+        }
+        String path = "Plugin.BungeeSyncSystem.ChannelNames.";
+        bungeeUtils = new BungeeUtils(getConfig().getString(path + "In", ""), getConfig().getString(path + "Out", ""));
+        bungeeUtils.openBungeeChannel();
+        path = "Plugin.BungeeSyncSystem.JavaSockets.";
+        if (getConfig().getBoolean(path + "enabled")) {
+            try {
+                dataClient = new DataClient(getConfig().getString(path + "hostName"),
+                        getConfig().getInt(path + "port"),
+                        getConfig().getString(path + "ClientName"));
+                dataClientUtils = new DataClientUtils(dataClient);
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not connect the socket data client: " + e.getMessage(), e);
             }
         }
         logger.message("&a&lDone");
-    }
-
-    private void initPluginChecks() {
-        initMethods.initPluginCheck();
-        logger.messages("&c&lFinished Vault initialization!&r");
     }
 
     private void initializeConfigFiles() {
@@ -542,7 +572,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void initializeWarningManager() {
-        if (!getConfig().getBoolean("Pman.Actions.WarningSystem")) return;
+        if (!getConfig().getBoolean("Pman.Actions.WarningSystem")) {
+            throw new Startup.DisabledException("Pman.Actions.WarningSystem is false");
+        }
         importLegacyWarnings();
         warningIo = Executors.newSingleThreadExecutor(task -> {
             Thread thread = new Thread(task, "AdminPanel-Warnings");
@@ -633,15 +665,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         languageManager.addLang(enLang, enLang.getLangName());
         languageManager.setCurrentLang(languageManager.getLang(getConfig().getString("Plugin.language"), true), true);
         setLanguageManagerEnabled(languageManager != null && languageManager.getCurrentLang() != null);
-        if (isLanguageManagerEnabled()) {
-            getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null, true));
-        } else {
-            getServer().getConsoleSender().sendMessage(AdminPanelUtils.chat("&f[&aAdmin-&ePanel&f] &cLanguage Manager is not enabled, " +
-                    "which means all the Items and Messages won't work! " +
-                    "The Plugin will automatically unload! " +
-                    "Look for Errors from the Admin-Panel in the Console!"));
-            Bukkit.getPluginManager().disablePlugin(this);
+        if (!isLanguageManagerEnabled()) {
+            throw new IllegalStateException("the language '" + getConfig().getString("Plugin.language") + "' could not be loaded, "
+                    + "all items and messages would be missing");
         }
+        getServer().getConsoleSender().sendMessage(languageManager.getMessage("Plugin.EnablingMessage", null, true));
     }
 
     private void setupStaffChatHandler() {
@@ -688,10 +716,11 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupAutoUpdaterManager() {
-        if (plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
-            autoUpdaterManager = new AutoUpdaterManager(plugin);
-            autoUpdaterManager.setup(updater);
+        if (!plugin.getConfig().getBoolean("Plugin.Updater.PluginUpdater.enabled")) {
+            throw new Startup.DisabledException("Plugin.Updater.PluginUpdater.enabled is false");
         }
+        autoUpdaterManager = new AutoUpdaterManager(plugin);
+        autoUpdaterManager.setup(updater);
     }
 
     private void setupPermissions() {
@@ -707,19 +736,20 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     }
 
     private void setupAddonLoader() {
-        if (plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled")) {
-            logger.emptySpacer();
-            logger.emptySpacer();
-            logger.coloredSpacer(ChatColor.RED);
-            logger.message("&cIt could happen that an Addon needs another Plugin to work.&r");
-            logger.message("&cThen this Addon will not start and the Loader&r");
-            logger.message("&cwill continue loading!&r");
-            logger.coloredSpacer(ChatColor.RED);
-            if (loader == null) {
-                loader = new AddonLoader(new File(this.getDataFolder() + "/addons"));
-            }
-            initMethods.initAddonLoader(loader);
+        if (!plugin.getConfig().getBoolean("Plugin.AddonSystem.enabled")) {
+            throw new Startup.DisabledException("Plugin.AddonSystem.enabled is false");
         }
+        logger.emptySpacer();
+        logger.emptySpacer();
+        logger.coloredSpacer(ChatColor.RED);
+        logger.message("&cIt could happen that an Addon needs another Plugin to work.&r");
+        logger.message("&cThen this Addon will not start and the Loader&r");
+        logger.message("&cwill continue loading!&r");
+        logger.coloredSpacer(ChatColor.RED);
+        if (loader == null) {
+            loader = new AddonLoader(new File(this.getDataFolder() + "/addons"));
+        }
+        initMethods.initAddonLoader(loader);
     }
 
     private void executeBackupManager() {

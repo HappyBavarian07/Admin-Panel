@@ -615,6 +615,42 @@ Messages:
     DurationSet: '%prefix% &9> &aDie Wetterdauer ist jetzt &f%duration%&a!'
     NotADuration: '%prefix% &9> &cDas ist keine gültige Dauer! (zum Beispiel 5m oder 1h, höchstens %max%)'
     WeatherSet: '%prefix% &9> &aDas Wetter von &7%world% &aist jetzt &f%weather%&a!'
+  StartupStatus:
+    # %feature% = Der Teil, %reason% = Warum, %count% = Wie viele, %status% = Der Status, %stage% = Der Teil, %detail% = Der Grund
+    Unavailable: '%prefix% &9> &c%feature% ist nicht verfügbar: &7%reason%'
+    Header: '%prefix% &9> &6Startstatus:'
+    Line: '&8- %status% &f%stage%&r%detail%'
+    Status:
+      OK: '&aOK'
+      DISABLED: '&7aus'
+      FAILED: '&cFEHLGESCHLAGEN'
+      SKIPPED: '&6ÜBERSPRUNGEN'
+    Kind:
+      Required: 'notwendig'
+      Optional: 'optional'
+    Stage:
+      libraries: 'Bibliotheken und Datenbank'
+      data: 'Daten und Plugin-Zustand'
+      api: 'API und Hilfsklassen'
+      bungee: 'BungeeCord und Socket-Sync'
+      placeholderapi: 'PlaceholderAPI'
+      supervanish: 'SuperVanish'
+      vault: 'Vault-Wirtschaft'
+      config: 'Config-Dateien'
+      warnings: 'Verwarnungssystem'
+      trolls: 'Trolle'
+      permissions: 'Rechte-Verwaltung'
+      prefix: 'Prefix'
+      events: 'Events und Staff-Chat'
+      language: 'Sprachverwaltung'
+      configupdate: 'Config-Update'
+      bstats: 'bStats'
+      updater: 'Updater'
+      autoupdater: 'Plugin-Auto-Updater'
+      permissionsetup: 'Rechte-Einrichtung'
+      commands: 'Befehle'
+      addons: 'Addon-Loader'
+      backup: 'Config-Backup'
 Items:
   General:
     ConfirmationMenu:
@@ -2125,6 +2161,12 @@ Items:
       lore:
         - '&aIn diesem Menu kann man auf Items klicken,'
         - '&adie einen dann in Untermenüs weiterleiten!'
+    StartupProblems:
+      material: REDSTONE_TORCH
+      displayName: '&cStartprobleme'
+      lore:
+        - '&7%count% Teil(e) von Admin-Panel sind nicht gestartet'
+        - '&eKlicke, um zu sehen welche'
   DangerZoneMenu:
     ServerStop:
       material: DIAMOND
@@ -2548,6 +2590,45 @@ Items:
           - '&7ohne Änderungen zu speichern.'
           - ''
           - '&eKlicke zum Bestätigen!'
+  StartupStatus:
+    Entry:
+      OK:
+        material: LIME_CONCRETE
+        displayName: '&a%stage%'
+        lore:
+          - '&7Status: &aOK'
+          - '&7Art: &f%kind%'
+      DISABLED:
+        material: GRAY_CONCRETE
+        displayName: '&7%stage%'
+        lore:
+          - '&7Status: &7deaktiviert'
+          - '&7Art: &f%kind%'
+          - '&7Grund: &f%detail%'
+      FAILED:
+        material: RED_CONCRETE
+        displayName: '&c%stage%'
+        lore:
+          - '&7Status: &cfehlgeschlagen'
+          - '&7Art: &f%kind%'
+          - '&7Fehler: &f%detail%'
+          - ''
+          - '&eKlicke, um den Fehler im Chat zu zeigen'
+      SKIPPED:
+        material: ORANGE_CONCRETE
+        displayName: '&6%stage%'
+        lore:
+          - '&7Status: &6übersprungen'
+          - '&7Art: &f%kind%'
+          - '&7Grund: &f%detail%'
+          - ''
+          - '&eKlicke, um den Grund im Chat zu zeigen'
+    Unavailable:
+      material: BARRIER
+      displayName: '&c%feature% ist nicht verfügbar'
+      lore:
+        - '&7Grund: &f%reason%'
+        - '&eKlicke, um ihn im Chat zu zeigen'
 MenuTitles:
   StartMenu: '&4&lAdmin-Panel'
   DangerZoneMenu: '&4Danger Zone'
@@ -2606,3 +2687,4 @@ MenuTitles:
     EntryEditMenu: '&6Bearbeiten: %migration_entry_name%'
   Misc:
     ConfirmationMenu: '&aBestätigungs Menu'
+  StartupStatus: '&cStartstatus'

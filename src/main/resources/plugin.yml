@@ -177,6 +177,7 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.UpdateLangFiles: true
           AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
           AdminPanel.AdminPanelAdminCommands.StaffChat: true
+          AdminPanel.AdminPanelAdminCommands.Status: true
       AdminPanel.PluginManager.*:
         default: op
         children:

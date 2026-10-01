@@ -69,10 +69,24 @@ class StartupTest {
     void disabledStagesAreNotFailures() {
         startup.run("core", true, () -> {
         });
-        startup.disabled("vault", "not installed");
+        startup.run("vault", false, () -> {
+            throw new Startup.DisabledException("not installed");
+        });
+        assertEquals("not installed", startup.result("vault").detail());
         assertFalse(startup.hasFailures());
         assertFalse(startup.isOk("vault"));
         assertEquals("Startup: 1 ok, 1 disabled, 0 broken", startup.summary());
+    }
+
+    @Test
+    void stageThatNeedsADisabledStageIsDisabledNotBroken() {
+        startup.run("updater", false, () -> {
+            throw new Startup.DisabledException("off");
+        });
+        startup.run("autoupdater", false, () -> {
+        }, "updater");
+        assertEquals(Startup.Status.DISABLED, startup.result("autoupdater").status());
+        assertFalse(startup.hasFailures());
     }
 
     @Test

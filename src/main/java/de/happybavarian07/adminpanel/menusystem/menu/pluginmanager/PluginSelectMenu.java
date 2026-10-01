@@ -5,6 +5,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
  * @Date 02.09.2021
  */
 
+import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
@@ -69,8 +70,7 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
         registerButton(getSlots() - 9, lgm.getItem("PluginManager.AutoUpdateMenu.OpenMenuItem", player, false),
                 MenuAction.of((p, e) -> {
                     if (plugin.getAutoUpdaterManager() == null) {
-                        p.sendMessage(lgm.getMessage("Player.General.NullMenu", p, true));
-                        plugin.getFileLogger().writeToLog(Level.WARNING, "AutoUpdaterManager is null, please check your config.yml and make sure the AutoUpdater is enabled.", LogPrefixExtension.ADMINPANEL_GUI, true);
+                        FeatureGate.sendUnavailable(p, "autoupdater");
                         return;
                     }
                     new PluginAutoUpdaterMenu(playerMenuUtility).open();

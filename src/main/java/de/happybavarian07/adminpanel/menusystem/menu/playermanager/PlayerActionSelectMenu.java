@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
@@ -56,10 +57,12 @@ public class PlayerActionSelectMenu extends Menu {
                 lgm.getItem(path + "ActionsItem", target, false),
                 (p, e) -> new PlayerActionsMenu(playerMenuUtility).open(), null);
 
-        if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
+        if (AdminPanelMain.getPlugin().getStartup().isOk("vault")) {
             registerButton(getSlot(path + "MoneyItem", 12),
                     lgm.getItem(path + "MoneyItem", target, false),
                     (p, e) -> new MoneyMenu(playerMenuUtility).open(), null);
+        } else if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
+            FeatureGate.placeUnavailable(this, getSlot(path + "MoneyItem", 12), "vault", player);
         }
 
         registerButton(getSlot(path + "BanItem", 14),
@@ -74,6 +77,8 @@ public class PlayerActionSelectMenu extends Menu {
             registerButton(getSlot("PlayerManager.WarningMenuItem", 24),
                     lgm.getItem("PlayerManager.WarningMenuItem", target, false),
                     (p, e) -> new PlayerWarningMenu(playerMenuUtility, this).open(), null);
+        } else if (FeatureGate.broken("warnings")) {
+            FeatureGate.placeUnavailable(this, getSlot("PlayerManager.WarningMenuItem", 24), "warnings", player);
         }
 
         registerButton(getSlot(path + "PermissionItem", 4),

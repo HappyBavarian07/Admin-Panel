@@ -99,5 +99,6 @@ public class AdminPanelAdminManager extends CommandManager {
         registerSubCommand(new BackupManagerCommand(getCommandName()));
         registerSubCommand(new PermissionMenuHelpCommand(getCommandName()));
         registerSubCommand(new StaffChatCommand(getCommandName()));
+        registerSubCommand(new StartupStatusCommand(getCommandName()));
     }
 }

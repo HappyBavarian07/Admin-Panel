@@ -39,8 +39,7 @@ records `disabled(id, reason)` when it is off. Stage ids are short English words
 returning), SuperVanish (absent is `DISABLED` "not installed"), Vault (absent is `DISABLED`, a failing economy setup is
 `FAILED`). The Bungee socket client no longer swallows its `IOException`; the stage records it.
 
-At the end of `onEnable` one line with `summary()` goes to the log, and ops with `AdminPanel.AdminPanelAdminCommands.Status`
-get a notice on join when `hasFailures()` is true (chat only, one line).
+At the end of `onEnable` one line with `summary()` goes to the log. (A notice on join was offered and not chosen.)
 
 ## Showing it
 

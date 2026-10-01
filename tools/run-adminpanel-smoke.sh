@@ -29,7 +29,7 @@ wait_for "Done (" 1 180 || status=1
 for cmd in "openpanel help" "openpanel ServerManagerMenu" "openpanel ServerManagerMenu Nobody" \
            "addon listaddons" "addon info Nothing" "addon disable" \
            "adminpaneladmin reloaddata" "adminpaneladmin reloadconfig" "adminpaneladmin SULControl Enable" \
-           "adminpaneladmin backup listBackups" "adminpaneladmin backup start Nothing" "adminpaneladmin permissionmenuhelp" \
+           "adminpaneladmin backup listBackups" "adminpaneladmin backup start Nothing" "adminpaneladmin permissionmenuhelp" "adminpaneladmin status" \
            "disableditems list" "disableditems disable NOT_AN_ITEM" "disableditems disable DIAMOND" "disableditems list" "disableditems enable DIAMOND" \
            "warn Nobody Test reason" "warn HappyBavarian07 Smoke reason" "warnings HappyBavarian07" "unwarn HappyBavarian07 all" "warnings HappyBavarian07" \
            "dataclient ListClients" "dataclient SyncTrolls ChatMuteMap" "perplayerlang"; do
@@ -47,6 +47,7 @@ echo "" >> "$CMDS" # tail exits on the next write once the server is gone
 
 echo "===== AdminPanel lines ====="
 grep -E "\[Admin-Panel\].*(Using Database|Imported old data|Could not|Error|Exception)" "$LOG"
+grep -E "Startup: |Startup stage" "$LOG"
 if grep -E "Error occurred while (enabling|disabling) Admin-Panel|Could not load 'plugins.Admin-Panel" "$LOG" | grep -q .; then
     echo "AdminPanel failed to enable or disable"; status=1
 fi

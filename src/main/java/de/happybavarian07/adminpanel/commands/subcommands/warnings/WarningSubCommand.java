@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.commands.subcommands.warnings;
 
+import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.warnings.WarningManager;
@@ -36,7 +37,10 @@ abstract class WarningSubCommand extends SubCommand {
 
     WarningManager manager(CommandSender sender) {
         WarningManager manager = AdminPanelMain.getPlugin().getWarningManager();
-        if (manager == null) CommandText.send(lgm, sender, KEY + "Disabled");
+        if (manager == null) {
+            if (FeatureGate.broken("warnings")) FeatureGate.sendUnavailable(sender, "warnings");
+            else CommandText.send(lgm, sender, KEY + "Disabled");
+        }
         return manager;
     }
 

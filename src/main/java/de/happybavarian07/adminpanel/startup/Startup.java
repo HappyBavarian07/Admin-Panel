@@ -24,6 +24,16 @@ public final class Startup {
         void run() throws Exception;
     }
 
+    /**
+     * Thrown by a stage that finds itself switched off on purpose: a config switch, or a plugin that is not installed.
+     * The stage is recorded as {@link Status#DISABLED}, which is not a failure.
+     */
+    public static final class DisabledException extends RuntimeException {
+        public DisabledException(String reason) {
+            super(reason);
+        }
+    }
+
     private final Map<String, Result> results = new LinkedHashMap<>();
     private final BiConsumer<String, Throwable> errorLog;
 
@@ -35,31 +45,29 @@ public final class Startup {
     }
 
     /**
-     * @param dependsOn stages that must be OK; if one is not, the action does not run and the stage is skipped
+     * @param dependsOn stages that must be OK; if one is not, the action does not run and the stage is skipped, or
+     *                  disabled when the stage it needs is disabled
      * @return whether the stage is OK
      * @throws StartupAbortedException if a required stage failed or was skipped
      */
     public boolean run(String id, boolean required, Action action, String... dependsOn) {
         for (String dependency : dependsOn) {
             if (!isOk(dependency)) {
-                return record(id, required, Status.SKIPPED, "needs " + dependency);
+                Result needed = results.get(dependency);
+                boolean off = needed != null && needed.status() == Status.DISABLED;
+                return record(id, required, off ? Status.DISABLED : Status.SKIPPED, "needs " + dependency);
             }
         }
         try {
             action.run();
+        } catch (DisabledException off) {
+            return record(id, required, Status.DISABLED, off.getMessage());
         } catch (Exception | LinkageError failure) {
             errorLog.accept("Startup stage '" + id + "' failed", failure);
             String detail = failure.getMessage() == null ? failure.getClass().getSimpleName() : failure.getMessage();
             return record(id, required, Status.FAILED, detail);
         }
         return record(id, required, Status.OK, "");
-    }
-
-    /**
-     * Records a stage that is switched off on purpose, for example by the config or because a plugin is not installed.
-     */
-    public void disabled(String id, String reason) {
-        record(id, false, Status.DISABLED, reason);
     }
 
     public boolean isOk(String id) {
