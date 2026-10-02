@@ -362,15 +362,13 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         startup.run("trolls", false, this::initializeTrollRegistry, "data", "config");
         startup.run("permissions", true, this::setupPermissionsManager, "data");
         startup.run("prefix", true, this::initializePrefix, "config");
-        startup.run("events", true, () -> {
-            initEvents();
-            setupStaffChatHandler();
-        }, "permissions");
+        startup.run("events", true, this::initEvents, "permissions");
         startup.run("language", true, () -> {
             setupLanguageHandler();
             importLegacyLanguages();
             enableLanguageManager();
         }, "config");
+        startup.run("staffchat", true, this::setupStaffChatHandler, "language");
         startup.run("configupdate", true, this::updateConfigFiles, "language");
         startup.run("bstats", false, () -> initializebStats(setupMetrics()), "language");
         startup.run("updater", false, this::initializeUpdater, "language");

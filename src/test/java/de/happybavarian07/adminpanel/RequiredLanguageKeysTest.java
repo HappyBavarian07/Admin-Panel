@@ -55,7 +55,7 @@ class RequiredLanguageKeysTest {
             text(root, missing, "Messages.StartupStatus.Status." + status);
         }
         for (String stage : List.of("libraries", "data", "api", "bungee", "placeholderapi", "supervanish", "vault", "config",
-                "warnings", "trolls", "permissions", "prefix", "events", "language", "configupdate", "bstats", "updater",
+                "warnings", "trolls", "permissions", "prefix", "events", "language", "staffchat", "configupdate", "bstats", "updater",
                 "autoupdater", "permissionsetup", "commands", "addons", "backup")) {
             text(root, missing, "Messages.StartupStatus.Stage." + stage);
         }

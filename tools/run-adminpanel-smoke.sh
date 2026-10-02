@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# Builds AdminPanel, starts the 1.21.10 test server, reloads once, stops it and prints AdminPanel errors.
+# Builds AdminPanel, starts a test server (default 1.21.10), reloads once, stops it and prints AdminPanel errors.
+# AP_SERVER, AP_JAVA: server folder and java; AP_SKIP_BUILD=1 reuses target/ (used by run-smoke-matrix.sh).
 set -uo pipefail
 SERVER="${AP_SERVER:-F:/Weitere Minecraft Test Server/Spigot 1.21.10}"
 JAVA="${AP_JAVA:-F:/Weitere Minecraft Test Server/jdk-21.0.5/bin/java}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SERVER_JAR=$(cd "$SERVER" && ls spigot-*.jar paper-*.jar 2>/dev/null | head -1)
 LOG="$SERVER/adminpanel-smoke.log"
 CMDS="$SERVER/adminpanel-smoke-cmds.txt"
 
-mvn -B -q -f "$ROOT/pom.xml" clean package -DskipTests || { echo "Build failed"; exit 1; }
+[ -n "${AP_SKIP_BUILD:-}" ] || mvn -B -q -f "$ROOT/pom.xml" clean package -DskipTests || { echo "Build failed"; exit 1; }
 JAR=$(ls "$ROOT"/target/Admin-Panel-*.jar | grep -v -E -- '-(javadoc|sources|shaded)\.jar$' | head -1)
 [ -f "$JAR" ] || { echo "No built jar in target/"; exit 1; }
 cp "$JAR" "$SERVER/plugins/$(basename "$JAR")"
@@ -22,7 +24,7 @@ wait_for() { # pattern, minimum count, timeout seconds
 
 : > "$CMDS"
 : > "$LOG"
-(cd "$SERVER" && tail -f "$CMDS" | "$JAVA" -Xms1G -Xmx2G -jar spigot-1.21.10.jar nogui > "$LOG" 2>&1) &
+(cd "$SERVER" && tail -f "$CMDS" | "$JAVA" -Xms1G -Xmx2G -jar "$SERVER_JAR" nogui > "$LOG" 2>&1) &
 
 status=0
 wait_for "Done (" 1 180 || status=1
@@ -45,7 +47,7 @@ wait_for "All dimensions are saved" 1 120 || status=1
 sleep 2
 echo "" >> "$CMDS" # tail exits on the next write once the server is gone
 
-echo "===== AdminPanel lines ====="
+echo "===== AdminPanel lines ($SERVER_JAR) ====="
 grep -E "\[Admin-Panel\].*(Using Database|Imported old data|Could not|Error|Exception)" "$LOG"
 grep -E "Startup: |Startup stage" "$LOG"
 if grep -E "Error occurred while (enabling|disabling) Admin-Panel|Could not load 'plugins.Admin-Panel" "$LOG" | grep -q .; then
