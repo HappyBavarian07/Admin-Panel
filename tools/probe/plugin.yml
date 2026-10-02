@@ -1,0 +1,5 @@
+name: ApProbe
+main: ApProbe
+version: 1.0
+api-version: 1.13
+depend: [Admin-Panel]

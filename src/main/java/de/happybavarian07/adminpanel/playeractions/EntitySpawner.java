@@ -61,7 +61,7 @@ public final class EntitySpawner {
     public static String key(EntityType type) {
         try {
             return type.getKey().getKey();
-        } catch (IllegalArgumentException unknown) {
+        } catch (IllegalArgumentException | IllegalStateException unknown) {
             return null;
         }
     }
