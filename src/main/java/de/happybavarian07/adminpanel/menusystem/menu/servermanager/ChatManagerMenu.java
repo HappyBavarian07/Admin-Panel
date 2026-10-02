@@ -14,13 +14,10 @@ import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public class ChatManagerMenu extends Menu implements Listener {
+public class ChatManagerMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
     public ChatManagerMenu(PlayerMenuUtility playerMenuUtility) {
@@ -112,14 +109,5 @@ public class ChatManagerMenu extends Menu implements Listener {
         registerButton(getSlot("General.Close", 22), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
-    }
-
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (plugin.getPluginStateManager().isGlobalChatMuted() && !player.hasPermission("AdminPanel.Bypass.ChatMute")) {
-            event.setCancelled(true);
-            player.sendMessage(lgm.getMessage("Player.ChatMute.PlayerMessage", player, true));
-        }
     }
 }

@@ -17,12 +17,9 @@ import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -33,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener {
+public class PluginSelectMenu extends PaginatedMenu<Plugin> {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final NamespacedKey pluginItemNamespacedKey = new NamespacedKey(plugin, "pluginItemName");
     private final List<Plugin> plugins;
@@ -76,11 +73,8 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
                     new PluginAutoUpdaterMenu(playerMenuUtility).open();
                 }).requires("AdminPanel.PluginManager.AutoUpdateMenu"), null);
         registerButton(getSlots() - 8, lgm.getItem("PluginManager.Load", player, false),
-                MenuAction.of((p, e) -> {
-                    playerMenuUtility.addData("TypePluginFileNameToLoadInChat", true);
-                    p.sendMessage(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", p, true));
-                    p.closeInventory();
-                }).requires("AdminPanel.PluginManager.LoadPlugins"), null);
+                MenuAction.prompt(lgm.getMessage("Player.PluginManager.TypePluginFileNameToLoadInChat", player, true),
+                        this::loadPluginFile).requires("AdminPanel.PluginManager.LoadPlugins"), null);
         registerButton(getSlots() - 7, lgm.getItem("PluginManager.Install", player, false),
                 MenuAction.of((p, e) -> new PluginInstallMenu(playerMenuUtility).open()).requires("AdminPanel.PluginManager.InstallPlugins"), null);
     }
@@ -125,34 +119,27 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> implements Listener 
     public void handleCloseMenu(InventoryCloseEvent e) {
     }
 
-    @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.hasData("TypePluginFileNameToLoadInChat")) {
-            event.setCancelled(true);
-            String message = ChatColor.stripColor(event.getMessage()).trim();
-            if (message.equals("cancel") || message.equals("exit")) {
-                playerMenuUtility.removeData("TypePluginFileNameToLoadInChat");
-                super.open();
-                return;
-            }
-            File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message + ".jar", true);
-            if (!pluginFile.exists()) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player, true));
-                return;
-            }
-            try {
-                plugin.getPluginUtils().load(pluginFile);
-            } catch (Exception e) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player, true));
-                return;
-            }
-            playerMenuUtility.removeData("TypePluginFileNameToLoadInChat");
-            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player, true));
-            super.open();
+    private void loadPluginFile(Player player, String input) {
+        String message = ChatColor.stripColor(input).trim();
+        if (message.equals("cancel") || message.equals("exit")) {
+            open();
+            return;
         }
+        File pluginFile = new File(plugin.getPluginFile().getParentFile(), message + ".jar");
+        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", message + ".jar", true);
+        if (!pluginFile.exists()) {
+            player.sendMessage(lgm.getMessage("Player.PluginManager.FileToLoadDoesNotExist", player, true));
+            MenuAction.prompt(null, this::loadPluginFile).execute(player, null);
+            return;
+        }
+        try {
+            plugin.getPluginUtils().load(pluginFile);
+        } catch (Exception e) {
+            player.sendMessage(lgm.getMessage("Player.PluginManager.LoadPluginError", player, true));
+            MenuAction.prompt(null, this::loadPluginFile).execute(player, null);
+            return;
+        }
+        player.sendMessage(lgm.getMessage("Player.PluginManager.PluginFileNameSelected", player, true));
+        open();
     }
 }

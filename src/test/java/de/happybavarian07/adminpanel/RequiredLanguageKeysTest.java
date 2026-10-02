@@ -47,6 +47,36 @@ class RequiredLanguageKeysTest {
         checkStartup("de");
     }
 
+    @Test
+    void englishHasTheTrollMoneyAndPermissionTexts() throws IOException {
+        checkMenus("en");
+    }
+
+    @Test
+    void germanHasTheTrollMoneyAndPermissionTexts() throws IOException {
+        checkMenus("de");
+    }
+
+    private static void checkMenus(String language) throws IOException {
+        Map<String, Object> root = load(language);
+        List<String> missing = new ArrayList<>();
+        for (String toggle : List.of("HurtingWater", "BreakPlacePrevent", "VillagerSounds", "DupeMobsOnKill", "ChatMute", "FreezePlayer")) {
+            item(root, missing, "Items.PlayerManager.TrollMenu." + toggle + ".true");
+            item(root, missing, "Items.PlayerManager.TrollMenu." + toggle + ".false");
+        }
+        for (String key : List.of("Kick.Serverstop", "Kick.ConnectionReset", "Kick.Whitelist", "Kick.ServerStoppedError",
+                "DropPlayerInv", "FakeOp", "FakeDeop", "StopAll")) {
+            item(root, missing, "Items.PlayerManager.TrollMenu." + key);
+        }
+        for (String key : List.of("MoneyMenu.EnterAmount", "MoneyMenu.NotANumber", "MoneyMenu.NoAccount", "MoneyMenu.NotEnough",
+                "MoneyMenu.Failed", "MoneyMenu.Gave", "MoneyMenu.SetTo", "MoneyMenu.Took", "TimeWeatherMenu.TimeNotApplied",
+                "TimeWeatherMenu.WeatherNotApplied", "Player.PlayerManager.Permissions.PermissionSet",
+                "Player.PlayerManager.Permissions.PermissionRemoved", "Player.PlayerManager.BanMenu.TargetBanMessage")) {
+            text(root, missing, "Messages." + key);
+        }
+        assertTrue(missing.isEmpty(), language + " is missing: " + missing);
+    }
+
     private static void checkStartup(String language) throws IOException {
         Map<String, Object> root = load(language);
         List<String> missing = new ArrayList<>();

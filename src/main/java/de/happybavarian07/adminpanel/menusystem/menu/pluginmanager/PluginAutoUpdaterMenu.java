@@ -13,12 +13,9 @@ import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -27,8 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
-public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements Listener {
+public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> {
     private final List<Plugin> plugins;
     private final Map<String, NewUpdater> pluginsToUpdate;
     private int spigotID = -1;
@@ -72,18 +70,10 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
         Player player = playerMenuUtility.getOwner();
         registerButton(getSlot("PluginManager.AutoUpdateMenu.AddPlugin", 46),
                 lgm.getItem("PluginManager.AutoUpdateMenu.AddPlugin", player, false),
-                (p, e) -> {
-                    playerMenuUtility.addData("AddPluginMetaData", true);
-                    p.closeInventory();
-                    p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", p, false));
-                }, null);
+                (p, e) -> promptFileName(p, lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectFileName", p, false)), null);
         registerButton(getSlot("PluginManager.AutoUpdateMenu.RemovePlugin", 47),
                 lgm.getItem("PluginManager.AutoUpdateMenu.RemovePlugin", player, false),
-                (p, e) -> {
-                    playerMenuUtility.addData("RemovePluginSelectMetaData", true);
-                    p.closeInventory();
-                    p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", p, false));
-                }, null);
+                (p, e) -> promptRemovePlugin(p, lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", p, false)), null);
     }
 
     @Override
@@ -136,64 +126,72 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
     public void handleCloseMenu(InventoryCloseEvent e) {
     }
 
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        Plugin selectedPlugin;
-        if (playerMenuUtility.hasData("AddPluginMetaData")) {
-            event.setCancelled(true);
-            String message = event.getMessage().replace(" ", "-");
-            if (!message.endsWith(".jar")) return;
-            this.fileName = message;
-            playerMenuUtility.removeData("AddPluginMetaData");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fileName%", message, true);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.FileNameSelected", player, false));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectSpigotID", player, true));
-            playerMenuUtility.addData("AddPluginSpigotIDMetaData", true);
-        } else if (playerMenuUtility.hasData("AddPluginSpigotIDMetaData")) {
-            event.setCancelled(true);
-            int message;
-            try {
-                message = Integer.parseInt(event.getMessage().replace(" ", ""));
-            } catch (NumberFormatException e) {
-                player.sendMessage(lgm.getMessage("Player.General.PlayerManager.Money.NotANumber", player, true));
+    private void ask(Player player, String message, BiConsumer<Player, String> onInput) {
+        MenuAction.prompt(message, onInput).execute(player, null);
+    }
+
+    private void promptFileName(Player player, String message) {
+        ask(player, message, (p, text) -> {
+            String name = text.replace(" ", "-");
+            if (!name.endsWith(".jar")) {
+                promptFileName(p, null);
                 return;
             }
-            this.spigotID = message;
-            playerMenuUtility.removeData("AddPluginSpigotIDMetaData");
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%spigotID%", message, true);
+            fileName = name;
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fileName%", name, true);
+            p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.FileNameSelected", p, false));
+            promptSpigotId(p, lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectSpigotID", p, true));
+        });
+    }
+
+    private void promptSpigotId(Player player, String message) {
+        ask(player, message, (p, text) -> {
+            int id;
+            try {
+                id = Integer.parseInt(text.replace(" ", ""));
+            } catch (NumberFormatException e) {
+                p.sendMessage(lgm.getMessage("Player.General.PlayerManager.Money.NotANumber", p, true));
+                promptSpigotId(p, null);
+                return;
+            }
+            spigotID = id;
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%spigotID%", id, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fileName%", fileName, false);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SpigotIDSelected", player, false));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPlugin", player, true));
-            playerMenuUtility.addData("AddPluginSelectPluginMetaData", true);
-        } else if (playerMenuUtility.hasData("AddPluginSelectPluginMetaData")) {
-            event.setCancelled(true);
-            String message = event.getMessage();
-            selectedPlugin = new PluginUtils().getPluginByName(message);
+            p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SpigotIDSelected", p, false));
+            promptPluginName(p, lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPlugin", p, true));
+        });
+    }
+
+    private void promptPluginName(Player player, String message) {
+        ask(player, message, (p, text) -> {
+            Plugin selectedPlugin = new PluginUtils().getPluginByName(text);
             if (selectedPlugin == null) {
+                promptPluginName(p, null);
                 return;
             }
             AdminPanelMain.getPlugin().getPluginDescriptionManager().addPluginDescription(selectedPlugin, "", spigotID);
-            playerMenuUtility.removeData("AddPluginSelectPluginMetaData");
             AdminPanelMain.getPlugin().getAutoUpdaterManager().addPluginToUpdater(selectedPlugin, spigotID, fileName);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", text, true);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%spigotID%", spigotID, false);
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%fileName%", fileName, false);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.PluginSelected", player, false));
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.AddedPlugin", player, true));
-            super.open();
-        } else if (playerMenuUtility.hasData("RemovePluginSelectMetaData")) {
-            event.setCancelled(true);
-            String message = event.getMessage().replace(" ", "-");
-            selectedPlugin = new PluginUtils().getPluginByName(message);
+            p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.PluginSelected", p, false));
+            p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.AddedPlugin", p, true));
+            open();
+        });
+    }
+
+    private void promptRemovePlugin(Player player, String message) {
+        ask(player, message, (p, text) -> {
+            String name = text.replace(" ", "-");
+            Plugin selectedPlugin = new PluginUtils().getPluginByName(name);
             if (selectedPlugin == null) {
+                promptRemovePlugin(p, null);
                 return;
             }
-            playerMenuUtility.removeData("RemovePluginSelectMetaData");
             AdminPanelMain.getPlugin().getAutoUpdaterManager().removePluginFromUpdater(selectedPlugin);
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", message, true);
-            player.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.RemovedPlugin", player, true));
-            super.open();
-        }
+            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%name%", name, true);
+            p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.RemovedPlugin", p, true));
+            open();
+        });
     }
 }

@@ -72,6 +72,7 @@ public class ApProbe extends JavaPlugin {
         check("spawning", () -> spawning(main));
         check("gamerules", () -> gameRules(main));
         check("time-weather", () -> timeWeather(main));
+        check("world-flags", this::worldFlags);
         worldLifecycle();
     }
 
@@ -169,6 +170,30 @@ public class ApProbe extends JavaPlugin {
         }
         expect(unreadable.isEmpty(), "rules without a GameRule object: " + unreadable);
         ok("gamerules", names.length + " rules, " + changed + " changed and restored, categories " + categories);
+    }
+
+    private void worldFlags() {
+        for (World world : Bukkit.getWorlds()) {
+            long before = world.getTime();
+            world.setTime(TimeEdit.add(before, 6000));
+            long after = world.getTime();
+            boolean timeWorks = Math.abs(after - TimeEdit.add(before, 6000)) < 5;
+            world.setTime(before);
+            boolean storm = world.hasStorm();
+            world.setStorm(!storm);
+            boolean stormWorks = world.hasStorm() == !storm;
+            world.setStorm(storm);
+            boolean monsters = world.getAllowMonsters();
+            boolean animals = world.getSpawnLimit(org.bukkit.entity.SpawnCategory.ANIMAL) != 0;
+            world.setSpawnLimit(org.bukkit.entity.SpawnCategory.ANIMAL, animals ? 0 : -1);
+            boolean animalsWork = (world.getSpawnLimit(org.bukkit.entity.SpawnCategory.ANIMAL) != 0) == !animals;
+            world.setSpawnLimit(org.bukkit.entity.SpawnCategory.ANIMAL, -1);
+            world.setSpawnFlags(!monsters, world.getAllowAnimals());
+            boolean monstersWork = world.getAllowMonsters() == !monsters;
+            world.setSpawnFlags(monsters, world.getAllowAnimals());
+            getLogger().info("PROBE info " + world.getName() + " " + world.getEnvironment() + " setTime=" + timeWorks
+                    + " setStorm=" + stormWorks + " animalsFlag=" + animalsWork + " monstersFlag=" + monstersWork);
+        }
     }
 
     private void timeWeather(World world) {

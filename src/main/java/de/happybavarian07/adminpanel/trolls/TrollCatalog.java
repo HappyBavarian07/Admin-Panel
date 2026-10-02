@@ -13,6 +13,7 @@ public final class TrollCatalog {
      * server has no attribute for them.
      */
     public static void registerAll(TrollRegistry registry, Plugin plugin, LanguageManager lgm) {
+        LegacyTrolls.registerAll(registry, plugin);
         registry.register(new CreeperHiss());
         registry.register(new FakeExplosion());
         registry.register(new Jumpscare(lgm));

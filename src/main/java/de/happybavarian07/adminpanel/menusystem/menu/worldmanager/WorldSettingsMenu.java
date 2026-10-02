@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
+import org.bukkit.entity.SpawnCategory;
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.events.AdminPanelEvent;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
@@ -70,10 +71,6 @@ public class WorldSettingsMenu extends Menu {
     @Override
     public void setMenuItems() {
         setFillerGlass();
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%world%", world.getName(), false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%size%", (long) world.getWorldBorder().getSize(), false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%players%", world.getPlayers().size(), false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", world.getEnvironment().name(), false);
 
         button("Info", 8, MenuAction.of((p, e) -> {
         }));
@@ -106,8 +103,8 @@ public class WorldSettingsMenu extends Menu {
         boolean monsters = world.getAllowMonsters();
         button("Monsters." + monsters, 22, MenuAction.of((p, e) -> world.setSpawnFlags(!monsters, world.getAllowAnimals()))
                 .then((p, e) -> refresh()).requires(SETTINGS));
-        boolean animals = world.getAllowAnimals();
-        button("Animals." + animals, 23, MenuAction.of((p, e) -> world.setSpawnFlags(world.getAllowMonsters(), !animals))
+        boolean animals = world.getSpawnLimit(SpawnCategory.ANIMAL) != 0;
+        button("Animals." + animals, 23, MenuAction.of((p, e) -> world.setSpawnLimit(SpawnCategory.ANIMAL, animals ? 0 : -1))
                 .then((p, e) -> refresh()).requires(SETTINGS));
         boolean keepInventory = Boolean.TRUE.equals(world.getGameRuleValue(GameRule.KEEP_INVENTORY));
         button("KeepInventory." + keepInventory, 24, MenuAction.of((p, e) -> world.setGameRule(GameRule.KEEP_INVENTORY, !keepInventory))
@@ -128,6 +125,10 @@ public class WorldSettingsMenu extends Menu {
     }
 
     private void button(String key, int slot, MenuAction action) {
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%world%", world.getName(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%size%", (long) world.getWorldBorder().getSize(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%players%", world.getPlayers().size(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", world.getEnvironment().name(), false);
         String path = PATH + key;
         registerButton(getSlot(path, slot), lgm.getItem(path, playerMenuUtility.getOwner(), true), action);
     }

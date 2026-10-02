@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionSelectMenu;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
@@ -78,25 +79,18 @@ public class PermissionActionMenu extends Menu {
         inventory.setItem(getSlot(path + "InfoItem", 4), infoItem);
         registerButton(getSlot(path + "SetTrue", 10), trueButton, (p, e) -> {
             permissionsManager.addPermission(targetUUID, permissionFullName, true, true);
-            if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", true, false);
-                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", p, true));
-            }
+            sendSet(p, true);
             open();
         }, null);
         registerButton(getSlot(path + "SetFalse", 12), falseButton, (p, e) -> {
             permissionsManager.addPermission(targetUUID, permissionFullName, false, true);
-            if (Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
-                lgm.addPlaceholder(PlaceholderType.MESSAGE, "%value%", false, false);
-                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.AddedPermission", p, true));
-            }
+            sendSet(p, false);
             open();
         }, null);
         registerButton(getSlot(path + "Remove", 14), removeButton, (p, e) -> {
             permissionsManager.removePermission(targetUUID, permissionFullName, true);
-            if (!Bukkit.getPlayer(targetUUID).hasPermission(permissionFullName)) {
-                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.RemovedPermission", p, true));
-            }
+            CommandText.send(lgm, p, "Player.PlayerManager.Permissions.PermissionRemoved", "%permission%", permissionFullName,
+                    "%target%", targetName());
             new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();
         }, null);
         registerButton(getSlot(path + "Info", 16), infoButton, (p, e) -> {
@@ -117,6 +111,16 @@ public class PermissionActionMenu extends Menu {
         registerButton(getSlot("General.Close", 22), closeButton,
                 MenuAction.of((p, e) ->
                         new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open()).requires("AdminPanel.Button.Close"), null);
+    }
+
+    private String targetName() {
+        Player target = Bukkit.getPlayer(targetUUID);
+        return target != null ? target.getName() : targetUUID.toString();
+    }
+
+    private void sendSet(Player staff, boolean value) {
+        CommandText.send(lgm, staff, "Player.PlayerManager.Permissions.PermissionSet", "%permission%", permissionFullName,
+                "%value%", value, "%target%", targetName());
     }
 
     @Override

@@ -196,6 +196,8 @@ Messages:
           EnterSort: '%prefix% &9> &aBitte gib die Sortierung in den Chat ein!'
           SortResult: '%prefix% &9> &aDie Sortierung wird angegewended!'
           PermissionNotFound: '%prefix% &9> &cDie Permission existiert nicht! (%permission%) (Wenn du willst, dass solche Permissions auch hinzugefügt werden, dann schau in die Config.)'
+        PermissionSet: '%prefix% &9> &e%permission% &awurde für &e%target% &aauf &e%value% &agesetzt!'
+        PermissionRemoved: '%prefix% &9> &e%permission% &awurde von &e%target% &aentfernt!'
       KickMenu:
         # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4Du wurdest vom Server geworfen! Grund: %reason%'
@@ -211,7 +213,7 @@ Messages:
           NewReasonSet: '%prefix% &9> &aDer neue Grund wurde gesetzt!'
       BanMenu:
         # %reason% = Der Grund, %duration% = Die Dauer des Bans, %staff% = Wer den Spieler gebannt hat
-        TargetKickMessage: '%prefix% &9> &4Du wurdest von diesem Server gebannt! \r\n &4Dauer: &4%duration% \r\n &4Grund: &4%reason%'
+        TargetBanMessage: '%prefix% &9> &4Du wurdest von diesem Server gebannt!\n&4Dauer: &4%duration%\n&4Grund: &4%reason%'
         SuccessfullyUnbanned: '%prefix% &9> &aDu hast den Spieler erfolgreich entbannt!'
         SuccessfullyBanned: '%prefix% &9> &aDu hast diesen Spieler erfolgreich gebannt!'
         AlreadyBanned: '%prefix% &9> &cDieser Spieler ist schon gebannt!'
@@ -615,6 +617,8 @@ Messages:
     DurationSet: '%prefix% &9> &aDie Wetterdauer ist jetzt &f%duration%&a!'
     NotADuration: '%prefix% &9> &cDas ist keine gültige Dauer! (zum Beispiel 5m oder 1h, höchstens %max%)'
     WeatherSet: '%prefix% &9> &aDas Wetter von &7%world% &aist jetzt &f%weather%&a!'
+    TimeNotApplied: '%prefix% &9> &c%world% hat die neue Zeit nicht übernommen. Nether und End nutzen die Zeit der Oberwelt.'
+    WeatherNotApplied: '%prefix% &9> &c%world% hat das neue Wetter nicht übernommen. Nether und End nutzen das Wetter der Oberwelt.'
   StartupStatus:
     # %feature% = Der Teil, %reason% = Warum, %count% = Wie viele, %status% = Der Status, %stage% = Der Teil, %detail% = Der Grund
     Unavailable: '%prefix% &9> &c%feature% ist nicht verfügbar: &7%reason%'
@@ -652,6 +656,16 @@ Messages:
       commands: 'Befehle'
       addons: 'Addon-Loader'
       backup: 'Config-Backup'
+  MoneyMenu:
+    # %target% = Der Spieler, %amount% = Der Betrag, %balance% = Das neue Guthaben, %error% = Der Fehler
+    EnterAmount: '%prefix% &9> &aBitte gib den Betrag für %target% in den Chat ein!'
+    NotANumber: '%prefix% &9> &cDas ist kein gültiger Betrag!'
+    NoAccount: '%prefix% &9> &c%target% hat kein Konto beim Wirtschafts-Plugin!'
+    NotEnough: '%prefix% &9> &c%target% hat dafür nicht genug Geld! (Guthaben: %balance%)'
+    Failed: '%prefix% &9> &cDie Transaktion für %target% ist fehlgeschlagen: %error%'
+    Gave: '%prefix% &9> &aDu hast &e%target% &e%amount% &agegeben! (Guthaben: &e%balance%&a)'
+    SetTo: '%prefix% &9> &aDu hast das Geld von &e%target% &aauf &e%amount% &agesetzt!'
+    Took: '%prefix% &9> &aDu hast &e%target% &e%amount% &aabgenommen! (Guthaben: &e%balance%&a)'
 Items:
   General:
     ConfirmationMenu:

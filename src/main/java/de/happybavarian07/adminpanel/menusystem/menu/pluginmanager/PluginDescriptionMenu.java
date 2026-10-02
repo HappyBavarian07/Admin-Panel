@@ -7,14 +7,11 @@ import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
-public class PluginDescriptionMenu extends Menu implements Listener {
+public class PluginDescriptionMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final LanguageManager lgm = plugin.getLanguageManager();
 
@@ -38,31 +35,19 @@ public class PluginDescriptionMenu extends Menu implements Listener {
         return 9;
     }
 
-    @EventHandler
-    public void onChat(PlayerChatEvent e) {
-        Player player = e.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.getData("SetDescriptionInChat") != null) {
-            e.setCancelled(true);
-            plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), e.getMessage());
-            player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetDescriptionInChat", player, true));
-            new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
-            playerMenuUtility.removeData("SetDescriptionInChat");
-        } else if (playerMenuUtility.getData("SetResourceIDInChat") != null) {
-            e.setCancelled(true);
+    private void promptResourceId(Player player, String message) {
+        MenuAction.prompt(message, (p, text) -> {
             try {
-                int resourceID = Integer.parseInt(e.getMessage());
+                int resourceID = Integer.parseInt(text);
                 plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), plugin.getPluginDescriptionManager().getDescriptionFromResourceID(resourceID));
-                player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetResourceInChat", player, true));
-                new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(player.getUniqueId())).open();
-                playerMenuUtility.removeData("SetResourceIDInChat");
+                p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetResourceInChat", p, true));
+                new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(p.getUniqueId())).open();
             } catch (NumberFormatException ex) {
-                player.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChatError", player, true));
+                p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChatError", p, true));
+                promptResourceId(p, null);
             }
-        }
+        }).execute(player, null);
     }
-
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent e) {
@@ -88,16 +73,14 @@ public class PluginDescriptionMenu extends Menu implements Listener {
                 p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.LoadedFromResourceID", p, true));
                 new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
             } else {
-                p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChat", p, true));
-                p.closeInventory();
-                playerMenuUtility.addData("SetResourceIDInChat", true);
+                promptResourceId(p, lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetResourceInChat", p, true));
             }
         }, null);
-        registerButton(getSlot(path + "SetWithChat", 5), lgm.getItem(path + "SetWithChat", player, false), (p, e) -> {
-            p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetDescriptionInChat", p, true));
-            p.closeInventory();
-            playerMenuUtility.addData("SetDescriptionInChat", true);
-        }, null);
+        registerButton(getSlot(path + "SetWithChat", 5), lgm.getItem(path + "SetWithChat", player, false), MenuAction.prompt(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SetDescriptionInChat", player, true), (p, text) -> {
+            plugin.getPluginDescriptionManager().addPluginDescription(playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class), text);
+            p.sendMessage(lgm.getMessage("Player.PluginManager.PluginDescriptionMenu.SuccessfullySetDescriptionInChat", p, true));
+            new PluginSettingsMenu(CoolStuffLib.getLib().getPlayerMenuUtility(p.getUniqueId())).open();
+        }), null);
         registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);

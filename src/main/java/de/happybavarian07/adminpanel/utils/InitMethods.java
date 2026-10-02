@@ -23,6 +23,8 @@ import de.happybavarian07.adminpanel.commands.managers.UnwarnManager;
 import de.happybavarian07.adminpanel.commands.managers.WarnManager;
 import de.happybavarian07.adminpanel.commands.managers.WarningsManager;
 import de.happybavarian07.adminpanel.listeners.DisabledItemsListener;
+import de.happybavarian07.adminpanel.listeners.ChatMuteListener;
+import de.happybavarian07.adminpanel.listeners.MaintenanceListener;
 import de.happybavarian07.adminpanel.listeners.MenuListener;
 import de.happybavarian07.adminpanel.listeners.PlayerEventHandler;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -275,6 +277,9 @@ public class InitMethods {
         pm.registerEvents(new PlayerEventHandler(AdminPanelMain.getPlugin().getPermissionsManager()), AdminPanelMain.getPlugin());
         logger.message("&3&lLoading Menu Listener Events!&r");
         pm.registerEvents(new MenuListener(), plugin);
+        logger.message("&3&lLoading Maintenance and Chat Mute Listener Events!&r");
+        pm.registerEvents(new MaintenanceListener(), plugin);
+        pm.registerEvents(new ChatMuteListener(), plugin);
         logger.message("&3&lLoading Disabled Items Listener Events!&r");
         new DisabledItemsListener();
         logger.message("&3&lLoading Main Class Listener Events!&r");

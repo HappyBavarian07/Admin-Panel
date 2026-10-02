@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.utils.AttributeLookup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
@@ -122,9 +123,13 @@ public class PlayerActionsMenu extends Menu {
                 target.setFireTicks(burnduration * 20);
             }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Burn"));
 
-        registerButton(getSlot(path + "Troll", 31), lgm.getItem(path + "Troll", target, false),
-            MenuAction.open(() -> new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)))
-                .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll"));
+        if (plugin.getStartup().isOk("trolls")) {
+            registerButton(getSlot(path + "Troll", 31), lgm.getItem(path + "Troll", target, false),
+                MenuAction.open(() -> new PlayerTrollMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(player)))
+                    .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Troll"));
+        } else {
+            FeatureGate.placeUnavailable(this, getSlot(path + "Troll", 31), "trolls", player);
+        }
 
         registerButton(getSlot(path + "Lightning", 33), lgm.getItem(path + "Lightning", target, false),
             MenuAction.of((p, e) -> target.getWorld().strikeLightning(target.getLocation()))

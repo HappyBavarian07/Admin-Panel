@@ -12,19 +12,13 @@ import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.server.ServerListPingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerManagerMenu extends Menu implements Listener {
+public class ServerManagerMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
     public ServerManagerMenu(PlayerMenuUtility playerMenuUtility) {
@@ -65,10 +59,12 @@ public class ServerManagerMenu extends Menu implements Listener {
 
         // Items
         registerButton(getSlot("Broadcast", 2), lgm.getItem(path + "Broadcast", player, false),
-                MenuAction.of((p, e) -> {
-                    p.closeInventory();
-                    playerMenuUtility.addData("serverManagerBroadcastMessage", true);
-                    p.sendMessage(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", p, true));
+                MenuAction.prompt(lgm.getMessage("Player.ServerManager.PleaseEnterAMessage", player, true), (p, text) -> {
+                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", AdminPanelUtils.chat(text), true);
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", p, false));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", p, false));
+                    Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastFooter", p, true));
+                    open();
                 }).requires("AdminPanel.ServerManagment.Broadcast"), null);
         registerButton(getSlot("ChatManagerItem", 4), lgm.getItem(path + "ChatManagerItem", player, false),
                 MenuAction.of((p, e) ->
@@ -141,47 +137,5 @@ public class ServerManagerMenu extends Menu implements Listener {
         registerButton(getSlot("General.Close", 22), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
-    }
-
-    @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.hasData("serverManagerBroadcastMessage") && player == playerMenuUtility.getOwner()) {
-            String message = AdminPanelUtils.chat(event.getMessage());
-            lgm.addPlaceholder(PlaceholderType.MESSAGE, "%message%", message, true);
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastHeader", player, false));
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastMessage", player, false));
-            Bukkit.broadcastMessage(lgm.getMessage("Player.ServerManager.BroadcastFooter", player, true));
-            playerMenuUtility.removeData("serverManagerBroadcastMessage");
-            super.open();
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-        if (player.hasPermission("AdminPanel.Bypass.KickInMaintenanceMode") ||
-                player.hasPermission("AdminPanel.*") ||
-                player.hasPermission("AdminPanel.Bypass.*")) return;
-        if (plugin.getPluginStateManager().isInMaintenanceMode()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, lgm.getMessage("Player.ServerManager.MaintenanceMode", player, true));
-        } else {
-            event.allow();
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onServerPing(ServerListPingEvent event) {
-        if (plugin.getPluginStateManager().isInMaintenanceMode()) {
-            event.setMotd(lgm.getMessage("Player.ServerManager.MaintenanceModeMOTD", null, true));
-            event.setMaxPlayers(lgm.getCustomObject("Messages.Player.ServerManager.MaintenanceMaxPlayerCount", null, 0, false));
-        } else {
-            event.setServerIcon(Bukkit.getServerIcon());
-            event.setMotd(Bukkit.getMotd());
-            event.setMaxPlayers(Bukkit.getMaxPlayers());
-        }
     }
 }

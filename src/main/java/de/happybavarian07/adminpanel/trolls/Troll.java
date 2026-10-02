@@ -32,6 +32,14 @@ public interface Troll {
     Kind kind();
 
     /**
+     * @return the item below {@code PlayerManager.TrollMenu} in the language file; toggles have a {@code true} and a
+     * {@code false} item below it
+     */
+    default String itemKey() {
+        return "More." + id();
+    }
+
+    /**
      * @param target the player the troll may be running on
      * @return {@code true} while the troll runs on the target, for a one shot only while it still has a pending task
      */

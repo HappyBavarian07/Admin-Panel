@@ -118,6 +118,10 @@ public class WorldTimeWeatherMenu extends Menu {
         }
         if (event.isCancelled()) return;
         world.setTime(event.getTicks());
+        if (Math.abs(world.getTime() - event.getTicks()) > 5) {
+            CommandText.send(lgm, staff, "TimeWeatherMenu.TimeNotApplied", "%world%", world.getName());
+            return;
+        }
         CommandText.send(lgm, staff, "TimeWeatherMenu.TimeSet", "%time%", event.getTicks(), "%clock%", clock(event.getTicks()), "%world%", world.getName());
     }
 
@@ -174,6 +178,11 @@ public class WorldTimeWeatherMenu extends Menu {
                     world.setThunderDuration(ticks);
                 }
             }
+        }
+        boolean raining = event.getWeather() != Weather.CLEAR;
+        if (world.hasStorm() != raining) {
+            CommandText.send(lgm, staff, "TimeWeatherMenu.WeatherNotApplied", "%world%", world.getName());
+            return;
         }
         CommandText.send(lgm, staff, "TimeWeatherMenu.WeatherSet", "%weather%", event.getWeather().getWeatherName(), "%world%", world.getName());
     }

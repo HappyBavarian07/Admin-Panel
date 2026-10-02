@@ -250,6 +250,8 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
 
             lgm.addPlaceholder(PlaceholderType.ITEM, "%group_name%", group.getFullName(), false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%group_item%", group.getFullName(), false);
+            lgm.addPlaceholder(PlaceholderType.ITEM, "%parent_groups%",
+                    group.getParent() != null ? group.getParent().getFullName() : "None", false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%value%", Bukkit.getPlayer(targetUUID).hasPermission(group.getFullName()), false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%sub_group_count%", String.valueOf(group.getSubGroups().size()), false);
             lgm.addPlaceholder(PlaceholderType.ITEM, "%sub_permission_count%", String.valueOf(group.getPermissions().size()), false);

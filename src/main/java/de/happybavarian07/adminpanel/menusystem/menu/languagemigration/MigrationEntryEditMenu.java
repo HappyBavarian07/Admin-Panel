@@ -5,13 +5,10 @@ import de.happybavarian07.coolstufflib.languagemanager.LanguageFileMigrator;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
+import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -21,10 +18,11 @@ import java.util.List;
  * @Author HappyBavarian07
  * @Date Juli 14, 2025 | 20:15
  */
-public class MigrationEntryEditMenu extends Menu implements Listener {
+public class MigrationEntryEditMenu extends Menu {
     private final LanguageFileMigrator.MigrationEntry migrationEntry;
     private final LanguageMigrationMenu languageMigrationMenu;
     private Object finalValue = "N/A";
+    private boolean awaitingInput;
 
     public MigrationEntryEditMenu(PlayerMenuUtility playerMenuUtility, LanguageMigrationMenu languageMigrationMenu) {
         super(playerMenuUtility);
@@ -49,13 +47,12 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
 
     @Override
     public void handleOpenMenu(InventoryOpenEvent inventoryOpenEvent) {
-        AdminPanelMain.getPlugin().getServer().getPluginManager().registerEvents(this, AdminPanelMain.getPlugin());
-        playerMenuUtility.setData("final_value_input", false, true);
+        awaitingInput = false;
     }
 
     @Override
     public void handleCloseMenu(InventoryCloseEvent inventoryCloseEvent) {
-        HandlerList.unregisterAll(this);
+        if (awaitingInput) return;
         languageMigrationMenu.open();
     }
 
@@ -137,11 +134,11 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
         registerButton(getSlot("LanguageMigrator.EntryEditMenu.EditFinalValue", 3), 
             lgm.getItem("LanguageMigrator.EntryEditMenu.EditFinalValue", player, false), 
             (p, e) -> {
-                p.closeInventory();
                 lgm.addPlaceholder(PlaceholderType.MESSAGE, "%current_value%", String.valueOf(finalValue), false);
                 p.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValue", p, true));
-                p.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValueFormat", p, true));
-                playerMenuUtility.setData("final_value_input", true, true);
+                awaitingInput = true;
+                MenuAction.prompt(lgm.getMessage("LanguageMigrator.EntryEditMenu.EnterFinalValueFormat", p, true),
+                        this::onFinalValue).execute(p, e);
             }, null);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%migration_entry_final_value%", finalValue, false);
         inventory.setItem(getSlot("LanguageMigrator.EntryEditMenu.FinalValueDisplay", 7), lgm.getItem("LanguageMigrator.EntryEditMenu.FinalValueDisplay", player, true));
@@ -159,19 +156,10 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
             }, null);
     }
 
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (!playerMenuUtility.getData("final_value_input", Boolean.class, false)) return;
-        if (!player.equals(playerMenuUtility.getOwner())) return;
-
-        String message = event.getMessage();
-        event.setCancelled(true);
-        playerMenuUtility.setData("final_value_input", false, true);
-
+    private void onFinalValue(Player player, String message) {
         if (message.equalsIgnoreCase("cancel")) {
             player.sendMessage(lgm.getMessage("LanguageMigrator.EntryEditMenu.EditCancelled", player, true));
-            super.open();
+            open();
             return;
         }
 
@@ -200,6 +188,6 @@ public class MigrationEntryEditMenu extends Menu implements Listener {
             finalValue = message;
         }
 
-        super.open();
+        open();
     }
 }

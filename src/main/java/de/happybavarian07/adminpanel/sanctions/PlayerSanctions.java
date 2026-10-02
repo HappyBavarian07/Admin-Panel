@@ -95,7 +95,7 @@ public final class PlayerSanctions {
         }
         Bukkit.getBanList(BanList.Type.NAME).addBan(name, why, expires, staff.getName());
         if (online != null) {
-            online.kickPlayer(CommandText.get(lgm, online, BAN_PATH + "TargetKickMessage",
+            online.kickPlayer(CommandText.get(lgm, online, BAN_PATH + "TargetBanMessage",
                     "%reason%", why, "%duration%", duration, "%staff%", staff.getName()));
         }
         recordBan(target.getUniqueId(), why, durationMillis, ipBanned, issuerOf(staff));

@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 
@@ -70,24 +71,20 @@ public class WorldCreateMenu extends Menu {
     public void setMenuItems() {
         Player owner = playerMenuUtility.getOwner();
         setFillerGlass();
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%name%", worldName, false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%seed%", seedText.isEmpty() ? "-" : seedText, false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%preset%", CommandText.get(lgm, owner, "WorldCreate.Preset." + preset.languageKey()), false);
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", environment.name(), false);
 
-        registerButton(getSlot(PATH + "Name", 10), lgm.getItem(PATH + "Name", owner, true),
+        registerButton(getSlot(PATH + "Name", 10), item(PATH + "Name", owner),
                 MenuAction.prompt(CommandText.get(lgm, owner, "WorldCreate.EnterName"), (p, input) -> {
                     worldName = WorldNames.normalize(input);
                     open();
                 }));
-        registerButton(getSlot(PATH + "Seed", 11), lgm.getItem(PATH + "Seed", owner, true),
+        registerButton(getSlot(PATH + "Seed", 11), item(PATH + "Seed", owner),
                 MenuAction.prompt(CommandText.get(lgm, owner, "WorldCreate.EnterSeed"), (p, input) -> {
                     seedText = input.trim().equals("-") ? "" : input.trim();
                     open();
                 }));
-        registerButton(getSlot(PATH + "Preset", 12), lgm.getItem(PATH + "Preset", owner, true),
+        registerButton(getSlot(PATH + "Preset", 12), item(PATH + "Preset", owner),
                 MenuAction.of((p, e) -> preset = preset.next()).then((p, e) -> refresh()));
-        registerButton(getSlot(PATH + "Environment." + environment, 13), lgm.getItem(PATH + "Environment." + environment, owner, true),
+        registerButton(getSlot(PATH + "Environment." + environment, 13), item(PATH + "Environment." + environment, owner),
                 MenuAction.of((p, e) -> {
                     World.Environment[] all = {World.Environment.NORMAL, World.Environment.NETHER, World.Environment.THE_END};
                     environment = all[(Arrays.asList(all).indexOf(environment) + 1) % all.length];
@@ -101,11 +98,19 @@ public class WorldCreateMenu extends Menu {
                 MenuAction.of((p, e) -> hardcore = !hardcore).then((p, e) -> refresh()));
         registerButton(getSlot(PATH + "TeleportAfter." + teleportAfter, 24), lgm.getItem(PATH + "TeleportAfter." + teleportAfter, owner, false),
                 MenuAction.of((p, e) -> teleportAfter = !teleportAfter).then((p, e) -> refresh()));
-        registerButton(getSlot(PATH + "CreateWorld", 22), lgm.getItem(PATH + "CreateWorld", owner, true),
+        registerButton(getSlot(PATH + "CreateWorld", 22), lgm.getItem(PATH + "CreateWorld", owner, false),
                 MenuAction.of((p, e) -> createWorld(p)).requires(PERMISSION));
         registerButton(getSlot("General.Close", 35), lgm.getItem("General.Back", owner, false),
                 MenuAction.open(() -> new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
                         .requires("AdminPanel.Button.Close"));
+    }
+
+    private ItemStack item(String path, Player owner) {
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%name%", worldName, false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%seed%", seedText.isEmpty() ? "-" : seedText, false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%preset%", CommandText.get(lgm, owner, "WorldCreate.Preset." + preset.languageKey()), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%environment%", environment.name(), false);
+        return lgm.getItem(path, owner, false);
     }
 
     private void createWorld(Player staff) {

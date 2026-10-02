@@ -15,7 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 
-public class DataClientSettingsMenu extends Menu implements Listener {
+public class DataClientSettingsMenu extends Menu {
     private final SettingsManager settingsManager;
 
     public DataClientSettingsMenu(PlayerMenuUtility playerMenuUtility) {
@@ -49,33 +49,6 @@ public class DataClientSettingsMenu extends Menu implements Listener {
 
     }
 
-    @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (playerMenuUtility.getOwner() != player) return;
-
-        if (playerMenuUtility.getData("AutoCheckConnectionTiming") != null) {
-            event.setCancelled(true);
-            String message = event.getMessage();
-            try {
-                int time = Integer.parseInt(message);
-                settingsManager.setCheckConnectionTiming(time);
-                playerMenuUtility.removeData("AutoCheckConnectionTiming");
-                player.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectingTimingChatSuccess", player, true));
-                super.open();
-            } catch (NumberFormatException e) {
-                player.sendMessage(lgm.getMessage("Player.Commands.NotANumber", player, true));
-            }
-        } else if (playerMenuUtility.getData("FileLoggingPrefix") != null) {
-            event.setCancelled(true);
-            String message = event.getMessage();
-            settingsManager.setFileLoggingPrefix(message);
-            playerMenuUtility.removeData("FileLoggingPrefix");
-            player.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChatSuccess", player, true));
-            super.open();
-        }
-    }
-
     @Override
     public void setMenuItems() {
         setFillerGlass();
@@ -104,16 +77,20 @@ public class DataClientSettingsMenu extends Menu implements Listener {
                 }).requires("AdminPanel.DataClient.Menu.Settings.FileLogging"), null);
 
         registerButton(15, lgm.getItem(path + "AutoCheckConnectionTiming", player, false),
-                MenuAction.of((p, e) -> {
-                    p.closeInventory();
-                    p.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", p, true));
-                    playerMenuUtility.addData("AutoCheckConnectionTiming", settingsManager.getCheckConnectionTiming());
+                MenuAction.prompt(lgm.getMessage("DataClient.Menu.AutoCheckConnectionTimingChat", player, true), (p, text) -> {
+                    try {
+                        settingsManager.setCheckConnectionTiming(Integer.parseInt(text.trim()));
+                        p.sendMessage(lgm.getMessage("DataClient.Menu.AutoCheckConnectingTimingChatSuccess", p, true));
+                    } catch (NumberFormatException invalid) {
+                        p.sendMessage(lgm.getMessage("Player.Commands.NotANumber", p, true));
+                    }
+                    open();
                 }).requires("AdminPanel.DataClient.Menu.Settings.AutoCheckConnectionTiming"), null);
         registerButton(16, lgm.getItem(path + "FileLoggingPrefix", player, false),
-                MenuAction.of((p, e) -> {
-                    p.closeInventory();
-                    p.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", p, true));
-                    playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
+                MenuAction.prompt(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChat", player, true), (p, text) -> {
+                    settingsManager.setFileLoggingPrefix(text);
+                    p.sendMessage(lgm.getMessage("DataClient.Menu.FileLoggingPrefixChatSuccess", p, true));
+                    open();
                 }).requires("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix"), null);
 
         registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", player, false),

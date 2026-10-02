@@ -15,7 +15,8 @@ public final class CommandText {
 
     /** {@code placeholders} are pairs: key, value, key, value, ... Values may use {@code &} color codes. */
     public static String get(LanguageManager lgm, CommandSender sender, String key, Object... placeholders) {
-        String text = lgm.getMessage(key, sender instanceof Player player ? player : null, false);
+        String text = lgm.getMessage(key, sender instanceof Player player ? player : null, false)
+                .replace("\\r\\n", "\n").replace("\\n", "\n");
         for (int i = 0; i + 1 < placeholders.length; i += 2) {
             text = text.replace(String.valueOf(placeholders[i]), AdminPanelUtils.chat(String.valueOf(placeholders[i + 1])));
         }
