@@ -10,6 +10,7 @@ import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import de.happybavarian07.adminpanel.utils.ConstantLookup;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -121,9 +122,14 @@ public class MenuListener implements Listener {
                 if (cfg.getBoolean("Panel.PlaySoundsWhenOpened")) {
                     if (cfg.getString("Panel.SoundWhenOpened") != null) {
                         String sound = cfg.getString("Panel.SoundWhenOpened");
-                        player.playSound(player.getLocation(), Sound.valueOf(sound),
-                                (float) cfg.getDouble("Panel.SoundVolume"),
-                                (float) cfg.getDouble("Panel.SoundPitch"));
+                        Sound opening = ConstantLookup.find(Sound.class, sound);
+                        if (opening == null) {
+                            AdminPanelMain.getPlugin().getLogger().warning("Panel.SoundWhenOpened '" + sound + "' is not a sound of this server version");
+                        } else {
+                            player.playSound(player.getLocation(), opening,
+                                    (float) cfg.getDouble("Panel.SoundVolume"),
+                                    (float) cfg.getDouble("Panel.SoundPitch"));
+                        }
                     }
                 }
             }

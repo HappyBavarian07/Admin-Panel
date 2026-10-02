@@ -95,6 +95,27 @@ class WorldLogicTest {
     }
 
     @Test
+    void gameRulesOfNewerVersionsAreCategorizedByTheirWords() {
+        assertEquals(GameRuleCategory.WORLD, GameRuleCategory.of("advance_time"));
+        assertEquals(GameRuleCategory.MOBS, GameRuleCategory.of("spawn_wandering_traders"));
+        assertEquals(GameRuleCategory.PLAYER, GameRuleCategory.of("immediate_respawn"));
+        assertEquals(GameRuleCategory.PLAYER, GameRuleCategory.of("spawnRadius"));
+        assertEquals(GameRuleCategory.WORLD, GameRuleCategory.of("spawn_chunk_radius"));
+        assertEquals(GameRuleCategory.DAMAGE, GameRuleCategory.of("fire_damage"));
+        assertEquals(GameRuleCategory.OTHER, GameRuleCategory.of("commandBlockOutput"));
+    }
+
+    @Test
+    void gameRulesAndSoundsAreFoundByNameWithoutTheirEnumMethods() {
+        assertEquals(org.bukkit.GameRule.KEEP_INVENTORY, GameRules.byName("keepInventory"));
+        assertNull(GameRules.byName("noSuchRule"));
+        assertEquals("keepInventory", GameRules.nameOf(org.bukkit.GameRule.KEEP_INVENTORY));
+        assertEquals(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP,
+                de.happybavarian07.adminpanel.utils.ConstantLookup.find(org.bukkit.Sound.class, "NO_SUCH_SOUND", "ENTITY_PLAYER_LEVELUP"));
+        assertNull(de.happybavarian07.adminpanel.utils.ConstantLookup.find(org.bukkit.Sound.class, "NO_SUCH_SOUND"));
+    }
+
+    @Test
     void gameRuleClicksChangeBooleansAndIntegers() {
         assertEquals(false, GameRuleEdit.next(true, GameRuleEdit.Step.UP));
         assertEquals(true, GameRuleEdit.next(false, GameRuleEdit.Step.DOWN));

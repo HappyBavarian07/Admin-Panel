@@ -6,6 +6,7 @@ import de.happybavarian07.adminpanel.events.world.MenuGameruleChangeEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.worlds.GameRuleCategory;
 import de.happybavarian07.adminpanel.worlds.GameRuleEdit;
+import de.happybavarian07.adminpanel.worlds.GameRules;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
@@ -42,9 +43,9 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         this.world = world;
         setOpeningPermission(PERMISSION);
         allRules = Arrays.stream(world.getGameRules())
-                .map(GameRule::getByName)
+                .map(GameRules::byName)
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(GameRule::getName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing(GameRules::nameOf, String.CASE_INSENSITIVE_ORDER))
                 .<GameRule<?>>map(rule -> rule)
                 .toList();
     }
@@ -68,8 +69,8 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
     public void preSetMenuItems() {
         String needle = search.toLowerCase(Locale.ROOT);
         List<GameRule<?>> entries = allRules.stream()
-                .filter(rule -> category == null || GameRuleCategory.of(rule.getName()) == category)
-                .filter(rule -> needle.isEmpty() || rule.getName().toLowerCase(Locale.ROOT).contains(needle))
+                .filter(rule -> category == null || GameRuleCategory.of(GameRules.nameOf(rule)) == category)
+                .filter(rule -> needle.isEmpty() || GameRules.nameOf(rule).toLowerCase(Locale.ROOT).contains(needle))
                 .toList();
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
@@ -125,10 +126,10 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
     }
 
     private void promptValue(Player staff, GameRule<?> rule, Object current, InventoryClickEvent event) {
-        MenuAction.prompt(CommandText.get(lgm, staff, "GameRuleMenu.EnterValue", "%rule%", rule.getName()), (p, text) -> {
+        MenuAction.prompt(CommandText.get(lgm, staff, "GameRuleMenu.EnterValue", "%rule%", GameRules.nameOf(rule)), (p, text) -> {
             Object typed = GameRuleEdit.parse(current, text);
             if (typed == null) {
-                CommandText.send(lgm, p, "GameRuleMenu.NotAValue", "%rule%", rule.getName());
+                CommandText.send(lgm, p, "GameRuleMenu.NotAValue", "%rule%", GameRules.nameOf(rule));
                 open();
                 return;
             }
@@ -151,7 +152,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         }
         if (event.isCancelled()) return;
         world.setGameRule((GameRule) rule, next);
-        CommandText.send(lgm, staff, "GameRuleMenu.ValueSet", "%rule%", rule.getName(), "%value%", next, "%world%", world.getName());
+        CommandText.send(lgm, staff, "GameRuleMenu.ValueSet", "%rule%", GameRules.nameOf(rule), "%value%", next, "%world%", world.getName());
         open();
     }
 
@@ -161,12 +162,12 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         Object standard = world.getGameRuleDefault(rule);
         String type = value instanceof Boolean ? "Boolean." + (((Boolean) value) ? "Enabled" : "Disabled")
                 : value instanceof Integer ? "Number" : "Unknown";
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%rule%", rule.getName(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%rule%", GameRules.nameOf(rule), false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%value%", value, false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%default%", standard, false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%mark%", Objects.equals(value, standard) ? "" : " &e*", false);
         lgm.addPlaceholder(PlaceholderType.ITEM, "%category%",
-                CommandText.get(lgm, viewer, "GameRuleMenu.Category." + categoryKey(GameRuleCategory.of(rule.getName()))), false);
+                CommandText.get(lgm, viewer, "GameRuleMenu.Category." + categoryKey(GameRuleCategory.of(GameRules.nameOf(rule)))), false);
         return lgm.getItem(PATH + "Rule." + type, viewer, true);
     }
 

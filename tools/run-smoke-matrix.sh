@@ -40,11 +40,15 @@ for row in "${TABLE[@]}"; do
         [ -f "$dir/plugins/$plugin" ] || cp "$PLUGINS_FROM"/$plugin "$dir/plugins/" 2>/dev/null
     done
     echo "########## $version"
+    plugin_jar=$(ls "$ROOT"/target/Admin-Panel-*.jar | grep -v -E -- '-(javadoc|sources|shaded|original)\.jar$' | head -1)
+    scan=$(python3 "$ROOT/tools/api_compat_scan.py" "$plugin_jar" "$dir/$(basename "$jar")" 2>&1)
+    scan_code=$?
+    echo "$scan"
     output=$(AP_SKIP_BUILD=1 AP_SERVER="$dir" AP_JAVA="$java" bash "$ROOT/tools/run-adminpanel-smoke.sh" 2>&1)
     code=$?
     echo "$output"
     summary=$(echo "$output" | grep -m1 -E "Startup: " | sed -E 's/.*\] //')
-    results+=("$version: exit=$code ${summary:-no startup line}")
+    results+=("$version: api-scan=$scan_code smoke=$code ${summary:-no startup line}")
 done
 
 echo

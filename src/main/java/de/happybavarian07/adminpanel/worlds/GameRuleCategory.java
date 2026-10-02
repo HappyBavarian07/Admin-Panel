@@ -1,35 +1,37 @@
 package de.happybavarian07.adminpanel.worlds;
 
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
- * Groups the gamerules for the filter button of the gamerule menu. Rules this list does not know, for example rules
- * added by newer versions, land in {@link #OTHER}.
+ * Groups the gamerules for the filter button of the gamerule menu. The group comes from words in the name, not from a
+ * list of names, so rules that newer versions add or rename (for example {@code doDaylightCycle} and
+ * {@code advance_time}) still land in a fitting group. A rule without a known word is in {@link #OTHER}.
  */
 public enum GameRuleCategory {
     MOBS, PLAYER, WORLD, DAMAGE, OTHER;
 
-    private static final Map<String, GameRuleCategory> BY_NAME = Map.ofEntries(
-            Map.entry("mobgriefing", MOBS), Map.entry("domobspawning", MOBS), Map.entry("domobloot", MOBS),
-            Map.entry("dopatrolspawning", MOBS), Map.entry("dotraderspawning", MOBS), Map.entry("dowardenspawning", MOBS),
-            Map.entry("disableraids", MOBS), Map.entry("doinsomnia", MOBS), Map.entry("forgivedeadplayers", MOBS),
-            Map.entry("universalanger", MOBS), Map.entry("maxentitycramming", MOBS), Map.entry("mobexplosiondropdecay", MOBS),
-            Map.entry("keepinventory", PLAYER), Map.entry("naturalregeneration", PLAYER), Map.entry("doimmediaterespawn", PLAYER),
-            Map.entry("showdeathmessages", PLAYER), Map.entry("announceadvancements", PLAYER),
-            Map.entry("playerssleepingpercentage", PLAYER), Map.entry("spawnradius", PLAYER),
-            Map.entry("spectatorsgeneratechunks", PLAYER), Map.entry("disableelytramovementcheck", PLAYER),
-            Map.entry("dolimitedcrafting", PLAYER), Map.entry("enderpearlsvanishondeath", PLAYER),
-            Map.entry("drowningdamage", DAMAGE), Map.entry("falldamage", DAMAGE), Map.entry("firedamage", DAMAGE),
-            Map.entry("freezedamage", DAMAGE),
-            Map.entry("dodaylightcycle", WORLD), Map.entry("doweathercycle", WORLD), Map.entry("dofiretick", WORLD),
-            Map.entry("randomtickspeed", WORLD), Map.entry("dotiledrops", WORLD), Map.entry("doentitydrops", WORLD),
-            Map.entry("snowaccumulationheight", WORLD), Map.entry("watersourceconversion", WORLD),
-            Map.entry("lavasourceconversion", WORLD), Map.entry("dovinesspread", WORLD),
-            Map.entry("blockexplosiondropdecay", WORLD), Map.entry("tntexplosiondropdecay", WORLD),
-            Map.entry("globalsoundevents", WORLD), Map.entry("tntexplodes", WORLD));
+    private record Rule(GameRuleCategory category, List<String> words) {
+    }
+
+    // the first group with a matching word wins, so "spawnradius" and "respawn" are checked before "spawn"
+    private static final List<Rule> RULES = List.of(
+            new Rule(DAMAGE, List.of("damage")),
+            new Rule(PLAYER, List.of("spawnradius", "respawn", "keepinventory", "advancement", "death", "sleeping", "spectator",
+                    "elytra", "movementcheck", "crafting", "regeneration", "debuginfo")),
+            new Rule(WORLD, List.of("spawnchunk")),
+            new Rule(MOBS, List.of("mob", "spawn", "raid", "patrol", "warden", "trader", "phantom", "anger", "forgive",
+                    "cramming", "insomnia")),
+            new Rule(WORLD, List.of("time", "weather", "daylight", "fire", "tick", "drops", "snow", "source", "vines",
+                    "explosion", "explode", "sound")));
 
     public static GameRuleCategory of(String ruleName) {
-        return BY_NAME.getOrDefault(ruleName.toLowerCase(Locale.ROOT), OTHER);
+        String name = ruleName.toLowerCase(Locale.ROOT).replace("_", "");
+        for (Rule rule : RULES) {
+            for (String word : rule.words()) {
+                if (name.contains(word)) return rule.category();
+            }
+        }
+        return OTHER;
     }
 }
