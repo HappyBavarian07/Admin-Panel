@@ -124,7 +124,7 @@ public class PluginSettingsMenu extends Menu {
         registerButton(getSlot(path + "Permissions.Item", 16), lgm.getItem(path + "Permissions.Item", player, false),
                 MenuAction.of((p, e) ->
                         new PluginPermissionsListMenu(playerMenuUtility, this).open()).requires("AdminPanel.PluginManager.PluginSettings.Commands"), null);
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), new AdminPanelStartMenu(playerMenuUtility)).open()).requires("AdminPanel.Button.Close"), null);
     }

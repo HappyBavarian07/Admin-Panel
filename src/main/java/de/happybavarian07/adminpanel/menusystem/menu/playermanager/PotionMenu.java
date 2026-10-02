@@ -43,6 +43,7 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
     public PotionMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission(PERMISSION);
+        setSavedMenu(new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
     }
 
     @Override
@@ -115,9 +116,6 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
                 MenuAction.prompt(CommandText.get(lgm, owner, "PotionMenu.EnterAmplifier"), this::setLevel).requires(PERMISSION));
         registerButton(getSlot(ACTIONS_PATH + "ClearPotions", 47), lgm.getItem(ACTIONS_PATH + "ClearPotions", owner, false),
                 MenuAction.of((p, e) -> clearEffects(p)).then((p, e) -> refresh()).requires(PERMISSION));
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", owner, false),
-                MenuAction.of((p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
-                        .requires("AdminPanel.Button.Close"));
     }
 
     private void handleEntryClick(Player staff, PotionEffectType type, InventoryClickEvent event) {

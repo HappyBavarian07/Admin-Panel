@@ -98,7 +98,7 @@ public class PluginDescriptionMenu extends Menu implements Listener {
             p.closeInventory();
             playerMenuUtility.addData("SetDescriptionInChat", true);
         }, null);
-        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new PluginSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }

@@ -137,7 +137,7 @@ public class PluginInstallMenu extends Menu {
             this.fileName = null;
             enableAfterInstall = false;
         }).thenClose());
-        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),
                 MenuAction.open(() -> new PluginSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
                         .requires("AdminPanel.Button.Close"));
     }

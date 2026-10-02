@@ -90,7 +90,7 @@ public class PlayerActionSelectMenu extends Menu {
                 }, null);
 
         registerButton(getSlot("General.Close", 26),
-                lgm.getItem("General.Close", target, false),
+                lgm.getItem("General.Back", target, false),
                 MenuAction.of((p, e) -> {
                     new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
                 }).requires("AdminPanel.Button.Close"), null);

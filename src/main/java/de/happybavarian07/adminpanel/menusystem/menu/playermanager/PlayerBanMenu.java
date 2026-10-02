@@ -129,7 +129,7 @@ public class PlayerBanMenu extends Menu {
                                 "%time%", durationText(player), "%reason%", reasonText()))
                         .requires(BAN_PERMISSION));
 
-        registerButton(getSlot("General.Close", 44), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 44), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
                         .requires("AdminPanel.Button.Close"));
     }

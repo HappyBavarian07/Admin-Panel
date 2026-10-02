@@ -27,6 +27,7 @@ public class WorldPlayersMenu extends PaginatedMenu<Player> {
         super(playerMenuUtility);
         this.world = world;
         setOpeningPermission(PERMISSION);
+        setSavedMenu(new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner()), world));
     }
 
     @Override
@@ -53,9 +54,6 @@ public class WorldPlayersMenu extends PaginatedMenu<Player> {
 
     @Override
     public void postSetMenuItems() {
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", playerMenuUtility.getOwner(), false),
-                MenuAction.of((p, e) -> new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
-                        .requires("AdminPanel.Button.Close"));
     }
 
     private void handleEntryClick(Player staff, Player entry, InventoryClickEvent event) {

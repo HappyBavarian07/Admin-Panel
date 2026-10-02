@@ -103,7 +103,7 @@ public class WorldTimeWeatherMenu extends Menu {
 
         registerButton(getSlot("General.Refresh", 27), lgm.getItem("General.Refresh", owner, false),
                 MenuAction.of((p, e) -> refresh()).requires("AdminPanel.Button.refresh"));
-        registerButton(getSlot("General.Close", 35), lgm.getItem("General.Close", owner, false),
+        registerButton(getSlot("General.Close", 35), lgm.getItem("General.Back", owner, false),
                 MenuAction.of((p, e) -> new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
                         .requires("AdminPanel.Button.Close"));
     }

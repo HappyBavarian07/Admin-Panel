@@ -73,7 +73,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
                 currentCommand.execute(p, currentCommand.getLabel(), new String[]{});
             }
         }, null);
-        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
                     new PluginCommandsListMenu(playerMenuUtility, this).open();

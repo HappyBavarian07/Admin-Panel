@@ -138,7 +138,7 @@ public class ServerManagerMenu extends Menu implements Listener {
                         super.open();
                     }).requires("AdminPanel.ServerManagment.MaintenanceMode"), null);
         }
-        registerButton(getSlot("General.Close", 22), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 22), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) ->
                         new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }

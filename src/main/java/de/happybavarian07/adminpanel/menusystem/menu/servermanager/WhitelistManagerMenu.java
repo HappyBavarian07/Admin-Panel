@@ -68,7 +68,7 @@ public class WhitelistManagerMenu extends Menu implements Listener {
         registerButton(getSlot(path + "TurnOn", 3), lgm.getItem(path + "TurnOn", player, false), (p, e) -> Bukkit.setWhitelist(true), null);
         registerButton(getSlot(path + "TurnOff", 5), lgm.getItem(path + "TurnOff", player, false), (p, e) -> Bukkit.setWhitelist(false), null);
         registerButton(getSlot(path + "Reload", 4), lgm.getItem(path + "Reload", player, false), (p, e) -> Bukkit.reloadWhitelist(), null);
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> new ServerManagerMenu(playerMenuUtility).open()).requires("AdminPanel.Button.Close"), null);
     }
 

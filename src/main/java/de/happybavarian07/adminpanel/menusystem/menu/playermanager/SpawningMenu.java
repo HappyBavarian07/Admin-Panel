@@ -42,6 +42,7 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
     public SpawningMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission(PERMISSION);
+        setSavedMenu(new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
     }
 
     @Override
@@ -125,9 +126,6 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
                 promptSearch.execute(p, e);
             }
         });
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", owner, false),
-                MenuAction.of((p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
-                        .requires("AdminPanel.Button.Close"));
     }
 
     private void toggle(String path, int defaultSlot, boolean enabled, Runnable flip) {

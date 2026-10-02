@@ -25,6 +25,7 @@ public class StartupStatusMenu extends PaginatedMenu<Startup.Result> {
     public StartupStatusMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission(PERMISSION);
+        setSavedMenu(new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
     }
 
     @Override
@@ -52,9 +53,6 @@ public class StartupStatusMenu extends PaginatedMenu<Startup.Result> {
 
     @Override
     public void postSetMenuItems() {
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", playerMenuUtility.getOwner(), false),
-                MenuAction.open(() -> new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
-                        .requires("AdminPanel.Button.Close"));
     }
 
     private void handleEntryClick(Player staff, Startup.Result entry, InventoryClickEvent event) {

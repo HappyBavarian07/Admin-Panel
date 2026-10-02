@@ -116,7 +116,7 @@ public class DataClientSettingsMenu extends Menu implements Listener {
                     playerMenuUtility.addData("FileLoggingPrefix", settingsManager.getFileLoggingPrefix());
                 }).requires("AdminPanel.DataClient.Menu.Settings.FileLoggingPrefix"), null);
 
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> new DataClientMainMenu(playerMenuUtility).open()).requires("AdminPanel.Button.Close"), null);
     }
 }

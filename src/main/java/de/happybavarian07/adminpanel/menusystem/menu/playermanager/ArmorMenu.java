@@ -67,7 +67,7 @@ public class ArmorMenu extends Menu {
         }
         registerButton(7, lgm.getItem("General.Refresh", target, false),
                 MenuAction.of((p, e) -> super.open()).requires("AdminPanel.Button.refresh"), null);
-        registerButton(8, lgm.getItem("General.Close", target, false),
+        registerButton(8, lgm.getItem("General.Back", target, false),
                 MenuAction.of((p, e) -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 }

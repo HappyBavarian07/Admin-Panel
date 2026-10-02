@@ -73,7 +73,7 @@ public class PermissionActionMenu extends Menu {
         ItemStack falseButton = lgm.getItem(path + "SetFalse", player, false);
         ItemStack removeButton = lgm.getItem(path + "Remove", player, false);
         ItemStack infoButton = lgm.getItem(path + "Info", player, false);
-        ItemStack closeButton = lgm.getItem("General.Close", player, false);
+        ItemStack closeButton = lgm.getItem("General.Back", player, false);
 
         inventory.setItem(getSlot(path + "InfoItem", 4), infoItem);
         registerButton(getSlot(path + "SetTrue", 10), trueButton, (p, e) -> {

@@ -103,7 +103,7 @@ public class WorldCreateMenu extends Menu {
                 MenuAction.of((p, e) -> teleportAfter = !teleportAfter).then((p, e) -> refresh()));
         registerButton(getSlot(PATH + "CreateWorld", 22), lgm.getItem(PATH + "CreateWorld", owner, true),
                 MenuAction.of((p, e) -> createWorld(p)).requires(PERMISSION));
-        registerButton(getSlot("General.Close", 35), lgm.getItem("General.Close", owner, false),
+        registerButton(getSlot("General.Close", 35), lgm.getItem("General.Back", owner, false),
                 MenuAction.open(() -> new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
                         .requires("AdminPanel.Button.Close"));
     }
@@ -122,9 +122,12 @@ public class WorldCreateMenu extends Menu {
         WorldOperations.Result result = WorldOperations.create(new WorldOperations.CreateRequest(event.getName(), preset,
                 event.getWorldEnvironment(), event.getSeed(), difficulty, event.isGenerateStructures(), event.isHardcore()));
         WorldResults.send(lgm, staff, "Create", result, event.getName());
-        if (result == WorldOperations.Result.OK && teleportAfter) {
-            World created = Bukkit.getWorld(event.getName());
-            if (created != null) staff.teleport(created.getSpawnLocation());
+        if (result != WorldOperations.Result.OK) {
+            open();
+        } else if (teleportAfter && Bukkit.getWorld(event.getName()) != null) {
+            staff.teleport(Bukkit.getWorld(event.getName()).getSpawnLocation());
+        } else {
+            new WorldSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)).open();
         }
     }
 }

@@ -252,7 +252,7 @@ public class PlayerTrollMenu extends Menu implements Listener {
             FeatureGate.placeUnavailable(this, getSlot(path + "MoreTrolls", 40), "trolls", playerMenuUtility.getOwner());
         }
 
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false),
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Back", target, false),
                 MenuAction.open(() -> new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())))
                         .requires("AdminPanel.Button.Close"));
     }

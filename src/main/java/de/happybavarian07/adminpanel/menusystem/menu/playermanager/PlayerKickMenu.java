@@ -89,7 +89,7 @@ public class PlayerKickMenu extends Menu {
                                 "%reason%", reasonText()))
                         .requires(KICK_PERMISSION));
 
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", player, false),
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open())
                         .requires("AdminPanel.Button.Close"));
     }

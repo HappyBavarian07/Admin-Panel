@@ -38,6 +38,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
     public PluginAutoUpdaterMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission("AdminPanel.PluginManager.AutoUpdateMenu");
+        setSavedMenu(new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
         pluginsToUpdate = new HashMap<>(AdminPanelMain.getPlugin().getAutoUpdaterManager().getAutoUpdaterPlugins());
         plugins = new ArrayList<>();
         for (String pluginName : pluginsToUpdate.keySet()) {
@@ -83,9 +84,6 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> implements List
                     p.closeInventory();
                     p.sendMessage(lgm.getMessage("Player.PluginManager.AutoPluginUpdater.SelectPluginToRemove", p, false));
                 }, null);
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", player, false),
-                MenuAction.of(
-                        (p, e) -> new AdminPanelStartMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open()).requires("AdminPanel.Button.Close"), null);
     }
 
     @Override

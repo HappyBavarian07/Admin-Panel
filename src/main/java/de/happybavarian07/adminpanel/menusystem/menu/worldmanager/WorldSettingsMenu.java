@@ -123,7 +123,7 @@ public class WorldSettingsMenu extends Menu {
 
         registerButton(getSlot("General.Refresh", 45), lgm.getItem("General.Refresh", playerMenuUtility.getOwner(), false),
                 MenuAction.of((p, e) -> refresh()).requires("AdminPanel.Button.refresh"));
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", playerMenuUtility.getOwner(), false),
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Back", playerMenuUtility.getOwner(), false),
                 MenuAction.of((p, e) -> openSelect()).requires("AdminPanel.Button.Close"));
     }
 

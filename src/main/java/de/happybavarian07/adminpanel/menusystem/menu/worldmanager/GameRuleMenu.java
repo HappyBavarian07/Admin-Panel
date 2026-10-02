@@ -42,6 +42,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         super(playerMenuUtility);
         this.world = world;
         setOpeningPermission(PERMISSION);
+        setSavedMenu(new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner()), world));
         allRules = Arrays.stream(world.getGameRules())
                 .map(GameRules::byName)
                 .filter(Objects::nonNull)
@@ -104,9 +105,6 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
                     page = 0;
                 }).then((p, e) -> refresh()));
 
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", owner, false),
-                MenuAction.of((p, e) -> new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), world).open())
-                        .requires("AdminPanel.Button.Close"));
     }
 
     private void handleEntryClick(Player staff, GameRule<?> rule, InventoryClickEvent event) {

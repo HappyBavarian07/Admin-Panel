@@ -84,7 +84,7 @@ public class MoneyMenu extends Menu implements Listener {
                     p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.PleaseEnterAmount", p, true));
                     p.closeInventory();
                 }).requires("AdminPanel.PlayerManager.PlayerSettings.Money.Take"), null);
-        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Close", target, false),
+        registerButton(getSlot("General.Close", 26), lgm.getItem("General.Back", target, false),
                 MenuAction.of((p, e) -> {
                     new PlayerActionSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
                 }).requires("AdminPanel.Button.Close"), null);

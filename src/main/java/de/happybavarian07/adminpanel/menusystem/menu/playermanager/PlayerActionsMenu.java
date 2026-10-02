@@ -191,7 +191,7 @@ public class PlayerActionsMenu extends Menu {
                 .requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Inventoryview"));
 
         // Close
-        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Close", target, false),
+        registerButton(getSlot("General.Close", 53), lgm.getItem("General.Back", target, false),
             MenuAction.open(() -> new PlayerSelectMenu(playerMenuUtility, new AdminPanelStartMenu(playerMenuUtility)))
                 .requires("AdminPanel.Button.Close"));
     }
