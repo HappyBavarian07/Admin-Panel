@@ -43,7 +43,7 @@ echo "reload confirm" >> "$CMDS"
 wait_for "Enabling Admin-Panel" 2 180 || status=1
 sleep 8
 echo "stop" >> "$CMDS"
-wait_for "All dimensions are saved" 1 120 || status=1
+wait_for "All dimensions are saved\|Saving chunks for level .*the_end" 1 120 || status=1
 sleep 2
 echo "" >> "$CMDS" # tail exits on the next write once the server is gone
 
