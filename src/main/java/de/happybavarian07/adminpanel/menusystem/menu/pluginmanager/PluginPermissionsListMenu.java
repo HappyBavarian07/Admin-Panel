@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
@@ -23,13 +25,10 @@ public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
         Plugin currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Permissions");
         permissions = currentPlugin.getDescription().getPermissions();
-        setPaginatedData(permissions, this::getPageItem, (player, current, event) -> {
-            player.sendMessage(AdminPanelUtils.chat("&6Name: &a" + current.getName()));
-            player.sendMessage(AdminPanelUtils.chat("&6Default: &a" + current.getDefault()));
-            player.sendMessage(AdminPanelUtils.chat("&6Description: &a" + current.getDescription()));
-            player.sendMessage(AdminPanelUtils.chat("&6Childrens: &a" + current.getChildren()));
-            player.sendMessage(AdminPanelUtils.chat("&6Permissibles: &a" + current.getPermissibles()));
-        });
+        setPaginatedData(permissions, this::getPageItem, (player, current, event) ->
+                CommandText.send(lgm, player, "PluginPermissionsList.Info", "%permission%", current.getName(),
+                        "%default%", current.getDefault(), "%description%", String.valueOf(current.getDescription()),
+                        "%children%", current.getChildren(), "%permissibles%", current.getPermissibles()));
     }
 
     @Override
@@ -48,16 +47,11 @@ public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
     }
 
     public ItemStack getPageItem(Permission permission) {
-        ItemStack item = new ItemStack(Material.WRITABLE_BOOK);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(permission.getName());
-        List<String> lore = new ArrayList<>();
-        lore.add("&6Default: &7" + permission.getDefault());
-        lore.add("&6Description: &7" + permission.getDescription());
-        lore.add("&6Click for Infos.");
-        meta.setLore(lore);
-        item.setItemMeta(meta);
-        return item;
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%permission%", permission.getName(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%default%", permission.getDefault(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%description%",
+                permission.getDescription() == null || permission.getDescription().isEmpty() ? "None" : permission.getDescription(), false);
+        return lgm.getItem("PluginManager.PermissionsList.Entry", playerMenuUtility.getOwner(), true);
     }
 
     public void handleOpenMenu(InventoryOpenEvent e) {

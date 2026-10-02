@@ -658,6 +658,9 @@ Messages:
     Gave: '%prefix% &9> &aYou gave &e%amount% &ato &e%target%&a! (balance: &e%balance%&a)'
     SetTo: '%prefix% &9> &aYou set the money of &e%target% &ato &e%amount%&a!'
     Took: '%prefix% &9> &aYou took &e%amount% &afrom &e%target%&a! (balance: &e%balance%&a)'
+  PluginPermissionsList:
+    # %permission% = The Name, %default% = The Default, %description% = The Description, %children% = The Children, %permissibles% = Who has it
+    Info: '&6Name: &a%permission%\n&6Default: &a%default%\n&6Description: &a%description%\n&6Children: &a%children%\n&6Permissibles: &a%permissibles%'
 Items:
   General:
     ConfirmationMenu:
@@ -2447,6 +2450,34 @@ Items:
           displayName: '&2Permissions'
           lore:
             - '&2List of all Permissions!'
+    CommandsList:
+      Entry:
+        material: COMMAND_BLOCK
+        displayName: '&a%command%'
+        lore:
+          - '&7Permission: &f%permission%'
+          - '&7Permission Message: &f%permission_message%'
+          - '&7Label: &f%label%'
+          - '&7Aliases: &f%aliases%'
+          - '&7Usage: &f%usage%'
+          - '&7Description: &f%description%'
+          - '&7Registered: &f%registered%'
+          - ''
+          - '&eClick to manage the command'
+      NotFound:
+        material: BARRIER
+        displayName: '&c%command%'
+        lore:
+          - '&cThis command is not registered by the plugin.'
+    PermissionsList:
+      Entry:
+        material: WRITABLE_BOOK
+        displayName: '&a%permission%'
+        lore:
+          - '&7Default: &f%default%'
+          - '&7Description: &f%description%'
+          - ''
+          - '&eClick to show the details in the chat'
   DataClientMenu:
     MainMenu:
       Controls:

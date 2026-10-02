@@ -68,6 +68,10 @@ class RequiredLanguageKeysTest {
                 "DropPlayerInv", "FakeOp", "FakeDeop", "StopAll")) {
             item(root, missing, "Items.PlayerManager.TrollMenu." + key);
         }
+        item(root, missing, "Items.PluginManager.CommandsList.Entry");
+        item(root, missing, "Items.PluginManager.CommandsList.NotFound");
+        item(root, missing, "Items.PluginManager.PermissionsList.Entry");
+        text(root, missing, "Messages.PluginPermissionsList.Info");
         for (String key : List.of("MoneyMenu.EnterAmount", "MoneyMenu.NotANumber", "MoneyMenu.NoAccount", "MoneyMenu.NotEnough",
                 "MoneyMenu.Failed", "MoneyMenu.Gave", "MoneyMenu.SetTo", "MoneyMenu.Took", "TimeWeatherMenu.TimeNotApplied",
                 "TimeWeatherMenu.WeatherNotApplied", "Player.PlayerManager.Permissions.PermissionSet",

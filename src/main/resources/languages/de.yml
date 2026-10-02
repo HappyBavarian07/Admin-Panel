@@ -666,6 +666,9 @@ Messages:
     Gave: '%prefix% &9> &aDu hast &e%target% &e%amount% &agegeben! (Guthaben: &e%balance%&a)'
     SetTo: '%prefix% &9> &aDu hast das Geld von &e%target% &aauf &e%amount% &agesetzt!'
     Took: '%prefix% &9> &aDu hast &e%target% &e%amount% &aabgenommen! (Guthaben: &e%balance%&a)'
+  PluginPermissionsList:
+    # %permission% = Der Name, %default% = Der Standard, %description% = Die Beschreibung, %children% = Die Kinder, %permissibles% = Wer sie hat
+    Info: '&6Name: &a%permission%\n&6Standard: &a%default%\n&6Beschreibung: &a%description%\n&6Kinder: &a%children%\n&6Berechtigte: &a%permissibles%'
 Items:
   General:
     ConfirmationMenu:
@@ -2452,6 +2455,34 @@ Items:
           displayName: '&2Permissions'
           lore:
             - '&2Liste aller Permissions!'
+    CommandsList:
+      Entry:
+        material: COMMAND_BLOCK
+        displayName: '&a%command%'
+        lore:
+          - '&7Berechtigung: &f%permission%'
+          - '&7Berechtigungs-Nachricht: &f%permission_message%'
+          - '&7Label: &f%label%'
+          - '&7Aliase: &f%aliases%'
+          - '&7Verwendung: &f%usage%'
+          - '&7Beschreibung: &f%description%'
+          - '&7Registriert: &f%registered%'
+          - ''
+          - '&eKlicke, um den Befehl zu verwalten'
+      NotFound:
+        material: BARRIER
+        displayName: '&c%command%'
+        lore:
+          - '&cDieser Befehl wird nicht vom Plugin registriert.'
+    PermissionsList:
+      Entry:
+        material: WRITABLE_BOOK
+        displayName: '&a%permission%'
+        lore:
+          - '&7Standard: &f%default%'
+          - '&7Beschreibung: &f%description%'
+          - ''
+          - '&eKlicke, um die Details im Chat zu zeigen'
   ConfigReloadMenu:
     ReloadConfig:
       material: WRITABLE_BOOK

@@ -1,5 +1,7 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
+import org.bukkit.entity.Player;
+import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
@@ -46,34 +48,18 @@ public class PluginCommandsListMenu extends PaginatedMenu<String> {
     }
 
     public ItemStack getPageItem(String commandName) {
-        ItemStack item = new ItemStack(Material.COMMAND_BLOCK);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(commandName);
-        // Permission, Permission-Message, Label, Aliases, Usage, Description, Registered
-        List<String> lore = new ArrayList<>();
+        Player viewer = playerMenuUtility.getOwner();
         PluginCommand command = ((JavaPlugin) currentPlugin).getCommand(commandName);
-        if (command != null) {
-            String permission = command.getPermission() != null ? command.getPermission() : "None";
-            String permissionMessage = command.getPermissionMessage() != null ? command.getPermissionMessage() : "None";
-            String label = command.getLabel();
-            String aliases = command.getAliases().isEmpty() ? "None" : String.join(", ", command.getAliases());
-            String usage = command.getUsage();
-            String description = command.getDescription();
-            boolean registered = plugin.getServer().getPluginCommand(commandName) != null;
-
-            lore.add("&7Permission: &f" + permission);
-            lore.add("&7Permission Message: &f" + permissionMessage);
-            lore.add("&7Label: &f" + label);
-            lore.add("&7Aliases: &f" + aliases);
-            lore.add("&7Usage: &f" + usage);
-            lore.add("&7Description: &f" + description);
-            lore.add("&7Registered: &f" + (registered ? "Yes" : "No"));
-        } else {
-            lore.add("&cCommand not found in plugin description!");
-        }
-        meta.setLore(lore);
-        item.setItemMeta(meta);
-        return item;
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%command%", commandName, false);
+        if (command == null) return lgm.getItem("PluginManager.CommandsList.NotFound", viewer, true);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%permission%", command.getPermission() != null ? command.getPermission() : "None", false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%permission_message%", command.getPermissionMessage() != null ? command.getPermissionMessage() : "None", false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%label%", command.getLabel(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%aliases%", command.getAliases().isEmpty() ? "None" : String.join(", ", command.getAliases()), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%usage%", command.getUsage(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%description%", command.getDescription(), false);
+        lgm.addPlaceholder(PlaceholderType.ITEM, "%registered%", command.isRegistered() ? "Yes" : "No", false);
+        return lgm.getItem("PluginManager.CommandsList.Entry", viewer, true);
     }
 
     public void handleOpenMenu(InventoryOpenEvent e) {

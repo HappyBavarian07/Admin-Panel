@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
+import de.happybavarian07.adminpanel.listeners.DisabledCommandsListener;
 import de.happybavarian07.adminpanel.startup.Startup;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
@@ -279,6 +280,7 @@ public class InitMethods {
         pm.registerEvents(new MenuListener(), plugin);
         logger.message("&3&lLoading Maintenance and Chat Mute Listener Events!&r");
         pm.registerEvents(new MaintenanceListener(), plugin);
+        pm.registerEvents(new DisabledCommandsListener(), plugin);
         pm.registerEvents(new ChatMuteListener(), plugin);
         logger.message("&3&lLoading Disabled Items Listener Events!&r");
         new DisabledItemsListener();

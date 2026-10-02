@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.lang.reflect.Field;
 
-public class PluginCommandSettingsMenu extends Menu implements Listener {
+public class PluginCommandSettingsMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
     private final PluginCommand currentCommand;
 
@@ -76,7 +76,7 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),
                 MenuAction.of((p, e) -> {
                     playerMenuUtility.addData("CurrentSelectedPlugin", currentCommand.getPlugin());
-                    new PluginCommandsListMenu(playerMenuUtility, this).open();
+                    new PluginCommandsListMenu(playerMenuUtility, new PluginSettingsMenu(playerMenuUtility)).open();
                 }).requires("AdminPanel.Button.Close"), null);
     }
 
@@ -92,11 +92,4 @@ public class PluginCommandSettingsMenu extends Menu implements Listener {
         }
     }
 
-    @EventHandler
-    public void onCmdPreprocess(PlayerCommandPreprocessEvent event) {
-        String command = event.getMessage().replaceFirst("/", "");
-        if (plugin.getDisabledCommands().contains(command)) {
-            event.setCancelled(true);
-        }
-    }
 }

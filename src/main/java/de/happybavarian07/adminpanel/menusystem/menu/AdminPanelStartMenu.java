@@ -50,6 +50,16 @@ public class AdminPanelStartMenu extends Menu {
     }
 
     @Override
+    public void open() {
+        long started = System.nanoTime();
+        super.open();
+        long millis = (System.nanoTime() - started) / 1_000_000;
+        if (millis > 40) {
+            AdminPanelMain.getPlugin().getLogger().info("Opening the start menu took " + millis + " ms");
+        }
+    }
+
+    @Override
     public void setMenuItems() {
         setFillerGlass();
         Player player = playerMenuUtility.getOwner();
