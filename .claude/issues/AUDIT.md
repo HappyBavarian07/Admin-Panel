@@ -11,9 +11,9 @@ several items they list are already fixed in code (see "Already fixed" at the bo
 
 ## Discrepancies / configuration
 
-### A9 — Roadmap/version drift
-- `UNIFIED_ROADMAP.md` header says 9.0.0; `pom.xml` is at a later version. Root audit docs
-  predate current code. Keep one source of truth; verify versions from `pom.xml`.
+### A9 — Roadmap/version drift (fixed 2026-10-21)
+- `pom.xml` said 9.0.1 since a March commit; it is 9.0.0 now, the version of the release. Root audit docs still predate the code.
+  Keep one source of truth; verify versions from `pom.xml`.
 
 ## Code quality / robustness
 
