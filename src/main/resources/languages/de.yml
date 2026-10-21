@@ -33,6 +33,11 @@ Messages:
     TrollsSync:
       TrollDataSendForAllPlayers: '%prefix% &9> &aDie Troll Daten des Trolls ''%troll%'' wurden an den Server geschickt.'
       TrollDataSendFailed: '%prefix% &9> &cDie Daten des Trolls ''%troll%'' konnten nicht gesendet werden.'
+    Menu:
+      AutoCheckConnectingTimingChatSuccess: '%prefix% &9> &aDas Intervall der automatischen Verbindungsprüfung wurde auf %apdataclient_auto_check_connection_timing% gesetzt!'
+      AutoCheckConnectionTimingChat: '%prefix% &9> &aGib das Intervall der automatischen Verbindungsprüfung im Chat ein! (Aktuell: %apdataclient_auto_check_connection_timing%)'
+      FileLoggingPrefixChat: '%prefix% &9> &aGib das Präfix für das Logging in Datei im Chat ein! (Aktuell: %apdataclient_file_logging_prefix%)'
+      FileLoggingPrefixChatSuccess: '%prefix% &9> &aDas Präfix für das Logging in Datei wurde auf %apdataclient_file_logging_prefix% gesetzt!'
     NotEnabled: '%prefix% &9> &cDer Data Client ist nicht aktiviert!'
   BackupSystem:
     SubCommands:
@@ -2483,6 +2488,125 @@ Items:
           - '&7Beschreibung: &f%description%'
           - ''
           - '&eKlicke, um die Details im Chat zu zeigen'
+  DataClientMenu:
+    MainMenu:
+      Controls:
+        Connect:
+          displayName: '&aVerbinden'
+          lore:
+            - '&aMit dem Server verbinden!'
+          material: GREEN_WOOL
+        Disconnect:
+          displayName: '&cTrennen'
+          lore:
+            - '&cVom Server trennen!'
+          material: RED_WOOL
+        PacketHandling:
+          false:
+            displayName: '&cPaket-Verarbeitung'
+            lore:
+              - '&cPaket-Verarbeitung einschalten!'
+            material: RED_WOOL
+          true:
+            displayName: '&aPaket-Verarbeitung'
+            lore:
+              - '&aPaket-Verarbeitung ausschalten!'
+            material: GREEN_WOOL
+        Reconnect:
+          displayName: '&aNeu verbinden'
+          lore:
+            - '&aErneut mit dem Server verbinden!'
+          material: ORANGE_WOOL
+      DataClientConnectedClients:
+        displayName: '&aData Client: &6Verbundene Clients'
+        lore:
+          - '&aAktuell verbundene Data Clients:'
+          - '&6%apdataclient_connected_clients%'
+          - '&aKlicke, um die verbundenen Clients zu ändern!'
+        material: PAPER
+      DataClientName:
+        displayName: '&aData Client: &6Name'
+        lore:
+          - '&aAktueller Name des Data Clients:'
+          - '&6%name%'
+          - '&aKlicke, um den Namen zu ändern!'
+        material: PAPER
+      DataClientSettings:
+        displayName: '&aData Client: &6Einstellungen'
+        lore:
+          - '&aKlicke, um die Einstellungen zu ändern!'
+        material: LEVER
+      DataClientStats:
+        displayName: '&aData Client: &6Statistiken'
+        lore:
+          - '&aAktuelle Statistiken des Data Clients:'
+          - '&f- &aPakete gesendet insgesamt: &6%apdataclient_stats_total_packets_send%'
+          - '&f- &aPakete gesendet (diese Sitzung): &6%apdataclient_stats_total_packets_send_this_session%'
+          - '&f- &aPakete empfangen insgesamt: &6%apdataclient_stats_total_packets_received%'
+          - '&f- &aPakete empfangen (diese Sitzung): &6%apdataclient_stats_total_packets_received_this_session%'
+          - '&f- &aFehler insgesamt: &6%apdataclient_stats_total_errors%'
+          - '&f- &aFehler (diese Sitzung): &6%apdataclient_stats_total_errors_this_session%'
+          - '&aKlicke, um die Statistiken zu ändern!'
+        material: PAPER
+      Settings:
+        AutoCheckConnection:
+          false:
+            displayName: '&cVerbindung automatisch prüfen'
+            lore:
+              - '&cAutomatische Verbindungsprüfung einschalten!'
+            material: RED_WOOL
+          true:
+            displayName: '&aVerbindung automatisch prüfen'
+            lore:
+              - '&aAutomatische Verbindungsprüfung ausschalten!'
+            material: GREEN_WOOL
+        AutoCheckConnectionTiming:
+          displayName: '&aIntervall der Verbindungsprüfung'
+          lore:
+            - '&aAktuelles Intervall der Verbindungsprüfung:'
+            - '&6%apdataclient_auto_check_connection_timing%'
+            - '&aKlicke, um das Intervall zu ändern!'
+          material: CLOCK
+        Debug:
+          false:
+            displayName: '&cDebug'
+            lore:
+              - '&cDebug einschalten!'
+            material: RED_WOOL
+          true:
+            displayName: '&aDebug'
+            lore:
+              - '&aDebug ausschalten!'
+            material: GREEN_WOOL
+        FileLogging:
+          false:
+            displayName: '&cLogging in Datei'
+            lore:
+              - '&cLogging in Datei einschalten!'
+            material: RED_WOOL
+          true:
+            displayName: '&aLogging in Datei'
+            lore:
+              - '&aLogging in Datei ausschalten!'
+            material: GREEN_WOOL
+        FileLoggingPrefix:
+          displayName: '&aPräfix für das Logging in Datei'
+          lore:
+            - '&aAktuelles Präfix für das Logging in Datei:'
+            - '&6%apdataclient_file_logging_prefix%'
+            - '&aKlicke, um das Präfix zu ändern!'
+          material: PAPER
+        OverwritePermissions:
+          false:
+            displayName: '&cBerechtigungen überschreiben'
+            lore:
+              - '&cBerechtigungen überschreiben einschalten!'
+            material: RED_WOOL
+          true:
+            displayName: '&aBerechtigungen überschreiben'
+            lore:
+              - '&aBerechtigungen überschreiben ausschalten!'
+            material: GREEN_WOOL
   ConfigReloadMenu:
     ReloadConfig:
       material: WRITABLE_BOOK

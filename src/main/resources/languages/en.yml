@@ -108,6 +108,16 @@ Messages:
       BackupNotFound: '%prefix% &9> &cThere is no Backup called ''%backupName%''!'
       NoBackupFile: '%prefix% &9> &cThere is no Backup File for ''%backupName%'' yet!'
   Player:
+    StaffChat:
+      ToggleOn: '%prefix% &9> &aThe Staff Chat was turned on for player ''%player_name%''!'
+      ToggleOff: '%prefix% &9> &aThe Staff Chat was turned off for player ''%player_name%''!'
+      Disabled: '%prefix% &9> &cThe Staff Chat is disabled!'
+      Enabled: '%prefix% &9> &aThe Staff Chat is enabled!'
+      # Placeholders for the Message Format:
+      # %sc_prefix% = The Prefix of the Staff Chat
+      # %player_name% = The Name of the Player
+      # %message% = The Message
+      MessageFormat: '%sc_prefix% | &7%player_name%&8: &f%message%'
     Commands:
       #VanillaItems:
       #Enable: '%prefix% &9> &c'

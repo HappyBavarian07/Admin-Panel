@@ -99,13 +99,13 @@ public class PermissionActionMenu extends Menu {
                 p.sendMessage(AdminPanelUtils.format(p,
                         "Info about Permission:" + "\n" +
                                 "  - &aName: &6" + perm.getName() + "\n" +
-                                "  - &aDescription: &6" + (perm.getDescription().isEmpty() ? perm.getDescription() : "None") + "\n" +
+                                "  - &aDescription: &6" + (perm.getDescription().isEmpty() ? "None" : perm.getDescription()) + "\n" +
                                 "  - &aDefault: &6" + perm.getDefault() + "\n" +
                                 "  - &aValue: &6" + (Objects.requireNonNull(Bukkit.getPlayer(targetUUID)).hasPermission(permissionFullName) ? "true" : "false") + "\n" +
                                 "  - &aTarget: &6" + Objects.requireNonNull(Bukkit.getPlayer(targetUUID)).getName() + "\n" +
-                                "  - &aChildren: &6" + (perm.getChildren().isEmpty() ? perm.getChildren().toString() : "None") + "\n", AdminPanelMain.getPrefix()));
+                                "  - &aChildren: &6" + (perm.getChildren().isEmpty() ? "None" : perm.getChildren().toString()) + "\n", AdminPanelMain.getPrefix()));
             } else {
-                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.ListMenu.PermissionNotFound", p, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.GroupMenu.PermissionNotFound", p, true));
             }
         }, null);
         registerButton(getSlot("General.Close", 22), closeButton,

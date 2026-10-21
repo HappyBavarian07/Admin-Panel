@@ -150,7 +150,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> {
             try {
                 id = Integer.parseInt(text.replace(" ", ""));
             } catch (NumberFormatException e) {
-                p.sendMessage(lgm.getMessage("Player.General.PlayerManager.Money.NotANumber", p, true));
+                p.sendMessage(lgm.getMessage("Player.PlayerManager.Money.NotANumber", p, true));
                 promptSpigotId(p, null);
                 return;
             }
