@@ -7,7 +7,6 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
-import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
@@ -28,7 +27,6 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class PluginSelectMenu extends PaginatedMenu<Plugin> {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
@@ -39,6 +37,7 @@ public class PluginSelectMenu extends PaginatedMenu<Plugin> {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.PluginManager.Open");
         plugins = new ArrayList<>(plugin.getPluginUtils().getAllPlugins());
+        setSearchable(Plugin::getName);
         setPaginatedData(plugins, this::getPageItem);
     }
 

@@ -169,6 +169,8 @@ Messages:
       SetCurrentLanguage: '%prefix% &9> &aSuccessfully set current Language to %fullname%!'
       AlreadyOnFirstPage: '%prefix% &9> &cYou''re already on the first page!'
       AlreadyOnLastPage: '%prefix% &9> &cYou''re already on the last page!'
+      SearchPrompt: '%prefix% &9> &eType a search word in chat, or &fcancel&e to keep the current list:'
+      SearchActive: '&7Active search: &f%search%'
       NoPermissions: '%prefix% &9> &cYou do not have access to this command!'
       OpeningMessageSelf: '%prefix% &9> &cYou opened the Admin-Panel for you!'
       OpeningMessageOther: '%prefix% &9> &c%player_name% opened the Admin-Panel for you!'
@@ -728,6 +730,12 @@ Items:
       displayName: '&aRefresh'
       lore:
         - '&aRefresh this Page!'
+    Search:
+      material: COMPASS
+      displayName: '&bSearch'
+      lore:
+        - '&bLeft click to search by name!'
+        - '&bRight click to clear the search!'
   PlayerManager:
     PlayerHead:
       material: PLAYER_HEAD

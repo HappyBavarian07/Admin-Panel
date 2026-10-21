@@ -6,12 +6,10 @@ import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +26,7 @@ public class PluginCommandsListMenu extends PaginatedMenu<String> {
         this.currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Commands");
         commandNames = new ArrayList<>(currentPlugin.getDescription().getCommands().keySet());
+        setSearchable(name -> name);
         setPaginatedData(commandNames, this::getPageItem, (player, commandName, event) ->
                 new PluginCommandSettingsMenu(playerMenuUtility, ((JavaPlugin) currentPlugin).getCommand(commandName)).open());
     }

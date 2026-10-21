@@ -43,6 +43,7 @@ public class PluginAutoUpdaterMenu extends PaginatedMenu<Plugin> {
             Plugin plugin = new PluginUtils().getPluginByName(pluginName);
             if (plugin != null) plugins.add(plugin);
         }
+        setSearchable(Plugin::getName);
         setPaginatedData(plugins, this::getPageItem);
     }
 

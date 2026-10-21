@@ -37,12 +37,12 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
     private final List<PotionEffectType> allTypes = EffectTypes.all();
     private int durationSeconds = 30;
     private int level = 1;
-    private String search = "";
     private EffectTypes.Category category;
 
     public PotionMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission(PERMISSION);
+        setSearchable(type -> EffectTypes.key(type) + " " + EffectTypes.key(type).replace('_', ' '));
         setSavedMenu(new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
     }
 
@@ -63,14 +63,13 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
 
     @Override
     public void preSetMenuItems() {
-        String needle = search.toLowerCase(Locale.ROOT);
         List<PotionEffectType> entries = allTypes.stream()
                 .filter(type -> category == null || EffectTypes.category(type) == category)
-                .filter(type -> needle.isEmpty() || EffectTypes.key(type).contains(needle))
                 .toList();
+        setSearchSlot(getSlot(PATH + "Search", 6));
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
-        if (perPage > 0) page = Math.min(page, Math.max(0, (entries.size() - 1) / perPage));
+        if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
     }
 
     @Override
@@ -83,23 +82,6 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
             registerButton(getSlot(presetPath, PRESET_SLOTS[i]), lgm.getItem(presetPath, owner, false),
                     MenuAction.of((p, e) -> applyPreset(p, preset)).requires(PERMISSION));
         }
-
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%search%", search.isEmpty() ? "-" : search, false);
-        MenuAction promptSearch = MenuAction.prompt(CommandText.get(lgm, owner, "PotionMenu.EnterSearch"), (p, text) -> {
-            search = text.trim().equals("-") ? "" : text.trim();
-            page = 0;
-            CommandText.send(lgm, p, search.isEmpty() ? "PotionMenu.SearchCleared" : "PotionMenu.SearchSet", "%search%", search);
-            open();
-        });
-        registerButton(getSlot(PATH + "Search", 6), lgm.getItem(PATH + "Search", owner, true), (p, e) -> {
-            if (e.isRightClick()) {
-                search = "";
-                page = 0;
-                refresh();
-            } else {
-                promptSearch.execute(p, e);
-            }
-        });
 
         String filterPath = PATH + "Filter." + (category == null ? "All" : categoryKey(category));
         registerButton(getSlot(PATH + "Filter", 7), lgm.getItem(filterPath, owner, false),

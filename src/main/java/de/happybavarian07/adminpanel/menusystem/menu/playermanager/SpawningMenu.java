@@ -36,12 +36,12 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
     private boolean glowing;
     private boolean armor;
     private boolean rider;
-    private String search = "";
     private SpawnCategory category;
 
     public SpawningMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
         setOpeningPermission(PERMISSION);
+        setSearchable(type -> EntitySpawner.key(type) + " " + EntitySpawner.key(type).replace('_', ' '));
         setSavedMenu(new PlayerActionsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner())));
     }
 
@@ -62,14 +62,13 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
 
     @Override
     public void preSetMenuItems() {
-        String needle = search.toLowerCase(Locale.ROOT);
         List<EntityType> entries = allTypes.stream()
                 .filter(type -> category == null || SpawnCategory.of(type.getEntityClass()) == category)
-                .filter(type -> needle.isEmpty() || EntitySpawner.key(type).contains(needle))
                 .toList();
+        setSearchSlot(getSlot(PATH + "Search", 45));
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
-        if (perPage > 0) page = Math.min(page, Math.max(0, (entries.size() - 1) / perPage));
+        if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
         count = Math.min(count, maxCount());
     }
 
@@ -110,22 +109,6 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
                     page = 0;
                 }).then((p, e) -> refresh()));
 
-        MenuAction promptSearch = MenuAction.prompt(CommandText.get(lgm, owner, "SpawningMenu.EnterSearch"), (p, text) -> {
-            search = text.trim().equals("-") ? "" : text.trim();
-            page = 0;
-            CommandText.send(lgm, p, search.isEmpty() ? "SpawningMenu.SearchCleared" : "SpawningMenu.SearchSet", "%search%", search);
-            open();
-        });
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%search%", search.isEmpty() ? "-" : search, false);
-        registerButton(getSlot(PATH + "Search", 45), lgm.getItem(PATH + "Search", owner, true), (p, e) -> {
-            if (e.isRightClick()) {
-                search = "";
-                page = 0;
-                refresh();
-            } else {
-                promptSearch.execute(p, e);
-            }
-        });
     }
 
     private void toggle(String path, int defaultSlot, boolean enabled, Runnable flip) {

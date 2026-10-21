@@ -31,6 +31,7 @@ public class BannedPlayersMenu extends PaginatedMenu<BanInfo> {
     public BannedPlayersMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.PlayerManager.BannedPlayers");
+        setSearchable(info -> info.target() + " " + info.reason());
     }
 
     @Override
@@ -53,7 +54,7 @@ public class BannedPlayersMenu extends PaginatedMenu<BanInfo> {
         List<BanInfo> entries = BanInfo.readAll();
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
-        if (perPage > 0) page = Math.min(page, Math.max(0, (entries.size() - 1) / perPage));
+        if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
     }
 
     private void handleEntryClick(Player staff, BanInfo info, InventoryClickEvent event) {

@@ -26,6 +26,7 @@ public class PlayerSelectMenu extends PaginatedMenu<Player> {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission("AdminPanel.PlayerManager.open");
         List<Player> players = new ArrayList<>(getServer().getOnlinePlayers());
+        setSearchable(Player::getName);
         setPaginatedData(players, this::getPageItem);
     }
 

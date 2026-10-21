@@ -35,13 +35,13 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
 
     private final World world;
     private final List<GameRule<?>> allRules;
-    private String search = "";
     private GameRuleCategory category;
 
     public GameRuleMenu(PlayerMenuUtility playerMenuUtility, World world) {
         super(playerMenuUtility);
         this.world = world;
         setOpeningPermission(PERMISSION);
+        setSearchable(rule -> GameRules.nameOf(rule) + " " + GameRules.nameOf(rule).replace('_', ' '));
         setSavedMenu(new WorldSettingsMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(playerMenuUtility.getOwner()), world));
         allRules = Arrays.stream(world.getGameRules())
                 .map(GameRules::byName)
@@ -68,35 +68,18 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
 
     @Override
     public void preSetMenuItems() {
-        String needle = search.toLowerCase(Locale.ROOT);
         List<GameRule<?>> entries = allRules.stream()
                 .filter(rule -> category == null || GameRuleCategory.of(GameRules.nameOf(rule)) == category)
-                .filter(rule -> needle.isEmpty() || GameRules.nameOf(rule).toLowerCase(Locale.ROOT).contains(needle))
                 .toList();
+        setSearchSlot(getSlot(PATH + "Search", 6));
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
-        if (perPage > 0) page = Math.min(page, Math.max(0, (entries.size() - 1) / perPage));
+        if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
     }
 
     @Override
     public void postSetMenuItems() {
         Player owner = playerMenuUtility.getOwner();
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%search%", search.isEmpty() ? "-" : search, false);
-        MenuAction promptSearch = MenuAction.prompt(CommandText.get(lgm, owner, "GameRuleMenu.EnterSearch"), (p, text) -> {
-            search = text.trim().equals("-") ? "" : text.trim();
-            page = 0;
-            CommandText.send(lgm, p, search.isEmpty() ? "GameRuleMenu.SearchCleared" : "GameRuleMenu.SearchSet", "%search%", search);
-            open();
-        });
-        registerButton(getSlot(PATH + "Search", 6), lgm.getItem(PATH + "Search", owner, true), (p, e) -> {
-            if (e.isRightClick()) {
-                search = "";
-                page = 0;
-                refresh();
-            } else {
-                promptSearch.execute(p, e);
-            }
-        });
 
         String filterPath = PATH + "Filter." + (category == null ? "All" : categoryKey(category));
         registerButton(getSlot(PATH + "Filter", 7), lgm.getItem(filterPath, owner, false),

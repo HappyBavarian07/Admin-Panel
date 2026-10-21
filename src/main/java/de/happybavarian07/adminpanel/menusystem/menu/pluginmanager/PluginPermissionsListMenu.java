@@ -2,19 +2,15 @@ package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PaginatedMenu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
-import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
@@ -25,6 +21,7 @@ public class PluginPermissionsListMenu extends PaginatedMenu<Permission> {
         Plugin currentPlugin = playerMenuUtility.getData("CurrentSelectedPlugin", Plugin.class);
         setOpeningPermission("AdminPanel.PluginManager.PluginSettings.Permissions");
         permissions = currentPlugin.getDescription().getPermissions();
+        setSearchable(Permission::getName);
         setPaginatedData(permissions, this::getPageItem, (player, current, event) ->
                 CommandText.send(lgm, player, "PluginPermissionsList.Info", "%permission%", current.getName(),
                         "%default%", current.getDefault(), "%description%", String.valueOf(current.getDescription()),

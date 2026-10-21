@@ -28,6 +28,7 @@ public class WhitelistedPlayersMenu extends PaginatedMenu<OfflinePlayer> {
         setOpeningPermission("AdminPanel.ServerManagment.ManageWhitelist");
         List<OfflinePlayer> players = new ArrayList<>();
         Collections.addAll(players, getServer().getOfflinePlayers());
+        setSearchable(player -> String.valueOf(player.getName()));
         setPaginatedData(players, this::getPageItem);
     }
 
