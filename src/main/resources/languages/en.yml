@@ -404,14 +404,6 @@ Messages:
     SystemDisabled: '%prefix% &9> &cThe Addon System is disabled!'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cYou have to be a Player!'
-  ConfigReloadMenu:
-    ConfigReloaded: '%prefix% &9> &aConfiguration reloaded successfully!'
-    LanguagesReloaded: '%prefix% &9> &aLanguages reloaded successfully!'
-    DataReloaded: '%prefix% &9> &aData service reloaded successfully!'
-    BackupToggled: '%prefix% &9> &aBackup system is now %backup_state%!'
-    CreatingBackup: '%prefix% &9> &aCreating backups...'
-    BackupCreated: '%prefix% &9> &aBackups created successfully!'
-    ReloadingPlugin: '%prefix% &9> &cReloading plugin...'
   DangerZoneMenu:
     StopReason: '&cServer stop requested from Danger Zone menu.'
     RestartReason: '&6Server restart requested from Danger Zone menu.'
@@ -2607,48 +2599,6 @@ Items:
             - '&aCurrent File Logging Prefix:'
             - '&6%apdataclient_file_logging_prefix%'
             - '&aClick to change the File Logging Prefix!'
-  ConfigReloadMenu:
-    ReloadConfig:
-      material: WRITABLE_BOOK
-      displayName: '&aReload Config'
-      lore:
-        - '&7Reload the plugin configuration'
-        - '&7without restarting the server.'
-        - ''
-        - '&eClick to reload config!'
-    ReloadLanguages:
-      material: BOOK
-      displayName: '&aReload Languages'
-      lore:
-        - '&7Reload all language files'
-        - '&7and translations.'
-        - ''
-        - '&eClick to reload languages!'
-    ReloadData:
-      material: CHEST
-      displayName: '&aReload Data'
-      lore:
-        - '&7Reload the DataService'
-        - '&7and all persistent data.'
-        - ''
-        - '&eClick to reload data!'
-    BackupAll:
-      material: ENDER_CHEST
-      displayName: '&6Create Backups'
-      lore:
-        - '&7Create backups of all'
-        - '&7registered files.'
-        - ''
-        - '&eClick to backup!'
-    ReloadPlugin:
-      material: REDSTONE
-      displayName: '&cReload Plugin'
-      lore:
-        - '&7Completely reload the plugin'
-        - '&7(disable + enable cycle).'
-        - ''
-        - '&c&lWarning: This may cause issues!'
-        - '&eClick to reload plugin!'
   LanguageMigration:
     Migration:
       MigrationItem:
@@ -2850,7 +2800,6 @@ MenuTitles:
       Settings: '&3Settings'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Settings'
-  ConfigReloadMenu: '&aConfiguration Manager'
   LanguageMigration:
     Migration: '&6Language Migration'
   LanguageMigrator:

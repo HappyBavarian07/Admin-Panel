@@ -362,14 +362,6 @@ Messages:
       Other: '&7Sonstige'
   Console:
     ExecutesPlayerCommand: '%prefix% &9> &cDu musst ein Spieler sein!'
-  ConfigReloadMenu:
-    ConfigReloaded: '%prefix% &9> &aKonfiguration erfolgreich neu geladen!'
-    LanguagesReloaded: '%prefix% &9> &aSprachen erfolgreich neu geladen!'
-    DataReloaded: '%prefix% &9> &aDatenservice erfolgreich neu geladen!'
-    BackupToggled: '%prefix% &9> &aBackup-System ist jetzt %backup_state%!'
-    CreatingBackup: '%prefix% &9> &aErstelle Backups...'
-    BackupCreated: '%prefix% &9> &aBackups erfolgreich erstellt!'
-    ReloadingPlugin: '%prefix% &9> &cLade Plugin neu...'
   DangerZoneMenu:
     StopReason: '&cServer-Stopp aus dem Danger-Zone-Menue angefordert.'
     RestartReason: '&6Server-Neustart aus dem Danger-Zone-Menue angefordert.'
@@ -2607,48 +2599,6 @@ Items:
             lore:
               - '&aBerechtigungen überschreiben ausschalten!'
             material: GREEN_WOOL
-  ConfigReloadMenu:
-    ReloadConfig:
-      material: WRITABLE_BOOK
-      displayName: '&aKonfiguration neu laden'
-      lore:
-        - '&7Lädt die Plugin-Konfiguration'
-        - '&7ohne Server-Neustart neu.'
-        - ''
-        - '&eKlicke zum Neuladen!'
-    ReloadLanguages:
-      material: BOOK
-      displayName: '&aSprachen neu laden'
-      lore:
-        - '&7Lädt alle Sprachdateien'
-        - '&7und Übersetzungen neu.'
-        - ''
-        - '&eKlicke zum Neuladen!'
-    ReloadData:
-      material: CHEST
-      displayName: '&aDaten neu laden'
-      lore:
-        - '&7Lädt den DataService und'
-        - '&7alle persistenten Daten neu.'
-        - ''
-        - '&eKlicke zum Neuladen!'
-    BackupAll:
-      material: ENDER_CHEST
-      displayName: '&6Backups erstellen'
-      lore:
-        - '&7Erstellt Backups aller'
-        - '&7registrierten Dateien.'
-        - ''
-        - '&eKlicke zum Sichern!'
-    ReloadPlugin:
-      material: REDSTONE
-      displayName: '&cPlugin neu laden'
-      lore:
-        - '&7Lädt das Plugin komplett neu'
-        - '&7(Deaktivieren + Aktivieren).'
-        - ''
-        - '&c&lWarnung: Kann Probleme verursachen!'
-        - '&eKlicke zum Neuladen!'
   LanguageMigration:
     Migration:
       MigrationItem:
@@ -2850,7 +2800,6 @@ MenuTitles:
       Settings: '&3Einstellungen'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Einstellungen'
-  ConfigReloadMenu: '&aKonfigurations-Manager'
   LanguageMigration:
     Migration: '&6Sprach-Migration'
   LanguageMigrator:
