@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
+import de.happybavarian07.coolstufflib.utils.ChatUtils;
 import de.happybavarian07.coolstufflib.utils.ItemUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.main.Head;
@@ -7,7 +8,6 @@ import de.happybavarian07.coolstufflib.CoolStuffLib;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.PlayerMenuUtility;
 import de.happybavarian07.coolstufflib.menusystem.misc.ConfirmationMenu;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -59,7 +59,7 @@ public class AdminPanelUtils {
     }
 
     public static String chat(String s) {
-        return ChatColor.translateAlternateColorCodes('&', s);
+        return ChatUtils.chat(s);
     }
 
     public static ItemStack createItem(Inventory inv, String materialString, int amount, int invSlot, String displayName, String... loreString) {
@@ -230,11 +230,7 @@ public class AdminPanelUtils {
     }
 
     public static String format(Player player, String message, String prefix) {
-        try {
-            return PlaceholderAPI.setPlaceholders(player, ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix)));
-        } catch (Exception e) {
-            return ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix));
-        }
+        return ChatUtils.format(player, message, prefix);
     }
 
     public static void clearChat(int lines, boolean broadcastChatClear, Player player) {

@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.main;
 
+import de.happybavarian07.coolstufflib.utils.ChatUtils;
 import de.happybavarian07.adminpanel.startup.Startup;
 import de.happybavarian07.adminpanel.startup.StartupAbortedException;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
@@ -502,7 +503,6 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void initializeUtils() {
         initMethods = new InitMethods(logger, Bukkit.getPluginManager(), plugin);
-        new ChatUtil();
     }
 
     private void setupBackupManager() {
@@ -639,7 +639,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void initializePrefix() {
         logger.message("&3&lMain.Prefix &9= &7Config.Plugin.Prefix&r");
-        setPrefix(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
+        setPrefix(ChatUtils.chat(Objects.requireNonNull(getConfig().getString("Plugin.Prefix"))));
         languageManager.setPrefix(getPrefix());
         logger.message("&e&lPrefix Done!&r");
     }

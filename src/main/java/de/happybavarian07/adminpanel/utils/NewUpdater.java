@@ -1,10 +1,10 @@
 package de.happybavarian07.adminpanel.utils;
 
+import de.happybavarian07.coolstufflib.utils.ChatUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.data.UpdaterCacheEntry;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -220,7 +220,7 @@ public class NewUpdater implements Listener {
                     }
                 } else {
                     if (logInConsole && plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) {
-                        plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Update available for Plugin: " + getPluginName()));
+                        plugin.getStartUpLogger().message(ChatUtils.chat(AdminPanelMain.getPrefix() + "&a No Update available for Plugin: " + getPluginName()));
                     }
                 }
                 if (listener != null) listener.onCheck(finalAvailable, latest);
@@ -252,22 +252,20 @@ public class NewUpdater implements Listener {
             }
             String latestId = getLatestVersionID();
             StringBuilder sb = new StringBuilder();
-            sb.append(ChatColor.translateAlternateColorCodes('&',
-                    " &cPlugin: " + getPluginName() + " outdated! &6Please download the new version on&r\n" +
+            sb.append(ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated! &6Please download the new version on&r\n" +
                             "&6https://www.spigotmc.org/" + fileUrl + "\n" +
                             "&6or just activate automatic updating and replacing in the Config!\n" +
                             "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
                             "&bNew Version: &c" + resolvedLatest + "&r\n" +
                             "&bNew Version ID: &c" + latestId + "&r"));
             if (title != null && !title.isEmpty())
-                sb.append(ChatColor.translateAlternateColorCodes('&', "\n&bNew Version Title: &c" + title + "&r"));
+                sb.append(ChatUtils.chat("\n&bNew Version Title: &c" + title + "&r"));
             if (descriptionDecoded != null && !descriptionDecoded.isEmpty())
-                sb.append(ChatColor.translateAlternateColorCodes('&', "\n&bNew Version Description: &c" + descriptionDecoded));
+                sb.append(ChatUtils.chat("\n&bNew Version Description: &c" + descriptionDecoded));
             return sb.toString();
         } catch (Exception e) {
             plugin.getFileLogger().writeToLog(Level.WARNING, "Failed to build cached update message: " + e.getMessage(), LogPrefixExtension.UPDATER);
-            return ChatColor.translateAlternateColorCodes('&',
-                    " &cPlugin: " + getPluginName() + " outdated!\n" +
+            return ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated!\n" +
                             "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
                             "&bNew Version: &c" + resolvedLatest);
         }
@@ -338,8 +336,8 @@ public class NewUpdater implements Listener {
         }
         if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && !replace) {
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + target));
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe Update is now available: &c" + target));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -369,8 +367,7 @@ public class NewUpdater implements Listener {
             }
             Bukkit.getPluginManager().enablePlugin(pluginUtils.getPluginByName("Admin-Panel"));
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
-                        "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
                                 "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefixExtension.UPDATER);
@@ -445,8 +442,8 @@ public class NewUpdater implements Listener {
         }
         if (force && !replace) {
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&', "&aThe Update is now available: &c" + target));
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe Update is now available: &c" + target));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + resolvedLatest + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -478,8 +475,7 @@ public class NewUpdater implements Listener {
             }
             Bukkit.getPluginManager().enablePlugin(loadedPlugin);
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatColor.translateAlternateColorCodes('&',
-                        "&aThe new Version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
+                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new Version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
                                 "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + resolvedLatest + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefixExtension.UPDATER);
@@ -528,10 +524,10 @@ public class NewUpdater implements Listener {
         if (cachedUpdateAvailable != null && cachedUpdateAvailable) {
             messages.sendUpdateMessage(player);
             if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and is located in the update folder!"));
+                player.sendMessage(ChatUtils.chat("&aThe new version was downloaded automatically and is located in the update folder!"));
             }
             if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
+                player.sendMessage(ChatUtils.chat("&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
                         "&aYou just need to reload the plugin via Plugin Manager, / reload, / restart or / stop / start"));
             }
         } else if (cachedUpdateAvailable == null && !updateInProgress.get()) {
@@ -586,14 +582,13 @@ public class NewUpdater implements Listener {
                 return;
             }
             String latest = cachedLatestVersionName != null ? cachedLatestVersionName : "Unknown";
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    " &cPlugin: " + getPluginName() + " outdated!\n" +
+            sender.sendMessage(ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated!\n" +
                             "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
                             "&bNew Version: &c" + latest));
         }
 
         public void sendNoUpdateMessage(CommandSender sender) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', AdminPanelMain.getPrefix() + "&a No Updates Available for Plugin: " + getPluginName() + "!"));
+            sender.sendMessage(ChatUtils.chat(AdminPanelMain.getPrefix() + "&a No Updates Available for Plugin: " + getPluginName() + "!"));
         }
     }
 }

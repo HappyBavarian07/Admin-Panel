@@ -1,11 +1,11 @@
 package de.happybavarian07.adminpanel.listeners;
 
+import de.happybavarian07.coolstufflib.utils.ChatUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -109,7 +109,7 @@ public class StaffChatHandler implements Listener {
 
     public String formatMessageAsStaffChat(String message, Player player) {
         assert this.prefix != null;
-        return ChatColor.translateAlternateColorCodes('&', this.messageFormat.replace("%sc_prefix%", this.prefix).replace("%player_name%", player.getName()).replace("%message%", message));
+        return ChatUtils.chat(this.messageFormat.replace("%sc_prefix%", this.prefix).replace("%player_name%", player.getName()).replace("%message%", message));
     }
 
     public void sendMessageInStaffChat(String s, Player player, boolean format) {

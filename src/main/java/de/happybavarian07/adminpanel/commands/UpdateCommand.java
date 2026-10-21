@@ -1,12 +1,12 @@
 package de.happybavarian07.adminpanel.commands;
 
+import de.happybavarian07.coolstufflib.utils.ChatUtils;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.adminpanel.utils.CardboardCommandGuard;
 import de.happybavarian07.adminpanel.utils.NewUpdater;
 import de.happybavarian07.coolstufflib.languagemanager.LanguageManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -87,8 +87,7 @@ public class UpdateCommand implements CommandExecutor, TabCompleter {
                             String versionDescriptionDecoded = updater.html2text(new String(java.util.Base64.getDecoder().decode(versionDescriptionEncoded)));
                             String versionLikes = String.valueOf(websiteData.getInt("likes"));
                             String versionDate = String.valueOf(websiteData.getInt("date"));
-                            Bukkit.getScheduler().runTask(AdminPanelMain.getPlugin(), () -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                    "&bCurrent Version: &c" + currentVersion + "&r\n" +
+                            Bukkit.getScheduler().runTask(AdminPanelMain.getPlugin(), () -> sender.sendMessage(ChatUtils.chat("&bCurrent Version: &c" + currentVersion + "&r\n" +
                                             "&bNew Version Name: &c" + versionName + "&r\n" +
                                             "&bNew Version ID: &c" + versionID + "&r\n" +
                                             "&bNew Version Title: &c" + versionTitle + "&r\n" +
