@@ -28,7 +28,8 @@ public class PluginInstallMenu extends Menu {
     private final AdminPanelMain plugin = AdminPanelMain.getPlugin();
 
     private int resourceID = 0;
-    private String fileName = "InstalledPlugin";
+    private static final String DEFAULT_FILE_NAME = "InstalledPlugin";
+    private String fileName = DEFAULT_FILE_NAME;
     private boolean enableAfterInstall = false;
 
     public PluginInstallMenu(PlayerMenuUtility playerMenuUtility) {
@@ -116,6 +117,9 @@ public class PluginInstallMenu extends Menu {
                     try {
                         Plugin installedPlugin = AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
                         plugin.getPluginDescriptionManager().addPluginDescription(installedPlugin, "", installEvent.getResourceID());
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", resourceID, true);
+                        lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", fileName, false);
+                        p.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", p, true));
                     } catch (FileNotFoundException fileNotFoundException) {
                         AdminPanelMain.logError("The plugin file to install was not found", fileNotFoundException);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.FileNotFound", p, true));
@@ -126,15 +130,12 @@ public class PluginInstallMenu extends Menu {
                         AdminPanelMain.logError("The plugin to install has unknown dependencies", unknownDependencyException);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.MissingDependencies", p, true));
                     }
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", resourceID, true);
-                    lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", fileName, false);
-                    p.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", p, true));
                 }
             } catch (NotAPanelEventException ex) {
                 AdminPanelMain.logError("The plugin install action was not a valid panel event", ex);
             }
             this.resourceID = 0;
-            this.fileName = null;
+            this.fileName = DEFAULT_FILE_NAME;
             enableAfterInstall = false;
         }).thenClose());
         registerButton(getSlot("General.Close", 8), lgm.getItem("General.Back", player, false),

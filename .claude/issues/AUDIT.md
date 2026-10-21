@@ -72,7 +72,14 @@ Menus migration, 2026-10-01 (smoke test and 40 unit tests green; clicks not yet 
   (page-relative index used on the whole list). Chat input in `PluginInstallMenu`, `WorldCreateMenu` and the permission
   search used `Listener` menus whose handlers `MenuListener` unregisters on close; they use the chat input service now.
 - Open in game: banned players on page 2, plugin install, world create, permission list (search, modes), player troll
-  toggles, language select menus. `PluginInstallMenu` sets `fileName = null` after Install and the next render would NPE.
+  toggles, language select menus.
+
+CoolStuffLib catch-up, 2026-10-21 (131 unit tests and the smoke test green against the current CoolStuffLib):
+- `PluginInstallMenu` reset `fileName` to `null` after an install, so a reused menu would NPE on the next render, and it
+  reported "successfully installed" after a failed download. It resets to the default name and reports success only on success.
+- `AdminPanelMain.updateConfig()` runs `ConfigUpdater` on every start. CoolStuffLib's updater wrote the template's values over
+  the owner's since the language rewrite; it keeps the owner's values again (checked on the test server: a changed
+  `StaffChat.ChatPrefix` under the plugin section survived two starts).
 
 - SQLite transaction rollback/finally: present (`SQLiteDataService.java:162-167,235-239`).
 - `DataServiceConfig.getInt` null-safe unbox: fixed (`:37-40`).
