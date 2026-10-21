@@ -1,6 +1,6 @@
 package de.happybavarian07.adminpanel.utils;
 
-import de.happybavarian07.coolstufflib.utils.ChatUtils;
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.data.UpdaterCacheEntry;
 import org.apache.commons.io.FileUtils;
@@ -220,7 +220,7 @@ public class NewUpdater implements Listener {
                     }
                 } else {
                     if (logInConsole && plugin.getConfig().getBoolean("Plugin.Updater.logNoUpdate")) {
-                        plugin.getStartUpLogger().message(ChatUtils.chat(AdminPanelMain.getPrefix() + "&a No Update available for Plugin: " + getPluginName()));
+                        plugin.getStartUpLogger().message(text("NoUpdate", "%plugin%", getPluginName()));
                     }
                 }
                 if (listener != null) listener.onCheck(finalAvailable, latest);
@@ -252,23 +252,21 @@ public class NewUpdater implements Listener {
             }
             String latestId = getLatestVersionID();
             StringBuilder sb = new StringBuilder();
-            sb.append(ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated! &6Please download the new version on&r\n" +
-                            "&6https://www.spigotmc.org/" + fileUrl + "\n" +
-                            "&6or just activate automatic updating and replacing in the Config!\n" +
-                            "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
-                            "&bNew Version: &c" + resolvedLatest + "&r\n" +
-                            "&bNew Version ID: &c" + latestId + "&r"));
+            sb.append(text("Outdated", "%plugin%", getPluginName(), "%url%", fileUrl, "%current%", getPluginVersion(),
+                    "%latest%", resolvedLatest, "%id%", latestId));
             if (title != null && !title.isEmpty())
-                sb.append(ChatUtils.chat("\n&bNew Version Title: &c" + title + "&r"));
+                sb.append(text("NewVersionTitle", "%title%", title));
             if (descriptionDecoded != null && !descriptionDecoded.isEmpty())
-                sb.append(ChatUtils.chat("\n&bNew Version Description: &c" + descriptionDecoded));
+                sb.append(text("NewVersionDescription", "%description%", descriptionDecoded));
             return sb.toString();
         } catch (Exception e) {
             plugin.getFileLogger().writeToLog(Level.WARNING, "Failed to build cached update message: " + e.getMessage(), LogPrefixExtension.UPDATER);
-            return ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated!\n" +
-                            "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
-                            "&bNew Version: &c" + resolvedLatest);
+            return text("OutdatedShort", "%plugin%", getPluginName(), "%current%", getPluginVersion(), "%latest%", resolvedLatest);
         }
+    }
+
+    private String text(String key, Object... placeholders) {
+        return CommandText.get(plugin.getLanguageManager(), plugin.getServer().getConsoleSender(), "Updater." + key, placeholders);
     }
 
     public void checkForUpdates(boolean logInConsole) {
@@ -336,8 +334,8 @@ public class NewUpdater implements Listener {
         }
         if ((plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") || force) && !replace) {
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe Update is now available: &c" + target));
+                plugin.getStartUpLogger().message(text("DownloadedToFolder", "%plugin%", getPluginName()));
+                plugin.getStartUpLogger().message(text("UpdateAvailable", "%target%", target));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -367,8 +365,7 @@ public class NewUpdater implements Listener {
             }
             Bukkit.getPluginManager().enablePlugin(pluginUtils.getPluginByName("Admin-Panel"));
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
-                                "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
+                plugin.getStartUpLogger().message(text("DownloadedAndReplaced", "%plugin%", getPluginName()));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + spigotVersion + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -442,8 +439,8 @@ public class NewUpdater implements Listener {
         }
         if (force && !replace) {
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new version for Plugin: " + getPluginName() + " was downloaded automatically and is located in the update folder!"));
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe Update is now available: &c" + target));
+                plugin.getStartUpLogger().message(text("DownloadedToFolder", "%plugin%", getPluginName()));
+                plugin.getStartUpLogger().message(text("UpdateAvailable", "%target%", target));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + resolvedLatest + ") got downloaded into the Update Folder! (Plugin Version: " + getPluginVersion() + ")", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -475,8 +472,7 @@ public class NewUpdater implements Listener {
             }
             Bukkit.getPluginManager().enablePlugin(loadedPlugin);
             if (logInConsole) {
-                plugin.getStartUpLogger().message(ChatUtils.chat("&aThe new Version for Plugin: " + getPluginName() + " was downloaded automatically and the old one replaced! \n" +
-                                "&aAnd The New Version started automatically! If you can, please check Console for Errors!"));
+                plugin.getStartUpLogger().message(text("DownloadedAndReplaced", "%plugin%", getPluginName()));
             }
             plugin.getFileLogger().writeToLog(Level.INFO, "New Version for Plugin: " + getPluginName() + " (" + resolvedLatest + ") got downloaded and replaced with the Plugin Version (" + getPluginVersion() + ")!", LogPrefixExtension.UPDATER);
             return UpdateResponse.UPDATE_SUCCESS;
@@ -524,11 +520,10 @@ public class NewUpdater implements Listener {
         if (cachedUpdateAvailable != null && cachedUpdateAvailable) {
             messages.sendUpdateMessage(player);
             if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && !plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace")) {
-                player.sendMessage(ChatUtils.chat("&aThe new version was downloaded automatically and is located in the update folder!"));
+                player.sendMessage(text("PlayerDownloadedToFolder"));
             }
             if (plugin.getConfig().getBoolean("Plugin.Updater.downloadPluginUpdate") && plugin.getConfig().getBoolean("Plugin.Updater.automaticReplace")) {
-                player.sendMessage(ChatUtils.chat("&aThe new version was downloaded automatically and the old version was automatically replaced! \n" +
-                        "&aYou just need to reload the plugin via Plugin Manager, / reload, / restart or / stop / start"));
+                player.sendMessage(text("PlayerDownloadedAndReplaced"));
             }
         } else if (cachedUpdateAvailable == null && !updateInProgress.get()) {
             checkForUpdatesAsync(false, (u, v) -> {
@@ -582,13 +577,11 @@ public class NewUpdater implements Listener {
                 return;
             }
             String latest = cachedLatestVersionName != null ? cachedLatestVersionName : "Unknown";
-            sender.sendMessage(ChatUtils.chat(" &cPlugin: " + getPluginName() + " outdated!\n" +
-                            "&bCurrent Version: &c" + getPluginVersion() + "&r\n" +
-                            "&bNew Version: &c" + latest));
+            sender.sendMessage(text("OutdatedShort", "%plugin%", getPluginName(), "%current%", getPluginVersion(), "%latest%", latest));
         }
 
         public void sendNoUpdateMessage(CommandSender sender) {
-            sender.sendMessage(ChatUtils.chat(AdminPanelMain.getPrefix() + "&a No Updates Available for Plugin: " + getPluginName() + "!"));
+            sender.sendMessage(text("NoUpdateSender", "%plugin%", getPluginName()));
         }
     }
 }

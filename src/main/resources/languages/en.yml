@@ -620,6 +620,20 @@ Messages:
     WeatherSet: '%prefix% &9> &aThe weather of &7%world% &ais now &f%weather%&a!'
     TimeNotApplied: '%prefix% &9> &c%world% did not take the new time. The nether and the end use the time of the overworld.'
     WeatherNotApplied: '%prefix% &9> &c%world% did not take the new weather. The nether and the end use the weather of the overworld.'
+  Updater:
+    # %plugin% = The name of the plugin, %current% = Its installed version, %latest% = The new version,
+    # %id% = The id of the new version, %url% = The download path on Spigot, %target% = The file of the update
+    NoUpdate: '%prefix% &a No Update available for Plugin: %plugin%'
+    NoUpdateSender: '%prefix% &a No Updates Available for Plugin: %plugin%!'
+    Outdated: ' &cPlugin: %plugin% outdated! &6Please download the new version on&r\n&6https://www.spigotmc.org/%url%\n&6or just activate automatic updating and replacing in the Config!\n&bCurrent Version: &c%current%&r\n&bNew Version: &c%latest%&r\n&bNew Version ID: &c%id%&r'
+    OutdatedShort: ' &cPlugin: %plugin% outdated!\n&bCurrent Version: &c%current%&r\n&bNew Version: &c%latest%'
+    NewVersionTitle: '\n&bNew Version Title: &c%title%&r'
+    NewVersionDescription: '\n&bNew Version Description: &c%description%'
+    DownloadedToFolder: '&aThe new version for Plugin: %plugin% was downloaded automatically and is located in the update folder!'
+    UpdateAvailable: '&aThe Update is now available: &c%target%'
+    DownloadedAndReplaced: '&aThe new version for Plugin: %plugin% was downloaded automatically and the old one replaced! \n&aAnd the new version started automatically! If you can, please check the console for errors!'
+    PlayerDownloadedToFolder: '&aThe new version was downloaded automatically and is located in the update folder!'
+    PlayerDownloadedAndReplaced: '&aThe new version was downloaded automatically and the old version was automatically replaced! \n&aYou just need to reload the plugin via the Plugin Manager, /reload, /restart or /stop and start the server again.'
   StartupStatus:
     # %feature% = The Part, %reason% = Why, %count% = How many, %status% = The Status, %stage% = The Part, %detail% = The Reason
     Unavailable: '%prefix% &9> &c%feature% is unavailable: &7%reason%'

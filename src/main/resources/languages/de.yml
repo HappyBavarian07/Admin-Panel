@@ -623,6 +623,20 @@ Messages:
     WeatherSet: '%prefix% &9> &aDas Wetter von &7%world% &aist jetzt &f%weather%&a!'
     TimeNotApplied: '%prefix% &9> &c%world% hat die neue Zeit nicht übernommen. Nether und End nutzen die Zeit der Oberwelt.'
     WeatherNotApplied: '%prefix% &9> &c%world% hat das neue Wetter nicht übernommen. Nether und End nutzen das Wetter der Oberwelt.'
+  Updater:
+    # %plugin% = Der Name des Plugins, %current% = Die installierte Version, %latest% = Die neue Version,
+    # %id% = Die ID der neuen Version, %url% = Der Download-Pfad auf Spigot, %target% = Die Datei des Updates
+    NoUpdate: '%prefix% &a Kein Update verfügbar für das Plugin: %plugin%'
+    NoUpdateSender: '%prefix% &a Keine Updates verfügbar für das Plugin: %plugin%!'
+    Outdated: ' &cPlugin: %plugin% ist veraltet! &6Bitte lade die neue Version herunter auf&r\n&6https://www.spigotmc.org/%url%\n&6oder aktiviere das automatische Updaten und Ersetzen in der Config!\n&bAktuelle Version: &c%current%&r\n&bNeue Version: &c%latest%&r\n&bID der neuen Version: &c%id%&r'
+    OutdatedShort: ' &cPlugin: %plugin% ist veraltet!\n&bAktuelle Version: &c%current%&r\n&bNeue Version: &c%latest%'
+    NewVersionTitle: '\n&bTitel der neuen Version: &c%title%&r'
+    NewVersionDescription: '\n&bBeschreibung der neuen Version: &c%description%'
+    DownloadedToFolder: '&aDie neue Version für das Plugin: %plugin% wurde automatisch heruntergeladen und liegt im Update-Ordner!'
+    UpdateAvailable: '&aDas Update ist jetzt verfügbar: &c%target%'
+    DownloadedAndReplaced: '&aDie neue Version für das Plugin: %plugin% wurde automatisch heruntergeladen und die alte ersetzt! \n&aUnd die neue Version wurde automatisch gestartet! Wenn du kannst, prüfe bitte die Konsole auf Fehler!'
+    PlayerDownloadedToFolder: '&aDie neue Version wurde automatisch heruntergeladen und liegt im Update-Ordner!'
+    PlayerDownloadedAndReplaced: '&aDie neue Version wurde automatisch heruntergeladen und die alte Version wurde automatisch ersetzt! \n&aDu musst das Plugin nur noch über den Plugin Manager, /reload, /restart oder /stop und einen Neustart laden.'
   StartupStatus:
     # %feature% = Der Teil, %reason% = Warum, %count% = Wie viele, %status% = Der Status, %stage% = Der Teil, %detail% = Der Grund
     Unavailable: '%prefix% &9> &c%feature% ist nicht verfügbar: &7%reason%'
