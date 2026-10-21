@@ -201,8 +201,13 @@ Messages:
           EnterSort: '%prefix% &9> &aBitte gib die Sortierung in den Chat ein!'
           SortResult: '%prefix% &9> &aDie Sortierung wird angegewended!'
           PermissionNotFound: '%prefix% &9> &cDie Permission existiert nicht! (%permission%) (Wenn du willst, dass solche Permissions auch hinzugefügt werden, dann schau in die Config.)'
+          NoSearchResults: '%prefix% &9> &cKeine Berechtigungen gefunden für: &e%query%'
+          SearchCleared: '%prefix% &9> &aSuche zurückgesetzt, alle Berechtigungen werden angezeigt.'
+          QueryError: '%prefix% &9> &cDie Suchanfrage enthielt Fehler. Bitte korrigiere sie: %error%'
         PermissionSet: '%prefix% &9> &e%permission% &awurde für &e%target% &aauf &e%value% &agesetzt!'
         PermissionRemoved: '%prefix% &9> &e%permission% &awurde von &e%target% &aentfernt!'
+        PermissionInfo: 'Infos zur Berechtigung:\n  - &aName: &6%permission%\n  - &aBeschreibung: &6%description%\n  - &aStandard: &6%default%\n  - &aWert: &6%value%\n  - &aZiel: &6%target%\n  - &aUntergeordnet: &6%children%'
+        PermissionInfoNone: 'Keine'
       KickMenu:
         # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4Du wurdest vom Server geworfen! Grund: %reason%'

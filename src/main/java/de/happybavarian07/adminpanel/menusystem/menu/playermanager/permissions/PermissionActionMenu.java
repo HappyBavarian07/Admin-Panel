@@ -4,7 +4,6 @@ import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerActionSelectMenu;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
-import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
 import de.happybavarian07.coolstufflib.menusystem.actions.MenuAction;
@@ -16,7 +15,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 
-import java.util.Objects;
 
 public class PermissionActionMenu extends Menu {
 
@@ -96,14 +94,15 @@ public class PermissionActionMenu extends Menu {
         registerButton(getSlot(path + "Info", 16), infoButton, (p, e) -> {
             Permission perm = Bukkit.getPluginManager().getPermission(permissionFullName);
             if (perm != null) {
-                p.sendMessage(AdminPanelUtils.format(p,
-                        "Info about Permission:" + "\n" +
-                                "  - &aName: &6" + perm.getName() + "\n" +
-                                "  - &aDescription: &6" + (perm.getDescription().isEmpty() ? "None" : perm.getDescription()) + "\n" +
-                                "  - &aDefault: &6" + perm.getDefault() + "\n" +
-                                "  - &aValue: &6" + (Objects.requireNonNull(Bukkit.getPlayer(targetUUID)).hasPermission(permissionFullName) ? "true" : "false") + "\n" +
-                                "  - &aTarget: &6" + Objects.requireNonNull(Bukkit.getPlayer(targetUUID)).getName() + "\n" +
-                                "  - &aChildren: &6" + (perm.getChildren().isEmpty() ? "None" : perm.getChildren().toString()) + "\n", AdminPanelMain.getPrefix()));
+                Player target = Bukkit.getPlayer(targetUUID);
+                String none = lgm.getMessage("Player.PlayerManager.Permissions.PermissionInfoNone", p, true);
+                CommandText.send(lgm, p, "Player.PlayerManager.Permissions.PermissionInfo",
+                        "%permission%", perm.getName(),
+                        "%description%", perm.getDescription().isEmpty() ? none : perm.getDescription(),
+                        "%default%", perm.getDefault(),
+                        "%value%", target != null && target.hasPermission(permissionFullName),
+                        "%target%", targetName(),
+                        "%children%", perm.getChildren().isEmpty() ? none : perm.getChildren().toString());
             } else {
                 p.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.GroupMenu.PermissionNotFound", p, true));
             }

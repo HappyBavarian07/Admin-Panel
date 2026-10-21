@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions;
 
+import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.utils.CustomPermission;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.utils.PermissionGroup;
@@ -325,7 +326,7 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
         if (sortQuery != null && !sortQuery.isEmpty()) {
             List<String> searchResults = tfidfSearchPermissions(sortQuery);
             if (searchResults.isEmpty()) {
-                player.sendMessage("No permissions found matching: " + sortQuery);
+                CommandText.send(lgm, player, "Player.PlayerManager.Permissions.GroupMenu.NoSearchResults", "%query%", sortQuery);
                 buildPermissionTree(new ArrayList<>());
             } else {
                 player.sendMessage(lgm.getMessage("Player.PlayerManager.Permissions.GroupMenu.SortResult", player, true));
@@ -333,7 +334,7 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
             }
         } else {
             buildPermissionTree(new ArrayList<>());
-            player.sendMessage("Search cleared - showing all permissions");
+            CommandText.send(lgm, player, "Player.PlayerManager.Permissions.GroupMenu.SearchCleared");
         }
 
         this.currentGroup = rootGroup;
@@ -396,7 +397,7 @@ public class PermissionListMenu extends PaginatedMenu<PermissionListMenu.Permiss
             }
             this.filteredResultCount = results.size();
         } catch (Exception e) {
-            playerMenuUtility.getOwner().sendMessage("The Query contained errors. Please fix them: " + e.getMessage());
+            CommandText.send(lgm, playerMenuUtility.getOwner(), "Player.PlayerManager.Permissions.GroupMenu.QueryError", "%error%", String.valueOf(e.getMessage()));
         }
         return results;
     }

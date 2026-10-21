@@ -198,8 +198,13 @@ Messages:
           EnterSort: '%prefix% &9> &aPlease enter your Sorting in the Chat!'
           SortResult: '%prefix% &9> &aThe Sorting gets applied!'
           PermissionNotFound: '%prefix% &9> &cThe permission does not exist! (%permission%) (If you want such permissions to be added as well, then check the config.)'
+          NoSearchResults: '%prefix% &9> &cNo permissions found matching: &e%query%'
+          SearchCleared: '%prefix% &9> &aSearch cleared, showing all permissions.'
+          QueryError: '%prefix% &9> &cThe query contained errors. Please fix them: %error%'
         PermissionSet: '%prefix% &9> &aSet &e%permission% &ato &e%value% &afor &e%target%&a!'
         PermissionRemoved: '%prefix% &9> &aRemoved &e%permission% &afrom &e%target%&a!'
+        PermissionInfo: 'Info about Permission:\n  - &aName: &6%permission%\n  - &aDescription: &6%description%\n  - &aDefault: &6%default%\n  - &aValue: &6%value%\n  - &aTarget: &6%target%\n  - &aChildren: &6%children%'
+        PermissionInfoNone: 'None'
       KickMenu:
         # %reason% = The Reason
         TargetKickMessage: '%prefix% &9> &4You got kicked from the Server! Reason: %reason%'
