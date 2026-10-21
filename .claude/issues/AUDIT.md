@@ -77,9 +77,11 @@ Menus migration, 2026-10-01 (smoke test and 40 unit tests green; clicks not yet 
 CoolStuffLib catch-up, 2026-10-21 (131 unit tests and the smoke test green against the current CoolStuffLib):
 - `PluginInstallMenu` reset `fileName` to `null` after an install, so a reused menu would NPE on the next render, and it
   reported "successfully installed" after a failed download. It resets to the default name and reports success only on success.
-- `AdminPanelMain.updateConfig()` runs `ConfigUpdater` on every start. CoolStuffLib's updater wrote the template's values over
-  the owner's since the language rewrite; it keeps the owner's values again (checked on the test server: a changed
-  `StaffChat.ChatPrefix` under the plugin section survived two starts).
+- AdminPanel carried its own copy of the config updater (`configupdater` package, plus an unused `OldConfigUpdater`). CoolStuffLib's
+  updater is used now and the copies are gone. Before that, CoolStuffLib's updater had three problems that this exposed and fixed
+  (with tests): it wrote the template's values over the owner's, it dropped ignored sections, and it tracked key paths by
+  indentation, which lost the comments behind deeply nested keys (the copy lost them too, CoolStuffLib's keeps them now).
+  Checked on the test server: a changed `StaffChat.ChatPrefix` survives, and the real `config.yml` comes out unchanged on a second run.
 
 - SQLite transaction rollback/finally: present (`SQLiteDataService.java:162-167,235-239`).
 - `DataServiceConfig.getInt` null-safe unbox: fixed (`:37-40`).

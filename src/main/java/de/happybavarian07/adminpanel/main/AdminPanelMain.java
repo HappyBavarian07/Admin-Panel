@@ -5,7 +5,7 @@ import de.happybavarian07.adminpanel.startup.StartupAbortedException;
 import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
-import de.happybavarian07.adminpanel.configupdater.ConfigUpdater;
+import de.happybavarian07.coolstufflib.configstuff.ConfigUpdater;
 import de.happybavarian07.adminpanel.data.AdminPanelData;
 import de.happybavarian07.adminpanel.data.LegacyDataImporter;
 import de.happybavarian07.adminpanel.data.LegacyWarningImporter;
