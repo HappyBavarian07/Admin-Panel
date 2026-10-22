@@ -76,17 +76,17 @@ public class PermissionActionMenu extends Menu {
 
         inventory.setItem(getSlot(path + "InfoItem", 4), infoItem);
         registerButton(getSlot(path + "SetTrue", 10), trueButton, (p, e) -> {
-            permissionsManager.addPermission(targetUUID, permissionFullName, true, true);
+            permissionsManager.getService().setUserPermission(p, targetUUID, permissionFullName, true, 0, java.util.Map.of());
             sendSet(p, true);
             open();
         }, null);
         registerButton(getSlot(path + "SetFalse", 12), falseButton, (p, e) -> {
-            permissionsManager.addPermission(targetUUID, permissionFullName, false, true);
+            permissionsManager.getService().setUserPermission(p, targetUUID, permissionFullName, false, 0, java.util.Map.of());
             sendSet(p, false);
             open();
         }, null);
         registerButton(getSlot(path + "Remove", 14), removeButton, (p, e) -> {
-            permissionsManager.removePermission(targetUUID, permissionFullName, true);
+            permissionsManager.getService().unsetUserPermission(p, targetUUID, permissionFullName, java.util.Map.of());
             CommandText.send(lgm, p, "Player.PlayerManager.Permissions.PermissionRemoved", "%permission%", permissionFullName,
                     "%target%", targetName());
             new PermissionListMenu(playerMenuUtility, new PlayerActionSelectMenu(playerMenuUtility)).open();

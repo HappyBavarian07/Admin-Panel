@@ -6,52 +6,60 @@ package de.happybavarian07.adminpanel.utils;/*
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 
 public enum LogPrefixExtension {
-    ACTIONSLOGGER_PLAYER("ActionsLogger - Player", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ACTIONSLOGGER_PLAYER", true)),
-    ACTIONSLOGGER_SERVER("ActionsLogger - Server", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ACTIONSLOGGER_SERVER", true)),
-    ACTIONSLOGGER_PANEL("ActionsLogger - Panel", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ACTIONSLOGGER_PANEL", true)),
-    ACTIONSLOGGER_PLUGIN("ActionsLogger - Plugin", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ACTIONSLOGGER_PLUGIN", true)),
-    ADDONLOADER("Addon-Loader", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADDONLOADER", true)),
-    ADMINPANEL("AdminPanel", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL", true)),
-    ADMINPANEL_MAIN("AdminPanel - Main", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL_MAIN", true)),
-    ADMINPANEL_COMMANDS("AdminPanel - Commands", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL_COMMANDS", true)),
-    ADMINPANEL_GUI("AdminPanel - GUI", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL_GUI", true)),
-    ADMINPANEL_LISTENER("AdminPanel - Listener", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL_LISTENER", true)),
-    ADMINPANEL_UTILS("AdminPanel - Utils", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ADMINPANEL_UTILS", true)),
-    DATELOGGER("DateLogger", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.DATELOGGER", true)),
-    API("API", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.API", true)),
-    COMMANDS("Commands", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.COMMANDS", true)),
-    CONFIG("Config", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.CONFIG", true)),
-    DATABASE("Database", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.DATABASE", true)),
-    DEBUG("Debug", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.DEBUG", true)),
-    ERROR("Error", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.ERROR", true)),
-    FILE("File", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.FILE", true)),
-    INFO("Info", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.INFO", true)),
-    INITIALIZER("Initializer", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.INITIALIZER", true)),
-    VAULT_MONEY("Vault - Money", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_MONEY", true)),
-    VAULT_PERMISSION("Vault - Permission", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_PERMISSION", true)),
-    VAULT_CHAT("Vault - Chat", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_CHAT", true)),
-    VAULT_ECONOMY("Vault - Economy", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_ECONOMY", true)),
-    VAULT_PLUGIN("Vault - Plugin", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.VAULT_PLUGIN", true)),
-    UPDATER("Updater", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.UPDATER", true)),
-    WEBUI("WebUI", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI", true)),
-    WEBUI_API("WebUI - API", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_API", true)),
-    WEBUI_CONSOLE("WebUI - Commands", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_COMMANDS", true)),
-    WEBUI_LOGIN("WebUI - Login", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_LOGIN", true)),
-    WEBUI_AUTH("WebUI - Auth", AdminPanelMain.getPlugin().getConfig().getBoolean("Plugin.LogActions.IndividualActions.WEBUI_AUTH", true));
+    ACTIONSLOGGER_PLAYER("ActionsLogger - Player"),
+    ACTIONSLOGGER_SERVER("ActionsLogger - Server"),
+    ACTIONSLOGGER_PANEL("ActionsLogger - Panel"),
+    ACTIONSLOGGER_PLUGIN("ActionsLogger - Plugin"),
+    ADDONLOADER("Addon-Loader"),
+    ADMINPANEL("AdminPanel"),
+    ADMINPANEL_MAIN("AdminPanel - Main"),
+    ADMINPANEL_COMMANDS("AdminPanel - Commands"),
+    ADMINPANEL_GUI("AdminPanel - GUI"),
+    ADMINPANEL_LISTENER("AdminPanel - Listener"),
+    ADMINPANEL_UTILS("AdminPanel - Utils"),
+    DATELOGGER("DateLogger"),
+    API("API"),
+    COMMANDS("Commands"),
+    CONFIG("Config"),
+    DATABASE("Database"),
+    DEBUG("Debug"),
+    ERROR("Error"),
+    FILE("File"),
+    INFO("Info"),
+    INITIALIZER("Initializer"),
+    VAULT_MONEY("Vault - Money"),
+    VAULT_PERMISSION("Vault - Permission"),
+    VAULT_CHAT("Vault - Chat"),
+    VAULT_ECONOMY("Vault - Economy"),
+    VAULT_PLUGIN("Vault - Plugin"),
+    UPDATER("Updater"),
+    WEBUI("WebUI"),
+    WEBUI_API("WebUI - API"),
+    WEBUI_CONSOLE("WebUI - Commands"),
+    WEBUI_LOGIN("WebUI - Login"),
+    WEBUI_AUTH("WebUI - Auth"),
+    PERMISSIONS("Permissions"),
+    JOURNAL("Journal");
 
     private final String logPrefix;
-    private final boolean enabled;
 
-    LogPrefixExtension(String logPrefix, boolean enabled) {
+    LogPrefixExtension(String logPrefix) {
         this.logPrefix = logPrefix;
-        this.enabled = enabled;
     }
 
     public String getLogPrefix() {
         return logPrefix;
     }
 
+    /**
+     * Whether messages of this kind are written to the log file. Read from the config each time, so {@code /adminpaneladmin reloadconfig}
+     * applies it: {@code Plugin.LogActions.enabled} switches all kinds off, {@code Plugin.LogActions.IndividualActions.<NAME>} one kind.
+     */
     public boolean isEnabled() {
-        return enabled;
+        AdminPanelMain plugin = AdminPanelMain.getPlugin();
+        if (plugin == null) return true;
+        org.bukkit.configuration.file.FileConfiguration config = plugin.getConfig();
+        return config.getBoolean("Plugin.LogActions.enabled", true)
+                && config.getBoolean("Plugin.LogActions.IndividualActions." + name(), true);
     }
 }

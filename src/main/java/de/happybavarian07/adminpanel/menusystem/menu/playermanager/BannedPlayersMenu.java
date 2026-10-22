@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.sanctions.BanInfo;
 import de.happybavarian07.adminpanel.sanctions.Durations;
@@ -62,6 +63,7 @@ public class BannedPlayersMenu extends PaginatedMenu<BanInfo> {
             BanList<?> list = Bukkit.getBanList(info.ip() ? BanList.Type.IP : BanList.Type.NAME);
             if (list.isBanned(info.target())) {
                 list.pardon(info.target());
+                AdminJournal.log(p, info.ip() ? "UNBAN_IP" : "UNBAN", info.target(), info.reason());
                 CommandText.send(lgm, p, MESSAGE_PATH + "SuccessfullyUnbanned", "%target%", info.target());
             } else {
                 CommandText.send(lgm, p, MESSAGE_PATH + "NotBanned", "%target%", info.target());

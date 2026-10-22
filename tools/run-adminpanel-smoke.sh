@@ -12,6 +12,7 @@ CMDS="$SERVER/adminpanel-smoke-cmds.txt"
 [ -n "${AP_SKIP_BUILD:-}" ] || mvn -B -q -f "$ROOT/pom.xml" clean package -DskipTests || { echo "Build failed"; exit 1; }
 JAR=$(ls "$ROOT"/target/Admin-Panel-*.jar | grep -v -E -- '-(javadoc|sources|shaded)\.jar$' | head -1)
 [ -f "$JAR" ] || { echo "No built jar in target/"; exit 1; }
+rm -f "$SERVER"/plugins/Admin-Panel-*.jar
 cp "$JAR" "$SERVER/plugins/$(basename "$JAR")"
 
 wait_for() { # pattern, minimum count, timeout seconds
@@ -34,7 +35,13 @@ for cmd in "openpanel help" "openpanel ServerManagerMenu" "openpanel ServerManag
            "adminpaneladmin backup listBackups" "adminpaneladmin backup start Nothing" "adminpaneladmin permissionmenuhelp" "adminpaneladmin status" \
            "disableditems list" "disableditems disable NOT_AN_ITEM" "disableditems disable DIAMOND" "disableditems list" "disableditems enable DIAMOND" \
            "warn Nobody Test reason" "warn HappyBavarian07 Smoke reason" "warnings HappyBavarian07" "unwarn HappyBavarian07 all" "warnings HappyBavarian07" \
-           "dataclient ListClients" "dataclient SyncTrolls ChatMuteMap" "perplayerlang"; do
+           "dataclient ListClients" "dataclient SyncTrolls ChatMuteMap" "perplayerlang" "aplang missing" "aplang find Staff" "aplang reload" "adminpaneladmin journal" "adminpaneladmin journalexport" \
+           "perms groups" "perms group smokevip create" "perms group smokevip weight 10" "perms group smokevip prefix [VIP] " "perms group smokevip set smoke.kit" \
+           "perms group smokevip parent add default" "perms group default parent add smokevip" "perms group smokevip info" \
+           "perms user Nobody info" "perms user HappyBavarian07 addgroup smokevip 1h" "perms user HappyBavarian07 set smoke.fly false 5m world=world" \
+           "perms user HappyBavarian07 info" "perms check HappyBavarian07 smoke.kit" "perms explain HappyBavarian07 smoke.fly" "perms search fly" \
+           "perms export smoke" "perms import smoke" "perms audit" "perms group smokevip members" "perms user HappyBavarian07 removegroup smokevip" "perms user HappyBavarian07 unset smoke.fly world=world" \
+           "perms group smokevip delete" "perms reload"; do
     echo "$cmd" >> "$CMDS"
     sleep 1
 done
@@ -63,5 +70,13 @@ if grep -E "Config Path not found|null path:|An Error occurred!|Error performing
     grep -E "Config Path not found|null path:|An Error occurred!|Error performing sub command" "$LOG" | head -10
     status=1
 fi
+if grep -E "Missing in the files of [a-z]+: [1-9]" "$LOG" | grep -q .; then
+    echo "/aplang missing found keys the plugin reads but a language file lacks:"
+    grep -E "Missing in the files of [a-z]+: [1-9]" "$LOG" | head -5
+    status=1
+fi
 [ -f "$SERVER/plugin_data.db" ] && { echo "plugin_data.db still in the server root"; status=1; }
+echo "===== /perms output ====="
+grep -E "Created the group|Set smoke|is now in the group|has smoke|Imported [0-9]+ groups|Wrote [0-9]+ groups|Latest permission changes|Permission manager ready|weight of|inherits from|never joined|cannot be deleted|would make" "$LOG" | head -30
+[ -f "$SERVER/plugins/Admin-Panel/permission-exports/smoke.yml" ] || { echo "perms export wrote no file"; status=1; }
 exit $status

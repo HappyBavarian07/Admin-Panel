@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
 import de.happybavarian07.adminpanel.utils.AdminPanelUtils;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
@@ -54,7 +55,10 @@ public class DangerZoneMenu extends Menu {
         registerButton(getSlot(path + "ServerStop", 11), lgm.getItem(path + "ServerStop", player, false), MenuAction.of((player1, event) -> {
             Utils.openConfirmationMenu(
                     lgm.getMessage("DangerZoneMenu.StopReason", player1, true),
-                    (player2, e) -> AdminPanelUtils.serverStop(60),
+                    (player2, e) -> {
+                        AdminJournal.log(player2, "SERVER_STOP", "", "in 60 seconds");
+                        AdminPanelUtils.serverStop(60);
+                    },
                     player1,
                     this
             );
@@ -62,7 +66,10 @@ public class DangerZoneMenu extends Menu {
         registerButton(getSlot(path + "ServerRestart", 15), lgm.getItem(path + "ServerRestart", player, false), MenuAction.of((player1, event) -> {
             Utils.openConfirmationMenu(
                     lgm.getMessage("DangerZoneMenu.RestartReason", player1, true),
-                    (player2, e) -> AdminPanelUtils.serverRestart(60),
+                    (player2, e) -> {
+                        AdminJournal.log(player2, "SERVER_RESTART", "", "in 60 seconds");
+                        AdminPanelUtils.serverRestart(60);
+                    },
                     player1,
                     this
             );

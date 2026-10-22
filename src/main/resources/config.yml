@@ -106,6 +106,7 @@ Plugin:
     # in the plugin.log File If You don't want this please disable this Option!
     enabled: true
     # This Option adds the possibility of disabling single Actions from being logged
+    # Warnings and errors are always written. Changes apply after /adminpaneladmin reloadconfig.
     IndividualActions:
       ACTIONSLOGGER_PLAYER: true
       ACTIONSLOGGER_SERVER: true
@@ -139,6 +140,8 @@ Plugin:
       WEBUI_CONSOLE: true
       WEBUI_LOGIN: true
       WEBUI_AUTH: true
+      PERMISSIONS: true
+      JOURNAL: true
 
   # The Auto Admin-Panel Updater Section
   Updater:
@@ -310,6 +313,41 @@ Pman:
   Money:
     # This is the currency used for the money part in the Pman
     currency: $
+
+# The admin journal records bans, kicks, warnings, op and permission changes, gamerule changes and more:
+# who did it, to whom and when. Show it with /adminpaneladmin journal, export it with /adminpaneladmin journalexport
+Journal:
+  # Set to false to turn the journal off (needs a restart)
+  Enabled: true
+  # Entries older than this many days are removed when the server starts, 0 keeps them forever
+  KeepDays: 0
+  # Which kinds of actions are written to the journal. Set a kind to false if you do not want it recorded.
+  # Changes apply after /adminpaneladmin reloadconfig.
+  Record:
+    Bans: true
+    Kicks: true
+    Warnings: true
+    Operators: true
+    Whitelist: true
+    Permissions: true
+    Gamerules: true
+    Plugins: true
+    Server: true
+    Other: true
+
+# The permission manager: groups with inheritance, temporary and per-world permissions. Open it with /perms or from the start menu.
+Permissions:
+  # Set to false to stop the permission manager from handing out permissions (needs a restart)
+  Enabled: true
+  # Whether every player inherits the group 'default'
+  DefaultGroup: true
+  # Whether the permissions of a player are worked out again when the player changes the world (needed for per-world entries)
+  WorldChange: true
+  # How often temporary permissions and group memberships that ended are removed, in seconds
+  SweepSeconds: 60
+  # Whether other plugins that use Vault read and change permissions, groups, prefixes and suffixes through this plugin (needs a restart).
+  # Turn it on only if no other permission plugin should answer Vault.
+  Vault: false
 
 # Settings of the Warning System (only used when Pman.Actions.WarningSystem is true)
 Warnings:

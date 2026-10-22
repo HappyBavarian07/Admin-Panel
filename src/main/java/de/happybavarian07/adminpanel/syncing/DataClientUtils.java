@@ -57,9 +57,6 @@ public class DataClientUtils {
 
             for (Entry<String, Boolean> stringBooleanEntry : permissions.entrySet()) {
                 this.plugin.getPermissionsManager().addPermission(player, stringBooleanEntry.getKey(), stringBooleanEntry.getValue(), false);
-                if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {
-                    this.plugin.getPermissionsManager().getPlayerPermissionsAttachments().get(player).setPermission(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
-                }
             }
 
             if (Bukkit.getPlayer(player) != null && Objects.requireNonNull(Bukkit.getPlayer(player)).isOnline()) {

@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.servermanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.coolstufflib.menusystem.Menu;
@@ -69,6 +70,7 @@ public class WhitelistManagerMenu extends Menu {
                 return;
             }
             target.setWhitelisted(add);
+            AdminJournal.log(p, add ? "WHITELIST_ADD" : "WHITELIST_REMOVE", String.valueOf(target.getName()), "");
             lgm.addPlaceholder(PlaceholderType.MESSAGE, "%target%", target.getName(), true);
             p.sendMessage(lgm.getMessage("Player.ServerManager.WhitelistManager." + (add ? "AddedPlayer" : "RemovedPlayer"), p, true));
             open();

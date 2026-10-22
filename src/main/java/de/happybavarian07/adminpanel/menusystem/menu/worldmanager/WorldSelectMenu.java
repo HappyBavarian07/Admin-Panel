@@ -45,11 +45,12 @@ public class WorldSelectMenu extends PaginatedMenu<WorldSelectMenu.Entry> {
     private enum Filter {ALL, LOADED, UNLOADED}
 
     private Filter filter = Filter.ALL;
-    private String search = "";
 
     public WorldSelectMenu(PlayerMenuUtility playerMenuUtility, Menu savedMenu) {
         super(playerMenuUtility, savedMenu);
         setOpeningPermission(PERMISSION);
+        setSearchable(Entry::name);
+        setSearchSlot(6);
     }
 
     @Override
@@ -78,14 +79,12 @@ public class WorldSelectMenu extends PaginatedMenu<WorldSelectMenu.Entry> {
         for (String name : WorldFolders.unloaded(Bukkit.getWorldContainer(), loadedNames)) {
             entries.add(new Entry(name, null));
         }
-        String needle = search.toLowerCase(Locale.ROOT);
         List<Entry> shown = entries.stream()
                 .filter(entry -> filter == Filter.ALL || (filter == Filter.LOADED) == entry.loaded())
-                .filter(entry -> needle.isEmpty() || entry.name().toLowerCase(Locale.ROOT).contains(needle))
                 .toList();
         setPaginatedData(shown, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
-        if (perPage > 0) page = Math.min(page, Math.max(0, (shown.size() - 1) / perPage));
+        if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
     }
 
     @Override
@@ -98,22 +97,6 @@ public class WorldSelectMenu extends PaginatedMenu<WorldSelectMenu.Entry> {
                 MenuAction.prompt(CommandText.get(lgm, owner, "WorldSelect.EnterImport"), this::importWorld)
                         .requires("AdminPanel.WorldManager.Import"));
 
-        lgm.addPlaceholder(PlaceholderType.ITEM, "%search%", search.isEmpty() ? "-" : search, false);
-        MenuAction promptSearch = MenuAction.prompt(CommandText.get(lgm, owner, "WorldSelect.EnterSearch"), (p, text) -> {
-            search = text.trim().equals("-") ? "" : text.trim();
-            page = 0;
-            CommandText.send(lgm, p, search.isEmpty() ? "WorldSelect.SearchCleared" : "WorldSelect.SearchSet", "%search%", search);
-            open();
-        });
-        registerButton(getSlot(PATH + "Search", 6), lgm.getItem(PATH + "Search", owner, true), (p, e) -> {
-            if (e.isRightClick()) {
-                search = "";
-                page = 0;
-                refresh();
-            } else {
-                promptSearch.execute(p, e);
-            }
-        });
         registerButton(getSlot(PATH + "Filter", 7), lgm.getItem(PATH + "Filter." + filter, owner, false),
                 MenuAction.of((p, e) -> {
                     filter = Filter.values()[(filter.ordinal() + 1) % Filter.values().length];

@@ -89,7 +89,7 @@ class RequiredLanguageKeysTest {
             text(root, missing, "Messages.StartupStatus.Status." + status);
         }
         for (String stage : List.of("libraries", "data", "api", "bungee", "placeholderapi", "supervanish", "vault", "config",
-                "warnings", "trolls", "permissions", "prefix", "events", "language", "staffchat", "configupdate", "bstats", "updater",
+                "warnings", "journal", "trolls", "permissions", "prefix", "events", "language", "staffchat", "configupdate", "bstats", "updater",
                 "autoupdater", "permissionsetup", "commands", "addons", "backup")) {
             text(root, missing, "Messages.StartupStatus.Stage." + stage);
         }
@@ -119,8 +119,8 @@ class RequiredLanguageKeysTest {
             item(root, missing, "Items.WorldManager.CreateMenu.Difficulty." + difficulty);
         }
         for (String key : List.of("Create", "Import", "CreateMenu.Name", "CreateMenu.Seed", "CreateMenu.Preset",
-                "CreateMenu.CreateWorld", "Select.Search", "Select.Filter.ALL", "Select.Filter.LOADED",
-                "Select.Filter.UNLOADED", "Select.Loaded", "Select.Unloaded", "GameRuleMenu.Search", "GameRuleMenu.Filter.All",
+                "CreateMenu.CreateWorld", "Select.Filter.ALL", "Select.Filter.LOADED",
+                "Select.Filter.UNLOADED", "Select.Loaded", "Select.Unloaded", "GameRuleMenu.Filter.All",
                 "GameRuleMenu.Rule.Boolean.Enabled", "GameRuleMenu.Rule.Boolean.Disabled", "GameRuleMenu.Rule.Number",
                 "GameRuleMenu.Rule.Unknown", "TimeWeather.Info", "TimeWeather.HourBack", "TimeWeather.HourForward",
                 "TimeWeather.SetExact", "TimeWeather.Freeze.true", "TimeWeather.Freeze.false", "TimeWeather.WeatherDuration",
@@ -144,13 +144,12 @@ class RequiredLanguageKeysTest {
             text(root, missing, "Messages.WorldManager.Action." + action);
         }
         for (WorldPreset preset : WorldPreset.values()) text(root, missing, "Messages.WorldCreate.Preset." + preset.languageKey());
-        for (String key : List.of("WorldSelect.EnterImport", "WorldSelect.EnterSearch", "WorldSelect.SearchSet",
-                "WorldSelect.SearchCleared", "WorldSelect.Teleported", "WorldSelect.MainWorld", "WorldSettings.Seed",
+        for (String key : List.of("WorldSelect.EnterImport",
+                "WorldSelect.Teleported", "WorldSelect.MainWorld", "WorldSettings.Seed",
                 "WorldSettings.SpawnSet", "WorldSettings.SpawnWrongWorld", "WorldSettings.EnterBorder",
                 "WorldSettings.BorderSet", "WorldSettings.NotASize", "WorldSettings.EnterDuplicate",
                 "WorldSettings.EnterRename", "WorldCreate.EnterName", "WorldCreate.EnterSeed", "WorldPlayers.Sent",
-                "WorldPlayers.Teleported", "GameRuleMenu.EnterSearch", "GameRuleMenu.SearchSet", "GameRuleMenu.SearchCleared",
-                "GameRuleMenu.EnterValue", "GameRuleMenu.NotAValue", "GameRuleMenu.ValueSet", "TimeWeatherMenu.EnterTime",
+                "WorldPlayers.Teleported", "GameRuleMenu.EnterValue", "GameRuleMenu.NotAValue", "GameRuleMenu.ValueSet", "TimeWeatherMenu.EnterTime",
                 "TimeWeatherMenu.NotATime", "TimeWeatherMenu.TimeSet", "TimeWeatherMenu.EnterDuration",
                 "TimeWeatherMenu.DurationSet", "TimeWeatherMenu.NotADuration", "TimeWeatherMenu.WeatherSet")) {
             text(root, missing, "Messages." + key);

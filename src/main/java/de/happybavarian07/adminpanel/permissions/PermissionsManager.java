@@ -1,9 +1,11 @@
 package de.happybavarian07.adminpanel.permissions;
 
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.permissions.engine.Node;
 import de.happybavarian07.adminpanel.utils.LogPrefixExtension;
 import de.happybavarian07.adminpanel.utils.tfidfsearch.TFIDFSearch;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,45 +15,67 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
+/**
+ * Entry point of the permission manager for the rest of the plugin. The real work is done by {@link PermissionService}; this class keeps
+ * the methods the plugin always had (single permissions of a player, reload, attachments), starts the service once the database is
+ * ready, imports the old {@code permissions.yml} and keeps the search index of all known permissions.
+ */
 public class PermissionsManager {
     private final AdminPanelMain plugin;
-    private final Map<UUID, PermissionAttachment> playerPermissionsAttachments = new HashMap<>();
-    private final Map<UUID, Map<String, Boolean>> permissionMapCache = new HashMap<>();
+    private final PermissionService service;
+    private final JpaPermissionStore store;
+    private final PlayerPermissionRepository repository;
     private final TFIDFSearch permissionSearcher;
-    private final PlayerPermissionRepository permissionRepository;
-    private CompletableFuture<Void> permissionIndexFuture;
+    private volatile CompletableFuture<Void> permissionIndexFuture;
+    private volatile int indexedHash;
     private Thread permissionIndexThread;
+    private volatile boolean vaultRegistered;
 
-    public PermissionsManager(AdminPanelMain plugin, long cacheClearDelayTicks) {
-        // TODO Add Player Groups to this to be like any other Permission system with groups and stuff.
+    public PermissionsManager(AdminPanelMain plugin) {
         this.plugin = plugin;
-        permissionSearcher = new TFIDFSearch(new String[]{"permissionName", "permissionDescription", "permissionDefault", "permissionChildren"});
-        this.permissionRepository = plugin.getRepositoryManager().getRepository(PlayerPermissionRepository.class);
+        this.repository = plugin.getRepositoryManager().getRepository(PlayerPermissionRepository.class);
+        this.store = new JpaPermissionStore(repository, plugin.getRepositoryManager().getRepository(PermissionGroupRepository.class),
+                plugin.getRepositoryManager().getRepository(GroupNodeRepository.class));
+        ExecutorService io = Executors.newSingleThreadExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "AdminPanel-Permission-IO");
+            thread.setDaemon(true);
+            return thread;
+        });
+        PermissionData data = new PermissionData(store, io, System::currentTimeMillis, AdminPanelMain::logError);
+        this.service = new PermissionService(plugin, data, io);
+        this.permissionSearcher = new TFIDFSearch(new String[]{"permissionName", "permissionDescription", "permissionDefault", "permissionChildren"});
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                permissionIndexThread = getPermissionIndexThread();
-                if (!permissionIndexThread.isAlive()) {
-                    permissionIndexThread.start();
-                }
+                startIndexer();
             }
         }.runTaskTimer(plugin, 0L, 6 * 60 * 20L);
     }
 
-    public void setup() {
-        migrateOldPermissions();
+    public PermissionService getService() {
+        return service;
+    }
 
+    public void setup() {
+        if (!plugin.getConfig().getBoolean("Permissions.Enabled", true)) {
+            plugin.getFileLogger().writeToLog(Level.INFO, "Permissions.Enabled is false: the permission manager does not hand out permissions",
+                    LogPrefixExtension.PERMISSIONS, true);
+            return;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            // wait for the database to be ready
-            while (!permissionRepository.isDatabaseReady()) {
+            while (!repository.isDatabaseReady()) {
                 if (!plugin.isEnabled()) return;
                 try {
                     Thread.sleep(100);
@@ -60,427 +84,194 @@ public class PermissionsManager {
                     return;
                 }
             }
-
             try {
-                long totalEntries = permissionRepository.count();
-                long uniquePlayers = permissionRepository.countDistinctPlayers();
-                long uniquePermissions = permissionRepository.countDistinctPermissions();
-
-                plugin.getFileLogger().writeToLog(Level.INFO, "Permission Repository Statistics:", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                plugin.getFileLogger().writeToLog(Level.INFO, "- Total permission entries: " + totalEntries, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                plugin.getFileLogger().writeToLog(Level.INFO, "- Unique players with permissions: " + uniquePlayers, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                plugin.getFileLogger().writeToLog(Level.INFO, "- Unique permissions defined: " + uniquePermissions, LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-            } catch (Exception e) {
-                AdminPanelMain.logError("Could not retrieve permission repository statistics", e);
+                migrateOldPermissions();
+                service.start();
+                if (plugin.getConfig().getBoolean("Permissions.Vault", false) && Bukkit.getPluginManager().getPlugin("Vault") != null) {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        de.happybavarian07.adminpanel.permissions.vault.VaultHook.register(plugin, service);
+                        vaultRegistered = true;
+                        plugin.getFileLogger().writeToLog(Level.INFO, "Registered as the Vault permission and chat provider", LogPrefixExtension.PERMISSIONS, true);
+                    });
+                }
+            } catch (RuntimeException e) {
+                AdminPanelMain.logError("Could not start the permission manager", e);
             }
-            plugin.getFileLogger().writeToLog(Level.INFO, "Database is ready starting Permission init code", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-            initPermissions();
         });
     }
 
+    public void shutdown() {
+        if (vaultRegistered) de.happybavarian07.adminpanel.permissions.vault.VaultHook.unregister(plugin);
+        service.stop();
+    }
+
+    // ---- search index
+
     public void onServerLoad(ServerLoadEvent event) {
-        if (event.getType() == ServerLoadEvent.LoadType.STARTUP) {
-            plugin.getFileLogger().writeToLog(Level.INFO, "Starting Permission Indexer Thread after Server is done starting now", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-            if (permissionIndexThread == null) {
-                permissionIndexThread = getPermissionIndexThread();
-            }
-            if (!permissionIndexThread.isAlive()) {
-                permissionIndexThread.start();
-            }
+        if (event.getType() == ServerLoadEvent.LoadType.STARTUP) startIndexer();
+    }
+
+    private synchronized void startIndexer() {
+        if (permissionIndexThread != null && permissionIndexThread.isAlive()) return;
+        permissionIndexThread = new Thread(this::indexPermissions, "Permission Indexer Thread");
+        permissionIndexThread.setDaemon(true);
+        permissionIndexThread.start();
+    }
+
+    private void indexPermissions() {
+        long startTime = System.currentTimeMillis();
+        List<Permission> permissions = new ArrayList<>(Bukkit.getPluginManager().getPermissions());
+        List<TFIDFSearch.Item> items = new ArrayList<>();
+        int hash = 1;
+        for (Permission permission : permissions) {
+            Map<String, Object> fields = new HashMap<>();
+            fields.put("permissionName", permission.getName());
+            fields.put("permissionDescription", permission.getDescription());
+            fields.put("permissionDefault", permission.getDefault().toString());
+            fields.put("permissionChildren", permission.getChildren().toString());
+            items.add(new TFIDFSearch.Item(fields));
+            hash += fields.hashCode();
         }
+        if (permissionIndexFuture != null && hash == indexedHash) return;
+        permissionIndexFuture = permissionSearcher.indexItems(items);
+        permissionIndexFuture.join();
+        indexedHash = hash;
+        plugin.getFileLogger().writeToLog(Level.INFO, "Permission search index built for " + items.size() + " permissions in "
+                + (System.currentTimeMillis() - startTime) + " ms", LogPrefixExtension.PERMISSIONS);
     }
 
     public TFIDFSearch getPermissionSearcher() {
-        if (permissionIndexFuture != null && !permissionIndexFuture.isDone()) {
-            plugin.getFileLogger().writeToLog(Level.INFO, "Waiting for permission index to complete...", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+        CompletableFuture<Void> running = permissionIndexFuture;
+        if (running != null && !running.isDone()) {
             try {
-                permissionIndexFuture.get();
+                running.get();
             } catch (Exception e) {
-                plugin.getFileLogger().writeToLog(Level.SEVERE, "Error while waiting for permission index to complete: " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
+                AdminPanelMain.logError("Could not wait for the permission search index", e);
             }
         }
         return permissionSearcher;
     }
 
-    public Map<UUID, PermissionAttachment> getPlayerPermissionsAttachments() {
-        return playerPermissionsAttachments;
-    }
-
-    private Thread getPermissionIndexThread() {
-        Thread permissionIndexThread = new Thread(() -> {
-            long startTime = System.currentTimeMillis();
-            List<Permission> permissions = new ArrayList<>(Bukkit.getPluginManager().getPermissions());
-            List<TFIDFSearch.Item> permissionItems = new ArrayList<>();
-
-            for (Permission permission : permissions) {
-                Map<String, Object> permissionData = new HashMap<>();
-                permissionData.put("permissionName", permission.getName());
-                permissionData.put("permissionDescription", permission.getDescription());
-                permissionData.put("permissionDefault", permission.getDefault().toString());
-                permissionData.put("permissionChildren", permission.getChildren().toString());
-                permissionItems.add(new TFIDFSearch.Item(permissionData));
-            }
-
-            permissionIndexFuture = permissionSearcher.indexItems(permissionItems);
-            permissionIndexFuture.join();
-
-            long endTime = System.currentTimeMillis();
-            plugin.getFileLogger().writeToLog(Level.INFO, "Permission Searcher took '" + (endTime - startTime) + "' ms to index " + permissionItems.size() + " permissions", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-        });
-        permissionIndexThread.setDaemon(true);
-        permissionIndexThread.setName("Permission Indexer Thread");
-        return permissionIndexThread;
-    }
+    // ---- import of the old permissions.yml
 
     private void migrateOldPermissions() {
         File permissionFile = new File(plugin.getDataFolder(), "permissions.yml");
-        if (!permissionFile.exists()) {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Old permissions.yml file does not exist or is empty: No migration needed!", "Permission Manager", true);
-            return;
-        }
-        plugin.getFileLogger().writeToLog(Level.INFO, "Starting migration of old permissions to database system", "Permission Manager", true);
-        FileConfiguration permissionsConfig = YamlConfiguration.loadConfiguration(permissionFile);
-        Objects.requireNonNull(permissionsConfig.getConfigurationSection("Permissions")).getKeys(false).forEach(playerUUID -> {
-            try {
-                UUID uuid = UUID.fromString(playerUUID);
-                String path = "Permissions." + playerUUID + ".Permissions";
-                Objects.requireNonNull(permissionsConfig.getConfigurationSection(path)).getKeys(false).forEach(perm -> {
-                    boolean value = permissionsConfig.getBoolean(path + "." + perm);
-                    // Speichern in der Datenbank
-                    PlayerPermission permission = new PlayerPermission();
-                    permission.setPlayerUUID(uuid);
-                    permission.setPermission(perm);
-                    permission.setValue(value);
-                    permission.setEntryID(generateUniqueEntryID(uuid.toString(), perm));
-                    permissionRepository.save(permission);
-                });
-            } catch (IllegalArgumentException e) {
-                plugin.getFileLogger().writeToLog(Level.WARNING, "Invalid UUID in permissions.yml: " + playerUUID, "Permission Manager", true);
-            }
-        });
-
-        // Umbenennen der alten permissions.yml um sie zu archivieren
-        File backupFile = new File(plugin.getDataFolder(), "permissions_old.yml");
-        if (permissionFile.renameTo(backupFile)) {
-            plugin.getFileLogger().writeToLog(Level.INFO, "Old permissions.yml has been renamed to permissions_old.yml", "Permission Manager", true);
-        } else {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Could not rename old permissions.yml file", "Permission Manager", true);
-        }
-
-        plugin.getFileLogger().writeToLog(Level.INFO, "Migration of old permissions completed", "Permission Manager", true);
-    }
-
-    private String generateUniqueEntryID(String playerUUID, String permission) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            String input = playerUUID + ":" + permission;
-            byte[] hash = md.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
-        }
-    }
-
-    public void initPermissions() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!permissionRepository.isDatabaseReady()) {
-                    plugin.getFileLogger().writeToLog(Level.WARNING, "Database not ready, skipping permission initialization", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                    return;
-                }
-
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    UUID playerUUID = online.getUniqueId();
-                    if (!playerPermissionsAttachments.containsKey(playerUUID)) {
-                        try {
-                            PermissionAttachment attachment = online.addAttachment(plugin);
-                            Map<String, Boolean> permissions;
-
-                            if (permissionMapCache.containsKey(playerUUID)) {
-                                permissions = permissionMapCache.get(playerUUID);
-                                plugin.getFileLogger().writeToLog(Level.FINE, "Loading permissions from cache for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
-                            } else {
-                                List<PlayerPermission> playerPermissions = permissionRepository.findByPlayerUUID(playerUUID);
-                                plugin.getFileLogger().writeToLog(Level.FINE, "Loading permissions from database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
-                                permissions = new HashMap<>();
-
-                                if (playerPermissions != null && !playerPermissions.isEmpty()) {
-                                    for (PlayerPermission playerPermission : playerPermissions) {
-                                        if (playerPermission != null && playerPermission.getPermission() != null) {
-                                            permissions.put(playerPermission.getPermission(), playerPermission.isValue());
-                                        }
-                                    }
-                                    plugin.getFileLogger().writeToLog(Level.INFO, "Loaded " + permissions.size() + " permissions from database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                                } else {
-                                    plugin.getFileLogger().writeToLog(Level.INFO, "No permissions found in database for " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                                }
-
-                                permissionMapCache.put(playerUUID, permissions);
-                            }
-
-                            for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
-                                if (perms.getKey() != null) {
-                                    attachment.setPermission(perms.getKey(), perms.getValue());
-                                }
-                            }
-
-                            playerPermissionsAttachments.put(playerUUID, attachment);
-                            online.recalculatePermissions();
-
-                            plugin.getFileLogger().writeToLog(Level.FINE, "Applied " + permissions.size() + " permissions to " + online.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), false);
-
-                        } catch (Exception e) {
-                            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for " + online.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-                        }
+        if (!permissionFile.exists()) return;
+        FileConfiguration config = YamlConfiguration.loadConfiguration(permissionFile);
+        ConfigurationSection players = config.getConfigurationSection("Permissions");
+        if (players != null) {
+            for (String key : players.getKeys(false)) {
+                ConfigurationSection entries = config.getConfigurationSection("Permissions." + key + ".Permissions");
+                if (entries == null) continue;
+                try {
+                    UUID uuid = UUID.fromString(key);
+                    for (String permission : entries.getKeys(false)) {
+                        store.saveUserNode(uuid, Node.of(permission, entries.getBoolean(permission)));
                     }
+                } catch (IllegalArgumentException e) {
+                    plugin.getFileLogger().writeToLog(Level.WARNING, "Invalid UUID in permissions.yml: " + key, LogPrefixExtension.PERMISSIONS, true);
                 }
             }
-        }.runTaskTimer(plugin, 20L, 5 * 60 * 20L);
+        }
+        File backup = new File(plugin.getDataFolder(), "permissions_old.yml");
+        if (permissionFile.renameTo(backup)) {
+            plugin.getFileLogger().writeToLog(Level.INFO, "Imported permissions.yml and renamed it to permissions_old.yml", LogPrefixExtension.PERMISSIONS, true);
+        } else {
+            plugin.getFileLogger().writeToLog(Level.WARNING, "Imported permissions.yml but could not rename it; it will be imported again next start",
+                    LogPrefixExtension.PERMISSIONS, true);
+        }
+    }
+
+    // ---- the methods the plugin always had
+
+    public Map<UUID, PermissionAttachment> getPlayerPermissionsAttachments() {
+        return service.attachments();
     }
 
     public void addPermission(UUID playerUUID, String permission, boolean value, boolean reloadPermissions) {
-        List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-        PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-        if (firstPermission != null) {
-            firstPermission.setValue(value);
-            permissionRepository.save(firstPermission);
-        } else {
-            PlayerPermission newPermission = new PlayerPermission();
-            newPermission.setPlayerUUID(playerUUID);
-            newPermission.setPermission(permission);
-            newPermission.setValue(value);
-            newPermission.setEntryID(generateUniqueEntryID(playerUUID.toString(), permission));
-            permissionRepository.save(newPermission);
-        }
-
         if (reloadPermissions) {
-            reloadPermissions(Bukkit.getPlayer(playerUUID));
+            service.setUserPermission(null, playerUUID, permission, value, 0, Map.of());
+        } else {
+            service.data().setUserNode(playerUUID, Node.of(permission, value));
         }
     }
 
     public void addPermissions(UUID playerUUID, Map<String, Boolean> permissions, boolean reloadPermissions) {
-        if (playerUUID == null) return;
-        if (permissions.isEmpty()) return;
-
-        for (Map.Entry<String, Boolean> entry : permissions.entrySet()) {
-            String permission = entry.getKey();
-            boolean value = entry.getValue();
-
-            List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-            PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-            if (firstPermission != null) {
-                // Aktualisieren des bestehenden Eintrags
-                firstPermission.setValue(value);
-                permissionRepository.save(firstPermission);
-            } else {
-                PlayerPermission newPermission = new PlayerPermission();
-                newPermission.setPlayerUUID(playerUUID);
-                newPermission.setPermission(permission);
-                newPermission.setValue(value);
-                newPermission.setEntryID(generateUniqueEntryID(playerUUID.toString(), permission));
-                permissionRepository.save(newPermission);
-            }
-        }
-
-        if (reloadPermissions) {
-            reloadPermissions(Bukkit.getPlayer(playerUUID));
-        }
+        if (playerUUID == null || permissions.isEmpty()) return;
+        permissions.forEach((permission, value) -> service.data().setUserNode(playerUUID, Node.of(permission, value)));
+        if (reloadPermissions) reloadPermissions(Bukkit.getPlayer(playerUUID));
     }
 
     public void setPermissionValue(UUID playerUUID, String permission, boolean value, boolean reloadPermissions, boolean createIfNotExists) {
-        List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-        PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-        if (firstPermission != null) {
-            firstPermission.setValue(value);
-            permissionRepository.save(firstPermission);
-
-            if (reloadPermissions) {
-                reloadPermissions(Bukkit.getPlayer(playerUUID));
-            }
-        } else if (createIfNotExists) {
-            addPermission(playerUUID, permission, value, reloadPermissions);
-        }
+        if (createIfNotExists || hasEntry(playerUUID, permission)) addPermission(playerUUID, permission, value, reloadPermissions);
     }
 
     public void setPermissionValues(UUID playerUUID, Map<String, Boolean> permissions, boolean reloadPermissions, boolean createIfNotExists) {
-        Map<String, Boolean> nonExistingPermissions = new HashMap<>();
-        for (Map.Entry<String, Boolean> entry : permissions.entrySet()) {
-            String permission = entry.getKey();
-            boolean value = entry.getValue();
+        permissions.forEach((permission, value) -> {
+            if (createIfNotExists || hasEntry(playerUUID, permission)) service.data().setUserNode(playerUUID, Node.of(permission, value));
+        });
+        if (reloadPermissions) reloadPermissions(Bukkit.getPlayer(playerUUID));
+    }
 
-            List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-            PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-            if (firstPermission != null) {
-                firstPermission.setValue(value);
-                permissionRepository.save(firstPermission);
-            } else if (createIfNotExists) {
-                nonExistingPermissions.put(permission, value);
-            }
-        }
-
-        if (createIfNotExists) {
-            addPermissions(playerUUID, nonExistingPermissions, false);
-        }
-
-        if (reloadPermissions) {
-            reloadPermissions(Bukkit.getPlayer(playerUUID));
-        }
+    private boolean hasEntry(UUID playerUUID, String permission) {
+        String normalized = Node.of(permission, true).permission();
+        return service.data().userNodes(playerUUID).stream().anyMatch(node -> node.permission().equals(normalized) && node.context().isEmpty());
     }
 
     public void removePermission(UUID playerUUID, String permission, boolean reloadPermissions) {
-        List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-        PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-        if (firstPermission != null) {
-            permissionRepository.delete(firstPermission);
-
-            if (reloadPermissions) {
-                reloadPermissions(Bukkit.getPlayer(playerUUID));
-            }
+        if (reloadPermissions) {
+            service.unsetUserPermission(null, playerUUID, permission, Map.of());
+        } else {
+            service.data().unsetUserNode(playerUUID, permission, Map.of());
         }
     }
 
     public void removePermissions(UUID playerUUID, String[] permissions, boolean reloadPermissions) {
-        for (String permission : permissions) {
-            List<PlayerPermission> existingPermission = permissionRepository.findByPlayerUUIDAndPermission(playerUUID, permission);
-            PlayerPermission firstPermission = existingPermission.isEmpty() ? null : existingPermission.get(0);
-
-            if (firstPermission != null) {
-                permissionRepository.delete(firstPermission);
-            }
-        }
-
-        if (reloadPermissions) {
-            reloadPermissions(Bukkit.getPlayer(playerUUID));
-        }
+        for (String permission : permissions) service.data().unsetUserNode(playerUUID, permission, Map.of());
+        if (reloadPermissions) reloadPermissions(Bukkit.getPlayer(playerUUID));
     }
 
+    /** @return the plain permissions of a player (no groups, no entries limited to a context, nothing that ended) */
     public Map<String, Boolean> getPlayerPermissions(UUID playerUUID) {
-        Map<String, Boolean> permissions = permissionMapCache.get(playerUUID);
-        if (permissions == null) {
-            permissions = new HashMap<>();
-            List<PlayerPermission> playerPermissions = permissionRepository.findByPlayerUUID(playerUUID);
-            for (PlayerPermission playerPermission : playerPermissions) {
-                permissions.put(playerPermission.getPermission(), playerPermission.isValue());
-            }
-            permissionMapCache.put(playerUUID, permissions);
+        long now = System.currentTimeMillis();
+        Map<String, Boolean> permissions = new TreeMap<>();
+        for (Node node : service.data().userNodes(playerUUID)) {
+            if (!node.isGroup() && node.context().isEmpty() && !node.expired(now)) permissions.put(node.permission(), node.value());
         }
         return permissions;
     }
 
     public Map<UUID, Map<String, Boolean>> getAllPlayerPermissions() {
-        Map<UUID, Map<String, Boolean>> allPermissions = new HashMap<>();
-        for (PlayerPermission permission : permissionRepository.findAll()) {
-            allPermissions.computeIfAbsent(permission.getPlayerUUID(), k -> new HashMap<>()).put(permission.getPermission(), permission.isValue());
+        Map<UUID, Map<String, Boolean>> all = new HashMap<>();
+        for (UUID user : service.knownUsers()) {
+            Map<String, Boolean> permissions = getPlayerPermissions(user);
+            if (!permissions.isEmpty()) all.put(user, permissions);
         }
-        return allPermissions;
+        return all;
     }
 
-    /**
-     * Reloads the Permissions for a Player
-     * <p>
-     * This Method reloads the Permissions for a Player.
-     * It removes the Permissions from the Player and adds them again.
-     *
-     * @param player The Player to reload the Permissions for
-     */
+    /** Works the permissions of a player out again and puts them on a fresh attachment. */
     public void reloadPermissions(Player player) {
-        if (player == null) return;
-
-        UUID playerUUID = player.getUniqueId();
-
-        if (playerPermissionsAttachments.containsKey(playerUUID)) {
-            player.removeAttachment(playerPermissionsAttachments.get(playerUUID));
-        }
-
-        PermissionAttachment attachment = player.addAttachment(plugin);
-        Map<String, Boolean> permissions;
-        if (permissionMapCache.containsKey(playerUUID)) {
-            permissions = permissionMapCache.get(playerUUID);
-        } else {
-            List<PlayerPermission> playerPermissions = permissionRepository.findByPlayerUUID(playerUUID);
-            permissions = new HashMap<>();
-            for (PlayerPermission playerPermission : playerPermissions) {
-                permissions.put(playerPermission.getPermission(), playerPermission.isValue());
-            }
-            permissionMapCache.put(playerUUID, permissions);
-        }
-
-        for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
-            attachment.setPermission(perms.getKey(), perms.getValue());
-        }
-
-        playerPermissionsAttachments.put(playerUUID, attachment);
-        player.recalculatePermissions();
-        player.updateCommands();
+        if (player != null) service.apply(player);
     }
 
-    /**
-     * Reloads the Permissions for all Players on the Server
-     * <p>
-     * This Method reloads the Permissions for all Players on the Server.
-     * It removes the Permissions from the Player and adds them again.
-     */
     public void reloadPermissionsGlobally() {
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            reloadPermissions(online);
-        }
+        service.applyAll();
     }
 
     public void clearPermissions(UUID playerUUID) {
-        if (playerPermissionsAttachments.containsKey(playerUUID)) {
-            playerPermissionsAttachments.get(playerUUID).remove();
-            playerPermissionsAttachments.remove(playerUUID);
-        }
-        permissionRepository.deleteAllByPlayerUUID(playerUUID);
+        service.clearUser(null, playerUUID);
     }
 
     public boolean hasPermissions(UUID permissionHolder) {
-        return permissionRepository.countEntriesByUUID(permissionHolder) > 0;
+        return !service.data().userNodes(permissionHolder).isEmpty();
     }
 
     public void loadPlayerPermissions(Player player) {
-        if (player == null) return;
-
-        UUID playerUUID = player.getUniqueId();
-        if (playerPermissionsAttachments.containsKey(playerUUID)) {
-            plugin.getFileLogger().writeToLog(Level.WARNING, "Player " + player.getName() + " already has permissions loaded, skipping.", LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-            return;
-        }
-
-        try {
-            PermissionAttachment attachment = player.addAttachment(plugin);
-            Map<String, Boolean> permissions = getPlayerPermissions(playerUUID);
-
-            for (Map.Entry<String, Boolean> perms : permissions.entrySet()) {
-                attachment.setPermission(perms.getKey(), perms.getValue());
-            }
-
-            playerPermissionsAttachments.put(playerUUID, attachment);
-            player.recalculatePermissions();
-            plugin.getFileLogger().writeToLog(Level.INFO, "Loaded permissions for player: " + player.getName(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-        } catch (Exception e) {
-            AdminPanelMain.logError("Could not load permissions for player " + player.getName(), e);
-            plugin.getFileLogger().writeToLog(Level.SEVERE, "Error loading permissions for player " + player.getName() + ": " + e.getMessage(), LogPrefixExtension.DATELOGGER.getLogPrefix(), true);
-        }
+        if (player != null) service.onJoin(player);
     }
 
     public void unloadPlayerPermissions(Player player) {
-        if (player == null) return;
-        UUID playerUUID = player.getUniqueId();
-        if (playerPermissionsAttachments.containsKey(playerUUID)) {
-            player.removeAttachment(playerPermissionsAttachments.get(playerUUID));
-            playerPermissionsAttachments.remove(playerUUID);
-        }
-        permissionMapCache.remove(playerUUID);
+        if (player != null) service.onQuit(player);
     }
 }

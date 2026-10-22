@@ -23,6 +23,14 @@ public class PlayerPermission {
     @Column(name = "value")
     private boolean value;
 
+    /** When the entry ends in milliseconds since the epoch, 0 for never. */
+    @Column(name = "expires_at")
+    private long expiresAt;
+
+    /** Where the entry applies as {@code key=value;key=value}, empty for everywhere. */
+    @Column(name = "context")
+    private String context;
+
     public String getEntryID() {
         return entryID;
     }
@@ -53,5 +61,21 @@ public class PlayerPermission {
 
     public void setValue(boolean value) {
         this.value = value;
+    }
+
+    public long getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(long expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public String getContext() {
+        return context == null ? "" : context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
     }
 }

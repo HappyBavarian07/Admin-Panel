@@ -66,7 +66,7 @@ public class PotionMenu extends PaginatedMenu<PotionEffectType> {
         List<PotionEffectType> entries = allTypes.stream()
                 .filter(type -> category == null || EffectTypes.category(type) == category)
                 .toList();
-        setSearchSlot(getSlot(PATH + "Search", 6));
+        setSearchSlot(6);
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
         if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));

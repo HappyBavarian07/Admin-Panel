@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.pluginmanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.plugins.PluginInstallEvent;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -117,6 +118,7 @@ public class PluginInstallMenu extends Menu {
                     try {
                         Plugin installedPlugin = AdminPanelMain.getAPI().downloadPluginFromSpiget(installEvent.getResourceID(), installEvent.getFileName(), installEvent.isEnableAfterInstall());
                         plugin.getPluginDescriptionManager().addPluginDescription(installedPlugin, "", installEvent.getResourceID());
+                        AdminJournal.log(p, "PLUGIN_INSTALL", installedPlugin.getName(), "Spiget resource " + installEvent.getResourceID());
                         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%resourceid%", resourceID, true);
                         lgm.addPlaceholder(PlaceholderType.MESSAGE, "%filename%", fileName, false);
                         p.sendMessage(lgm.getMessage("Player.PluginManager.SuccessfullyInstalled", p, true));

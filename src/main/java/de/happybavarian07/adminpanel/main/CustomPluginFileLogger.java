@@ -24,11 +24,16 @@ public class CustomPluginFileLogger extends PluginFileLogger {
         super(dataFolder, logFileName);
     }
 
+    /**
+     * Writes a message unless its kind is switched off in {@code Plugin.LogActions}. Warnings and errors are always written, so switching
+     * a kind off never hides a problem.
+     */
     public PluginFileLogger writeToLog(Level record, String stringToLog, LogPrefixExtension logPrefix, boolean sendToConsole) {
+        if (record.intValue() < Level.WARNING.intValue() && !logPrefix.isEnabled()) return this;
         return super.writeToLog(record, stringToLog, logPrefix.getLogPrefix(), sendToConsole);
     }
 
     public PluginFileLogger writeToLog(Level record, String stringToLog, LogPrefixExtension logPrefix) {
-        return super.writeToLog(record, stringToLog, logPrefix.getLogPrefix(), false);
+        return writeToLog(record, stringToLog, logPrefix, false);
     }
 }

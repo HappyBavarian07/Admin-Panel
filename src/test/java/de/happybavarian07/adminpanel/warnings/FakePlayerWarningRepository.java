@@ -36,6 +36,12 @@ class FakePlayerWarningRepository implements PlayerWarningRepository {
     }
 
     @Override
+    public List<PlayerWarning> findByStatusAndExpiresAtBetween(String status, long from, long to) {
+        return rows.values().stream()
+                .filter(row -> row.getStatus().name().equals(status) && row.getExpiresAt() >= from && row.getExpiresAt() <= to).toList();
+    }
+
+    @Override
     public Optional<PlayerWarning> findById(Long id) {
         return Optional.ofNullable(rows.get(id));
     }

@@ -8,6 +8,7 @@ import de.happybavarian07.coolstufflib.utils.StartUpLogger;
 import de.happybavarian07.adminpanel.addonloader.loadingutils.AddonLoader;
 import de.happybavarian07.coolstufflib.configstuff.ConfigUpdater;
 import de.happybavarian07.adminpanel.data.AdminPanelData;
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.data.LegacyDataImporter;
 import de.happybavarian07.adminpanel.data.LegacyWarningImporter;
 import de.happybavarian07.adminpanel.data.PluginDescriptionEntry;
@@ -15,6 +16,11 @@ import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.troll.TrollToggleEvent;
 import de.happybavarian07.adminpanel.listeners.InternalCacheHandler;
 import de.happybavarian07.adminpanel.listeners.StaffChatHandler;
+import de.happybavarian07.adminpanel.permissions.GroupNodeEntity;
+import de.happybavarian07.adminpanel.permissions.GroupNodeRepository;
+import de.happybavarian07.adminpanel.permissions.PermissionGroupEntity;
+import de.happybavarian07.adminpanel.permissions.PermissionGroupRepository;
+import de.happybavarian07.adminpanel.permissions.PermissionService;
 import de.happybavarian07.adminpanel.permissions.PermissionsManager;
 import de.happybavarian07.adminpanel.permissions.PlayerPermission;
 import de.happybavarian07.adminpanel.permissions.PlayerPermissionRepository;
@@ -89,6 +95,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
     private boolean languageManagerEnabled;
     private WarningManager warningManager;
     private ExecutorService warningIo;
+    private ExecutorService journalIo;
+    private AdminJournal journal;
     private TrollRegistry trollRegistry;
     private InitMethods initMethods;
     private BackupManager backupManager;
@@ -165,6 +173,10 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     public RepositoryManager getRepositoryManager() {
         return coolStuffLib.getRepositoryManager();
+    }
+
+    public PermissionService getPermissionService() {
+        return permissionsManager.getService();
     }
 
     public PermissionsManager getPermissionsManager() {
@@ -360,6 +372,7 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         startup.run("vault", false, initMethods::initVault, "api");
         startup.run("config", true, this::initializeConfigFiles, "api");
         startup.run("warnings", false, this::initializeWarningManager, "data", "config");
+        startup.run("journal", false, this::initializeJournal, "data", "config");
         startup.run("trolls", false, this::initializeTrollRegistry, "data", "config");
         startup.run("permissions", true, this::setupPermissionsManager, "data");
         startup.run("prefix", true, this::initializePrefix, "config");
@@ -453,6 +466,8 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
                 .setLanguageFolder(new File(this.getDataFolder() + "/languages"))
                 .setResourceDirectory("languages")
                 .setPrefix("[Admin-Panel]")
+                .enableCommands("aplang")
+                .watchFiles(true)
                 .build();
     }
 
@@ -588,6 +603,29 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, warningManager::sweep, 20L * 60, 20L * 60);
     }
 
+    private void initializeJournal() {
+        if (!getConfig().getBoolean("Journal.Enabled", true)) {
+            throw new Startup.DisabledException("Journal.Enabled is false");
+        }
+        journalIo = Executors.newSingleThreadExecutor(task -> {
+            Thread thread = new Thread(task, "AdminPanel-Journal");
+            thread.setDaemon(true);
+            return thread;
+        });
+        journal = new AdminJournal(data.actions(), journalIo, System::currentTimeMillis, AdminPanelMain::logError,
+                id -> Bukkit.getOfflinePlayer(id).getName());
+        journal.setCategoryFilter(category -> getConfig().getBoolean("Journal.Record." + category, true));
+        AdminJournal.install(journal);
+        long purged = journal.purgeOlderThanDays(getConfig().getInt("Journal.KeepDays", 0));
+        if (purged > 0) {
+            fileLogger.writeToLog(Level.INFO, "Removed " + purged + " admin journal entries older than " + getConfig().getInt("Journal.KeepDays", 0) + " days", LogPrefixExtension.ADMINPANEL_MAIN, true);
+        }
+    }
+
+    public AdminJournal getJournal() {
+        return journal;
+    }
+
     private void initializeTrollRegistry() {
         trollRegistry = new TrollRegistry(
                 id -> getConfig().getBoolean("Pman.Actions.Trolls." + id, true),
@@ -634,7 +672,9 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
 
     private void setupPermissionsManager() {
         getRepositoryManager().registerRepository(PlayerPermissionRepository.class, PlayerPermission.class);
-        permissionsManager = new PermissionsManager(this, 5 * 60 * 20L);
+        getRepositoryManager().registerRepository(PermissionGroupRepository.class, PermissionGroupEntity.class);
+        getRepositoryManager().registerRepository(GroupNodeRepository.class, GroupNodeEntity.class);
+        permissionsManager = new PermissionsManager(this);
     }
 
     private void initializePrefix() {
@@ -675,8 +715,21 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(staffChatHandler, plugin);
     }
 
+    private void reportConfigProblems() {
+        try (InputStream template = getResource("config.yml")) {
+            if (template == null) return;
+            YamlConfiguration shipped = YamlConfiguration.loadConfiguration(new java.io.InputStreamReader(template, java.nio.charset.StandardCharsets.UTF_8));
+            for (ConfigValidator.Problem problem : ConfigValidator.validate(shipped, getConfig())) {
+                fileLogger.writeToLog(Level.WARNING, "config.yml " + problem, LogPrefixExtension.ADMINPANEL_MAIN, true);
+            }
+        } catch (IOException e) {
+            logError("Could not check config.yml", e);
+        }
+    }
+
     private void updateConfigFiles() {
         updateConfig();
+        reportConfigProblems();
         boolean autoLanguageFileUpdating = getConfig().getBoolean("Plugin.Updater.AutomaticLanguageFileUpdating");
         if (autoLanguageFileUpdating) {
             fileLogger.writeToLog(Level.INFO, "Auto Language File Updating is enabled!", LogPrefixExtension.ADMINPANEL_MAIN, true);
@@ -768,6 +821,18 @@ public class AdminPanelMain extends JavaPlugin implements Listener {
         loader = null;
         if (trollRegistry != null) {
             trollRegistry.stopEverything();
+        }
+        if (permissionsManager != null) {
+            permissionsManager.shutdown();
+        }
+        AdminJournal.install(null);
+        if (journalIo != null) {
+            journalIo.shutdown();
+            try {
+                journalIo.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
         if (warningIo != null) {
             warningIo.shutdown();

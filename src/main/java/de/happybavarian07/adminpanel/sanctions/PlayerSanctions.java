@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.sanctions;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.data.PlayerWarning;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -99,6 +100,7 @@ public final class PlayerSanctions {
                     "%reason%", why, "%duration%", duration, "%staff%", staff.getName()));
         }
         recordBan(target.getUniqueId(), why, durationMillis, ipBanned, issuerOf(staff));
+        AdminJournal.log(staff, ipBanned ? "BAN_IP" : "BAN", name, duration + " | " + why);
         if (!silent) {
             Bukkit.broadcastMessage(CommandText.get(lgm, null, BAN_PATH + "Broadcast",
                     "%staff%", staff.getName(), "%target%", name, "%duration%", duration, "%reason%", why));
@@ -122,6 +124,7 @@ public final class PlayerSanctions {
         if (online == null) return KickResult.OFFLINE;
         String why = reason == null || reason.isBlank() ? CommandText.get(lgm, staff, KICK_PATH + "DefaultReason") : reason;
         online.kickPlayer(CommandText.get(lgm, online, KICK_PATH + "TargetKickMessage", "%reason%", why, "%staff%", staff.getName()));
+        AdminJournal.log(staff, "KICK", target.getName(), why);
         WarningManager history = plugin.getWarningManager();
         if (history != null) {
             String text = ChatColor.stripColor(CommandText.get(lgm, null, "Warnings.Record.Kick", "%reason%", why));

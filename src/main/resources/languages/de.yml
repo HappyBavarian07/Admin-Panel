@@ -338,9 +338,6 @@ Messages:
     # %preset% = Der Name des Presets, %search% = Der Suchtext
     PresetApplied: '%prefix% &9> &aDas Preset &7%preset% &awurde bei &7%target% &aangewendet!'
     PresetFailed: '%prefix% &9> &cDas Preset &7%preset% &cließ sich bei &7%target% &cnicht anwenden!'
-    EnterSearch: '%prefix% &9> &aBitte gib einen Teil des Effektnamens in den Chat ein! (&f-&a löscht die Suche)'
-    SearchSet: '%prefix% &9> &aSuche nach &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aDie Suche wurde gelöscht!'
     Category:
       Beneficial: '&aNützlich'
       Harmful: '&cSchädlich'
@@ -358,9 +355,6 @@ Messages:
     EnterName: '%prefix% &9> &aBitte gib den Namen der Entitäten in den Chat ein! (&f-&a entfernt den Namen)'
     NameSet: '%prefix% &9> &aDer Name ist jetzt &f%name%&a!'
     NameCleared: '%prefix% &9> &aDer Name wurde entfernt!'
-    EnterSearch: '%prefix% &9> &aBitte gib einen Teil des Entitätsnamens in den Chat ein! (&f-&a löscht die Suche)'
-    SearchSet: '%prefix% &9> &aSuche nach &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aDie Suche wurde gelöscht!'
     Category:
       Hostile: '&cFeindlich'
       Passive: '&aFriedlich'
@@ -372,20 +366,6 @@ Messages:
   DangerZoneMenu:
     StopReason: '&cServer-Stopp aus dem Danger-Zone-Menue angefordert.'
     RestartReason: '&6Server-Neustart aus dem Danger-Zone-Menue angefordert.'
-  LanguageMigration:
-    Error:
-      NoLanguageFileSelected: '%prefix% &9> &cKeine Sprachdatei ausgewählt!'
-    Message:
-      NoEntriesSelected: '%prefix% &9> &cKeine Einträge für Migration ausgewählt!'
-      MigrationFailed: '%prefix% &9> &cMigration fehlgeschlagen! Prüfe die Konsole für Fehler.'
-      MigrationApplied: '%prefix% &9> &aMigration erfolgreich angewendet!'
-  LanguageMigrator:
-    EntryEditMenu:
-      EnterFinalValue: '%prefix% &9> &aGib den Endwert im Chat ein.'
-      EnterFinalValueFormat: '&7Formate: &eGanzzahl (123)&7, &eDezimalzahl (12.3)&7, &eBoolean (true/false)&7, &eListe ([a,b,c])&7, &eText (beliebig)&7. Tippe &ccancel &7zum Abbrechen.'
-      FinalValueSet: '%prefix% &9> &aEndwert gesetzt auf: &f%final_value%'
-      EditCancelled: '%prefix% &9> &cBearbeitung abgebrochen.'
-      InvalidInput: '%prefix% &9> &cUngültige Eingabe! Wird als Text verwendet.'
   AddonCommand:
     # Format Placeholders:
     # %addon_name% = Addon Name
@@ -570,9 +550,6 @@ Messages:
   WorldSelect:
     # %search% = Der Suchtext, %world% = Die Welt
     EnterImport: '%prefix% &9> &aBitte gib den Ordnernamen der Welt in den Chat ein!'
-    EnterSearch: '%prefix% &9> &aBitte gib einen Teil des Weltnamens in den Chat ein! (&f-&a löscht die Suche)'
-    SearchSet: '%prefix% &9> &aSuche nach &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aDie Suche wurde gelöscht!'
     Teleported: '%prefix% &9> &aDu wurdest zum Spawn von &7%world% &ateleportiert!'
     MainWorld: ' &7(Hauptwelt)'
   WorldSettings:
@@ -599,10 +576,6 @@ Messages:
     Sent: '%prefix% &9> &aDer Spieler &7%target% &awurde in die Hauptwelt geschickt!'
     Teleported: '%prefix% &9> &aDu wurdest zu &7%target% &ateleportiert!'
   GameRuleMenu:
-    # %rule% = Die Regel, %value% = Der Wert, %world% = Die Welt, %search% = Der Suchtext
-    EnterSearch: '%prefix% &9> &aBitte gib einen Teil des Regelnamens in den Chat ein! (&f-&a löscht die Suche)'
-    SearchSet: '%prefix% &9> &aSuche nach &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aDie Suche wurde gelöscht!'
     EnterValue: '%prefix% &9> &aBitte gib den neuen Wert von &7%rule% &ain den Chat ein! (true oder false, oder eine Zahl)'
     NotAValue: '%prefix% &9> &cDas ist kein Wert, den &7%rule% &chaben kann!'
     ValueSet: '%prefix% &9> &a&7%rule% &aist jetzt &f%value% &ain &7%world%&a!'
@@ -637,6 +610,88 @@ Messages:
     DownloadedAndReplaced: '&aDie neue Version für das Plugin: %plugin% wurde automatisch heruntergeladen und die alte ersetzt! \n&aUnd die neue Version wurde automatisch gestartet! Wenn du kannst, prüfe bitte die Konsole auf Fehler!'
     PlayerDownloadedToFolder: '&aDie neue Version wurde automatisch heruntergeladen und liegt im Update-Ordner!'
     PlayerDownloadedAndReplaced: '&aDie neue Version wurde automatisch heruntergeladen und die alte Version wurde automatisch ersetzt! \n&aDu musst das Plugin nur noch über den Plugin Manager, /reload, /restart oder /stop und einen Neustart laden.'
+  Permissions:
+    Command:
+      # %usage% = Die richtige Schreibweise, %error% = Was schiefging, %target% = Der Spieler, %group% = Die Gruppe
+      Usage: '%prefix% &9> &cBenutzung: &f%usage%'
+      BadArgument: '%prefix% &9> &c%error%'
+      Error: '%prefix% &9> &cDas hat nicht funktioniert: %error%'
+      NotReady: '%prefix% &9> &cDer Rechte-Manager läuft nicht (er startet noch oder Permissions.Enabled ist false).'
+      NoEditPermission: '%prefix% &9> &cDu darfst das ansehen, aber nicht ändern.'
+      PlayerNotFound: '%prefix% &9> &cDer Spieler &f%target% &cwar noch nie auf diesem Server.'
+      PlayerOnly: '%prefix% &9> &cNur ein Spieler kann ein Menü öffnen.'
+      GroupNotFound: '%prefix% &9> &cEs gibt keine Gruppe &f%group%&c.'
+      # %permission% = Das Recht, %value% = true oder false, %target% = Spieler oder Gruppe, %extra% = Ende und Welt des Eintrags
+      Set: '%prefix% &9> &f%permission% &awurde für &f%target% &aauf &f%value% &agesetzt%extra%&a.'
+      Unset: '%prefix% &9> &f%permission% &awurde bei &f%target% &aentfernt.'
+      UnsetMissing: '%prefix% &9> &c%target% hat keinen Eintrag &f%permission% &c(mit dieser Welt).'
+      GroupAdded: '%prefix% &9> &f%target% &aist jetzt in der Gruppe &f%group%%extra%&a.'
+      GroupRemoved: '%prefix% &9> &f%target% &aist nicht mehr in der Gruppe &f%group%&a.'
+      GroupNotMember: '%prefix% &9> &c%target% ist nicht in der Gruppe &f%group% &c(mit dieser Welt).'
+      Cleared: '%prefix% &9> &aAlle Einträge von &f%target% &awurden entfernt.'
+      GroupCreated: '%prefix% &9> &aDie Gruppe &f%group% &awurde erstellt.'
+      GroupCreateFailed: '%prefix% &9> &cDie Gruppe &f%group% &ckonnte nicht erstellt werden. Namen haben 1 bis 32 Buchstaben, Ziffern, - oder _ und müssen neu sein.'
+      GroupDeleted: '%prefix% &9> &aDie Gruppe &f%group% &awurde gelöscht.'
+      GroupDeleteFailed: '%prefix% &9> &cDie Gruppe &f%group% &ckann nicht gelöscht werden (die Gruppe default bleibt).'
+      GroupCycle: '%prefix% &9> &cDamit würde &f%group% &csich selbst erben oder die Gruppe existiert nicht.'
+      ParentAdded: '%prefix% &9> &f%group% &aerbt jetzt von &f%parent%&a.'
+      ParentRemoved: '%prefix% &9> &f%group% &aerbt nicht mehr von &f%parent%&a.'
+      ParentMissing: '%prefix% &9> &c%group% erbt nicht von &f%parent%&c.'
+      WeightSet: '%prefix% &9> &aDas Gewicht von &f%group% &aist jetzt &f%weight%&a.'
+      MetaSet: '%prefix% &9> &aDer Wert %kind% von &f%group% &aist jetzt &f%text%&a.'
+      # %target% = Der Spieler, %groups% = Gruppen, %prefix% = Chat-Präfix, %suffix% = Chat-Suffix
+      UserHeader: '&6&l%target% &7- Gruppen: &f%groups% &7- Präfix: &f%prefix% &7- Suffix: &f%suffix%'
+      EntryLine: '&8- %entry%'
+      GroupLine: '&8- &bGruppe &f%entry%'
+      ParentLine: '&8- &berbt &f%entry%'
+      NoEntries: '&7Keine Einträge.'
+      Problem: '&c! %problem%'
+      Remaining: 'noch %time%'
+      # %result% = true, false oder nicht gesetzt
+      CheckResult: '%prefix% &9> &f%target% &7hat &f%permission%&7: %result%'
+      ExplainBukkit: '&7Der Server sagt: %result%'
+      ExplainNone: '&7Kein Eintrag nennt dieses Recht, also gilt der Standardwert des Rechts.'
+      ExplainLine: '%mark% &f%source% &7sagt %entry%'
+      GroupsHeader: '&6Gruppen (%count%), schwerste zuerst:'
+      GroupsLine: '&8- &f%group% &7Gewicht %weight%, %entries% Einträge'
+      GroupHeader: '&6&lGruppe %group% &7- Gewicht: &f%weight% &7- Anzeigename: &f%display% &7- Präfix: &f%prefix% &7- Suffix: &f%suffix%'
+      MembersHeader: '&6Geladene Mitglieder von %group% (%count%):'
+      MembersLine: '&8- &f%member% &7%entry%'
+      SearchHeader: '&6Rechte, die zu &f%query% &6passen (%count%):'
+      SearchLine: '&8- &f%permission%&7%description%'
+      SearchEmpty: '%prefix% &9> &cKein Recht passt zu &f%query%&c.'
+      JournalOff: '%prefix% &9> &cDas Journal ist ausgeschaltet (Journal.Enabled in der Config).'
+      AuditEmpty: '%prefix% &9> &7Keine Rechteänderungen gefunden.'
+      AuditHeader: '&6Letzte Rechteänderungen (%count%):'
+      AuditLine: '&8%time% &f%actor% &6%action% &f%target% &7%details%'
+      Exported: '%prefix% &9> &a%groups% Gruppen und %users% Spieler wurden nach &fplugins/Admin-Panel/permission-exports/%file% &ageschrieben.'
+      ExportFailed: '%prefix% &9> &cExport fehlgeschlagen: %error%'
+      ImportMissing: '%prefix% &9> &cIn permission-exports gibt es keine Datei &f%file%&c.'
+      Imported: '%prefix% &9> &a%groups% Gruppen, %users% Spieler und %entries% Einträge aus &f%file% &aimportiert.'
+      ImportFailed: '%prefix% &9> &cImport fehlgeschlagen: %error%'
+      Reloaded: '%prefix% &9> &aDie Rechtegruppen werden neu gelesen und alle Spieler neu berechnet.'
+    Menu:
+      PromptPlayer: '%prefix% &9> &aSchreibe den Namen des Spielers in den Chat (cancel bricht ab).'
+      PromptGroupName: '%prefix% &9> &aSchreibe den Namen der neuen Gruppe in den Chat (cancel bricht ab).'
+      PromptPermission: '%prefix% &9> &aSchreibe das Recht, danach wenn gewünscht false, eine Dauer wie 7d und world=name, zum Beispiel: essentials.fly 7d world=nether'
+      PromptGroup: '%prefix% &9> &aSchreibe die Gruppe, danach wenn gewünscht eine Dauer und world=name, zum Beispiel: vip 30d'
+      PromptDuration: '%prefix% &9> &aSchreibe, wie lange der Eintrag gilt, zum Beispiel 7d oder 2h. permanent bedeutet ohne Ende.'
+      PromptWorld: '%prefix% &9> &aSchreibe die Welt, auf die der Eintrag beschränkt ist. - gilt für jede Welt.'
+      PromptWeight: '%prefix% &9> &aSchreibe das neue Gewicht als Zahl. Die schwerere Gruppe gewinnt.'
+      PromptText: '%prefix% &9> &aSchreibe den neuen Text, Farben mit &. - löscht ihn.'
+      NotANumber: '%prefix% &9> &cDas ist keine Zahl.'
+      ConfirmDelete: '&cGruppe löschen? Die Mitglieder verlieren sie.'
+      BrowseName: '%prefix% &9> &7Recht: &f%permission%'
+  Journal:
+    # %page% = Die Seite, %pages% = Die Anzahl der Seiten, %total% = Die Anzahl der Einträge
+    Header: '%prefix% &9> &6Admin-Journal &7(Seite %page%/%pages%, %total% Einträge)'
+    # %id% = Die Nummer des Eintrags, %time% = Wann, %actor% = Wer, %action% = Was, %target% = Bei wem, %details% = Mehr
+    Line: '&8#%id% &7%time% &f%actor% &6%action% &f%target% &7%details%'
+    Empty: '%prefix% &9> &cDas Journal hat keine Einträge.'
+    NotEnabled: '%prefix% &9> &cDas Journal ist ausgeschaltet (Journal.Enabled in der Config).'
+    NotANumber: '%prefix% &9> &cDas ist keine Seitenzahl.'
+    Exported: '%prefix% &9> &a%count% Einträge nach &f%file%&a exportiert.'
+    ExportFailed: '%prefix% &9> &cDas Journal konnte nicht exportiert werden: %error%'
   StartupStatus:
     # %feature% = Der Teil, %reason% = Warum, %count% = Wie viele, %status% = Der Status, %stage% = Der Teil, %detail% = Der Grund
     Unavailable: '%prefix% &9> &c%feature% ist nicht verfügbar: &7%reason%'
@@ -660,6 +715,7 @@ Messages:
       vault: 'Vault-Wirtschaft'
       config: 'Config-Dateien'
       warnings: 'Verwarnungssystem'
+      journal: 'Admin-Journal'
       trolls: 'Trolle'
       permissions: 'Rechte-Verwaltung'
       prefix: 'Prefix'
@@ -688,6 +744,177 @@ Messages:
     # %permission% = Der Name, %default% = Der Standard, %description% = Die Beschreibung, %children% = Die Kinder, %permissibles% = Wer sie hat
     Info: '&6Name: &a%permission%\n&6Standard: &a%default%\n&6Beschreibung: &a%description%\n&6Kinder: &a%children%\n&6Berechtigte: &a%permissibles%'
 Items:
+  PermissionManager:
+    Hub:
+      Players:
+        material: PLAYER_HEAD
+        displayName: '&aSpieler'
+        lore:
+          - '&7Alle, die online sind oder Einträge haben.'
+          - '&7Öffne einen Spieler, um Rechte und Gruppen zu ändern.'
+      Groups:
+        material: CHEST
+        displayName: '&6Gruppen'
+        lore:
+          - '&7Gruppen erstellen, Gewicht, Eltern'
+          - '&7und Rechte festlegen.'
+      Browse:
+        material: BOOKSHELF
+        displayName: '&bAlle Rechte'
+        lore:
+          - '&7Jedes Recht jedes Plugins mit Beschreibung'
+          - '&7und Standardwert. Mit Suche.'
+      Audit:
+        material: WRITABLE_BOOK
+        displayName: '&eRechteänderungen'
+        lore:
+          - '&7Wer wann welches Recht oder welche Gruppe geändert hat.'
+      Reload:
+        material: REDSTONE
+        displayName: '&cNeu laden'
+        lore:
+          - '&7Liest die Gruppen neu und berechnet alle Spieler.'
+    Players:
+      Entry:
+        material: PLAYER_HEAD
+        displayName: '&a%target%'
+        lore:
+          - '&7Gruppen: &f%groups%'
+          - '&7Einträge: &f%entries%'
+          - '&7Online: &f%online%'
+          - '&eKlick: &7Einträge öffnen'
+      Lookup:
+        material: COMPASS
+        displayName: '&bSpieler suchen'
+        lore:
+          - '&7Schreibe einen Namen in den Chat.'
+    Groups:
+      Entry:
+        material: CHEST
+        displayName: '&6%group%'
+        lore:
+          - '&7Gewicht: &f%weight%'
+          - '&7Anzeigename: &f%display%'
+          - '&7Einträge: &f%entries%'
+          - '&7Geladene Mitglieder: &f%members%'
+          - '&eKlick: &7Gruppe öffnen'
+      Create:
+        material: LIME_CONCRETE
+        displayName: '&aNeue Gruppe'
+        lore:
+          - '&7Schreibe den Namen in den Chat.'
+    Group:
+      Info:
+        material: CHEST
+        displayName: '&6%group%'
+        lore:
+          - '&7Gewicht: &f%weight%'
+          - '&7Anzeigename: &f%display%'
+          - '&7Präfix: &f%prefix%'
+          - '&7Suffix: &f%suffix%'
+          - '&7Einträge: &f%entries%'
+      Entries:
+        material: BOOK
+        displayName: '&bEinträge und Eltern'
+        lore:
+          - '&7Rechte der Gruppe und die Gruppen, von denen sie erbt.'
+      Weight:
+        material: ANVIL
+        displayName: '&eGewicht: &f%weight%'
+        lore:
+          - '&7Die schwerere Gruppe gewinnt, wenn sich zwei widersprechen.'
+      Prefix:
+        material: NAME_TAG
+        displayName: '&ePräfix: &f%prefix%'
+        lore:
+          - '&7Steht im Chat vor dem Namen.'
+      Suffix:
+        material: NAME_TAG
+        displayName: '&eSuffix: &f%suffix%'
+        lore:
+          - '&7Steht im Chat hinter dem Namen.'
+      Display:
+        material: OAK_SIGN
+        displayName: '&eAnzeigename: &f%display%'
+        lore:
+          - '&7Ein schönerer Name für Listen.'
+      Delete:
+        material: RED_CONCRETE
+        displayName: '&cGruppe löschen'
+        lore:
+          - '&7Die Mitglieder verlieren die Gruppe.'
+    Entries:
+      AddPermission:
+        material: LIME_CONCRETE
+        displayName: '&aRecht hinzufügen'
+        lore:
+          - '&7Schreibe es in den Chat, zum Beispiel:'
+          - '&fessentials.fly 7d world=nether'
+      AddGroup:
+        material: CYAN_CONCRETE
+        displayName: '&bIn eine Gruppe aufnehmen'
+        lore:
+          - '&7Schreibe die Gruppe und wenn gewünscht eine Dauer.'
+      AddParent:
+        material: CYAN_CONCRETE
+        displayName: '&bElterngruppe hinzufügen'
+        lore:
+          - '&7Die Gruppe hat dann alles, was die Eltern haben.'
+      UserInfo:
+        material: PLAYER_HEAD
+        displayName: '&6%subject%'
+        lore:
+          - '&7Gruppen: &f%groups%'
+          - '&7Präfix: &f%prefix%'
+          - '&7Suffix: &f%suffix%'
+      Entry:
+        Allow:
+          material: LIME_DYE
+          displayName: '&a%permission%'
+          lore:
+            - '&7Erlaubt'
+            - '&7Endet: &f%expires%'
+            - '&7Welt: &f%context%'
+            - '&eLinks: &7Verbieten    &eRechts: &7Entfernen'
+            - '&eShift-Links: &7Dauer setzen'
+            - '&eShift-Rechts: &7Welt setzen'
+        Deny:
+          material: RED_DYE
+          displayName: '&c%permission%'
+          lore:
+            - '&7Verboten'
+            - '&7Endet: &f%expires%'
+            - '&7Welt: &f%context%'
+            - '&eLinks: &7Erlauben    &eRechts: &7Entfernen'
+            - '&eShift-Links: &7Dauer setzen'
+            - '&eShift-Rechts: &7Welt setzen'
+        Group:
+          material: CHEST
+          displayName: '&bGruppe &f%permission%'
+          lore:
+            - '&7Endet: &f%expires%'
+            - '&7Welt: &f%context%'
+            - '&eRechts: &7Entfernen'
+            - '&eShift-Links: &7Dauer setzen'
+            - '&eShift-Rechts: &7Welt setzen'
+        Parent:
+          material: ENDER_CHEST
+          displayName: '&bErbt von &f%permission%'
+          lore:
+            - '&7Endet: &f%expires%'
+            - '&7Welt: &f%context%'
+            - '&eRechts: &7Entfernen'
+            - '&eShift-Links: &7Dauer setzen'
+            - '&eShift-Rechts: &7Welt setzen'
+    Browse:
+      Entry:
+        material: PAPER
+        displayName: '&f%permission%'
+        lore:
+          - '&7%description%'
+          - '&7Standard: &f%default%'
+          - '&7Kinder: &f%children%'
+          - '&eKlick: &7Namen in den Chat schreiben'
   General:
     ConfirmationMenu:
       Confirm:
@@ -1492,14 +1719,6 @@ Items:
           lore:
             - '&7Blindheit und Übelkeit für 10 Sekunden'
             - '&eKlicke, um es dem Spieler zu geben'
-      Search:
-        material: OAK_SIGN
-        displayName: '&aSuche'
-        # %search% = Der aktuelle Suchtext
-        lore:
-          - '&7Aktuell: &f%search%'
-          - '&eLinksklick: &7Suche im Chat eingeben'
-          - '&eRechtsklick: &7Suche löschen'
       Filter:
         All:
           material: HOPPER
@@ -1590,14 +1809,6 @@ Items:
           lore:
             - '&7Die Entitäten spawnen ohne Reiter'
             - '&eKlicke zum Einschalten'
-      Search:
-        material: OAK_SIGN
-        displayName: '&aSuche'
-        # %search% = Der aktuelle Suchtext
-        lore:
-          - '&7Aktuell: &f%search%'
-          - '&eLinksklick: &7Suche im Chat eingeben'
-          - '&eRechtsklick: &7Suche löschen'
       Filter:
         All:
           material: HOPPER
@@ -1971,13 +2182,6 @@ Items:
         - '&7Lädt einen Weltordner aus dem Serverordner'
         - '&eKlicke, um den Ordnernamen einzugeben'
     Select:
-      Search:
-        material: COMPASS
-        displayName: '&aSuche'
-        lore:
-          - '&7Suche: &f%search%'
-          - '&eLinksklick: &7Suche eingeben'
-          - '&eRechtsklick: &7Suche löschen'
       Filter:
         ALL:
           material: HOPPER
@@ -2013,13 +2217,6 @@ Items:
           - ''
           - '&eKlick: &7Diese Welt laden'
     GameRuleMenu:
-      Search:
-        material: COMPASS
-        displayName: '&aSuche'
-        lore:
-          - '&7Suche: &f%search%'
-          - '&eLinksklick: &7Suche eingeben'
-          - '&eRechtsklick: &7Suche löschen'
       Filter:
         All:
           material: HOPPER
@@ -2135,6 +2332,12 @@ Items:
           - '&eKlick: &7Zum Spieler teleportieren'
           - '&eRechtsklick: &7In die Hauptwelt schicken'
   StartMenu:
+    PermissionManager:
+      material: SHIELD
+      displayName: '&6Rechte-Manager'
+      lore:
+        - '&7Gruppen, Gewichte, zeitlich begrenzte und'
+        - '&7weltbezogene Rechte und das Protokoll der Änderungen.'
     SwitchLanguageMenuItem:
       material: BLUE_WOOL
       displayName: '&aWechsle die Sprache temporär'
@@ -2626,117 +2829,15 @@ Items:
             lore:
               - '&aBerechtigungen überschreiben ausschalten!'
             material: GREEN_WOOL
-  LanguageMigration:
-    Migration:
-      MigrationItem:
-        material: PAPER
-        displayName: '&6%key%'
-        lore:
-          - '&7Status: &e%migration_status%'
-          - ''
-          - '&7Benutzerwert:'
-          - '&f%user_value%'
-          - ''
-          - '&7Ressourcenwert:'
-          - '&f%resource_value%'
-          - ''
-          - '&eKlicke zum Bearbeiten!'
-      FilterItem:
-        material: HOPPER
-        displayName: '&6Filter-Modus'
-        lore:
-          - '&7Aktuell: &e%status_filter_mode%'
-          - ''
-          - '%selected_all_filter%'
-          - '%selected_changed_only_filter%'
-          - '%selected_unchanged_only_filter%'
-          - '%selected_missing_only_filter%'
-          - ''
-          - '&eKlicke zum Wechseln!'
-      ApplyChanges:
-        material: EMERALD
-        displayName: '&aÄnderungen übernehmen'
-        lore:
-          - '&7Gesamteinträge: &e%total_migration_count%'
-          - '&7Gefiltert: &e%filtered_migration_count%'
-          - '&7Übernommen: &a%actually_applied_migration_count%'
-          - ''
-          - '&eKlicke zum Übernehmen!'
-  LanguageMigrator:
-    EntryEditMenu:
-      Name:
-        material: NAME_TAG
-        displayName: '&6Eintrag: %migration_entry_name%'
-        lore:
-          - '&7Status: &e%migration_entry_status%'
-      KeepUserValue:
-        material: GREEN_WOOL
-        displayName: '&aBenutzerwert behalten'
-        lore:
-          - '&7Aktueller Benutzerwert:'
-          - '&f%migration_entry_user_value%'
-          - ''
-          - '&eKlicke für Vorschau'
-          - '&eShift-Klick zum Übernehmen!'
-      KeepResourceValue:
-        material: BLUE_WOOL
-        displayName: '&9Ressourcenwert behalten'
-        lore:
-          - '&7Ressourcenwert:'
-          - '&f%migration_entry_resource_value%'
-          - ''
-          - '&eKlicke für Vorschau'
-          - '&eShift-Klick zum Übernehmen!'
-      DeleteEntryFromFile:
-        material: RED_WOOL
-        displayName: '&cEintrag löschen'
-        lore:
-          - '&7Entfernt diesen Eintrag aus'
-          - '&7der Sprachdatei.'
-          - ''
-          - '&eKlicke für Vorschau'
-          - '&eShift-Klick zum Übernehmen!'
-      KeepRemovedFromFile:
-        material: BARRIER
-        displayName: '&cEntfernt lassen'
-        lore:
-          - '&7Lässt diesen Eintrag'
-          - '&7aus der Datei entfernt.'
-          - ''
-          - '&eKlicke für Vorschau'
-          - '&eShift-Klick zum Übernehmen!'
-      EditFinalValue:
-        material: WRITABLE_BOOK
-        displayName: '&6Eigenen Wert bearbeiten'
-        lore:
-          - '&7Gib einen eigenen Wert'
-          - '&7im Chat ein.'
-          - ''
-          - '&7Unterstützt:'
-          - '&8• &7Ganzzahlen (123)'
-          - '&8• &7Dezimalzahlen (123.45)'
-          - '&8• &7Boolesche Werte (true/false)'
-          - '&8• &7Listen ([item1, item2])'
-          - '&8• &7Zeichenketten (beliebiger Text)'
-          - ''
-          - '&eKlicke zum Bearbeiten!'
-      FinalValueDisplay:
-        material: PAPER
-        displayName: '&aEndwert-Vorschau'
-        lore:
-          - '&7Dies wird gespeichert:'
-          - '&f%migration_entry_final_value%'
-      Close:
-        material: EMERALD_BLOCK
-        displayName: '&aBestätigen & Schließen'
-        lore:
-          - '&7Speichert den Endwert und'
-          - '&7kehrt zum Migrationsmenü zurück.'
-          - ''
-          - '&7Tipp: Drücke ESC zum Abbrechen'
-          - '&7ohne Änderungen zu speichern.'
-          - ''
-          - '&eKlicke zum Bestätigen!'
+  Journal:
+    Entry:
+      material: PAPER
+      displayName: '&6%action% &f%target%'
+      lore:
+        - '&7Von: &f%actor%'
+        - '&7Wann: &f%time%'
+        - '&7Details: &f%details%'
+        - '&8#%id%'
   StartupStatus:
     Entry:
       OK:
@@ -2777,6 +2878,14 @@ Items:
         - '&7Grund: &f%reason%'
         - '&eKlicke, um ihn im Chat zu zeigen'
 MenuTitles:
+  PermissionManager:
+    Hub: '&6Rechte-Manager'
+    Players: '&aRechte: Spieler'
+    Groups: '&6Rechte: Gruppen'
+    Group: '&6Gruppe: %group%'
+    Entries: '&aEinträge: %subject%'
+    Browse: '&bAlle Rechte'
+    Audit: '&eRechteänderungen'
   StartMenu: '&4&lAdmin-Panel'
   DangerZoneMenu: '&4Danger Zone'
   SwitchLanguageMenu: '&aSprachen'
@@ -2827,10 +2936,7 @@ MenuTitles:
       Settings: '&3Einstellungen'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Einstellungen'
-  LanguageMigration:
-    Migration: '&6Sprach-Migration'
-  LanguageMigrator:
-    EntryEditMenu: '&6Bearbeiten: %migration_entry_name%'
   Misc:
     ConfirmationMenu: '&aBestätigungs Menu'
+  Journal: '&6Admin-Journal'
   StartupStatus: '&cStartstatus'

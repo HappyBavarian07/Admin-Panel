@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.warnings;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.data.PlayerWarning;
 import de.happybavarian07.adminpanel.data.PlayerWarningRepository;
 
@@ -85,6 +86,7 @@ public final class WarningManager {
                     durationMillis > 0 ? now + durationMillis : 0);
             repository.save(warning);
             list.add(warning);
+            AdminJournal.log(actor(issuerOrNull), "WARN", player.toString(), clip(reason));
             escalate(player, countActive(list, now));
             return warning;
         });
@@ -122,6 +124,7 @@ public final class WarningManager {
             if (warning == null || warning.getStatus() == WarningStatus.REMOVED) return false;
             warning.setReason(clip(reason));
             repository.save(warning);
+            AdminJournal.log(actor(editor), "WARN_EDIT", warning.getPlayerUuid(), "#" + id + ": " + clip(reason));
             return true;
         });
     }
@@ -137,6 +140,7 @@ public final class WarningManager {
             if (warning == null || warning.getStatus() != WarningStatus.ACTIVE) return false;
             warning.end(WarningStatus.EXPIRED, clock.getAsLong(), actor(by));
             repository.save(warning);
+            AdminJournal.log(actor(by), "WARN_END", warning.getPlayerUuid(), "#" + id);
             return true;
         });
     }
@@ -156,6 +160,7 @@ public final class WarningManager {
                 repository.save(warning);
                 ended++;
             }
+            if (ended > 0) AdminJournal.log(actor(by), "WARN_END_ALL", player.toString(), ended + " warnings");
             return ended;
         });
     }
@@ -171,6 +176,7 @@ public final class WarningManager {
             if (warning == null || warning.getStatus() == WarningStatus.REMOVED) return false;
             warning.end(WarningStatus.REMOVED, clock.getAsLong(), actor(by));
             repository.save(warning);
+            AdminJournal.log(actor(by), "WARN_REMOVE", warning.getPlayerUuid(), "#" + id);
             return true;
         });
     }
@@ -253,8 +259,7 @@ public final class WarningManager {
     public int sweepNow() {
         long now = clock.getAsLong();
         int expired = 0;
-        for (PlayerWarning stored : repository.findByStatus(WarningStatus.ACTIVE.name())) {
-            if (stored.getExpiresAt() <= 0 || stored.getExpiresAt() > now) continue;
+        for (PlayerWarning stored : repository.findByStatusAndExpiresAtBetween(WarningStatus.ACTIVE.name(), 1L, now)) {
             PlayerWarning warning = cachedInstance(stored.getId());
             if (warning == null) warning = stored;
             warning.end(WarningStatus.EXPIRED, stored.getExpiresAt(), PlayerWarning.SYSTEM);

@@ -65,7 +65,7 @@ public class SpawningMenu extends PaginatedMenu<EntityType> {
         List<EntityType> entries = allTypes.stream()
                 .filter(type -> category == null || SpawnCategory.of(type.getEntityClass()) == category)
                 .toList();
-        setSearchSlot(getSlot(PATH + "Search", 45));
+        setSearchSlot(45);
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
         if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));

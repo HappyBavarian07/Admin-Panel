@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
+import de.happybavarian07.adminpanel.menusystem.menu.permissionmanager.PermissionEntriesMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.money.MoneyMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.permissions.PermissionListMode;
@@ -84,9 +85,14 @@ public class PlayerActionSelectMenu extends Menu {
         registerButton(getSlot(path + "PermissionItem", 4),
                 lgm.getItem(path + "PermissionItem", target, false),
                 (p, e) -> {
-                    playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
-                    playerMenuUtility.addData("SortQuery", "");
-                    new PermissionListMenu(playerMenuUtility, this).open();
+                    if (e.isShiftClick()) {
+                        playerMenuUtility.addData("PermissionListMode", PermissionListMode.ALL);
+                        playerMenuUtility.addData("SortQuery", "");
+                        new PermissionListMenu(playerMenuUtility, this).open();
+                    } else {
+                        PermissionEntriesMenu.ofPlayer(playerMenuUtility, this, playerMenuUtility.getTargetUUID(),
+                                String.valueOf(Bukkit.getOfflinePlayer(playerMenuUtility.getTargetUUID()).getName())).open();
+                    }
                 }, null);
 
         registerButton(getSlot("General.Close", 26),

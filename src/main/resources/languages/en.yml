@@ -335,9 +335,6 @@ Messages:
     # %preset% = The Name of the Preset, %search% = The Search Text
     PresetApplied: '%prefix% &9> &aApplied the preset &7%preset% &ato &7%target%&a!'
     PresetFailed: '%prefix% &9> &cThe preset &7%preset% &ccould not be applied to &7%target%&c!'
-    EnterSearch: '%prefix% &9> &aPlease enter a part of the effect name in the Chat! (&f-&a clears the search)'
-    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aThe search was cleared!'
     Category:
       Beneficial: '&aBeneficial'
       Harmful: '&cHarmful'
@@ -355,9 +352,6 @@ Messages:
     EnterName: '%prefix% &9> &aPlease enter the name of the entities in the Chat! (&f-&a removes the name)'
     NameSet: '%prefix% &9> &aThe name is now &f%name%&a!'
     NameCleared: '%prefix% &9> &aThe name was removed!'
-    EnterSearch: '%prefix% &9> &aPlease enter a part of the entity name in the Chat! (&f-&a clears the search)'
-    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aThe search was cleared!'
     Category:
       Hostile: '&cHostile'
       Passive: '&aPassive'
@@ -414,20 +408,6 @@ Messages:
   DangerZoneMenu:
     StopReason: '&cServer stop requested from Danger Zone menu.'
     RestartReason: '&6Server restart requested from Danger Zone menu.'
-  LanguageMigration:
-    Error:
-      NoLanguageFileSelected: '%prefix% &9> &cNo language file selected!'
-    Message:
-      NoEntriesSelected: '%prefix% &9> &cNo entries selected for migration!'
-      MigrationFailed: '%prefix% &9> &cMigration failed! Check console for errors.'
-      MigrationApplied: '%prefix% &9> &aMigration applied successfully!'
-  LanguageMigrator:
-    EntryEditMenu:
-      EnterFinalValue: '%prefix% &9> &aEnter the final value in chat.'
-      EnterFinalValueFormat: '&7Formats: &eInteger (123)&7, &eFloat (12.3)&7, &eBoolean (true/false)&7, &eList ([a,b,c])&7, &eString (text)&7. Type &ccancel &7to abort.'
-      FinalValueSet: '%prefix% &9> &aFinal value set to: &f%final_value%'
-      EditCancelled: '%prefix% &9> &cEdit cancelled.'
-      InvalidInput: '%prefix% &9> &cInvalid input! Using as string instead.'
   ToManyArguments: '&4Too many Arguments!'
   TooFewArguments: '&4Too few Arguments!'
   AdminPanelAdmin:
@@ -567,9 +547,6 @@ Messages:
   WorldSelect:
     # %search% = The Search Text, %world% = The World
     EnterImport: '%prefix% &9> &aPlease enter the folder name of the world in the Chat!'
-    EnterSearch: '%prefix% &9> &aPlease enter a part of the world name in the Chat! (&f-&a clears the search)'
-    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aThe search was cleared!'
     Teleported: '%prefix% &9> &aTeleported you to the spawn of &7%world%&a!'
     MainWorld: ' &7(main world)'
   WorldSettings:
@@ -596,10 +573,6 @@ Messages:
     Sent: '%prefix% &9> &aSent &7%target% &ato the main world!'
     Teleported: '%prefix% &9> &aTeleported you to &7%target%&a!'
   GameRuleMenu:
-    # %rule% = The Rule, %value% = The Value, %world% = The World, %search% = The Search Text
-    EnterSearch: '%prefix% &9> &aPlease enter a part of the rule name in the Chat! (&f-&a clears the search)'
-    SearchSet: '%prefix% &9> &aSearching for &7%search%&a!'
-    SearchCleared: '%prefix% &9> &aThe search was cleared!'
     EnterValue: '%prefix% &9> &aPlease enter the new value of &7%rule% &ain the Chat! (true or false, or a number)'
     NotAValue: '%prefix% &9> &cThat is not a value &7%rule% &ccan have!'
     ValueSet: '%prefix% &9> &a&7%rule% &ais now &f%value% &ain &7%world%&a!'
@@ -634,6 +607,88 @@ Messages:
     DownloadedAndReplaced: '&aThe new version for Plugin: %plugin% was downloaded automatically and the old one replaced! \n&aAnd the new version started automatically! If you can, please check the console for errors!'
     PlayerDownloadedToFolder: '&aThe new version was downloaded automatically and is located in the update folder!'
     PlayerDownloadedAndReplaced: '&aThe new version was downloaded automatically and the old version was automatically replaced! \n&aYou just need to reload the plugin via the Plugin Manager, /reload, /restart or /stop and start the server again.'
+  Permissions:
+    Command:
+      # %usage% = The correct syntax, %error% = What went wrong, %target% = The player, %group% = The group
+      Usage: '%prefix% &9> &cUsage: &f%usage%'
+      BadArgument: '%prefix% &9> &c%error%'
+      Error: '%prefix% &9> &cThat did not work: %error%'
+      NotReady: '%prefix% &9> &cThe permission manager is not running (it is still starting or Permissions.Enabled is false).'
+      NoEditPermission: '%prefix% &9> &cYou may look at this, but you may not change it.'
+      PlayerNotFound: '%prefix% &9> &cThe player &f%target% &chas never joined this server.'
+      PlayerOnly: '%prefix% &9> &cOnly a player can open a menu.'
+      GroupNotFound: '%prefix% &9> &cThere is no group &f%group%&c.'
+      # %permission% = The permission, %value% = true or false, %target% = The player or group, %extra% = End and world of the entry
+      Set: '%prefix% &9> &aSet &f%permission% &ato &f%value% &afor &f%target%%extra%&a.'
+      Unset: '%prefix% &9> &aRemoved &f%permission% &afrom &f%target%&a.'
+      UnsetMissing: '%prefix% &9> &c%target% has no entry &f%permission% &c(with that world).'
+      GroupAdded: '%prefix% &9> &f%target% &ais now in the group &f%group%%extra%&a.'
+      GroupRemoved: '%prefix% &9> &f%target% &ais no longer in the group &f%group%&a.'
+      GroupNotMember: '%prefix% &9> &c%target% is not in the group &f%group% &c(with that world).'
+      Cleared: '%prefix% &9> &aRemoved every entry of &f%target%&a.'
+      GroupCreated: '%prefix% &9> &aCreated the group &f%group%&a.'
+      GroupCreateFailed: '%prefix% &9> &cThe group &f%group% &ccould not be created. Names are 1 to 32 letters, digits, - or _ and must be new.'
+      GroupDeleted: '%prefix% &9> &aDeleted the group &f%group%&a.'
+      GroupDeleteFailed: '%prefix% &9> &cThe group &f%group% &ccannot be deleted (the default group stays).'
+      GroupCycle: '%prefix% &9> &cThat would make &f%group% &cinherit itself or the group does not exist.'
+      ParentAdded: '%prefix% &9> &f%group% &anow inherits from &f%parent%&a.'
+      ParentRemoved: '%prefix% &9> &f%group% &ano longer inherits from &f%parent%&a.'
+      ParentMissing: '%prefix% &9> &c%group% does not inherit from &f%parent%&c.'
+      WeightSet: '%prefix% &9> &aThe weight of &f%group% &ais now &f%weight%&a.'
+      MetaSet: '%prefix% &9> &aThe %kind% of &f%group% &ais now &f%text%&a.'
+      # %target% = The player, %groups% = Groups, %prefix% = Chat prefix, %suffix% = Chat suffix
+      UserHeader: '&6&l%target% &7- groups: &f%groups% &7- prefix: &f%prefix% &7- suffix: &f%suffix%'
+      EntryLine: '&8- %entry%'
+      GroupLine: '&8- &bgroup &f%entry%'
+      ParentLine: '&8- &binherits &f%entry%'
+      NoEntries: '&7No entries.'
+      Problem: '&c! %problem%'
+      Remaining: '%time% left'
+      # %result% = true, false or not set
+      CheckResult: '%prefix% &9> &f%target% &7has &f%permission%&7: %result%'
+      ExplainBukkit: '&7The server says: %result%'
+      ExplainNone: '&7No entry mentions this permission, so the default of the permission applies.'
+      ExplainLine: '%mark% &f%source% &7says %entry%'
+      GroupsHeader: '&6Groups (%count%), heaviest first:'
+      GroupsLine: '&8- &f%group% &7weight %weight%, %entries% entries'
+      GroupHeader: '&6&lGroup %group% &7- weight: &f%weight% &7- display name: &f%display% &7- prefix: &f%prefix% &7- suffix: &f%suffix%'
+      MembersHeader: '&6Members of %group% that are loaded (%count%):'
+      MembersLine: '&8- &f%member% &7%entry%'
+      SearchHeader: '&6Permissions matching &f%query% &6(%count%):'
+      SearchLine: '&8- &f%permission%&7%description%'
+      SearchEmpty: '%prefix% &9> &cNo permission matches &f%query%&c.'
+      JournalOff: '%prefix% &9> &cThe journal is turned off (Journal.Enabled in the config).'
+      AuditEmpty: '%prefix% &9> &7No permission changes found.'
+      AuditHeader: '&6Latest permission changes (%count%):'
+      AuditLine: '&8%time% &f%actor% &6%action% &f%target% &7%details%'
+      Exported: '%prefix% &9> &aWrote %groups% groups and %users% players to &fplugins/Admin-Panel/permission-exports/%file%&a.'
+      ExportFailed: '%prefix% &9> &cCould not export: %error%'
+      ImportMissing: '%prefix% &9> &cThere is no file &f%file% &cin permission-exports.'
+      Imported: '%prefix% &9> &aImported %groups% groups, %users% players and %entries% entries from &f%file%&a.'
+      ImportFailed: '%prefix% &9> &cCould not import: %error%'
+      Reloaded: '%prefix% &9> &aThe permission groups are read again and everyone is applied.'
+    Menu:
+      PromptPlayer: '%prefix% &9> &aType the name of the player in the chat (cancel aborts).'
+      PromptGroupName: '%prefix% &9> &aType the name of the new group in the chat (cancel aborts).'
+      PromptPermission: '%prefix% &9> &aType the permission, then if you like false, a duration like 7d and world=name, for example: essentials.fly 7d world=nether'
+      PromptGroup: '%prefix% &9> &aType the group, then if you like a duration and world=name, for example: vip 30d'
+      PromptDuration: '%prefix% &9> &aType how long the entry lasts, for example 7d or 2h. Type permanent for no end.'
+      PromptWorld: '%prefix% &9> &aType the world the entry is limited to. Type - for every world.'
+      PromptWeight: '%prefix% &9> &aType the new weight as a number. The heavier group wins.'
+      PromptText: '%prefix% &9> &aType the new text, colors with &. Type - to clear it.'
+      NotANumber: '%prefix% &9> &cThat is not a number.'
+      ConfirmDelete: '&cDelete this group? Members lose it.'
+      BrowseName: '%prefix% &9> &7Permission: &f%permission%'
+  Journal:
+    # %page% = The page, %pages% = The number of pages, %total% = The number of entries
+    Header: '%prefix% &9> &6Admin journal &7(page %page%/%pages%, %total% entries)'
+    # %id% = The number of the entry, %time% = When, %actor% = Who did it, %action% = What, %target% = To whom, %details% = More
+    Line: '&8#%id% &7%time% &f%actor% &6%action% &f%target% &7%details%'
+    Empty: '%prefix% &9> &cThe journal has no entries.'
+    NotEnabled: '%prefix% &9> &cThe journal is turned off (Journal.Enabled in the config).'
+    NotANumber: '%prefix% &9> &cThat is not a page number.'
+    Exported: '%prefix% &9> &aExported %count% entries to &f%file%&a.'
+    ExportFailed: '%prefix% &9> &cCould not export the journal: %error%'
   StartupStatus:
     # %feature% = The Part, %reason% = Why, %count% = How many, %status% = The Status, %stage% = The Part, %detail% = The Reason
     Unavailable: '%prefix% &9> &c%feature% is unavailable: &7%reason%'
@@ -657,6 +712,7 @@ Messages:
       vault: 'Vault economy'
       config: 'Config files'
       warnings: 'Warning system'
+      journal: 'Admin journal'
       trolls: 'Trolls'
       permissions: 'Permissions manager'
       prefix: 'Prefix'
@@ -685,6 +741,177 @@ Messages:
     # %permission% = The Name, %default% = The Default, %description% = The Description, %children% = The Children, %permissibles% = Who has it
     Info: '&6Name: &a%permission%\n&6Default: &a%default%\n&6Description: &a%description%\n&6Children: &a%children%\n&6Permissibles: &a%permissibles%'
 Items:
+  PermissionManager:
+    Hub:
+      Players:
+        material: PLAYER_HEAD
+        displayName: '&aPlayers'
+        lore:
+          - '&7Everyone who is online or has entries.'
+          - '&7Open a player to change permissions and groups.'
+      Groups:
+        material: CHEST
+        displayName: '&6Groups'
+        lore:
+          - '&7Create groups, set their weight, parents'
+          - '&7and permissions.'
+      Browse:
+        material: BOOKSHELF
+        displayName: '&bAll permissions'
+        lore:
+          - '&7Every permission of every plugin,'
+          - '&7with description and default. Use the search.'
+      Audit:
+        material: WRITABLE_BOOK
+        displayName: '&ePermission changes'
+        lore:
+          - '&7Who changed which permission or group, and when.'
+      Reload:
+        material: REDSTONE
+        displayName: '&cReload'
+        lore:
+          - '&7Reads the groups again and applies everyone.'
+    Players:
+      Entry:
+        material: PLAYER_HEAD
+        displayName: '&a%target%'
+        lore:
+          - '&7Groups: &f%groups%'
+          - '&7Entries: &f%entries%'
+          - '&7Online: &f%online%'
+          - '&eClick: &7Open the entries'
+      Lookup:
+        material: COMPASS
+        displayName: '&bFind a player'
+        lore:
+          - '&7Type a name in the chat.'
+    Groups:
+      Entry:
+        material: CHEST
+        displayName: '&6%group%'
+        lore:
+          - '&7Weight: &f%weight%'
+          - '&7Display name: &f%display%'
+          - '&7Entries: &f%entries%'
+          - '&7Members loaded: &f%members%'
+          - '&eClick: &7Open the group'
+      Create:
+        material: LIME_CONCRETE
+        displayName: '&aNew group'
+        lore:
+          - '&7Type the name in the chat.'
+    Group:
+      Info:
+        material: CHEST
+        displayName: '&6%group%'
+        lore:
+          - '&7Weight: &f%weight%'
+          - '&7Display name: &f%display%'
+          - '&7Prefix: &f%prefix%'
+          - '&7Suffix: &f%suffix%'
+          - '&7Entries: &f%entries%'
+      Entries:
+        material: BOOK
+        displayName: '&bEntries and parents'
+        lore:
+          - '&7Permissions of the group and the groups it inherits from.'
+      Weight:
+        material: ANVIL
+        displayName: '&eWeight: &f%weight%'
+        lore:
+          - '&7The heavier group wins when two groups disagree.'
+      Prefix:
+        material: NAME_TAG
+        displayName: '&ePrefix: &f%prefix%'
+        lore:
+          - '&7Shown before the name in the chat.'
+      Suffix:
+        material: NAME_TAG
+        displayName: '&eSuffix: &f%suffix%'
+        lore:
+          - '&7Shown after the name in the chat.'
+      Display:
+        material: OAK_SIGN
+        displayName: '&eDisplay name: &f%display%'
+        lore:
+          - '&7A nicer name for lists.'
+      Delete:
+        material: RED_CONCRETE
+        displayName: '&cDelete the group'
+        lore:
+          - '&7Members lose the group.'
+    Entries:
+      AddPermission:
+        material: LIME_CONCRETE
+        displayName: '&aAdd a permission'
+        lore:
+          - '&7Type it in the chat, for example:'
+          - '&fessentials.fly 7d world=nether'
+      AddGroup:
+        material: CYAN_CONCRETE
+        displayName: '&bAdd to a group'
+        lore:
+          - '&7Type the group and if you like a duration.'
+      AddParent:
+        material: CYAN_CONCRETE
+        displayName: '&bAdd a parent group'
+        lore:
+          - '&7The group then has everything the parent has.'
+      UserInfo:
+        material: PLAYER_HEAD
+        displayName: '&6%subject%'
+        lore:
+          - '&7Groups: &f%groups%'
+          - '&7Prefix: &f%prefix%'
+          - '&7Suffix: &f%suffix%'
+      Entry:
+        Allow:
+          material: LIME_DYE
+          displayName: '&a%permission%'
+          lore:
+            - '&7Allowed'
+            - '&7Ends: &f%expires%'
+            - '&7World: &f%context%'
+            - '&eLeft: &7Deny    &eRight: &7Remove'
+            - '&eShift-Left: &7Set duration'
+            - '&eShift-Right: &7Set world'
+        Deny:
+          material: RED_DYE
+          displayName: '&c%permission%'
+          lore:
+            - '&7Denied'
+            - '&7Ends: &f%expires%'
+            - '&7World: &f%context%'
+            - '&eLeft: &7Allow    &eRight: &7Remove'
+            - '&eShift-Left: &7Set duration'
+            - '&eShift-Right: &7Set world'
+        Group:
+          material: CHEST
+          displayName: '&bGroup &f%permission%'
+          lore:
+            - '&7Ends: &f%expires%'
+            - '&7World: &f%context%'
+            - '&eRight: &7Remove'
+            - '&eShift-Left: &7Set duration'
+            - '&eShift-Right: &7Set world'
+        Parent:
+          material: ENDER_CHEST
+          displayName: '&bInherits &f%permission%'
+          lore:
+            - '&7Ends: &f%expires%'
+            - '&7World: &f%context%'
+            - '&eRight: &7Remove'
+            - '&eShift-Left: &7Set duration'
+            - '&eShift-Right: &7Set world'
+    Browse:
+      Entry:
+        material: PAPER
+        displayName: '&f%permission%'
+        lore:
+          - '&7%description%'
+          - '&7Default: &f%default%'
+          - '&7Children: &f%children%'
+          - '&eClick: &7Write the name to the chat'
   General:
     ConfirmationMenu:
       Confirm:
@@ -1490,14 +1717,6 @@ Items:
           lore:
             - '&7Blindness and Nausea for 10 seconds'
             - '&eClick to give it to the player'
-      Search:
-        material: OAK_SIGN
-        displayName: '&aSearch'
-        # %search% = The current Search Text
-        lore:
-          - '&7Current: &f%search%'
-          - '&eLeft-Click: &7Type a search in the chat'
-          - '&eRight-Click: &7Clear the search'
       Filter:
         All:
           material: HOPPER
@@ -1588,14 +1807,6 @@ Items:
           lore:
             - '&7The entities spawn without a rider'
             - '&eClick to switch on'
-      Search:
-        material: OAK_SIGN
-        displayName: '&aSearch'
-        # %search% = The current Search Text
-        lore:
-          - '&7Current: &f%search%'
-          - '&eLeft-Click: &7Type a search in the chat'
-          - '&eRight-Click: &7Clear the search'
       Filter:
         All:
           material: HOPPER
@@ -1969,13 +2180,6 @@ Items:
         - '&7Loads a world folder of the server folder'
         - '&eClick to type the folder name'
     Select:
-      Search:
-        material: COMPASS
-        displayName: '&aSearch'
-        lore:
-          - '&7Search: &f%search%'
-          - '&eLeft-Click: &7Type a search'
-          - '&eRight-Click: &7Clear the search'
       Filter:
         ALL:
           material: HOPPER
@@ -2011,13 +2215,6 @@ Items:
           - ''
           - '&eClick: &7Load this world'
     GameRuleMenu:
-      Search:
-        material: COMPASS
-        displayName: '&aSearch'
-        lore:
-          - '&7Search: &f%search%'
-          - '&eLeft-Click: &7Type a search'
-          - '&eRight-Click: &7Clear the search'
       Filter:
         All:
           material: HOPPER
@@ -2133,6 +2330,12 @@ Items:
           - '&eClick: &7Teleport to the player'
           - '&eRight-Click: &7Send to the main world'
   StartMenu:
+    PermissionManager:
+      material: SHIELD
+      displayName: '&6Permission Manager'
+      lore:
+        - '&7Groups, weights, temporary and per-world'
+        - '&7permissions, and the log of changes.'
     SwitchLanguageMenuItem:
       material: BLUE_WOOL
       displayName: '&aChange the language temporarily'
@@ -2626,117 +2829,15 @@ Items:
             - '&aCurrent File Logging Prefix:'
             - '&6%apdataclient_file_logging_prefix%'
             - '&aClick to change the File Logging Prefix!'
-  LanguageMigration:
-    Migration:
-      MigrationItem:
-        material: PAPER
-        displayName: '&6%key%'
-        lore:
-          - '&7Status: &e%migration_status%'
-          - ''
-          - '&7User Value:'
-          - '&f%user_value%'
-          - ''
-          - '&7Resource Value:'
-          - '&f%resource_value%'
-          - ''
-          - '&eClick to edit this entry!'
-      FilterItem:
-        material: HOPPER
-        displayName: '&6Filter Mode'
-        lore:
-          - '&7Current: &e%status_filter_mode%'
-          - ''
-          - '%selected_all_filter%'
-          - '%selected_changed_only_filter%'
-          - '%selected_unchanged_only_filter%'
-          - '%selected_missing_only_filter%'
-          - ''
-          - '&eClick to cycle filter modes!'
-      ApplyChanges:
-        material: EMERALD
-        displayName: '&aApply Changes'
-        lore:
-          - '&7Total entries: &e%total_migration_count%'
-          - '&7Filtered: &e%filtered_migration_count%'
-          - '&7Applied: &a%actually_applied_migration_count%'
-          - ''
-          - '&eClick to apply selected changes!'
-  LanguageMigrator:
-    EntryEditMenu:
-      Name:
-        material: NAME_TAG
-        displayName: '&6Entry: %migration_entry_name%'
-        lore:
-          - '&7Status: &e%migration_entry_status%'
-      KeepUserValue:
-        material: GREEN_WOOL
-        displayName: '&aKeep User Value'
-        lore:
-          - '&7Current user value:'
-          - '&f%migration_entry_user_value%'
-          - ''
-          - '&eClick to preview'
-          - '&eShift-click to apply!'
-      KeepResourceValue:
-        material: BLUE_WOOL
-        displayName: '&9Keep Resource Value'
-        lore:
-          - '&7Resource value:'
-          - '&f%migration_entry_resource_value%'
-          - ''
-          - '&eClick to preview'
-          - '&eShift-click to apply!'
-      DeleteEntryFromFile:
-        material: RED_WOOL
-        displayName: '&cDelete Entry'
-        lore:
-          - '&7Remove this entry from'
-          - '&7the language file.'
-          - ''
-          - '&eClick to preview'
-          - '&eShift-click to apply!'
-      KeepRemovedFromFile:
-        material: BARRIER
-        displayName: '&cKeep Removed'
-        lore:
-          - '&7Keep this entry removed'
-          - '&7from the file.'
-          - ''
-          - '&eClick to preview'
-          - '&eShift-click to apply!'
-      EditFinalValue:
-        material: WRITABLE_BOOK
-        displayName: '&6Edit Custom Value'
-        lore:
-          - '&7Enter a custom value'
-          - '&7in chat.'
-          - ''
-          - '&7Supports:'
-          - '&8• &7Integers (123)'
-          - '&8• &7Floats (123.45)'
-          - '&8• &7Booleans (true/false)'
-          - '&8• &7Lists ([item1, item2])'
-          - '&8• &7Strings (any text)'
-          - ''
-          - '&eClick to edit!'
-      FinalValueDisplay:
-        material: PAPER
-        displayName: '&aFinal Value Preview'
-        lore:
-          - '&7This is what will be saved:'
-          - '&f%migration_entry_final_value%'
-      Close:
-        material: EMERALD_BLOCK
-        displayName: '&aConfirm & Close'
-        lore:
-          - '&7Save the final value and'
-          - '&7return to migration menu.'
-          - ''
-          - '&7Tip: Press ESC to cancel'
-          - '&7without saving changes.'
-          - ''
-          - '&eClick to confirm!'
+  Journal:
+    Entry:
+      material: PAPER
+      displayName: '&6%action% &f%target%'
+      lore:
+        - '&7By: &f%actor%'
+        - '&7When: &f%time%'
+        - '&7Details: &f%details%'
+        - '&8#%id%'
   StartupStatus:
     Entry:
       OK:
@@ -2777,6 +2878,14 @@ Items:
         - '&7Reason: &f%reason%'
         - '&eClick to show it in the chat'
 MenuTitles:
+  PermissionManager:
+    Hub: '&6Permission Manager'
+    Players: '&aPermissions: Players'
+    Groups: '&6Permissions: Groups'
+    Group: '&6Group: %group%'
+    Entries: '&aEntries: %subject%'
+    Browse: '&bAll permissions'
+    Audit: '&ePermission changes'
   StartMenu: '&4&lAdmin-Panel'
   DangerZoneMenu: '&4Danger Zone'
   SwitchLanguageMenu: '&aLanguages'
@@ -2827,10 +2936,7 @@ MenuTitles:
       Settings: '&3Settings'
   DataClientMainMenu: '&aData Client'
   DataClientSettingsMenu: '&aData Client Settings'
-  LanguageMigration:
-    Migration: '&6Language Migration'
-  LanguageMigrator:
-    EntryEditMenu: '&6Edit: %migration_entry_name%'
   Misc:
     ConfirmationMenu: '&aConfirmation Menu'
+  Journal: '&6Admin Journal'
   StartupStatus: '&cStartup Status'

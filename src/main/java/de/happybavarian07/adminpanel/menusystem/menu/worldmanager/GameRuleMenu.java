@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.worldmanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.commands.CommandText;
 import de.happybavarian07.adminpanel.events.NotAPanelEventException;
 import de.happybavarian07.adminpanel.events.world.MenuGameruleChangeEvent;
@@ -71,7 +72,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         List<GameRule<?>> entries = allRules.stream()
                 .filter(rule -> category == null || GameRuleCategory.of(GameRules.nameOf(rule)) == category)
                 .toList();
-        setSearchSlot(getSlot(PATH + "Search", 6));
+        setSearchSlot(6);
         setPaginatedData(entries, this::getPageItem, this::handleEntryClick);
         int perPage = getPaginatedItemSlots().length;
         if (perPage > 0) page = Math.min(page, Math.max(0, (paginatedData.size() - 1) / perPage));
@@ -133,6 +134,7 @@ public class GameRuleMenu extends PaginatedMenu<GameRule<?>> {
         }
         if (event.isCancelled()) return;
         world.setGameRule((GameRule) rule, next);
+        AdminJournal.log(staff, "GAMERULE", world.getName(), GameRules.nameOf(rule) + ": " + current + " -> " + next);
         CommandText.send(lgm, staff, "GameRuleMenu.ValueSet", "%rule%", GameRules.nameOf(rule), "%value%", next, "%world%", world.getName());
         open();
     }

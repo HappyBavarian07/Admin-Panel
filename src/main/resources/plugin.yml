@@ -178,6 +178,28 @@ permissions:
           AdminPanel.AdminPanelAdminCommands.StartUpLoggerControl: true
           AdminPanel.AdminPanelAdminCommands.StaffChat: true
           AdminPanel.AdminPanelAdminCommands.Status: true
+      AdminPanel.Permissions:
+        description: Use the permission manager (/perms and its menus)
+        default: op
+        children:
+          AdminPanel.Permissions.Command: true
+          AdminPanel.Permissions.Menu: true
+          AdminPanel.Permissions.User: true
+          AdminPanel.Permissions.User.Edit: true
+          AdminPanel.Permissions.Group: true
+          AdminPanel.Permissions.Group.Edit: true
+          AdminPanel.Permissions.Check: true
+          AdminPanel.Permissions.Search: true
+          AdminPanel.Permissions.Audit: true
+          AdminPanel.Permissions.Export: true
+          AdminPanel.Permissions.Import: true
+          AdminPanel.Permissions.Reload: true
+      AdminPanel.Journal:
+        description: See and export the admin journal
+        default: op
+        children:
+          AdminPanel.Journal.View: true
+          AdminPanel.Journal.Export: true
       AdminPanel.PluginManager.*:
         default: op
         children:
@@ -383,12 +405,3 @@ permissions:
                     default: op
                   AdminPanel.PlayerManager.PlayerSettings.Actions.PlayerSpawnLocation:
                     default: op
-      AdminPanel.LanguageMigration:
-        default: op
-        children:
-          AdminPanel.LanguageMigration.Open:
-            description: Open the language migration UI
-            default: op
-          AdminPanel.LanguageMigration.Apply:
-            description: Apply selected language migration changes
-            default: op

@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.menusystem.menu;
 import de.happybavarian07.coolstufflib.languagemanager.PlaceholderType;
 import de.happybavarian07.adminpanel.startup.Startup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
+import de.happybavarian07.adminpanel.menusystem.menu.permissionmanager.PermissionHubMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.playermanager.PlayerSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.pluginmanager.PluginSelectMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.servermanager.DangerZoneMenu;
@@ -96,7 +97,17 @@ public class AdminPanelStartMenu extends Menu {
                 new PluginSelectMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p), this).open();
             }).requires("AdminPanel.PluginManager.open"), null);
 
-        registerButton(getSlot(path + "ServerManager", 16), 
+        registerButton(getSlot(path + "PermissionManager", 14),
+            lgm.getItem(path + "PermissionManager", player, false),
+            MenuAction.of((p, e) -> {
+                if (!AdminPanelMain.getPlugin().getPermissionService().isReady()) {
+                    p.sendMessage(lgm.getMessage("Permissions.Command.NotReady", p, true));
+                    return;
+                }
+                new PermissionHubMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();
+            }).requires(PermissionHubMenu.PERMISSION), null);
+
+        registerButton(getSlot(path + "ServerManager", 16),
             lgm.getItem(path + "ServerManager", player, false), 
             MenuAction.of((p, e) -> {
                 new ServerManagerMenu(AdminPanelMain.getAPI().getPlayerMenuUtility(p)).open();

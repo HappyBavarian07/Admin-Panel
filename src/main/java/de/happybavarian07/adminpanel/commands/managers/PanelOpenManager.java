@@ -3,6 +3,7 @@ package de.happybavarian07.adminpanel.commands.managers;/*
  * @Date 27.04.2022 | 17:07
  */
 
+import de.happybavarian07.adminpanel.menusystem.menu.JournalMenu;
 import de.happybavarian07.adminpanel.menusystem.menu.StartupStatusMenu;
 import de.happybavarian07.adminpanel.commands.subcommands.panels.MenuOpenCommand;
 import de.happybavarian07.adminpanel.menusystem.menu.AdminPanelStartMenu;
@@ -107,6 +108,8 @@ public class PanelOpenManager extends CommandManager {
                 AdminPanelStartMenu::new));
         registerSubCommand(new MenuOpenCommand(getCommandName(), "StartupStatusMenu", StartupStatusMenu.PERMISSION,
                 StartupStatusMenu::new));
+        registerSubCommand(new MenuOpenCommand(getCommandName(), "JournalMenu", JournalMenu.PERMISSION,
+                JournalMenu::new));
         registerSubCommand(new MenuOpenCommand(getCommandName(), "TempLanguageSelectMenu", "AdminPanel.SwitchLanguage",
                 pmu -> new TempLanguageSelectMenu(pmu, null)));
     }

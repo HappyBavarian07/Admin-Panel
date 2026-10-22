@@ -1,5 +1,6 @@
 package de.happybavarian07.adminpanel.menusystem.menu.playermanager;
 
+import de.happybavarian07.adminpanel.journal.AdminJournal;
 import de.happybavarian07.adminpanel.menusystem.menu.FeatureGate;
 import de.happybavarian07.adminpanel.utils.AttributeLookup;
 import de.happybavarian07.adminpanel.main.AdminPanelMain;
@@ -173,6 +174,7 @@ public class PlayerActionsMenu extends Menu {
                 }
                 p.sendMessage(lgm.getMessage("Player.PlayerManager.OppedMessage", p, true));
                 target.setOp(true);
+                AdminJournal.log(p, "OP", target.getName(), "");
             }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Op"));
 
         // Fifth Row
@@ -189,6 +191,7 @@ public class PlayerActionsMenu extends Menu {
                 }
                 p.sendMessage(lgm.getMessage("Player.PlayerManager.DeoppedMessage", p, true));
                 target.setOp(false);
+                AdminJournal.log(p, "DEOP", target.getName(), "");
             }).requires("AdminPanel.PlayerManager.PlayerSettings.Actions.Deop"));
 
         registerButton(getSlot(path + "Armor", 51), lgm.getItem(path + "Armor", target, false),

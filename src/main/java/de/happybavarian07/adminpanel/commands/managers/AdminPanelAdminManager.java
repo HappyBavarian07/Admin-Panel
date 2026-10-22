@@ -100,5 +100,7 @@ public class AdminPanelAdminManager extends CommandManager {
         registerSubCommand(new PermissionMenuHelpCommand(getCommandName()));
         registerSubCommand(new StaffChatCommand(getCommandName()));
         registerSubCommand(new StartupStatusCommand(getCommandName()));
+        registerSubCommand(new JournalCommand(getCommandName()));
+        registerSubCommand(new JournalExportCommand(getCommandName()));
     }
 }

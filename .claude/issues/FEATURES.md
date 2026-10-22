@@ -11,25 +11,28 @@ and delete it here. Rechecked against the code on 2026-10-01; the old items abou
    stages that return success or failure, so a failed optional part (Vault, SuperVanish, bungee sync, addons, updater)
    disables only its own menus and commands instead of the whole plugin. Largest robustness gain; also the biggest
    change. Folds in the old "graceful degradation" idea (a capability registry the menus ask before showing a button).
-2. **Config schema validation** — validate `config.yml` and `database.properties` keys and types at startup, warn on
-   unknown keys, report missing ones (would have caught the old MySQL key mismatch). Never write to `config.yml`;
-   report only.
+2. **Config schema validation** — `config.yml` is checked at startup (`ConfigValidator`, shipped 2026-10-22). Still open:
+   `database.properties`, which would have caught the old MySQL key mismatch.
 3. **Async policy for the sync layer** — the proxy socket reader and packet handler still run on raw threads in
    `ConnectionHandler` and `PacketHandler`; give them an owner that stops them on disable.
 
 ## Data & diagnostics
 
-4. **Admin action journal + export** — append-only table of moderation and admin actions (who, what, target, when)
-   with a CSV export, viewable in a menu. Own database table.
+4. **Admin action journal + export** — shipped 2026-10-22 (`journal` package, table `admin_actions`, `JournalMenu`, CSV
+   export). Hooked so far: bans, unbans, kicks, warnings, op, whitelist, permissions, gamerules, plugin install, server
+   stop and restart. Not hooked yet: troll toggles, world create/delete/import/settings, maintenance mode, plugin
+   enable/disable/unload, language switches, data client actions, addon actions.
 5. **Database migration command** — `/adminpanel migrate <sqlite|mysql>` with dry run and progress, built on the
    CoolStuffLib JPA layer (the old DataService migration util is gone).
 
 ## Permissions & moderation
 
-6. **Permission groups with inheritance** — group profiles merged with per-player entries at resolution time. The
-   `PermissionGroup` class under `menusystem/menu/playermanager/permissions/utils` only builds the display tree today.
-7. **Permission audit trail** — who changed which node and when, viewable in the permission menu; can share the journal
-   table of item 4.
+6. **Permission groups with inheritance** — shipped in 9.0.0 as the permission manager (`permissions/` package, `/perms`,
+   `menusystem/menu/permissionmanager`): groups with weights and parents, temporary and per-world entries, prefixes,
+   explain, export and import, optional Vault provider. Still open: a context provider for regions, a web editor, and
+   syncing groups between servers (the data client only syncs per-player permissions).
+7. **Permission audit trail** — shipped: every change is a journal entry (`PERMISSION_*`, `GROUP_*`, `USER_*`), `/perms audit`
+   and the audit menu show only those. Still open: the history of one node as its own view.
 
 ## UX
 
